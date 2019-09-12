@@ -1,3 +1,6 @@
+**THIS REPO (openMF/incubator-fineract) IS ARCHIVED, PLEASE USE & CONTRIBUTE TO [apache/fineract](https://github.com/apache/fineract) INSTEAD.**
+
+
 Apache Fineract: A Platform for Microfinance
 ============
 
