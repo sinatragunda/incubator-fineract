@@ -33,6 +33,8 @@ public class SQLInjectionValidator {
 	private final static String SQL_PATTERN = "[a-zA-Z_=,\\-'!><.?\"`% ()0-9*\n\r]*";
 
 	public final static void validateSQLInput(final String sqlSearch) {
+
+	
 		String lowerCaseSQL = sqlSearch.toLowerCase();
 		for (String ddl : DDL_COMMANDS) {
 			if (lowerCaseSQL.contains(ddl)) {
@@ -40,18 +42,23 @@ public class SQLInjectionValidator {
 			}
 		}
 
+	
 		for (String dml : DML_COMMANDS) {
 			if (lowerCaseSQL.contains(dml)) {
 				throw new SQLInjectionException();
 			}
 		}
 
+
+		
 		for (String comments : COMMENTS) {
 			if (lowerCaseSQL.contains(comments)) {
 				throw new SQLInjectionException();
 			}
 		}
 
+
+	
 		//Removing the space before and after '=' operator 
 		//String s = "          \"              OR 1    =    1"; For the cases like this
 		boolean injectionFound = false;
@@ -104,6 +111,8 @@ public class SQLInjectionValidator {
 				}
 			}
 		}
+
+
 		if (injectionFound) {
 			throw new SQLInjectionException();
 		}

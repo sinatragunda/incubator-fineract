@@ -56,6 +56,8 @@ public class ShareProductDividendAssembler {
             final LocalDate dividendPeriodStartDate, final LocalDate dividendPeriodEndDate) {
 
         ShareProductData product = (ShareProductData) this.shareProductReadPlatformService.retrieveOne(productId, false);
+        BigDecimal dividendLowerLimit = product.getDividendLowerLimit();
+
         MonetaryCurrency currency = new MonetaryCurrency(product.getCurrency().code(), product.getCurrency().decimalPlaces(), product
                 .getCurrency().currencyInMultiplesOf());
         Collection<ShareAccountData> shareAccountDatas = this.ShareAccountReadPlatformService.retrieveAllShareAccountDataForDividends(
@@ -69,6 +71,7 @@ public class ShareProductDividendAssembler {
         if(product.getMinimumActivePeriod() != null) { //minimum active period may be null 
             minimumActivePeriod = product.getMinimumActivePeriod();
         }
+
         final Map<Long, Long> numberOfSharesdaysPerAccount = new HashMap<>();
         long numberOfShareDays = calculateNumberOfShareDays(dividendPeriodEndDate, dividendPeriodStartDate, minimumActivePeriod,
                 shareAccountDatas, numberOfSharesdaysPerAccount);
@@ -77,9 +80,16 @@ public class ShareProductDividendAssembler {
             double amountPerShareDay = amount.doubleValue() / numberOfShareDays;
             productDividendPayOutDetails = new ShareProductDividendPayOutDetails(productId, Money.of(currency, amount).getAmount(),
                     dividendPeriodStartDate.toDate(), dividendPeriodEndDate.toDate());
+            
             for (ShareAccountData accountData : shareAccountDatas) {
+
                 long numberOfShareDaysPerAccount = numberOfSharesdaysPerAccount.get(accountData.getId());
                 double amountForAccount = numberOfShareDaysPerAccount * amountPerShareDay;
+                
+                if(dividendLowerLimit.doubleValue() > amountForAccount){
+                    continue ;
+                }
+
                 final Money accountAmount = Money.of(currency, BigDecimal.valueOf(amountForAccount));
                 ShareAccountDividendDetails dividendDetails = new ShareAccountDividendDetails(accountData.getId(),
                         accountAmount.getAmount());

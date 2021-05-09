@@ -65,4 +65,11 @@ public interface ShareProductApiConstants {
 
     String accountingRuleParamName = "accountingRule";
 
+    /// added 03/11/2020
+    String propertyTypeParam = "propertyType";
+    String monthlyDepositParam = "monthlyDeposit";
+
+    /// added 16/04/2021
+    String dividendLowerLimitParam = "dividendLowerLimit";
+
 }

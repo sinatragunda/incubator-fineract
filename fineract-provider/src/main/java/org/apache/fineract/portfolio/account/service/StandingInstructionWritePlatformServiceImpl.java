@@ -16,6 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+    Change log
+    01/27/2021
+        SettlementInstructionsHelper : (phase a)
+
+    02/26/2021
+        phase a1 ::: Some line was returning the orignal due for loan repayment so we had to bypass that line so that we are able to get savings account balance
+
+*/
 package org.apache.fineract.portfolio.account.service;
 
 import static org.apache.fineract.portfolio.account.AccountDetailConstants.fromAccountTypeParamName;
@@ -67,6 +76,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+
+import org.apache.fineract.portfolio.account.helper.SettlementInstructionsHelper;
+
 @Service
 public class StandingInstructionWritePlatformServiceImpl implements StandingInstructionWritePlatformService {
 
@@ -79,6 +92,7 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
     private final StandingInstructionReadPlatformService standingInstructionReadPlatformService;
     private final AccountTransfersWritePlatformService accountTransfersWritePlatformService;
     private final JdbcTemplate jdbcTemplate;
+    private final SettlementInstructionsHelper settlementInstructionsHelper ;
 
     @Autowired
     public StandingInstructionWritePlatformServiceImpl(final StandingInstructionDataValidator standingInstructionDataValidator,
@@ -86,7 +100,7 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
             final AccountTransferDetailRepository accountTransferDetailRepository,
             final StandingInstructionRepository standingInstructionRepository,
             final StandingInstructionReadPlatformService standingInstructionReadPlatformService,
-            final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final RoutingDataSource dataSource) {
+            final AccountTransfersWritePlatformService accountTransfersWritePlatformService, final RoutingDataSource dataSource ,final SettlementInstructionsHelper settlementInstructionsHelper) {
         this.standingInstructionDataValidator = standingInstructionDataValidator;
         this.standingInstructionAssembler = standingInstructionAssembler;
         this.accountTransferDetailRepository = accountTransferDetailRepository;
@@ -94,6 +108,7 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
         this.standingInstructionReadPlatformService = standingInstructionReadPlatformService;
         this.accountTransfersWritePlatformService = accountTransfersWritePlatformService;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.settlementInstructionsHelper = settlementInstructionsHelper ;
     }
 
     @Transactional
@@ -220,8 +235,17 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
 
             }
             BigDecimal transactionAmount = data.amount();
+
+            // phase code a 
+
+            long loanId = data.toAccount().accountId();
+            long savingsAccountId = data.fromAccount().accountId();
+
+            settlementInstructionsHelper.init(loanId ,savingsAccountId);
+
             if (data.toAccountType().isLoanAccount()
                     && (recurrenceType.isDuesRecurrence() || (isDueForTransfer && instructionType.isDuesAmoutTransfer()))) {
+
                 StandingInstructionDuesData standingInstructionDuesData = this.standingInstructionReadPlatformService
                         .retriveLoanDuesData(data.toAccount().accountId());
                 if (data.instructionType().isDuesAmoutTransfer()) {
@@ -232,10 +256,36 @@ public class StandingInstructionWritePlatformServiceImpl implements StandingInst
                 }
             }
 
+
+            if(settlementInstructionsHelper.isAdjustSettlementAmount()){
+                ///this where we get to change that lots of stuff 
+                transactionAmount = settlementInstructionsHelper.getTransactionAmount(transactionAmount);
+            }
+
+            /// phase a over 
+
+            if (data.toAccountType().isLoanAccount()
+                    && (recurrenceType.isDuesRecurrence() || (isDueForTransfer && instructionType.isDuesAmoutTransfer()))) {
+                StandingInstructionDuesData standingInstructionDuesData = this.standingInstructionReadPlatformService
+                        .retriveLoanDuesData(data.toAccount().accountId());
+                if (data.instructionType().isDuesAmoutTransfer()) {
+                    //System here we should check some amounts as usual and make sure it takes the transaction amount for partial payments
+                    //transactionAmount = standingInstructionDuesData.totalDueAmount();
+                    /// new change 25/02/2021 phase a1
+                    if(!settlementInstructionsHelper.isAdjustSettlementAmount()){
+                        transactionAmount = standingInstructionDuesData.totalDueAmount();
+                    }
+                }
+                if (recurrenceType.isDuesRecurrence()) {
+                    isDueForTransfer = new LocalDate().equals(standingInstructionDuesData.dueDate());
+                }
+            }
+
             if (isDueForTransfer && transactionAmount != null && transactionAmount.compareTo(BigDecimal.ZERO) > 0) {
                 final SavingsAccount fromSavingsAccount = null;
                 final boolean isRegularTransaction = true;
                 final boolean isExceptionForBalanceCheck = false;
+
                 AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, transactionAmount, data.fromAccountType(),
                         data.toAccountType(), data.fromAccount().accountId(), data.toAccount().accountId(), data.name()
                                 + " Standing instruction trasfer ", null, null, null, null, data.toTransferType(), null, null, data

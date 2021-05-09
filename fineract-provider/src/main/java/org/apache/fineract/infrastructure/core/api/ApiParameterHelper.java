@@ -16,6 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+    Changelog 
+        01/31/2017 
+            Added function runAsBulkReport ....used for reports that take very long to run 
+
+
+
+*/
 package org.apache.fineract.infrastructure.core.api;
 
 import java.util.ArrayList;
@@ -115,6 +124,18 @@ public class ApiParameterHelper {
         }
         return exportPDF;
     }
+
+    // added 01/31/2021 
+    public static boolean runAsBulkReport(final MultivaluedMap<String, String> queryParams) {
+        boolean runAsBulkReport = false;
+        if (queryParams.getFirst("bulkReport") != null) {
+            final String bulkReportValue = queryParams.getFirst("bulkReport");
+            runAsBulkReport = "true".equalsIgnoreCase(bulkReportValue);
+        }
+        return runAsBulkReport;
+    }
+
+
 
     public static boolean parameterType(final MultivaluedMap<String, String> queryParams) {
         boolean parameterType = false;

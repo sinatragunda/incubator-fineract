@@ -16,6 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+ Changelog
+ 01/27/2021
+ isSettlementPartialPayment 
+
+
+
+*/
 package org.apache.fineract.portfolio.loanproduct.serialization;
 
 import java.lang.reflect.Type;
@@ -108,7 +116,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -153,6 +161,13 @@ public final class LoanProductDataValidator {
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isEqualAmortizationParam, element)) {
             isEqualAmortization = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isEqualAmortizationParam, element);
             baseDataValidator.reset().parameter(LoanProductConstants.isEqualAmortizationParam).value(isEqualAmortization).ignoreIfNull()
+                    .validateForBooleanValue();
+        }
+
+        boolean isSettlementPartialPayment = false;
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isSettlementPartialPaymentParam, element)) {
+            isSettlementPartialPayment = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isSettlementPartialPaymentParam, element);
+            baseDataValidator.reset().parameter(LoanProductConstants.isSettlementPartialPaymentParam).value(isSettlementPartialPayment).ignoreIfNull()
                     .validateForBooleanValue();
         }
 

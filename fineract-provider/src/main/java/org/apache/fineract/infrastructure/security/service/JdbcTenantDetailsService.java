@@ -35,6 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import org.springframework.jdbc.support.rowset.*;
 /**
  * A JDBC implementation of {@link TenantDetailsService} for loading a tenants
  * details by a <code>tenantIdentifier</code>.
@@ -145,4 +146,52 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
         final List<FineractPlatformTenant> fineractPlatformTenants = this.jdbcTemplate.query(sql, rm, new Object[] {});
         return fineractPlatformTenants;
     }
+
+
+    @Override
+    public void createTenant(String tenantIdentifier ,String timezone){
+
+        String sql = String.format("CREATE DATABASE IF NOT EXISTS %s",tenantIdentifier);
+        
+        jdbcTemplate.execute(sql);
+        
+        String insertTenant = String.format("INSERT INTO tenant_server_connections(schema_name) VALUES('%s')",tenantIdentifier);
+        
+        //jdbcTemplate = JdbcTemplateInit.getJdbcTemplate("mifosplatform-tenants");
+        int rows = 0;
+
+        if(!tenantExists(tenantIdentifier)){
+            rows = jdbcTemplate.update(insertTenant);
+        }
+
+        System.err.println("-------------------------------------------updated rows------------------"+rows);
+
+        if(rows > 0){
+
+            String queryReportId = String.format("SELECT id from tenant_server_connections where schema_name = '%s'",tenantIdentifier);
+
+            ///here we should get the id value we have created 
+            SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(queryReportId);
+            Long tenantId = null ;
+
+            if(sqlRowSet.first()){
+
+                tenantId = sqlRowSet.getLong("id");
+
+                System.err.println("------------------------------Tenant Id-----------------"+tenantId);
+                String createTenantLink = String.format("INSERT into tenants(identifier ,name,timezone_id,oltp_id ,report_id) VALUES('%s','%s','%s',%i ,%i)",tenantIdentifier ,tenantIdentifier ,timezone ,tenantId ,tenantId);
+                jdbcTemplate.update(createTenantLink);
+            }
+        }
+    }
+
+
+    public boolean tenantExists(String tenantIdentifier){
+
+        String sql = String.format("SELECT * FROM tenant_server_connections WHERE schema_name = '%s'" ,tenantIdentifier);
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql);
+        return sqlRowSet.first();
+    }
+
+
 }

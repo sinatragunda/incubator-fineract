@@ -51,6 +51,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import org.apache.fineract.wese.infrastructure.helper.BulkReportHelper ;
+import java.util.concurrent.Callable ;
+import java.util.concurrent.Future ;
+import org.json.JSONObject;
+
+/* 
+    Change log 
+    added 01/02/2021 new function code phase a
+
+
+*/
+
 @Path("/runreports")
 @Component
 @Scope("singleton")
@@ -73,6 +85,56 @@ public class RunreportsApiResource {
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
     }
 
+     @GET
+    @Path("/bulkReport/{referenceId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/vnd.ms-excel", "application/pdf", "text/html" })
+    public Response bulkReport(@PathParam("referenceId") final String referenceId, @Context final UriInfo uriInfo) {
+
+        
+        int reportStatus = BulkReportHelper.bulkReportStatus(referenceId);
+        
+        if(reportStatus==1){
+
+            ///report done processing now lets build output son
+            Future future = BulkReportHelper.getBulkReport(referenceId);
+            
+            GenericResultsetData genericResultSet = null ;
+            
+            try{
+                genericResultSet = (GenericResultsetData)future.get();
+            }
+
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+            String reportName = "Test report";
+            final StreamingOutput result = this.readExtraDataAndReportingService
+                .retrieveReportCSVEx(genericResultSet);
+
+            return Response.ok().entity(result).type("text/csv")
+                .header("Content-Disposition", "attachment;filename=" + reportName.replaceAll(" ", "") + ".csv").build();
+         
+        }
+
+        JSONObject json = new JSONObject();
+        if(reportStatus ==-1){     
+            
+            String message = "Invalid reference number or request has been flushed out of the system .Run a new report";    
+            json.put("message" ,message);
+            json.put("status" ,false);
+        }
+
+        else{
+            json.put("message" ,"Request still being processed ,please wait");
+            json.put("status" ,true);
+
+        }
+        return Response.ok().entity(json.toString()).type(MediaType.APPLICATION_JSON).build();
+        
+    }
+
     @GET
     @Path("{reportName}")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -85,19 +147,41 @@ public class RunreportsApiResource {
         final boolean exportCsv = ApiParameterHelper.exportCsv(uriInfo.getQueryParameters());
         final boolean parameterType = ApiParameterHelper.parameterType(uriInfo.getQueryParameters());
         final boolean exportPdf = ApiParameterHelper.exportPdf(uriInfo.getQueryParameters());
+        final boolean runAsBulkReport = ApiParameterHelper.runAsBulkReport(uriInfo.getQueryParameters());
 
         checkUserPermissionForReport(reportName, parameterType);
+
+    
+
+        // phase a
+        //added 01/02/2021 used for bulk reports those that take long to run and usually times out 
+        if(runAsBulkReport){
+
+            ///we need some callable here son
+            final Map<String, String> reportParams = getReportParams(queryParams); 
+            Callable callable = this.readExtraDataAndReportingService.retrieveGenericResultsetCallable(reportName,
+                    "report", reportParams);
+            
+            String json = BulkReportHelper.runBulkReport(callable).toString();
+
+            return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
+
+        }
+
 
         String parameterTypeValue = null;
         if (!parameterType) {
             parameterTypeValue = "report";
             String reportType = this.readExtraDataAndReportingService.getReportType(reportName);
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
-            if (reportingProcessService != null) { return reportingProcessService.processRequest(reportName, queryParams); }
-        } else {
+            if (reportingProcessService != null){
+                return reportingProcessService.processRequest(reportName, queryParams); 
+            }
+        } 
+        else {
             parameterTypeValue = "parameter";
         }
-
+ 
         // PDF format
 
         if (exportPdf) {
@@ -115,9 +199,11 @@ public class RunreportsApiResource {
 
         }
 
-        if (!exportCsv) {
-            final Map<String, String> reportParams = getReportParams(queryParams);
 
+        if (!exportCsv) {
+
+
+            final Map<String, String> reportParams = getReportParams(queryParams);
             final GenericResultsetData result = this.readExtraDataAndReportingService.retrieveGenericResultset(reportName,
                     parameterTypeValue, reportParams);
 
@@ -138,6 +224,7 @@ public class RunreportsApiResource {
         }
 
         // CSV Export
+
         final Map<String, String> reportParams = getReportParams(queryParams);
         final StreamingOutput result = this.readExtraDataAndReportingService
                 .retrieveReportCSV(reportName, parameterTypeValue, reportParams);

@@ -16,6 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+    ChangeLog
+    01/27/2021
+    isSettlementPartialPayment
+
+*/
 package org.apache.fineract.portfolio.loanproduct.service;
 
 import java.math.BigDecimal;
@@ -227,7 +233,8 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + "lp.allow_variabe_installments as isVariableIntallmentsAllowed, "
                     + "lvi.minimum_gap as minimumGap, "
                     + "lvi.maximum_gap as maximumGap, "
-                    + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization "
+                    + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization, "
+                    + "lp.is_settlement_partial_payment as isSettlementPartialPayment "
                     + " from m_product_loan lp "
                     + " left join m_fund f on f.id = lp.fund_id "
                     + " left join m_product_loan_recalculation_details lpr on lpr.product_id=lp.id "
@@ -449,7 +456,9 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final boolean syncExpectedWithDisbursementDate = rs.getBoolean("syncExpectedWithDisbursementDate");
             
             final boolean canUseForTopup = rs.getBoolean("canUseForTopup");
+            final boolean isSettlementPartialPayment = rs.getBoolean("isSettlementPartialPayment");
 
+       
             return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                     numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
                     minInterestRatePerPeriod, maxInterestRatePerPeriod, annualInterestRate, repaymentFrequencyType,
@@ -465,7 +474,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     installmentAmountInMultiplesOf, allowAttributeOverrides, isLinkedToFloatingInterestRates, floatingRateId,
                     floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                     maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableIntallmentsAllowed, minimumGap,
-                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
         }
     }
 

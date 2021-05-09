@@ -94,4 +94,29 @@ public class TenantDatabaseUpgradeService {
 
         tenantDataSourcePortFixService.fixUpTenantsSchemaServerPort();
     }
+
+    public boolean upgradeTenant(String tenantIdentifier) {
+        
+        upgradeTenantDB();
+        final FineractPlatformTenant tenant = this.tenantDetailsService.loadTenantById(tenantIdentifier);
+        final FineractPlatformTenantConnection connection = tenant.getConnection();
+        if (connection.isAutoUpdateEnabled()) {
+            final Flyway flyway = new Flyway();
+            String connectionProtocol = driverConfig.constructProtocol(connection.getSchemaServer(), connection.getSchemaServerPort(), connection.getSchemaName()) ;
+            DriverDataSource source = new DriverDataSource(driverConfig.getDriverClassName(), connectionProtocol, connection.getSchemaUsername(), connection.getSchemaPassword()) ;
+            flyway.setDataSource(source);
+            flyway.setLocations("sql/migrations/core_db");
+            flyway.setOutOfOrder(true);
+            try {
+                flyway.migrate();
+            } catch (FlywayException e) {
+                String betterMessage = e.getMessage() + "; for Tenant DB URL: " + connectionProtocol + ", username: "
+                        + connection.getSchemaUsername();
+                throw new FlywayException(betterMessage, e.getCause());
+            }
+        
+        }
+        return true ;
+    }
+
 }

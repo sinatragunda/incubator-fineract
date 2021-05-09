@@ -16,6 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* Change log 
+    01/27/2021 - isSettlementPartialPayment added 
+
+*/
 package org.apache.fineract.portfolio.loanproduct.domain;
 
 import java.math.BigDecimal;
@@ -186,6 +191,11 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     @Column(name = "is_equal_amortization", nullable = false)
     private boolean isEqualAmortization = false;
 
+
+    @Column(name = "is_settlement_partial_payment", nullable = false)
+    private boolean isSettlementPartialPayment = false;
+
+
     public static LoanProduct assembleFromJson(final Fund fund, final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy,
             final List<Charge> productCharges, final JsonCommand command, final AprCalculator aprCalculator, FloatingRate floatingRate) {
 
@@ -338,6 +348,10 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         final boolean isEqualAmortization = command.parameterExists(LoanProductConstants.isEqualAmortizationParam) ? command
                 .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isEqualAmortizationParam) : false;
 
+        final boolean isSettlementPartialPayment = command.parameterExists(LoanProductConstants.isSettlementPartialPaymentParam) ? command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isSettlementPartialPaymentParam) : false;
+
+
         return new LoanProduct(fund, loanTransactionProcessingStrategy, name, shortName, description, currency, principal, minPrincipal,
                 maxPrincipal, interestRatePerPeriod, minInterestRatePerPeriod, maxInterestRatePerPeriod, interestFrequencyType,
                 annualInterestRate, interestMethod, interestCalculationPeriodMethod, allowPartialPeriodInterestCalcualtion, repaymentEvery,
@@ -351,7 +365,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 installmentAmountInMultiplesOf, loanConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRate,
                 interestRateDifferential, minDifferentialLendingRate, maxDifferentialLendingRate, defaultDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGapBetweenInstallments,
-                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization, isSettlementPartialPayment);
 
     }
 
@@ -581,7 +595,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate,
             Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments,
-            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization) {
+            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment) {
         this.fund = fund;
         this.transactionProcessingStrategy = transactionProcessingStrategy;
         this.name = name.trim();
@@ -659,6 +673,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         		syncExpectedWithDisbursementDate;
         this.canUseForTopup = canUseForTopup;
         this.isEqualAmortization = isEqualAmortization;
+        this.isSettlementPartialPayment = isSettlementPartialPayment ;
     }
 
     public MonetaryCurrency getCurrency() {
@@ -1044,6 +1059,13 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             this.canUseForTopup = newValue;
         }
 
+        if(command.isChangeInBooleanParameterNamed("isSettlementPartialPayment",this.isSettlementPartialPayment)){
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed("isSettlementPartialPayment");
+            actualChanges.put("isSettlementPartialPayment", newValue);
+            this.isSettlementPartialPayment = newValue;
+        }
+
+
         return actualChanges;
     }
 
@@ -1378,6 +1400,14 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
 
     public void setEqualAmortization(boolean isEqualAmortization) {
         this.isEqualAmortization = isEqualAmortization;
+    }
+
+    public boolean isSettlementPartialPayment(){
+        return isSettlementPartialPayment ;
+    }
+
+    public void setSettlementPartialPayment(boolean isSettlementPartialPayment){
+        this.isSettlementPartialPayment = isSettlementPartialPayment ;
     }
 
 }

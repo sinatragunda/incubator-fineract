@@ -87,26 +87,44 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
         if (this.noPentaho) { throw new PlatformDataIntegrityException("error.msg.no.pentaho", "Pentaho is not enabled",
                 "Pentaho is not enabled"); }
 
+       
         final String reportPath = MIFOS_BASE_DIR + File.separator + "pentahoReports" + File.separator + reportName + ".prpt";
+        
         logger.info("Report path: " + reportPath);
 
         // load report definition
         final ResourceManager manager = new ResourceManager();
+
         manager.registerDefaults();
+        
         Resource res;
 
+     
         try {
             res = manager.createDirectly(reportPath, MasterReport.class);
+
+          
+
             final MasterReport masterReport = (MasterReport) res.getResource();
+
+
             final DefaultReportEnvironment reportEnvironment = (DefaultReportEnvironment) masterReport.getReportEnvironment();
+            
+
+        
             if (locale != null) {
                 reportEnvironment.setLocale(locale);
             }
+
             addParametersToReport(masterReport, reportParams);
 
+          
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+
+         
             if ("PDF".equalsIgnoreCase(outputType)) {
+
                 PdfReportUtil.createPDF(masterReport, baos);
                 return Response.ok().entity(baos.toByteArray()).type("application/pdf").build();
             }
@@ -188,6 +206,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             // passed as parameters to allow multitenant penaho reporting
             // and
             // data scoping
+   
             final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
             final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
             String tenantUrl = driverConfig.constructProtocol(tenantConnection.getSchemaServer(), tenantConnection.getSchemaServerPort(), tenantConnection.getSchemaName()) ;
@@ -202,6 +221,9 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             rptParamValues.put("tenantUrl", tenantUrl);
             rptParamValues.put("username", tenantConnection.getSchemaUsername());
             rptParamValues.put("password", tenantConnection.getSchemaPassword());
+
+
+          
         } catch (final Exception e) {
             logger.error("error.msg.reporting.error:" + e.getMessage());
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());

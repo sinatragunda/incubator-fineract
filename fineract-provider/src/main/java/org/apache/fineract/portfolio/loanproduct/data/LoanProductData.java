@@ -16,6 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+
+/*
+Change log 
+01/27/2021 - Added variable isSettlementPartialPayment ;
+
+
+*/
 package org.apache.fineract.portfolio.loanproduct.data;
 
 import java.math.BigDecimal;
@@ -185,6 +193,10 @@ public class LoanProductData {
     private final boolean syncExpectedWithDisbursementDate;
     private final boolean isEqualAmortization;
 
+    // added by Wese 
+    private final boolean isSettlementPartialPayment ;
+   
+
     /**
      * Used when returning lookup information about loan product for dropdowns.
      */
@@ -260,6 +272,11 @@ public class LoanProductData {
         final boolean syncExpectedWithDisbursementDate = false;
         final boolean canUseForTopup = false;
         final boolean isEqualAmortization = false;
+        final boolean isSettlementPartialPayment = false;
+   
+
+
+
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
                 minInterestRatePerPeriod, maxInterestRatePerPeriod, annualInterestRate, repaymentFrequencyType, interestRateFrequencyType,
@@ -274,7 +291,7 @@ public class LoanProductData {
                 loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId, floatingRateName,
                 interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate, maxDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
 
     }
 
@@ -352,6 +369,8 @@ public class LoanProductData {
         final boolean syncExpectedWithDisbursementDate = false;
         final boolean canUseForTopup = false;
         final boolean isEqualAmortization = false;
+        final boolean isSettlementPartialPayment = false ;
+   
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
@@ -367,7 +386,7 @@ public class LoanProductData {
                 loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId, floatingRateName,
                 interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate, maxDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
 
     }
 
@@ -452,6 +471,8 @@ public class LoanProductData {
         final boolean syncExpectedWithDisbursementDate = false;
         final boolean canUseForTopup = false;
         final boolean isEqualAmortization = false;
+        final boolean isSettlementPartialPayment = false ;
+   
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
@@ -467,7 +488,7 @@ public class LoanProductData {
                 installmentAmountInMultiplesOf, loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId,
                 floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                 maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
 
     }
     
@@ -546,6 +567,8 @@ public class LoanProductData {
         final boolean syncExpectedWithDisbursementDate = false;
         final boolean canUseForTopup = false;
         final boolean isEqualAmortization = false;
+        final boolean isSettlementPartialPayment = false;
+   
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
@@ -561,7 +584,7 @@ public class LoanProductData {
                 installmentAmountInMultiplesOf, loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId,
                 floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                 maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
 
     }
 
@@ -600,7 +623,8 @@ public class LoanProductData {
             BigDecimal minDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate, BigDecimal maxDifferentialLendingRate,
             boolean isFloatingInterestRateCalculationAllowed, final boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments, 
-            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization) {
+            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment
+   ) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -705,6 +729,7 @@ public class LoanProductData {
         this.syncExpectedWithDisbursementDate = syncExpectedWithDisbursementDate;
         this.canUseForTopup = canUseForTopup;
         this.isEqualAmortization = isEqualAmortization;
+        this.isSettlementPartialPayment = isSettlementPartialPayment ;
 
     }
 
@@ -842,6 +867,7 @@ public class LoanProductData {
         this.syncExpectedWithDisbursementDate = productData.syncExpectedWithDisbursementDate;
         this.canUseForTopup = productData.canUseForTopup;
         this.isEqualAmortization = productData.isEqualAmortization;
+        this.isSettlementPartialPayment = productData.isSettlementPartialPayment ;
     }
 
     private Collection<ChargeData> nullIfEmpty(final Collection<ChargeData> charges) {
@@ -1229,5 +1255,9 @@ public class LoanProductData {
 
     public BigDecimal getMaxInterestRatePerPeriod() {
         return maxInterestRatePerPeriod;
+    }
+
+    public Boolean isSettlementPartialPayment(){
+        return isSettlementPartialPayment ;
     }
 }

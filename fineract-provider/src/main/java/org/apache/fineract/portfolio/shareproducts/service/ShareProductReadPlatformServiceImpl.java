@@ -54,6 +54,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+
+import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+
 @Service(value = "shareReadPlatformService")
 public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformService {
 
@@ -160,7 +163,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     public Collection<ProductData> retrieveAllForLookup() {
         AllShareProductRowMapper mapper = new AllShareProductRowMapper();
         String sql = "select " + mapper.schema();
-        return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+        return this.jdbcTemplate.query(sql, mapper);
     }
 
     @Override
@@ -177,11 +180,14 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
             final String name = rs.getString("name");
             final String shortName = rs.getString("short_name");
             final Long totalShares = rs.getLong("total_shares");
-            return ShareProductData.generic(id, name, shortName, totalShares);
+            final PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"property_type"));
+            final BigDecimal monthlyDeposit = rs.getBigDecimal("monthly_deposit");
+            final BigDecimal dividendLowerLimit = rs.getBigDecimal("dividend_lower_limit");
+            return ShareProductData.generic(id, name, shortName, totalShares ,propertyType ,monthlyDeposit ,dividendLowerLimit);
         }
 
         public String schema() {
-            return "shareproduct.id, shareproduct.name, shareproduct.short_name, shareproduct.total_shares from m_share_product shareproduct";
+            return "shareproduct.id, shareproduct.name, shareproduct.short_name, shareproduct.total_shares ,shareproduct.monthly_deposit ,shareproduct.dividend_lower_limit, shareproduct.property_type from m_share_product shareproduct";
         }
     }
 
@@ -216,6 +222,9 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
                     .append("shareproduct.currency_multiplesof, shareproduct.total_shares, shareproduct.issued_shares, ")
                     .append("shareproduct.unit_price, shareproduct.capital_amount,  ")
                     .append("shareproduct.accounting_type as accountingType, ")
+                    .append("shareproduct.monthly_deposit as monthlyDeposit, ")
+                    .append("shareproduct.dividend_lower_limit as dividendLowerLimit, ")
+                    .append("shareproduct.property_type as propertyType, ")
                     .append("shareproduct.minimum_client_shares, shareproduct.nominal_client_shares, ")
                     .append("shareproduct.maximum_client_shares, shareproduct.minimum_active_period_frequency, ")
                     .append("shareproduct.minimum_active_period_frequency_enum, shareproduct.lockin_period_frequency, ")
@@ -275,10 +284,18 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
             final Integer accountingRuleId = JdbcSupport.getInteger(rs, "accountingType");
             final EnumOptionData accountingRuleType = AccountingEnumerations.accountingRuleType(accountingRuleId);
 
+            /// added 03/11/2020
+            final PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"propertyType"));
+            
+            final BigDecimal monthlyDeposit = rs.getBigDecimal("monthlyDeposit");
+
+            /// added 16/04/2021 
+            final BigDecimal dividendLowerLimit = rs.getBigDecimal("dividendLowerLimit");
+
             return ShareProductData.data(id, name, shortName, description, externalId, currency, totalShares, issuedShares, unitPrice,
                     capitalAmount, minimumClientShares, nominalClientShares, maximumClientShares, shareMarketCollection, charges,
                     allowDividendsForInactiveClients, lockinPeriodFrequency, lockinPeriodFrequencyType, minimumActivePeriod,
-                    minimumActivePeriodType, accountingRuleType);
+                    minimumActivePeriodType, accountingRuleType ,propertyType ,monthlyDeposit, dividendLowerLimit);
         }
 
         public String schema() {

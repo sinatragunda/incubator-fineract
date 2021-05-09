@@ -16,6 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/* Change log 
+    23/02/2021
+        changed calculateLoanSchedule function to disable param validation please see line 680 - 670
+
+
+*/
 package org.apache.fineract.portfolio.loanaccount.api;
 
 import static org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations.interestType;
@@ -666,7 +673,11 @@ public class LoansApiResource {
             final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
             final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
 
-            final LoanScheduleModel loanSchedule = this.calculationPlatformService.calculateLoanSchedule(query, true);
+            /// phase A change 
+            /// changing this line so that we can add value of false so that loan calculator doesnt validate params and fail    
+            /// final LoanScheduleModel loanSchedule = this.calculationPlatformService.calculateLoanSchedule(query, true);
+            final LoanScheduleModel loanSchedule = this.calculationPlatformService.calculateLoanSchedule(query, false);
+
 
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.loanScheduleToApiJsonSerializer.serialize(settings, loanSchedule.toData(), new HashSet<String>());

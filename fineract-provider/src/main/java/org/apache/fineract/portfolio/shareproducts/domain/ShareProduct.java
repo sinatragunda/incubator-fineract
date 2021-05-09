@@ -48,6 +48,12 @@ import org.apache.fineract.portfolio.shareproducts.data.ShareProductMarketPriceD
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.DateTime;
 
+
+
+// added 02/11/2020AT 11:26
+import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+
+
 @Entity
 @Table(name = "m_share_product")
 public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
@@ -127,6 +133,19 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
     @Column(name = "accounting_type", nullable = false)
     protected Integer accountingRule;
 
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name="property_type" ,nullable= true)
+    private PROPERTY_TYPE propertyType;
+
+    @Column(name = "monthly_deposit", nullable = true)
+    private BigDecimal monthlyDeposit ;
+
+    /// addded 16/04/2021 
+
+    @Column(name = "dividend_lower_limit", nullable = true)
+    private BigDecimal dividendLowerLimit ;
+
     protected ShareProduct() {
 
     }
@@ -137,7 +156,7 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
             Set<ShareProductMarketPrice> marketPrice, Set<Charge> charges, final Boolean allowDividendCalculationForInactiveClients,
             final Integer lockinPeriod, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriod,
             final PeriodFrequencyType minimumActivePeriodForDividendsType, AppUser createdBy, DateTime createdDate, AppUser lastModifiedBy,
-            DateTime lastModifiedDate, final AccountingRuleType accountingRuleType) {
+            DateTime lastModifiedDate, final AccountingRuleType accountingRuleType,final PROPERTY_TYPE propertyType ,BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
 
         this.name = name;
         this.shortName = shortName;
@@ -167,6 +186,9 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
         if (accountingRuleType != null) {
             this.accountingRule = accountingRuleType.getValue();
         }
+        this.propertyType = propertyType ;
+        this.monthlyDeposit = monthlyDeposit ;
+        this.dividendLowerLimit = dividendLowerLimit ;
     }
 
     public boolean setProductName(String productName) {
@@ -436,4 +458,47 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
     public Long getDefaultClientShares() {
         return this.nominalShares ;
     }
+
+    public PROPERTY_TYPE getPropertyType(){
+        return this.propertyType ;
+    }
+
+
+    public BigDecimal getMonthlyDeposit(){
+        return this.monthlyDeposit ;
+    }
+
+    public boolean setPropertyType(PROPERTY_TYPE propertyType){
+        boolean returnValue = false;
+        if (this.propertyType == null || !this.propertyType.equals(propertyType)) {
+            this.propertyType = propertyType;
+            returnValue = true;
+        }
+        return returnValue;
+    }
+
+    public boolean setMonthlyDeposit(BigDecimal monthlyDeposit){
+        boolean returnValue = false;
+        if (this.monthlyDeposit == null || !this.monthlyDeposit.equals(monthlyDeposit)) {
+            this.monthlyDeposit = monthlyDeposit;
+            returnValue = true;
+        }
+        return returnValue;
+    }
+
+    public boolean setDividendLowerLimit(BigDecimal dividendLowerLimit){
+        boolean returnValue = false;
+        if (this.dividendLowerLimit == null || !this.dividendLowerLimit.equals(dividendLowerLimit)) {
+            this.dividendLowerLimit = dividendLowerLimit;
+            returnValue = true;
+        }
+        return returnValue;
+    }
+
+    public BigDecimal getDividendLowerLimit(){
+        return this.dividendLowerLimit;
+    }
+
+
+
 }

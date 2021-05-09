@@ -16,6 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*
+    Change Log 
+    01/27/2021 
+    isSettlememtPaymentParam 
+*/
 package org.apache.fineract.portfolio.loanproduct;
 
 import java.math.BigDecimal;
@@ -133,6 +138,8 @@ public interface LoanProductConstants {
     public static final String canUseForTopup = "canUseForTopup";
     
     public static final String isEqualAmortizationParam = "isEqualAmortization";
-    
+
+    public static final String isSettlementPartialPaymentParam = "isSettlementPartialPayment";
+          
 
 }

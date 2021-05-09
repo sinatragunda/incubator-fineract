@@ -60,6 +60,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
 @Service
 public class ShareProductDataSerializer {
 
@@ -87,7 +88,7 @@ public class ShareProductDataSerializer {
 			AccountingConstants.SHARES_PRODUCT_ACCOUNTING_PARAMS.INCOME_FROM_FEES.getValue(),
 			AccountingConstants.SHARES_PRODUCT_ACCOUNTING_PARAMS.SHARES_EQUITY.getValue(),
 			AccountingConstants.SHARES_PRODUCT_ACCOUNTING_PARAMS.SHARES_REFERENCE.getValue(),
-			AccountingConstants.SHARES_PRODUCT_ACCOUNTING_PARAMS.SHARES_SUSPENSE.getValue()));
+			AccountingConstants.SHARES_PRODUCT_ACCOUNTING_PARAMS.SHARES_SUSPENSE.getValue(),ShareProductApiConstants.propertyTypeParam ,ShareProductApiConstants.monthlyDepositParam ,ShareProductApiConstants.dividendLowerLimitParam));
 
 	private static final Set<String> supportedParametersForDivident = new HashSet<>(Arrays.asList(
 			ShareProductApiConstants.locale_paramname, ShareProductApiConstants.dateFormatParamName,
@@ -118,10 +119,11 @@ public class ShareProductDataSerializer {
         final String shortName = this.fromApiJsonHelper.extractStringNamed(ShareProductApiConstants.shortname_paramname, element);
         baseDataValidator.reset().parameter(ShareProductApiConstants.shortname_paramname).value(shortName).notBlank()
                 .notExceedingLengthOf(4);
-        String description = null;
-        if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.description_paramname, element)) {
-            description = this.fromApiJsonHelper.extractStringNamed(ShareProductApiConstants.description_paramname, element);
-        }
+        
+		final String description = this.fromApiJsonHelper
+				.extractStringNamed(ShareProductApiConstants.description_paramname, element);
+		baseDataValidator.reset().parameter(ShareProductApiConstants.description_paramname).value(description)
+				.notBlank().notExceedingLengthOf(500);
 
         String externalId = this.fromApiJsonHelper.extractStringNamed(ShareProductApiConstants.externalid_paramname, element);
         // baseDataValidator.reset().parameter(ShareProductApiConstants.externalid_paramname).value(externalId).notBlank();
@@ -190,6 +192,19 @@ public class ShareProductDataSerializer {
         Integer lockinPeriod = this.fromApiJsonHelper.extractIntegerNamed(ShareProductApiConstants.lockperiod_paramname, element, locale);
         PeriodFrequencyType lockPeriodType = extractPeriodType(ShareProductApiConstants.lockinperiodfrequencytype_paramname, element);
 
+
+        Integer propertyTypeInt = this.fromApiJsonHelper.extractIntegerNamed(ShareProductApiConstants.propertyTypeParam, element, locale);
+        PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(propertyTypeInt);
+
+        final BigDecimal monthlyDeposit = this.fromApiJsonHelper.extractBigDecimalNamed(ShareProductApiConstants.monthlyDepositParam, element,
+                locale);
+        baseDataValidator.reset().parameter(ShareProductApiConstants.monthlyDepositParam).value(monthlyDeposit).ignoreIfNull();
+
+        /// 16/04/2021
+        final BigDecimal dividendLowerLimit = this.fromApiJsonHelper.extractBigDecimalNamed(ShareProductApiConstants.dividendLowerLimitParam, element,
+                locale);
+        baseDataValidator.reset().parameter(ShareProductApiConstants.dividendLowerLimitParam).value(dividendLowerLimit).ignoreIfNull();
+
         AppUser createdBy = platformSecurityContext.authenticatedUser();
         AppUser modifiedBy = createdBy;
         DateTime createdDate = DateUtils.getLocalDateTimeOfTenant().toDateTime();
@@ -197,7 +212,7 @@ public class ShareProductDataSerializer {
         ShareProduct product = new ShareProduct(productName, shortName, description, externalId, currency, totalNumberOfShares,
                 sharesIssued, unitPrice, shareCapitalValue, minimumClientShares, nominalClientShares, maximumClientShares, marketPriceSet,
                 charges, allowdividendsForInactiveClients, lockinPeriod, lockPeriodType, minimumActivePeriod, minimumActivePeriodType,
-                createdBy, createdDate, modifiedBy, modifiedOn, accountingRuleType);
+                createdBy, createdDate, modifiedBy, modifiedOn, accountingRuleType ,propertyType ,monthlyDeposit ,dividendLowerLimit);
        
         for (ShareProductMarketPrice data : marketPriceSet) {
             data.setShareProduct(product);
@@ -210,6 +225,13 @@ public class ShareProductDataSerializer {
         PeriodFrequencyType frequencyType = PeriodFrequencyType.INVALID;
         frequencyType = PeriodFrequencyType.fromInt(this.fromApiJsonHelper.extractIntegerWithLocaleNamed(paramName, element));
         return frequencyType;
+    }
+
+
+    private PROPERTY_TYPE extractPropertyType(String paramName ,final JsonElement element){
+        PROPERTY_TYPE propertyType = PROPERTY_TYPE.DEFAULT ;
+        propertyType = PROPERTY_TYPE.fromInt(this.fromApiJsonHelper.extractIntegerWithLocaleNamed(paramName ,element));
+        return propertyType ;
     }
 
     private Set<ShareProductMarketPriceData> asembleShareMarketPriceForUpdate(final JsonElement element) {
@@ -456,6 +478,13 @@ public class ShareProductDataSerializer {
             }
         }
 
+        if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.propertyTypeParam, element)) {
+            PROPERTY_TYPE propertyType = extractPropertyType(ShareProductApiConstants.propertyTypeParam, element);
+            if (product.setPropertyType(propertyType)) {
+                actualChanges.put(ShareProductApiConstants.propertyTypeParam, propertyType);
+            }
+        }
+
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
         
         BigDecimal shareCapitalValue;
@@ -467,6 +496,27 @@ public class ShareProductDataSerializer {
                 actualChanges.put(ShareProductApiConstants.sharecapital_paramname, shareCapitalValue);
             }
         }
+
+        ///added 03/11/2020
+        BigDecimal monthlyDeposit = null;
+        if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.monthlyDepositParam, element)) {
+            monthlyDeposit = this.fromApiJsonHelper.extractBigDecimalNamed(ShareProductApiConstants.monthlyDepositParam, element, locale);
+            baseDataValidator.reset().parameter(ShareProductApiConstants.monthlyDepositParam).value(monthlyDeposit).ignoreIfNull();
+            if (product.setMonthlyDeposit(monthlyDeposit)) {
+                actualChanges.put(ShareProductApiConstants.monthlyDepositParam, monthlyDeposit);
+            }
+        }
+
+        ///added 16/04/2021
+        BigDecimal dividendLowerLimit = null;
+        if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.dividendLowerLimitParam, element)) {
+            dividendLowerLimit = this.fromApiJsonHelper.extractBigDecimalNamed(ShareProductApiConstants.dividendLowerLimitParam, element, locale);
+            baseDataValidator.reset().parameter(ShareProductApiConstants.dividendLowerLimitParam).value(dividendLowerLimit).ignoreIfNull();
+            if (product.setDividendLowerLimit(dividendLowerLimit)) {
+                actualChanges.put(ShareProductApiConstants.dividendLowerLimitParam, dividendLowerLimit);
+            }
+        }
+
         return actualChanges;
     }
 

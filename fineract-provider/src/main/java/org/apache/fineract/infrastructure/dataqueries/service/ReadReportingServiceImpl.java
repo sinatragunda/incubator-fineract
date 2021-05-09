@@ -64,6 +64,15 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
+import java.util.concurrent.Callable ;
+
+/*
+    Changelog
+    01/02/2021 added new function impl retrieveGenericResultsetCallable
+
+
+*/
+
 @Service
 public class ReadReportingServiceImpl implements ReadReportingService {
 
@@ -87,6 +96,33 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         this.genericDataService = genericDataService;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
         this.columnValidator = columnValidator;
+    }
+
+
+    @Override
+    public StreamingOutput retrieveReportCSVEx(final GenericResultsetData result) {
+
+        return new StreamingOutput() {
+
+            @Override
+            public void write(final OutputStream out) {
+                try {
+
+                    final StringBuffer sb = generateCsvFileBuffer(result);
+                    final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+                    final byte[] outputByte = new byte[4096];
+                    Integer readLen = in.read(outputByte, 0, 4096);
+
+                    while (readLen != -1) {
+                        out.write(outputByte, 0, readLen);
+                        readLen = in.read(outputByte, 0, 4096);
+                    }
+                
+                } catch (final Exception e) {
+                    throw new PlatformDataIntegrityException("error.msg.exception.error", e.getMessage());
+                }
+            }
+        };
     }
 
     @Override
@@ -118,7 +154,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 }
             }
         };
-
     }
 
     private StringBuffer generateCsvFileBuffer(final GenericResultsetData result) {
@@ -183,6 +218,17 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         final long elapsed = System.currentTimeMillis() - startTime;
         logger.info("FINISHING Report/Request Name: " + name + " - " + type + "     Elapsed Time: " + elapsed);
         return result;
+    }
+
+    /// added 01/02/2021 
+    @Override
+    public Callable retrieveGenericResultsetCallable(final String name ,final String type ,final Map<String ,String> queryParams){
+
+        Callable callable = ()->{
+            return retrieveGenericResultset(name ,type ,queryParams);
+        };
+
+        return callable ;
     }
 
     private String getSQLtoRun(final String name, final String type, final Map<String, String> queryParams) {

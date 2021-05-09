@@ -30,11 +30,28 @@ import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportParameterData;
 import org.apache.fineract.useradministration.domain.AppUser;
 
+import java.util.concurrent.Callable ;
+
+/*
+    Changelog 
+    01/02/2021 added function retrieveGenericResultsetCallable ;
+    02/02/2021 added function retrieveReportCSV(String name, String type, Map<String, String> extractedQueryParams);
+
+    
+
+*/
 public interface ReadReportingService {
 
     StreamingOutput retrieveReportCSV(String name, String type, Map<String, String> extractedQueryParams);
 
     GenericResultsetData retrieveGenericResultset(String name, String type, Map<String, String> extractedQueryParams);
+
+    /// added 01/02/2021 
+    Callable retrieveGenericResultsetCallable(String name, String type, Map<String, String> extractedQueryParams);
+
+    /// added 02/02/2021
+    StreamingOutput retrieveReportCSVEx(GenericResultsetData result);
+
 
     String retrieveReportPDF(String name, String type, Map<String, String> extractedQueryParams);
 

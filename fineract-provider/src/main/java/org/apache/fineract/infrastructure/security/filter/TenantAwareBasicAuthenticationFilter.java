@@ -104,7 +104,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
         final StopWatch task = new StopWatch();
         task.start();
-
+      
         try {
 
             if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {

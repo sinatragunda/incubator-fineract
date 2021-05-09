@@ -1169,9 +1169,11 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     public GenericResultsetData retrieveDataTableGenericResultSet(final String dataTableName, final Long appTableId, final String order,
             final Long id) {
 
+
         final String appTable = queryForApplicationTableName(dataTableName);
 
         checkMainResourceExistsWithinScope(appTable, appTableId);
+
 
         final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
 
@@ -1179,19 +1181,25 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         // id only used for reading a specific entry in a one to many datatable
         // (when updating)
+        sql = "select * from `" + dataTableName + "` where id = " + id;
+        
         if (id == null) {
         	String whereClause = getFKField(appTable) + " = " + appTableId;
-        	SQLInjectionValidator.validateSQLInput(whereClause);
-            sql = sql + "select * from `" + dataTableName + "` where " + whereClause;
-        } else {
-            sql = sql + "select * from `" + dataTableName + "` where id = " + id;
-        }
 
-        this.columnValidator.validateSqlInjection(sql, order);
-        if (order != null) {
+     
+        	SQLInjectionValidator.validateSQLInput(whereClause);
+            //sql = null;
+            sql ="select * from `" + dataTableName + "` where " + whereClause;
+        } 
+
+        
+        if (StringUtils.isNotBlank(order)) {
+            this.columnValidator.validateSqlInjection(sql, order);
             sql = sql + " order by " + order;
         }
 
+
+     
         final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
 
         return new GenericResultsetData(columnHeaders, result);

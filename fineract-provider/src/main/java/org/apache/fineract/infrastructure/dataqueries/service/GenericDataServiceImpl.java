@@ -198,6 +198,10 @@ public class GenericDataServiceImpl implements GenericDataService {
 
         final SqlRowSet columnDefinitions = getDatatableMetaData(datatable);
 
+
+        System.err.println("-----------did we get data here DatatableNotFoundException-----------"+datatable);
+
+
         final List<ResultsetColumnHeaderData> columnHeaders = new ArrayList<>();
 
         columnDefinitions.beforeFirst();
@@ -241,8 +245,12 @@ public class GenericDataServiceImpl implements GenericDataService {
 
             }
 
+            System.err.println("----------------------------we have done columnValues---------------------");
+
             final ResultsetColumnHeaderData rsch = ResultsetColumnHeaderData.detailed(columnName, columnType, columnLength, columnNullable,
                     columnIsPrimaryKey, columnValues, codeName);
+
+            System.err.println("-----------------------------where is error son------------------");
 
             columnHeaders.add(rsch);
         }
