@@ -16,12 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*
-    ChangeLog
-    01/27/2021
-    isSettlementPartialPayment
-
-*/
 package org.apache.fineract.portfolio.loanproduct.service;
 
 import java.math.BigDecimal;
@@ -55,6 +49,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+
+import org.apache.fineract.wese.enumerations.SACCO_LOAN_LOCK ;
+
 
 @Service
 public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatformService {
@@ -233,8 +230,12 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + "lp.allow_variabe_installments as isVariableIntallmentsAllowed, "
                     + "lvi.minimum_gap as minimumGap, "
                     + "lvi.maximum_gap as maximumGap, "
-                    + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization, "
-                    + "lp.is_settlement_partial_payment as isSettlementPartialPayment "
+                    + "lp.is_settlement_partial_payment as isSettlementPartialPayment, "
+                    + "lp.is_sacco_product as isSaccoProduct, "
+                    + "lp.sacco_loan_lock as saccoLoanLock ,"
+                    + "lp.loan_factor as loanFactor, "
+                    + "lp.share_account_validity as shareAccountValidity, "
+                    + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization "
                     + " from m_product_loan lp "
                     + " left join m_fund f on f.id = lp.fund_id "
                     + " left join m_product_loan_recalculation_details lpr on lpr.product_id=lp.id "
@@ -316,9 +317,20 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final int amortizationTypeId = JdbcSupport.getInteger(rs, "amortizationMethod");
             final EnumOptionData amortizationType = LoanEnumerations.amortizationType(amortizationTypeId);
             final boolean isEqualAmortization = rs.getBoolean("isEqualAmortization");
-            
+           // final boolean isInterestAveragePayments = rs.getBoolean("isInterestAveragePayments");
+            final boolean isSettlementPartialPayment = rs.getBoolean("isSettlementPartialPayment");
             final Integer interestRateFrequencyTypeId = JdbcSupport.getInteger(rs, "interestRatePerPeriodFreq");
             final EnumOptionData interestRateFrequencyType = LoanEnumerations.interestRateFrequencyType(interestRateFrequencyTypeId);
+
+
+            /// added on the 08/10/2020 
+            final boolean isSaccoProduct = rs.getBoolean("isSaccoProduct");
+            final Integer loanFactor = JdbcSupport.getInteger(rs, "loanFactor");
+            final Integer shareAccountValidity = JdbcSupport.getInteger(rs, "shareAccountValidity");   
+
+            /// added on the 22/10/2020
+            int saccoLoanLockInt = JdbcSupport.getInteger(rs ,"saccoLoanLock");
+            final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
 
             final int interestTypeId = JdbcSupport.getInteger(rs, "interestMethod");
             final EnumOptionData interestType = LoanEnumerations.interestType(interestTypeId);
@@ -456,9 +468,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final boolean syncExpectedWithDisbursementDate = rs.getBoolean("syncExpectedWithDisbursementDate");
             
             final boolean canUseForTopup = rs.getBoolean("canUseForTopup");
-            final boolean isSettlementPartialPayment = rs.getBoolean("isSettlementPartialPayment");
 
-       
             return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                     numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
                     minInterestRatePerPeriod, maxInterestRatePerPeriod, annualInterestRate, repaymentFrequencyType,
@@ -474,7 +484,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     installmentAmountInMultiplesOf, allowAttributeOverrides, isLinkedToFloatingInterestRates, floatingRateId,
                     floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                     maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableIntallmentsAllowed, minimumGap,
-                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment);
+                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock);
         }
     }
 
@@ -578,6 +588,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
 
         return this.jdbcTemplate.query(sql, rm, new Object[] {});
     }
+
 
     @Override
     public Collection<LoanProductData> retrieveRestrictedProductsForMix(final Long productId) {

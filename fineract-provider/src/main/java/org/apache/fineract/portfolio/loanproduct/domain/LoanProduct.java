@@ -16,11 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-/* Change log 
-    01/27/2021 - isSettlementPartialPayment added 
-
-*/
 package org.apache.fineract.portfolio.loanproduct.domain;
 
 import java.math.BigDecimal;
@@ -70,6 +65,8 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import org.apache.fineract.wese.enumerations.SACCO_LOAN_LOCK ;
 
 /**
  * Loan products allow for categorisation of an organisations loans into
@@ -191,10 +188,25 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     @Column(name = "is_equal_amortization", nullable = false)
     private boolean isEqualAmortization = false;
 
-
     @Column(name = "is_settlement_partial_payment", nullable = false)
     private boolean isSettlementPartialPayment = false;
 
+
+
+    @Column(name = "is_sacco_product", nullable = false)
+    private boolean isSaccoProduct = false;
+
+
+    @Column(name = "loan_factor", nullable = true)
+    private Integer loanFactor = null;
+
+    @Column(name = "share_account_validity", nullable = true)
+    private Integer shareAccountValidity = null;
+
+
+    //added 22/10/2020
+    @Column(name = "sacco_loan_lock", nullable = true)
+    private SACCO_LOAN_LOCK saccoLoanLock = null;
 
     public static LoanProduct assembleFromJson(final Fund fund, final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy,
             final List<Charge> productCharges, final JsonCommand command, final AprCalculator aprCalculator, FloatingRate floatingRate) {
@@ -233,6 +245,9 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         Integer minimumGapBetweenInstallments = null;
         Integer maximumGapBetweenInstallments = null;
 
+
+        final Integer repaymentEvery = command.integerValueOfParameterNamed("repaymentEvery");
+        final Integer numberOfRepayments = command.integerValueOfParameterNamed("numberOfRepayments");
         final Boolean isLinkedToFloatingInterestRates = command.booleanObjectValueOfParameterNamed("isLinkedToFloatingInterestRates");
         if (isLinkedToFloatingInterestRates != null && isLinkedToFloatingInterestRates) {
             interestRateDifferential = command.bigDecimalValueOfParameterNamed("interestRateDifferential");
@@ -246,7 +261,8 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             interestRatePerPeriod = command.bigDecimalValueOfParameterNamed("interestRatePerPeriod");
             minInterestRatePerPeriod = command.bigDecimalValueOfParameterNamed("minInterestRatePerPeriod");
             maxInterestRatePerPeriod = command.bigDecimalValueOfParameterNamed("maxInterestRatePerPeriod");
-            annualInterestRate = aprCalculator.calculateFrom(interestFrequencyType, interestRatePerPeriod);
+            annualInterestRate = aprCalculator.calculateFrom(interestFrequencyType, interestRatePerPeriod, numberOfRepayments, repaymentEvery, repaymentFrequencyType);
+
         }
 
         final Boolean isVariableInstallmentsAllowed = command
@@ -256,8 +272,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             maximumGapBetweenInstallments = command.integerValueOfParameterNamed(LoanProductConstants.maximumGapBetweenInstallments);
         }
 
-        final Integer repaymentEvery = command.integerValueOfParameterNamed("repaymentEvery");
-        final Integer numberOfRepayments = command.integerValueOfParameterNamed("numberOfRepayments");
         final Integer minNumberOfRepayments = command.integerValueOfParameterNamed("minNumberOfRepayments");
         final Integer maxNumberOfRepayments = command.integerValueOfParameterNamed("maxNumberOfRepayments");
         final BigDecimal inArrearsTolerance = command.bigDecimalValueOfParameterNamed("inArrearsTolerance");
@@ -341,15 +355,37 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         final boolean syncExpectedWithDisbursementDate = command.booleanPrimitiveValueOfParameterNamed("syncExpectedWithDisbursementDate");
         
         
-		final boolean canUseForTopup = command.parameterExists(LoanProductConstants.canUseForTopup)
-				? command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.canUseForTopup)
-				: false;
-				
+        final boolean canUseForTopup = command.parameterExists(LoanProductConstants.canUseForTopup)
+                ? command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.canUseForTopup)
+                : false;
+                
         final boolean isEqualAmortization = command.parameterExists(LoanProductConstants.isEqualAmortizationParam) ? command
                 .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isEqualAmortizationParam) : false;
 
         final boolean isSettlementPartialPayment = command.parameterExists(LoanProductConstants.isSettlementPartialPaymentParam) ? command
                 .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isSettlementPartialPaymentParam) : false;
+
+
+        
+        final boolean isSaccoProduct = command.parameterExists(LoanProductConstants.isSaccoProductParam) ? command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isSaccoProductParam) : false;
+
+        final Integer loanFactor = command
+                .integerValueOfParameterNamed(LoanProductConstants.loanFactorParam);
+
+        final Integer shareAccountValidity = command
+                .integerValueOfParameterNamed(LoanProductConstants.shareAccountValidityParam);
+
+
+        final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(command
+                .integerValueOfParameterNamed(LoanProductConstants.saccoLoanLockParam));
+
+
+
+
+        // final boolean isInterestAveragePayments = command.parameterExists(LoanProductConstants.isInterestAveragePaymentsParam) ? command
+        //         .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isInterestAveragePaymentsParam) : false;
+
 
 
         return new LoanProduct(fund, loanTransactionProcessingStrategy, name, shortName, description, currency, principal, minPrincipal,
@@ -365,7 +401,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 installmentAmountInMultiplesOf, loanConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRate,
                 interestRateDifferential, minDifferentialLendingRate, maxDifferentialLendingRate, defaultDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGapBetweenInstallments,
-                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization, isSettlementPartialPayment);
+                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock);
 
     }
 
@@ -595,7 +631,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate,
             Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments,
-            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment) {
+            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment,final boolean isSaccoProduct ,final Integer loanFactor ,final Integer shareAccountValidity ,final SACCO_LOAN_LOCK saccoLoanLock) {
         this.fund = fund;
         this.transactionProcessingStrategy = transactionProcessingStrategy;
         this.name = name.trim();
@@ -670,10 +706,17 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         this.canDefineInstallmentAmount = canDefineEmiAmount;
         this.installmentAmountInMultiplesOf = installmentAmountInMultiplesOf;
         this.syncExpectedWithDisbursementDate = 
-        		syncExpectedWithDisbursementDate;
+                syncExpectedWithDisbursementDate;
         this.canUseForTopup = canUseForTopup;
         this.isEqualAmortization = isEqualAmortization;
         this.isSettlementPartialPayment = isSettlementPartialPayment ;
+    
+
+        this.isSaccoProduct = isSaccoProduct ;
+        this.loanFactor = loanFactor ;
+        this.shareAccountValidity = shareAccountValidity ;
+        this.saccoLoanLock = saccoLoanLock ;
+     //   this.isInterestAveragePayments = isInterestAveragePayments;
     }
 
     public MonetaryCurrency getCurrency() {
@@ -898,10 +941,10 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         }
         
         if(command.isChangeInBooleanParameterNamed("syncExpectedWithDisbursementDate"
-        		, this.syncExpectedWithDisbursementDate)){
-        	final boolean newValue = command.booleanPrimitiveValueOfParameterNamed("syncExpectedWithDisbursementDate");
-        	actualChanges.put("syncExpectedWithDisbursementDate", newValue);
-        	this.syncExpectedWithDisbursementDate = newValue;
+                , this.syncExpectedWithDisbursementDate)){
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed("syncExpectedWithDisbursementDate");
+            actualChanges.put("syncExpectedWithDisbursementDate", newValue);
+            this.syncExpectedWithDisbursementDate = newValue;
         }
 
         /**
@@ -1059,10 +1102,45 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             this.canUseForTopup = newValue;
         }
 
-        if(command.isChangeInBooleanParameterNamed("isSettlementPartialPayment",this.isSettlementPartialPayment)){
+        ///added 27/10/2020 this will work i think for updating 
+
+        if(command.isChangeInBooleanParameterNamed("isSaccoProduct"
+                , this.isSaccoProduct)){
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed("isSaccoProduct");
+            actualChanges.put("isSaccoProduct", newValue);
+            this.isSaccoProduct = newValue;
+        }
+
+        if(command.isChangeInBooleanParameterNamed("isSettlementPartialPayment"
+                , this.isSettlementPartialPayment)){
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed("isSettlementPartialPayment");
             actualChanges.put("isSettlementPartialPayment", newValue);
             this.isSettlementPartialPayment = newValue;
+        }
+
+
+        if (command.isChangeInIntegerParameterNamed("loanFactor",
+                this.loanFactor)) {
+            final Integer newValue = command.integerValueOfParameterNamed("loanFactor");
+            actualChanges.put("loanFactor", newValue);
+            actualChanges.put("locale", localeAsInput);
+            this.loanFactor = newValue;
+        }
+
+        if (command.isChangeInIntegerParameterNamed("shareAccountValidity",
+                this.shareAccountValidity)) {
+            final Integer newValue = command.integerValueOfParameterNamed("shareAccountValidity");
+            actualChanges.put("shareAccountValidity", newValue);
+            actualChanges.put("locale", localeAsInput);
+            this.shareAccountValidity = newValue;
+        }
+
+        if (command.isChangeInIntegerParameterNamed("saccoLoanLock",
+                this.saccoLoanLock.ordinal())) {
+            final Integer newValue = command.integerValueOfParameterNamed("saccoLoanLock");
+            actualChanges.put("saccoLoanLock", newValue);
+            actualChanges.put("locale", localeAsInput);
+            this.saccoLoanLock = SACCO_LOAN_LOCK.fromInt(newValue);
         }
 
 
@@ -1214,14 +1292,14 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     }
     
     public boolean syncExpectedWithDisbursementDate() {
-		return syncExpectedWithDisbursementDate;
-	}
+        return syncExpectedWithDisbursementDate;
+    }
 
-	public void setSyncExpectedWithDisbursementDate(boolean syncExpectedWithDisbursementDate) {
-		this.syncExpectedWithDisbursementDate = syncExpectedWithDisbursementDate;
-	}
+    public void setSyncExpectedWithDisbursementDate(boolean syncExpectedWithDisbursementDate) {
+        this.syncExpectedWithDisbursementDate = syncExpectedWithDisbursementDate;
+    }
 
-	public Map<String, BigDecimal> fetchBorrowerCycleVariationsForCycleNumber(final Integer cycleNumber) {
+    public Map<String, BigDecimal> fetchBorrowerCycleVariationsForCycleNumber(final Integer cycleNumber) {
         Map<String, BigDecimal> borrowerCycleVariations = new HashMap<>();
         borrowerCycleVariations.put(LoanProductConstants.principal, this.loanProductRelatedDetail.getPrincipal().getAmount());
         borrowerCycleVariations.put(LoanProductConstants.interestRatePerPeriod,
@@ -1398,16 +1476,38 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         return isEqualAmortization;
     }
 
+    public boolean isSettlementPartialPayment() {
+        return isSettlementPartialPayment;
+    }
+
+
     public void setEqualAmortization(boolean isEqualAmortization) {
         this.isEqualAmortization = isEqualAmortization;
     }
 
-    public boolean isSettlementPartialPayment(){
-        return isSettlementPartialPayment ;
+
+    public boolean isSaccoProduct(){
+        return isSaccoProduct ;
     }
 
-    public void setSettlementPartialPayment(boolean isSettlementPartialPayment){
-        this.isSettlementPartialPayment = isSettlementPartialPayment ;
+    public SACCO_LOAN_LOCK saccoLoanLock(){
+        return saccoLoanLock ;
     }
+
+    public Integer loanFactor(){
+        return loanFactor ;
+    }
+
+    public Integer shareAccountValidity(){
+        return shareAccountValidity;
+    }
+
+    // public void setIsInterestAveragePayments(boolean isInterestAveragePayments){
+    //     this.isInterestAveragePayments = isInterestAveragePayments ;
+    // }
+
+    // public boolean isInterestAveragePayments(){
+    //     return isInterestAveragePayments ;
+    // }
 
 }

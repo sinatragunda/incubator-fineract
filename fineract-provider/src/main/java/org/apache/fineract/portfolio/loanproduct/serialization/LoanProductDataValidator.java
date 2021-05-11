@@ -16,14 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*
- Changelog
- 01/27/2021
- isSettlementPartialPayment 
-
-
-
-*/
 package org.apache.fineract.portfolio.loanproduct.serialization;
 
 import java.lang.reflect.Type;
@@ -63,6 +55,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+
+import org.apache.fineract.wese.enumerations.SACCO_LOAN_LOCK ;
+
 
 @Component
 public final class LoanProductDataValidator {
@@ -116,7 +112,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -170,6 +166,23 @@ public final class LoanProductDataValidator {
             baseDataValidator.reset().parameter(LoanProductConstants.isSettlementPartialPaymentParam).value(isSettlementPartialPayment).ignoreIfNull()
                     .validateForBooleanValue();
         }
+       
+
+        /// added 08 /10/2020 
+
+        final Integer loanFactor = this.fromApiJsonHelper.extractIntegerNamed("loanFactor", element, Locale.getDefault());
+        baseDataValidator.reset().parameter("loanFactor").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
+
+
+        final Integer shareAccountValidity = this.fromApiJsonHelper.extractIntegerNamed("shareAccountValidity", element, Locale.getDefault());
+        baseDataValidator.reset().parameter("shareAccountValidity").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
+
+        final Integer saccoLoanLockInt =  this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
+        baseDataValidator.reset().parameter("saccoLoanLock").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
+
+        final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
+
+
 
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.minimumDaysBetweenDisbursalAndFirstRepayment, element)) {
             final Long minimumDaysBetweenDisbursalAndFirstRepayment = this.fromApiJsonHelper.extractLongNamed(
@@ -346,8 +359,8 @@ public final class LoanProductDataValidator {
         if (this.fromApiJsonHelper.parameterExists("isLinkedToFloatingInterestRates", element)
                 && this.fromApiJsonHelper.extractBooleanNamed("isLinkedToFloatingInterestRates", element) == true) {
             if (isEqualAmortization) { throw new EqualAmortizationUnsupportedFeatureException("floating.interest.rate",
-                    "floating interest rate"); }      	
-        	if (this.fromApiJsonHelper.parameterExists("interestRatePerPeriod", element)) {
+                    "floating interest rate"); }        
+            if (this.fromApiJsonHelper.parameterExists("interestRatePerPeriod", element)) {
                 baseDataValidator
                         .reset()
                         .parameter("interestRatePerPeriod")
@@ -528,7 +541,7 @@ public final class LoanProductDataValidator {
 
             final Integer interestRateFrequencyType = this.fromApiJsonHelper.extractIntegerNamed("interestRateFrequencyType", element,
                     Locale.getDefault());
-            baseDataValidator.reset().parameter("interestRateFrequencyType").value(interestRateFrequencyType).notNull().inMinMaxRange(0, 3);
+            baseDataValidator.reset().parameter("interestRateFrequencyType").value(interestRateFrequencyType).notNull().inMinMaxRange(0, 4);
         }
 
         // Guarantee Funds
@@ -667,7 +680,7 @@ public final class LoanProductDataValidator {
     private void validateVariableInstallmentSettings(final DataValidatorBuilder baseDataValidator, final JsonElement element) {
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.allowVariableInstallmentsParamName, element)
                 && this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.allowVariableInstallmentsParamName, element)) {
-        	
+            
             boolean isEqualAmortization = false;
             if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isEqualAmortizationParam, element)) {
                 isEqualAmortization = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isEqualAmortizationParam, element);
@@ -965,15 +978,19 @@ public final class LoanProductDataValidator {
     }
 
     public void validateForUpdate(final String json, final LoanProduct loanProduct) {
+
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.supportedParameters);
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loanproduct");
 
         final JsonElement element = this.fromApiJsonHelper.parse(json);
+        
         if (this.fromApiJsonHelper.parameterExists("name", element)) {
             final String name = this.fromApiJsonHelper.extractStringNamed("name", element);
             baseDataValidator.reset().parameter("name").value(name).notBlank().notExceedingLengthOf(100);
@@ -1162,6 +1179,33 @@ public final class LoanProductDataValidator {
                     .validateForBooleanValue();
         }
 
+
+        ///loan sacco products added 26/10/2020
+
+        boolean isSaccoProduct = loanProduct.isSaccoProduct();
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isSaccoProductParam, element)) {
+            isSaccoProduct = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isSaccoProductParam, element);
+            baseDataValidator.reset().parameter(LoanProductConstants.isSaccoProductParam).value(isSaccoProduct).ignoreIfNull()
+                    .validateForBooleanValue();
+        }
+
+        if (this.fromApiJsonHelper.parameterExists("loanFactor", element)) {
+            final Integer loanFactor = this.fromApiJsonHelper.extractIntegerNamed("loanFactor", element, Locale.getDefault());
+            baseDataValidator.reset().parameter("loanFactor").value(loanFactor).notNull().integerZeroOrGreater();
+        }
+
+        if (this.fromApiJsonHelper.parameterExists("shareAccountValidity", element)) {
+            final Integer shareAccountValidity = this.fromApiJsonHelper.extractIntegerNamed("shareAccountValidity", element, Locale.getDefault());
+            baseDataValidator.reset().parameter("shareAccountValidity").value(shareAccountValidity).ignoreIfNull().integerZeroOrGreater();
+        }
+
+
+        if (this.fromApiJsonHelper.parameterExists("saccoLoanLock", element)) {
+            final Integer saccoLoanLock = this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
+            baseDataValidator.reset().parameter("saccoLoanLock").value(saccoLoanLock).ignoreIfNull();
+        }
+
+
         // Interest recalculation settings
         Boolean isInterestRecalculationEnabled = loanProduct.isInterestRecalculationEnabled();
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isInterestRecalculationEnabledParameterName, element)) {
@@ -1185,8 +1229,8 @@ public final class LoanProductDataValidator {
             isLinkedToFloatingInterestRates = this.fromApiJsonHelper.extractBooleanNamed("isLinkedToFloatingInterestRates", element);
         }
         if (isLinkedToFloatingInterestRates) {
-        	if(isEqualAmortization){
-            	throw new EqualAmortizationUnsupportedFeatureException("floating.interest.rate", "floating interest rate");
+            if(isEqualAmortization){
+                throw new EqualAmortizationUnsupportedFeatureException("floating.interest.rate", "floating interest rate");
             }
             if (this.fromApiJsonHelper.parameterExists("interestRatePerPeriod", element)) {
                 baseDataValidator
@@ -1383,7 +1427,7 @@ public final class LoanProductDataValidator {
                 interestRateFrequencyType = this.fromApiJsonHelper.extractIntegerNamed("interestRateFrequencyType", element,
                         Locale.getDefault());
             }
-            baseDataValidator.reset().parameter("interestRateFrequencyType").value(interestRateFrequencyType).notNull().inMinMaxRange(0, 3);
+            baseDataValidator.reset().parameter("interestRateFrequencyType").value(interestRateFrequencyType).notNull().inMinMaxRange(0, 4);
         }
 
         // Guarantee Funds
