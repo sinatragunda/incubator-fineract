@@ -17,5 +17,5 @@
 -- under the License.
 --
 
-
+ALTER TABLE `m_product_loan` DROP COLUMN `sacco_loan_lock`;
 ALTER TABLE `m_product_loan` ADD COLUMN `sacco_loan_lock` smallint(5) DEFAULT 2 ;

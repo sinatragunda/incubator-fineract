@@ -64,7 +64,6 @@ import java.util.*;
 @Path("/loanproducts")
 @Component
 @Scope("singleton")
-@Api(value = "Loan Products", description = "A Loan product is a template that is used when creating a loan. Much of the template definition can be overridden during loan creation.")
 public class LoanProductsApiResource {
 
     private final Set<String> LOAN_PRODUCT_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "shortName", "description",
@@ -231,7 +230,6 @@ public class LoanProductsApiResource {
     @Path("{productId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String updateLoanProduct(@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
     public String updateLoanProduct(@PathParam("productId") final Long productId,final String apiRequestBodyAsJson) {
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateLoanProduct(productId).withJson(apiRequestBodyAsJson)

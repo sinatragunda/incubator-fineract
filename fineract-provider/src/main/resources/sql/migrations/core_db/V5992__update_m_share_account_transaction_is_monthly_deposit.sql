@@ -17,6 +17,7 @@
 -- under the License.
 --
 
+ALTER TABLE `m_share_account_transactions` DROP COLUMN `is_monthly_deposit`;
 
 ALTER TABLE `m_share_account_transactions`
 ADD COLUMN `is_monthly_deposit` smallint(5) DEFAULT 0 ;

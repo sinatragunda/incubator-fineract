@@ -17,6 +17,7 @@
 -- under the License.
 --
 
+-- ALTER TABLE `m_share_product` DROP COLUMN `dividend_lower_limit`;
 
 ALTER TABLE `m_share_product`
 ADD COLUMN `dividend_lower_limit` decimal(19.6) DEFAULT 0 ;

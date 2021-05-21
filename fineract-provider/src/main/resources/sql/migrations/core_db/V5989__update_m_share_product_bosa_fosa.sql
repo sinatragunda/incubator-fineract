@@ -17,5 +17,8 @@
 -- under the License.
 --
 
+ALTER TABLE `m_share_product` DROP COLUMN `property_type`;
+ALTER TABLE `m_share_product` DROP COLUMN `monthly_deposit`;
+
 ALTER TABLE `m_share_product` ADD COLUMN `property_type` int(5) DEFAULT 2 ;
 ALTER TABLE `m_share_product` ADD COLUMN `monthly_deposit` decimal(20,3) DEFAULT 0 ;

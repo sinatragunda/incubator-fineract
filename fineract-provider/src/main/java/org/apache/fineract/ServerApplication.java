@@ -27,6 +27,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+
 /**
  * Fineract main() application which launches Fineract in an embedded Tomcat HTTP
  * (using Spring Boot).
@@ -52,5 +57,17 @@ public class ServerApplication {
 		ConfigurableApplicationContext ctx = SpringApplication.run(Configuration.class, args);
 		ApplicationExitUtil.waitForKeyPressToCleanlyExit(ctx);
 	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				System.err.println("---------------------------------add some fucking cors here-------------------");
+				registry.addMapping("/*").allowedOrigins("*");
+			}
+		};
+	}
+
 
 }
