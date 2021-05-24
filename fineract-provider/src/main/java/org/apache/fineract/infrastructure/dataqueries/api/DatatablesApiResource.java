@@ -81,7 +81,6 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getDatatables(@QueryParam("apptable") final String apptable, @Context final UriInfo uriInfo) {
 
-        System.err.println("---------------------print as many tables as you can here son-------------------");
         final List<DatatableData> result = this.readWriteNonCoreDataService.retrieveDatatableNames(apptable);
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
@@ -157,9 +156,7 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getDatatable(@PathParam("datatable") final String datatable, @Context final UriInfo uriInfo) {
 
-        System.err.println("---------------------------------------get a datatable here with name "+datatable);
-
-        final DatatableData result = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
+      final DatatableData result = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
@@ -172,14 +169,11 @@ public class DatatablesApiResource {
     public String getDatatable(@PathParam("datatable") final String datatable, @PathParam("apptableId") final Long apptableId,
             @QueryParam("order") final String order, @Context final UriInfo uriInfo) {
 
-        System.err.println("----------------------------------------read non core table with apptableId "+apptableId);
         this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
 
         final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveDataTableGenericResultSet(datatable, apptableId,
                 order, null);
 
-
-        System.err.println("-------------------------------where is the error here son-------------------");
 
         String json = "";
         final boolean genericResultSet = ApiParameterHelper.genericResultSet(uriInfo.getQueryParameters());
@@ -189,9 +183,7 @@ public class DatatablesApiResource {
         } else {
             json = this.genericDataService.generateJsonFromGenericResultsetData(results);
         }
-
-        System.err.println("--------------------done now lets return json data "+json);
-
+     
         return json;
     }
 

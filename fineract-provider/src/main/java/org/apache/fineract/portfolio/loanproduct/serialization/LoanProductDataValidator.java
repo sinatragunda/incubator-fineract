@@ -112,7 +112,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.isAllowMultipleInstancesParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -181,7 +181,15 @@ public final class LoanProductDataValidator {
         baseDataValidator.reset().parameter("saccoLoanLock").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
 
         final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
+        
+        /// added 24/05/2021
 
+        boolean isAllowMultipleInstances = false;
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isAllowMultipleInstancesParam, element)) {
+            isAllowMultipleInstances = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isAllowMultipleInstancesParam, element);
+            baseDataValidator.reset().parameter(LoanProductConstants.isAllowMultipleInstancesParam).value(isAllowMultipleInstances).ignoreIfNull()
+                    .validateForBooleanValue();
+        }        
 
 
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.minimumDaysBetweenDisbursalAndFirstRepayment, element)) {

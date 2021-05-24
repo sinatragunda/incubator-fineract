@@ -63,7 +63,6 @@ public class ServerApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				System.err.println("---------------------------------add some fucking cors here-------------------");
 				registry.addMapping("/*").allowedOrigins("*");
 			}
 		};

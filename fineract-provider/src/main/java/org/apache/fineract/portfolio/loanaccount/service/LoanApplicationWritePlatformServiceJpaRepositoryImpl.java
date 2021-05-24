@@ -108,6 +108,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+
+/// added 24/05/2021 
+import org.apache.fineract.portfolio.loanaccount.helper.AllowMultipleInstancesHelper;
+
 @Service
 public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements LoanApplicationWritePlatformService {
 
@@ -220,7 +224,13 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
             final Long productId = this.fromJsonHelper.extractLongNamed("productId", command.parsedJson());
             final LoanProduct loanProduct = this.loanProductRepository.findOne(productId);
+            
+
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
+
+                        /// 24/05/2021
+            /// added new line here allow multiple instances 
+            AllowMultipleInstancesHelper.status(loanProduct);
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
                         if(clientId !=null){

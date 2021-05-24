@@ -233,6 +233,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + "lp.is_settlement_partial_payment as isSettlementPartialPayment, "
                     + "lp.is_sacco_product as isSaccoProduct, "
                     + "lp.sacco_loan_lock as saccoLoanLock ,"
+                    + "lp.allow_multiple_instances as allowMultipleInstances ,"
                     + "lp.loan_factor as loanFactor, "
                     + "lp.share_account_validity as shareAccountValidity, "
                     + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization "
@@ -329,6 +330,10 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final Integer shareAccountValidity = JdbcSupport.getInteger(rs, "shareAccountValidity");   
 
             /// added on the 22/10/2020
+
+
+            /// added on the 24/05/2021 
+            final boolean isAllowMultipleInstances = rs.getBoolean("allowMultipleInstances");
             int saccoLoanLockInt = JdbcSupport.getInteger(rs ,"saccoLoanLock");
             final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
 
@@ -484,7 +489,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     installmentAmountInMultiplesOf, allowAttributeOverrides, isLinkedToFloatingInterestRates, floatingRateId,
                     floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                     maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableIntallmentsAllowed, minimumGap,
-                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock);
+                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,isAllowMultipleInstances);
         }
     }
 

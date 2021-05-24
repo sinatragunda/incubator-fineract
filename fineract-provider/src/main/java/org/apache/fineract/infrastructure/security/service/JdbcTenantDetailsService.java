@@ -164,8 +164,6 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
             rows = jdbcTemplate.update(insertTenant);
         }
 
-        System.err.println("-------------------------------------------updated rows------------------"+rows);
-
         if(rows > 0){
 
             String queryReportId = String.format("SELECT id from tenant_server_connections where schema_name = '%s'",tenantIdentifier);
@@ -177,8 +175,6 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
             if(sqlRowSet.first()){
 
                 tenantId = sqlRowSet.getLong("id");
-
-                System.err.println("------------------------------Tenant Id-----------------"+tenantId);
                 String createTenantLink = String.format("INSERT into tenants(identifier ,name,timezone_id,oltp_id ,report_id) VALUES('%s','%s','%s',%i ,%i)",tenantIdentifier ,tenantIdentifier ,timezone ,tenantId ,tenantId);
                 jdbcTemplate.update(createTenantLink);
             }

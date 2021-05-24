@@ -21,9 +21,7 @@ public class BulkReportHelper{
 
 		BulkReportTask bulkReportTask = new BulkReportTask();
 		bulkReportTask.call(callable);
-
-		System.err.println("----------------------callable been run runBulkReport--------------------");
-		
+	
 		IndexedSession.indexedSession().add(bulkReportTask);
 
 		String sessionId = bulkReportTask.getSessionId();
@@ -31,8 +29,6 @@ public class BulkReportHelper{
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("sessionId" ,sessionId);
 		jsonObject.put("status" ,true);
-
-		System.err.println("-------------------------------response is ------------------"+jsonObject.toString());
 
 		return jsonObject ;
 	}
