@@ -112,6 +112,8 @@ import com.google.gson.JsonElement;
 /// added 24/05/2021 
 import org.apache.fineract.portfolio.loanaccount.helper.AllowMultipleInstancesHelper;
 
+import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
+
 @Service
 public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements LoanApplicationWritePlatformService {
 
@@ -151,6 +153,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final GlobalConfigurationRepositoryWrapper globalConfigurationRepository;
     private final FineractEntityToEntityMappingRepository repository;
     private final FineractEntityRelationRepository fineractEntityRelationRepository;
+    private final AccountDetailsReadPlatformService accountDetailsReadPlatformService;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
@@ -173,7 +176,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, 
             final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
-            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService) {
+            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
+            final AccountDetailsReadPlatformService accountDetailsReadPlatformService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -208,6 +212,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.globalConfigurationRepository = globalConfigurationRepository;
         this.repository = repository;
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
+        this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -228,20 +233,26 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
-                        /// 24/05/2021
-            /// added new line here allow multiple instances 
-            AllowMultipleInstancesHelper.status(loanProduct);
-
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
-                        if(clientId !=null){
-                        Client client= this.clientRepository.findOneWithNotFoundDetection(clientId);
-                        officeSpecificLoanProductValidation( productId,client.getOffice().getId());
-                        }
-                        final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
-                        if(groupId != null){
-                        	Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
-                            officeSpecificLoanProductValidation( productId,group.getOffice().getId());
-                        }
+            
+            System.err.println("------------------------clientId is----------------"+clientId);
+            if(clientId !=null){
+                
+                Client client= this.clientRepository.findOneWithNotFoundDetection(clientId);
+                officeSpecificLoanProductValidation( productId,client.getOffice().getId());
+
+                
+                /// 24/05/2021
+                /// added new line here allow multiple instances 
+                AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,clientId ,productId);
+
+            }
+            
+            final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
+            if(groupId != null){
+            	Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
+                officeSpecificLoanProductValidation( productId,group.getOffice().getId());
+            }
             
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 

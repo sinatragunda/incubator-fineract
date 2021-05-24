@@ -76,4 +76,8 @@ public class AccountSummaryCollectionData {
         return returnCollection;
     }
 
+    public Collection<LoanAccountSummaryData> loanAccounts(){
+        return this.loanAccounts ;
+    }
+
 }

@@ -23,17 +23,38 @@
 */
 package org.apache.fineract.portfolio.loanaccount.helper;
 
+import java.util.Collection;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.exception.AllowMultipleLoanInstancesException;
 
+import org.apache.fineract.portfolio.accountdetails.data.LoanAccountSummaryData;
+
+import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
+import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 
 public class AllowMultipleInstancesHelper{
 
-	public static void status(LoanProduct loanProduct){
+	public static void status(LoanProduct loanProduct ,AccountDetailsReadPlatformService accountDetailsReadPlatformService ,Long productId, Long clientId){
 
-		boolean allow = loanProduct.isAllowMultipleInstances();
+		boolean allow = loanProduct.allowMultipleInstances();
+		
 		if(!allow){
-			throw new AllowMultipleLoanInstancesException(loanProduct.productName());
+
+        	AccountSummaryCollectionData clientAccount = accountDetailsReadPlatformService.retrieveClientAccountDetails(clientId);
+			/// let iterate through loans now get data we want son 
+			Collection<LoanAccountSummaryData> loanAccounts = clientAccount.loanAccounts();
+
+			System.err.println("-----------------------------loan counter is------------"+loanAccounts.size());
+			
+			for(LoanAccountSummaryData l : loanAccounts){
+				System.err.println("-------------------------compare id "+productId+"-----------------with summary id "+l.id());
+				if(productId==l.id()){
+					if(l.isActive()){
+						throw new AllowMultipleLoanInstancesException(loanProduct.productName());
+					}
+				}
+			}
+
 		}
 	}
 

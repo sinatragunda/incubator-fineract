@@ -144,7 +144,7 @@ public interface LoanProductConstants {
 
     public static final String saccoLoanLockParam = "saccoLoanLock";
 
-    public static final String isAllowMultipleInstancesParam = "allowMultipleInstances";
+    public static final String allowMultipleInstancesParam = "allowMultipleInstances";
 
 
 

@@ -112,7 +112,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.isAllowMultipleInstancesParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -184,10 +184,10 @@ public final class LoanProductDataValidator {
         
         /// added 24/05/2021
 
-        boolean isAllowMultipleInstances = false;
-        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isAllowMultipleInstancesParam, element)) {
-            isAllowMultipleInstances = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isAllowMultipleInstancesParam, element);
-            baseDataValidator.reset().parameter(LoanProductConstants.isAllowMultipleInstancesParam).value(isAllowMultipleInstances).ignoreIfNull()
+        boolean allowMultipleInstances = false;
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.allowMultipleInstancesParam, element)) {
+            allowMultipleInstances = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.allowMultipleInstancesParam, element);
+            baseDataValidator.reset().parameter(LoanProductConstants.allowMultipleInstancesParam).value(allowMultipleInstances).ignoreIfNull()
                     .validateForBooleanValue();
         }        
 

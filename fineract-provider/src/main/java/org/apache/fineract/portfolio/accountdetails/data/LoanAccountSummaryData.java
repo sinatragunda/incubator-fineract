@@ -63,4 +63,13 @@ public class LoanAccountSummaryData {
         this.originalLoan = originalLoan;
         this.amountPaid = amountPaid;
     }
+
+    public boolean isActive(){
+        return status.isActive();
+
+    }
+
+    public Long id(){
+        return this.id;
+    }
 }
