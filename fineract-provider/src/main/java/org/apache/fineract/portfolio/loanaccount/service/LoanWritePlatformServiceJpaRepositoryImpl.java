@@ -129,6 +129,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 
+///added 25/05/2021
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.loanaccount.helper.RevolvingLoanHelper;
+
+
+/// added 31/05/2021
+import java.util.ArrayList;
+
 @Service
 public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatformService {
 
@@ -173,6 +181,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessingStrategy;
     private final CodeValueRepositoryWrapper codeValueRepository;
     private final CashierTransactionDataValidator cashierTransactionDataValidator;
+    private final SavingsAccountAssembler savingsAccountAssembler ;
 
     @Autowired
     public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -204,7 +213,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final LoanRepaymentScheduleTransactionProcessorFactory transactionProcessingStrategy,
             final CodeValueRepositoryWrapper codeValueRepository,
             final LoanRepositoryWrapper loanRepositoryWrapper,
-            final CashierTransactionDataValidator cashierTransactionDataValidator) {
+            final CashierTransactionDataValidator cashierTransactionDataValidator,
+            final SavingsAccountAssembler savingsAccountAssembler) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
         this.loanAssembler = loanAssembler;
@@ -244,6 +254,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
         this.codeValueRepository = codeValueRepository;
         this.cashierTransactionDataValidator = cashierTransactionDataValidator;
+        this.savingsAccountAssembler = savingsAccountAssembler ;
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -255,6 +266,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Override
     public CommandProcessingResult disburseLoan(final Long loanId, final JsonCommand command, Boolean isAccountTransfer) {
 
+    
         final AppUser currentUser = getAppUserIfPresent();
 
         this.loanEventApiJsonValidator.validateDisbursement(command.json(), isAccountTransfer);
@@ -265,6 +277,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         
         // validate ActualDisbursement Date Against Expected Disbursement Date
         LoanProduct loanProduct = loan.loanProduct();
+        
         if(loanProduct.syncExpectedWithDisbursementDate()){
         	syncExpectedDateWithActualDisbursementDate(loan, actualDisbursementDate);
         }
@@ -1123,6 +1136,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Override
     public CommandProcessingResult closeLoan(final Long loanId, final JsonCommand command) {
 
+
         AppUser currentUser = getAppUserIfPresent();
 
         this.loanEventApiJsonValidator.validateTransactionWithNoAmount(command.json());
@@ -1707,6 +1721,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final String errorMessage = "Disburse Loan with id:" + loan.getId() + " requires linked savings account for payment";
             throw new LinkedAccountRequiredException("loan.disburse.to.savings", errorMessage, loan.getId());
         }
+
         final SavingsAccount fromSavingsAccount = null;
         final boolean isExceptionForBalanceCheck = false;
         final boolean isRegularTransaction = true;
@@ -1717,6 +1732,43 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 isRegularTransaction, isExceptionForBalanceCheck);
         this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
 
+
+        //// added 25/05/2021
+        ////if then we get savings account balance and pay off exising linked loan now
+        //RevolveAccountHelper.disburseTransfer()
+
+        String revolveAccountIds = loan.revolvingAccountId();
+
+        if(revolveAccountIds != null){
+
+            SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
+            
+            StringTokenizer token = new StringTokenizer(revolveAccountIds ,",");
+            List<Loan> revolveLoanAccountsList = new ArrayList<>();
+
+            while(token.hasMoreTokens()){
+                Long id = Long.decode(token.nextToken());
+                Loan revolveLoanAccount = this.loanAssembler.assembleFrom(id);
+                revolveLoanAccountsList.add(revolveLoanAccount);
+            }
+
+            RevolvingLoanHelper.revolvingLoansBalanceCheck(revolveLoanAccountsList ,savingsAccount);
+            
+            for(Loan revolveLoanAccount : revolveLoanAccountsList){
+                Long id = revolveLoanAccount.getId();
+                BigDecimal revolveDTOAmount = RevolvingLoanHelper.revolvingLoanDTOAmount(revolveLoanAccount ,savingsAccount);
+
+                final AccountTransferDTO revolveAccountDTO = new AccountTransferDTO(transactionDate, revolveDTOAmount,
+                        PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, portfolioAccountData.accountId(), id,
+                        "Revolving Loan Payoff", locale, fmt, paymentDetail, LoanTransactionType.REPAYMENT.getValue(), null, null, null,
+                        AccountTransferType.LOAN_REPAYMENT.getValue(), null, null, txnExternalId, revolveLoanAccount, null, fromSavingsAccount,
+                        isRegularTransaction, isExceptionForBalanceCheck);
+
+                this.accountTransfersWritePlatformService.transferFunds(revolveAccountDTO);
+   
+            }
+        }
+ 
     }
 
     @Override

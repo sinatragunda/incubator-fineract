@@ -72,4 +72,8 @@ public class LoanAccountSummaryData {
     public Long id(){
         return this.id;
     }
+
+    public Long productId(){
+        return this.productId;
+    }
 }

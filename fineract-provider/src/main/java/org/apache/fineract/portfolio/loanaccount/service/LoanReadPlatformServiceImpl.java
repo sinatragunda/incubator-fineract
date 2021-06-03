@@ -607,6 +607,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     + " l.total_writtenoff_derived as totalWrittenOff,"
                     + " l.writeoff_reason_cv_id as writeoffReasonId,"
                     + " codev.code_value as writeoffReason,"
+
+                    // added 28/05/2021
+                    + " l.revolving_account_id as revolvingAccountId,"
                     + " l.total_outstanding_derived as totalOutstanding,"
                     + " l.total_overpaid_derived as totalOverpaid,"
                     + " l.fixed_emi_amount as fixedEmiAmount,"
@@ -901,59 +904,67 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final Boolean createStandingInstructionAtDisbursement = rs.getBoolean("createStandingInstructionAtDisbursement");
 
             LoanInterestRecalculationData interestRecalculationData = null;
+            
             if (isInterestRecalculationEnabled) {
 
-                final Long lprId = JdbcSupport.getLong(rs, "lirId");
-                final Long productId = JdbcSupport.getLong(rs, "loanId");
-                final int compoundTypeEnumValue = JdbcSupport.getInteger(rs, "compoundType");
-                final EnumOptionData interestRecalculationCompoundingType = LoanEnumerations
-                        .interestRecalculationCompoundingType(compoundTypeEnumValue);
-                final int rescheduleStrategyEnumValue = JdbcSupport.getInteger(rs, "rescheduleStrategy");
-                final EnumOptionData rescheduleStrategyType = LoanEnumerations.rescheduleStrategyType(rescheduleStrategyEnumValue);
-                final CalendarData calendarData = null;
-                final int restFrequencyEnumValue = JdbcSupport.getInteger(rs, "restFrequencyEnum");
-                final EnumOptionData restFrequencyType = LoanEnumerations.interestRecalculationFrequencyType(restFrequencyEnumValue);
-                final int restFrequencyInterval = JdbcSupport.getInteger(rs, "restFrequencyInterval");
-                final Integer restFrequencyNthDayEnumValue = JdbcSupport.getInteger(rs, "restFrequencyNthDayEnum");
-                EnumOptionData restFrequencyNthDayEnum = null;
-                if (restFrequencyNthDayEnumValue != null) {
-                    restFrequencyNthDayEnum = LoanEnumerations.interestRecalculationCompoundingNthDayType(restFrequencyNthDayEnumValue);
-                }
-                final Integer restFrequencyWeekDayEnumValue = JdbcSupport.getInteger(rs, "restFrequencyWeekDayEnum");
-                EnumOptionData restFrequencyWeekDayEnum = null;
-                if (restFrequencyWeekDayEnumValue != null) {
-                    restFrequencyWeekDayEnum = LoanEnumerations
-                            .interestRecalculationCompoundingDayOfWeekType(restFrequencyWeekDayEnumValue);
-                }
-                final Integer restFrequencyOnDay = JdbcSupport.getInteger(rs, "restFrequencyOnDay");
-                final CalendarData compoundingCalendarData = null;
-                final Integer compoundingFrequencyEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyEnum");
-                EnumOptionData compoundingFrequencyType = null;
-                if (compoundingFrequencyEnumValue != null) {
-                    compoundingFrequencyType = LoanEnumerations.interestRecalculationFrequencyType(compoundingFrequencyEnumValue);
-                }
-                final Integer compoundingInterval = JdbcSupport.getInteger(rs, "compoundingInterval");
-                final Integer compoundingFrequencyNthDayEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyNthDayEnum");
-                EnumOptionData compoundingFrequencyNthDayEnum = null;
-                if (compoundingFrequencyNthDayEnumValue != null) {
-                    compoundingFrequencyNthDayEnum = LoanEnumerations
-                            .interestRecalculationCompoundingNthDayType(compoundingFrequencyNthDayEnumValue);
-                }
-                final Integer compoundingFrequencyWeekDayEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyWeekDayEnum");
-                EnumOptionData compoundingFrequencyWeekDayEnum = null;
-                if (compoundingFrequencyWeekDayEnumValue != null) {
-                    compoundingFrequencyWeekDayEnum = LoanEnumerations
-                            .interestRecalculationCompoundingDayOfWeekType(compoundingFrequencyWeekDayEnumValue);
-                }
-                final Integer compoundingFrequencyOnDay = JdbcSupport.getInteger(rs, "compoundingFrequencyOnDay");
+                try{
+                    final Long lprId = JdbcSupport.getLong(rs, "lirId");
+                    final Long productId = JdbcSupport.getLong(rs, "loanId");
+                    final int compoundTypeEnumValue = JdbcSupport.getInteger(rs, "compoundType");
+                    final EnumOptionData interestRecalculationCompoundingType = LoanEnumerations
+                            .interestRecalculationCompoundingType(compoundTypeEnumValue);
+                    final int rescheduleStrategyEnumValue = JdbcSupport.getInteger(rs, "rescheduleStrategy");
+                    final EnumOptionData rescheduleStrategyType = LoanEnumerations.rescheduleStrategyType(rescheduleStrategyEnumValue);
+                    final CalendarData calendarData = null;
+                    final int restFrequencyEnumValue = JdbcSupport.getInteger(rs, "restFrequencyEnum");
+                    final EnumOptionData restFrequencyType = LoanEnumerations.interestRecalculationFrequencyType(restFrequencyEnumValue);
+                    final int restFrequencyInterval = JdbcSupport.getInteger(rs, "restFrequencyInterval");
+                    final Integer restFrequencyNthDayEnumValue = JdbcSupport.getInteger(rs, "restFrequencyNthDayEnum");
+                    EnumOptionData restFrequencyNthDayEnum = null;
+                    if (restFrequencyNthDayEnumValue != null) {
+                        restFrequencyNthDayEnum = LoanEnumerations.interestRecalculationCompoundingNthDayType(restFrequencyNthDayEnumValue);
+                    }
+                    final Integer restFrequencyWeekDayEnumValue = JdbcSupport.getInteger(rs, "restFrequencyWeekDayEnum");
+                    EnumOptionData restFrequencyWeekDayEnum = null;
+                    if (restFrequencyWeekDayEnumValue != null) {
+                        restFrequencyWeekDayEnum = LoanEnumerations
+                                .interestRecalculationCompoundingDayOfWeekType(restFrequencyWeekDayEnumValue);
+                    }
+                    final Integer restFrequencyOnDay = JdbcSupport.getInteger(rs, "restFrequencyOnDay");
+                    final CalendarData compoundingCalendarData = null;
+                    final Integer compoundingFrequencyEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyEnum");
+                    EnumOptionData compoundingFrequencyType = null;
+                    if (compoundingFrequencyEnumValue != null) {
+                        compoundingFrequencyType = LoanEnumerations.interestRecalculationFrequencyType(compoundingFrequencyEnumValue);
+                    }
+                    final Integer compoundingInterval = JdbcSupport.getInteger(rs, "compoundingInterval");
+                    final Integer compoundingFrequencyNthDayEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyNthDayEnum");
+                    EnumOptionData compoundingFrequencyNthDayEnum = null;
+                    if (compoundingFrequencyNthDayEnumValue != null) {
+                        compoundingFrequencyNthDayEnum = LoanEnumerations
+                                .interestRecalculationCompoundingNthDayType(compoundingFrequencyNthDayEnumValue);
+                    }
+                    final Integer compoundingFrequencyWeekDayEnumValue = JdbcSupport.getInteger(rs, "compoundingFrequencyWeekDayEnum");
+                    EnumOptionData compoundingFrequencyWeekDayEnum = null;
+                    if (compoundingFrequencyWeekDayEnumValue != null) {
+                        compoundingFrequencyWeekDayEnum = LoanEnumerations
+                                .interestRecalculationCompoundingDayOfWeekType(compoundingFrequencyWeekDayEnumValue);
+                    }
+                    final Integer compoundingFrequencyOnDay = JdbcSupport.getInteger(rs, "compoundingFrequencyOnDay");
 
-                final Boolean isCompoundingToBePostedAsTransaction = rs.getBoolean("isCompoundingToBePostedAsTransaction");
-                final Boolean allowCompoundingOnEod = rs.getBoolean("allowCompoundingOnEod");
-                interestRecalculationData = new LoanInterestRecalculationData(lprId, productId, interestRecalculationCompoundingType,
-                        rescheduleStrategyType, calendarData, restFrequencyType, restFrequencyInterval, restFrequencyNthDayEnum,
-                        restFrequencyWeekDayEnum, restFrequencyOnDay, compoundingCalendarData, compoundingFrequencyType,
-                        compoundingInterval, compoundingFrequencyNthDayEnum, compoundingFrequencyWeekDayEnum, compoundingFrequencyOnDay,
-                        isCompoundingToBePostedAsTransaction, allowCompoundingOnEod);
+                    final Boolean isCompoundingToBePostedAsTransaction = rs.getBoolean("isCompoundingToBePostedAsTransaction");
+                    final Boolean allowCompoundingOnEod = rs.getBoolean("allowCompoundingOnEod");
+                    interestRecalculationData = new LoanInterestRecalculationData(lprId, productId, interestRecalculationCompoundingType,
+                            rescheduleStrategyType, calendarData, restFrequencyType, restFrequencyInterval, restFrequencyNthDayEnum,
+                            restFrequencyWeekDayEnum, restFrequencyOnDay, compoundingCalendarData, compoundingFrequencyType,
+                            compoundingInterval, compoundingFrequencyNthDayEnum, compoundingFrequencyWeekDayEnum, compoundingFrequencyOnDay,
+                            isCompoundingToBePostedAsTransaction, allowCompoundingOnEod);
+                }
+                catch(NullPointerException n){
+
+                    System.err.println("-------------------------------------we catching errors now---------------------"+n.getMessage());
+
+                }
             }
 
             final boolean canUseForTopup = rs.getBoolean("canUseForTopup");
@@ -961,6 +972,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final Long closureLoanId = rs.getLong("closureLoanId");
             final String closureLoanAccountNo = rs.getString("closureLoanAccountNo");
             final BigDecimal topupAmount = rs.getBigDecimal("topupAmount");
+
+            // added 28/05/2021
+            final String revolvingAccountId = rs.getString("revolvingAccountId");
 
             return LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
@@ -975,7 +989,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     loanProductCounter, multiDisburseLoan, canDefineInstallmentAmount, fixedEmiAmount, outstandingLoanBalance, inArrears,
                     graceOnArrearsAgeing, isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
                     interestRecalculationData, createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap,
-                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization);
+                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId);
         }
     }
 

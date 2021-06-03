@@ -35,7 +35,6 @@ public class PaymentTypeHelper {
 
     public static Integer createPaymentType(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
             final String name, final String description, final Boolean isCashPayment, final Integer position) {
-        System.out.println("---------------------------------CREATING A PAYMENT TYPE---------------------------------------------");
         return Utils.performServerPost(requestSpec, responseSpec, CREATE_PAYMENTTYPE_URL,
                 getJsonToCreatePaymentType(name, description, isCashPayment, position), "resourceId");
     }
@@ -48,7 +47,6 @@ public class PaymentTypeHelper {
         hm.put("isCashPayment", isCashPayment);
         if (position != null) hm.put("position", position);
 
-        System.out.println("------------------------CREATING PAYMENT TYPE-------------------------" + hm);
         return new Gson().toJson(hm);
     }
 
@@ -63,7 +61,6 @@ public class PaymentTypeHelper {
     public static PaymentTypeDomain retrieveById(RequestSpecification requestSpec, ResponseSpecification responseSpec,
             final Integer paymentTypeId) {
         final String GET_PAYMENTTYPE_URL = PAYMENTTYPE_URL + "/" + paymentTypeId + "?" + Utils.TENANT_IDENTIFIER;
-        System.out.println("---------------------------------GET PAYMENT TYPE---------------------------------------------");
         Object get = Utils.performServerGet(requestSpec, responseSpec, GET_PAYMENTTYPE_URL, ""); 
         final String jsonData = new Gson().toJson(get);
         return new Gson().fromJson(jsonData, new TypeToken<PaymentTypeDomain>() {}.getType());
@@ -73,7 +70,6 @@ public class PaymentTypeHelper {
     public static HashMap<String, String> updatePaymentType(final int id, HashMap request, final RequestSpecification requestSpec,
             final ResponseSpecification responseSpec) {
         final String UPDATE_PAYMENTTYPE_URL = PAYMENTTYPE_URL + "/" + id + "?" + Utils.TENANT_IDENTIFIER;
-        System.out.println("---------------------------------UPDATE PAYMENT TYPE " + id + "---------------------------------------------");
         HashMap<String, String> hash = Utils.performServerPut(requestSpec, responseSpec, UPDATE_PAYMENTTYPE_URL,
                 new Gson().toJson(request), "changes");
         return hash;
@@ -81,7 +77,6 @@ public class PaymentTypeHelper {
 
     public static Integer deletePaymentType(final int id, final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
         final String DELETE_PAYMENTTYPE_URL = PAYMENTTYPE_URL + "/" + id + "?" + Utils.TENANT_IDENTIFIER;
-        System.out.println("---------------------------------DELETING PAYMENT TYPE " + id + "--------------------------------------------");
         return Utils.performServerDelete(requestSpec, responseSpec, DELETE_PAYMENTTYPE_URL, "resourceId");
     }
 

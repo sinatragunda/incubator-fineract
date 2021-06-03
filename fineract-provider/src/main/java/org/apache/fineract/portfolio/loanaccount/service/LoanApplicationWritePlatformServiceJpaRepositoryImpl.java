@@ -114,6 +114,12 @@ import org.apache.fineract.portfolio.loanaccount.helper.AllowMultipleInstancesHe
 
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 
+/// added 25/05/2021
+import org.apache.fineract.portfolio.loanaccount.helper.RevolvingLoanHelper;
+
+/// added 31/05/2021
+import java.util.StringTokenizer ;
+
 @Service
 public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements LoanApplicationWritePlatformService {
 
@@ -225,6 +231,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     public CommandProcessingResult submitApplication(final JsonCommand command) {
 
         try {
+
             final AppUser currentUser = getAppUserIfPresent();
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
             final Long productId = this.fromJsonHelper.extractLongNamed("productId", command.parsedJson());
@@ -234,25 +241,25 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
-            
-            System.err.println("------------------------clientId is----------------"+clientId);
+        
             if(clientId !=null){
-                
+
                 Client client= this.clientRepository.findOneWithNotFoundDetection(clientId);
                 officeSpecificLoanProductValidation( productId,client.getOffice().getId());
-
                 
                 /// 24/05/2021
                 /// added new line here allow multiple instances 
-                AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,clientId ,productId);
-
-            }
+                AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId);
             
+            }
             final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
+            
             if(groupId != null){
-            	Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
+                Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
             }
+
+
             
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
@@ -276,6 +283,25 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
 
             final Loan newLoanApplication = this.loanAssembler.assembleFrom(command, currentUser);
+
+            /// added 25/05/2021
+            ///do the whole revolve loan thing here 
+
+            final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
+            
+            if(revolvingAccountIds!=null){
+
+                StringTokenizer token = new StringTokenizer(revolvingAccountIds ,",");
+                List<Loan> list = new ArrayList<>();
+                while(token.hasMoreTokens()){
+                    Long id = new Long(token.nextToken());
+                    final Loan revolvingLoanAccount = this.loanAssembler.assembleFrom(id);
+                    list.add(revolvingLoanAccount);
+                }
+                
+                RevolvingLoanHelper.validateApplication(list ,newLoanApplication);   
+                
+            }
 
             validateSubmittedOnDate(newLoanApplication);
 

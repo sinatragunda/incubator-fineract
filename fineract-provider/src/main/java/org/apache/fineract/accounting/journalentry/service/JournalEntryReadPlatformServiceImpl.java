@@ -251,6 +251,8 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
             final Boolean onlyManualEntries, final Date fromDate, final Date toDate, final String transactionId, final Integer entityType,
             final JournalEntryAssociationParametersData associationParametersData) {
 
+        System.err.println("--------------------------retrueve alll journals here-------------------------------");
+
         GLJournalEntryMapper rm = new GLJournalEntryMapper(associationParametersData);
         final StringBuilder sqlBuilder = new StringBuilder(200);
         sqlBuilder.append("select SQL_CALC_FOUND_ROWS ");

@@ -43,14 +43,16 @@ public enum SACCO_LOAN_LOCK {
         return this.value ;
     }
 
-    public static SACCO_LOAN_LOCK fromInt(int commandValue){
+    public static SACCO_LOAN_LOCK fromInt(Integer commandValue){
 
-        for(SACCO_LOAN_LOCK crbRequest : SACCO_LOAN_LOCK.values()){
+        if(commandValue != null){
+            for(SACCO_LOAN_LOCK crbRequest : SACCO_LOAN_LOCK.values()){
 
-            if(crbRequest.ordinal() == commandValue){
-                return crbRequest ;
+                if(crbRequest.ordinal() == commandValue){
+                    return crbRequest ;
+                }
             }
         }
-        return null ;
+        return SACCO_LOAN_LOCK.NONE ;
     }
 }

@@ -580,7 +580,9 @@ public class LoanEnumerations {
     }
 
     public static EnumOptionData interestRecalculationCompoundingType(final InterestRecalculationCompoundingMethod type) {
+        
         EnumOptionData optionData = null;
+
         switch (type) {
             case FEE:
                 optionData = new EnumOptionData(InterestRecalculationCompoundingMethod.FEE.getValue().longValue(),

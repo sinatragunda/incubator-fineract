@@ -37,24 +37,24 @@ public class AllowMultipleInstancesHelper{
 	public static void status(LoanProduct loanProduct ,AccountDetailsReadPlatformService accountDetailsReadPlatformService ,Long productId, Long clientId){
 
 		boolean allow = loanProduct.allowMultipleInstances();
-		
+
 		if(!allow){
 
         	AccountSummaryCollectionData clientAccount = accountDetailsReadPlatformService.retrieveClientAccountDetails(clientId);
-			/// let iterate through loans now get data we want son 
+			/// lets iterate through loans now get data we want son 
 			Collection<LoanAccountSummaryData> loanAccounts = clientAccount.loanAccounts();
 
-			System.err.println("-----------------------------loan counter is------------"+loanAccounts.size());
-			
-			for(LoanAccountSummaryData l : loanAccounts){
-				System.err.println("-------------------------compare id "+productId+"-----------------with summary id "+l.id());
-				if(productId==l.id()){
-					if(l.isActive()){
-						throw new AllowMultipleLoanInstancesException(loanProduct.productName());
+			try {
+				for(LoanAccountSummaryData l : loanAccounts){
+					if(productId==l.productId()){
+						if(l.isActive()){
+							throw new AllowMultipleLoanInstancesException(loanProduct.productName());
+						}
 					}
 				}
 			}
-
+			catch(NullPointerException n){
+			}
 		}
 	}
 

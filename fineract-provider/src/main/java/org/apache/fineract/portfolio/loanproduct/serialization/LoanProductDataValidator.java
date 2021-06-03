@@ -174,15 +174,29 @@ public final class LoanProductDataValidator {
         baseDataValidator.reset().parameter("loanFactor").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
 
 
-        final Integer shareAccountValidity = this.fromApiJsonHelper.extractIntegerNamed("shareAccountValidity", element, Locale.getDefault());
-        baseDataValidator.reset().parameter("shareAccountValidity").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
+        Integer shareAccountValidity = this.fromApiJsonHelper.extractIntegerNamed("shareAccountValidity", element, Locale.getDefault());
+        baseDataValidator.reset().parameter("shareAccountValidity").value(shareAccountValidity).ignoreIfNull().integerZeroOrGreater();
 
-        final Integer saccoLoanLockInt =  this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
-        baseDataValidator.reset().parameter("saccoLoanLock").value(loanFactor).ignoreIfNull().integerZeroOrGreater();
+        //Integer saccoLoanLockInt =  this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
+        //baseDataValidator.reset().parameter("saccoLoanLock").value(saccoLoanLockInt).ignoreIfNull();
+
+
+
+        Integer saccoLoanLockInt = null ;
+        if(this.fromApiJsonHelper.parameterExists("saccoLoanLock", element)) {
+            saccoLoanLockInt = this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
+            baseDataValidator.reset().parameter("saccoLoanLock").value(saccoLoanLockInt).ignoreIfNull();
+        }
+
+
+        System.err.println("---------------------------------saccoLoanLockInt-----------------"+saccoLoanLockInt);
+
 
         final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
         
         /// added 24/05/2021
+
+        System.err.println("----------------------------SACCO_LOAN_LOCK------------"+saccoLoanLock);
 
         boolean allowMultipleInstances = false;
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.allowMultipleInstancesParam, element)) {

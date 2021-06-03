@@ -209,7 +209,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
 
      //added 24/05/2021
     @Column(name = "allow_multiple_instances", nullable = true)
-    private boolean allowMultipleInstances = false;
+    private boolean allowMultipleInstances = true;
 
 
     public static LoanProduct assembleFromJson(final Fund fund, final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy,

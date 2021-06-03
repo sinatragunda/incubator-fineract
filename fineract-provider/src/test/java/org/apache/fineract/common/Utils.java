@@ -59,7 +59,6 @@ public class Utils {
 
     public static String loginIntoServerAndGetBase64EncodedAuthenticationKey() {
         try {
-            System.out.println("-----------------------------------LOGIN-----------------------------------------");
             final String json = RestAssured.post(LOGIN_URL).asString();
             assertThat("Failed to login into fineract platform", StringUtils.isBlank(json), is(false));
             return JsonPath.with(json).get("base64EncodedAuthenticationKey");

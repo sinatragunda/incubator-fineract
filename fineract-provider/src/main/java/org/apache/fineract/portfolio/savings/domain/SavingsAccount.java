@@ -3066,4 +3066,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     		return allowOverdraft;
     }
 
+    public BigDecimal accountBalance(){
+        return getAccountBalance();
+    }
+
 }

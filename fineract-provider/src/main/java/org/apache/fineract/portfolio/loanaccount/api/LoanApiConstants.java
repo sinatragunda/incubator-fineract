@@ -126,4 +126,8 @@ public interface LoanApiConstants {
     public static final String datatables = "datatables";
     
     public static final String isEqualAmortizationParam = "isEqualAmortization";
+
+
+    ///added 26/05/2021
+    public static final String revolvingAccountIdParam = "revolvingAccountId";
 }

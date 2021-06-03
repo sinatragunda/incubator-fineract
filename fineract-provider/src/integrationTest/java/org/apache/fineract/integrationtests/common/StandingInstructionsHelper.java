@@ -97,7 +97,6 @@ public class StandingInstructionsHelper {
 
     public Integer createStandingInstruction(final String clientId, final String fromAccountId, final String toAccountId,
             final String fromAccountType, final String toAccountType, final String validFrom, final String validTo, final String monthDay) {
-        System.out.println("-------------------------------- CREATE STANDING INSTRUCTIONS --------------------------------");
         final String standingInstructionAsJSON = new StandingInstructionsHelper(this.requestSpec, this.responseSpec) //
                 .build(clientId.toString(), fromAccountId.toString(), toAccountId.toString(), fromAccountType, toAccountType, validFrom,
                         validTo, monthDay);
@@ -107,7 +106,6 @@ public class StandingInstructionsHelper {
 
     public HashMap getStandingInstructionById(final String standingInstructionId) {
 
-        System.out.println("----------------------------- RETRIEVING STANDING INSTRUCTION BY ID---------------------------");
         final String GET_STANDING_INSTRUCTION_BY_ID_URL = STANDING_INSTRUCTIONS_URL + "/" + standingInstructionId + "?"
                 + Utils.TENANT_IDENTIFIER;
         final HashMap response = Utils.performServerGet(this.requestSpec, this.responseSpec, GET_STANDING_INSTRUCTION_BY_ID_URL, "");

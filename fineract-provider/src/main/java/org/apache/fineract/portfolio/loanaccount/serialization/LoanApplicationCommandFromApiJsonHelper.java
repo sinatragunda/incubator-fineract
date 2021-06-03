@@ -93,7 +93,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.linkAccountIdParameterName, LoanApiConstants.disbursementDataParameterName,
             LoanApiConstants.emiAmountParameterName, LoanApiConstants.maxOutstandingBalanceParameterName,
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -385,6 +385,14 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         if (this.fromApiJsonHelper.parameterExists(linkAccountIdParameterName, element)) {
             final Long linkAccountId = this.fromApiJsonHelper.extractLongNamed(linkAccountIdParameterName, element);
             baseDataValidator.reset().parameter(linkAccountIdParameterName).value(linkAccountId).ignoreIfNull().longGreaterThanZero();
+        }
+
+
+        ///Added 26/05/2021
+
+        if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.revolvingAccountIdParam, element)) {
+            final String revolvingAccountId = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.revolvingAccountIdParam, element);
+            baseDataValidator.reset().parameter(LoanApiConstants.revolvingAccountIdParam).value(revolvingAccountId).ignoreIfNull();
         }
 
         final String createSiAtDisbursementParameterName = "createStandingInstructionAtDisbursement";
