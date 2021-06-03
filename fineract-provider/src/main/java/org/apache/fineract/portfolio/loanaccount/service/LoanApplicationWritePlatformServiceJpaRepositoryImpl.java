@@ -241,28 +241,15 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
-<<<<<<< Updated upstream
         
             if(clientId !=null){
 
-=======
-            
-            System.err.println("------------------------clientId is----------------"+clientId);
-            
-             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
-            if(clientId !=null){
->>>>>>> Stashed changes
                 Client client= this.clientRepository.findOneWithNotFoundDetection(clientId);
                 officeSpecificLoanProductValidation( productId,client.getOffice().getId());
                 
-<<<<<<< Updated upstream
                 /// 24/05/2021
                 /// added new line here allow multiple instances 
                 AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId);
-=======
-                
-            }
->>>>>>> Stashed changes
             
             }
             final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
@@ -274,7 +261,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
 
             
-
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
