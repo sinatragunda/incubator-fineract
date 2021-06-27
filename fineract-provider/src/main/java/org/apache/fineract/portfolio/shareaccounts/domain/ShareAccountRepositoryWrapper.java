@@ -33,8 +33,11 @@ public class ShareAccountRepositoryWrapper {
 	}
 	
 	public ShareAccount findOneWithNotFoundDetection(final Long accountId) {
+
+		System.err.println("-----------------------mappable exceptions------------"+accountId);
 		ShareAccount account = this.shareAccountRepository.findOne(accountId) ;
 		if(account == null) {
+			System.err.println("---------------------------throw shareaccounts not found error");
 			throw new ShareAccountNotFoundException(accountId) ;
 		}
 		return account ;

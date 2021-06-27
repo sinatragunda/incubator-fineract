@@ -16,9 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.fineract.portfolio.shareaccounts.data;
 
+import java.io.Serializable;
 import org.joda.time.LocalDate;
+
 
 @SuppressWarnings("unused")
 public class ShareAccountApplicationTimelineData {
@@ -48,6 +51,9 @@ public class ShareAccountApplicationTimelineData {
     private final String closedByFirstname;
     private final String closedByLastname;
 
+
+    private final LocalDate monthlyDepositDate ;
+
     public static ShareAccountApplicationTimelineData templateDefault() {
 
         final LocalDate submittedOnDate = null;
@@ -71,10 +77,14 @@ public class ShareAccountApplicationTimelineData {
         final String closedByFirstname = null;
         final String closedByLastname = null;
 
+        final LocalDate monthlyDepositDate = null ;
+
+        System.err.println("-------------------------------------ShareAccountApplicationTimelineData default-------");
+
         return new ShareAccountApplicationTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname, submittedByLastname,
                 rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname, approvedOnDate, approvedByUsername, 
                 approvedByFirstname, approvedByLastname, activatedOnDate, activatedByUsername, activatedByFirstname, activatedByLastname, 
-                closedOnDate, closedByUsername, closedByFirstname, closedByLastname);
+                closedOnDate, closedByUsername, closedByFirstname, closedByLastname ,monthlyDepositDate);
     }
 
     public ShareAccountApplicationTimelineData(final LocalDate submittedOnDate, final String submittedByUsername,
@@ -83,7 +93,10 @@ public class ShareAccountApplicationTimelineData {
             final LocalDate approvedOnDate, final String approvedByUsername,
             final String approvedByFirstname, final String approvedByLastname, final LocalDate activatedOnDate,
             final String activatedByUsername, final String activatedByFirstname, final String activatedByLastname,
-            final LocalDate closedOnDate, final String closedByUsername, final String closedByFirstname, final String closedByLastname) {
+            final LocalDate closedOnDate, final String closedByUsername, final String closedByFirstname, final String closedByLastname ,final LocalDate monthlyDepositDate) {
+
+        System.err.println("------------------------when is this called--------------------?");
+        
         this.submittedOnDate = submittedOnDate;
         this.submittedByUsername = submittedByUsername;
         this.submittedByFirstname = submittedByFirstname;
@@ -104,5 +117,15 @@ public class ShareAccountApplicationTimelineData {
         this.closedByUsername = closedByUsername;
         this.closedByFirstname = closedByFirstname;
         this.closedByLastname = closedByLastname;
+        this.monthlyDepositDate = monthlyDepositDate ;
+    }
+
+
+    public LocalDate getApprovedDate(){
+        return this.approvedDate ;
+    }
+
+    public LocalDate getMonthlyDepositDate(){
+        return this.monthlyDepositDate ;
     }
 }

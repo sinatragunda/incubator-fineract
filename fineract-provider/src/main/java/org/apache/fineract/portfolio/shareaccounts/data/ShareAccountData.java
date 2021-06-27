@@ -94,20 +94,29 @@ public class ShareAccountData implements AccountData {
     private transient Integer rowIndex;
     private  String dateFormat;
 
+
+    // added 05/11/2020
+    private LocalDate monthlyDepositDate ;
+
+    /// make shift function to set shareproductdata for use with sacco functions 
+    /// added 05/11/2020
+    private ShareProductData shareProductData ;
+
     public static ShareAccountData importInstance(Long clientId,Long productId,Integer requestedShares,String externalId,
             LocalDate submittedOnDate , Integer minimumActivePeriodDays,Integer minimumActivePeriodFrequencyType,
             Integer lockinPeriodFrequency,Integer lockinPeriodFrequencyType,LocalDate applicationDate,
             Boolean allowDividendCalculationForInactiveClients, Collection<ShareAccountChargeData> charges,
-            Long defaultSavingsAccountId,Integer rowIndex,String locale, String dateFormat){
+            Long defaultSavingsAccountId,Integer rowIndex,String locale, String dateFormat ,LocalDate monthlyDepositDate
+            ){
         return new ShareAccountData(clientId,productId,requestedShares,externalId,submittedOnDate,minimumActivePeriodDays,
                 minimumActivePeriodFrequencyType,lockinPeriodFrequency,lockinPeriodFrequencyType,applicationDate,allowDividendCalculationForInactiveClients,charges,
-                defaultSavingsAccountId,rowIndex,locale,dateFormat);
+                defaultSavingsAccountId,rowIndex,locale,dateFormat ,monthlyDepositDate);
     }
     private ShareAccountData(Long clientId,Long productId,Integer requestedShares,String externalId,
             LocalDate submittedDate , Integer minimumActivePeriod,Integer minimumActivePeriodFrequencyType,
             Integer lockinPeriodFrequency,Integer lockinPeriodFrequencyType,LocalDate applicationDate,
             Boolean allowDividendCalculationForInactiveClients, Collection<ShareAccountChargeData> charges,
-            Long savingsAccountId,Integer rowIndex,String locale, String dateFormat) {
+            Long savingsAccountId,Integer rowIndex,String locale, String dateFormat ,LocalDate monthlyDepositDate) {
 
         this.clientId = clientId;
         this.productId = productId;
@@ -146,6 +155,7 @@ public class ShareAccountData implements AccountData {
         this.lockinPeriodFrequencyTypeOptions = null;
         this.minimumActivePeriodFrequencyTypeOptions = null;
         this.clientSavingsAccounts = null;
+        this.monthlyDepositDate = monthlyDepositDate ;
     }
 
     public Integer getRowIndex() {
@@ -269,6 +279,7 @@ public class ShareAccountData implements AccountData {
     }
 
     public static ShareAccountData lookup(final Long id, final String accountNo, final Long clientId, final String clientName) {
+        
         String externalId = null;
         ShareAccountSummaryData summaryData = null;
         Collection<ShareAccountTransactionData> purchasedSharesData = null;
@@ -304,6 +315,14 @@ public class ShareAccountData implements AccountData {
         return this.id;
     }
 
+    public Long clientId(){
+        return this.clientId ;
+    }
+
+    public String accountNo(){
+        return this.accountNo ;
+    }
+
     public Collection<ShareAccountTransactionData> getPurchasedShares() {
         return this.purchasedShares;
     }
@@ -311,8 +330,42 @@ public class ShareAccountData implements AccountData {
     public void setCurrentMarketPrice(final BigDecimal currentMarketPrice) {
         this.currentMarketPrice = currentMarketPrice;
     }
+    public BigDecimal getCurrentMarketPrice(){
+    	return this.currentMarketPrice ;
+    }
     
     public void setDividends(Collection<ShareAccountDividendData> dividends) {
         this.dividends = dividends ;
     }
+
+    public ShareAccountSummaryData getShareAccountSummaryData(){
+    	return this.summary ;
+    }
+
+    public LocalDate getSubmittedDate(){
+        return this.timeline.getApprovedDate() ;
+    }
+
+    public LocalDate approvedDate(){
+        return this.timeline.getApprovedDate();
+    }
+
+    public LocalDate getMonthlyDepositDate(){
+        return this.timeline.getMonthlyDepositDate() ;
+    }
+
+
+    public void setShareProductData(ShareProductData s){
+        this.shareProductData = s ;
+    }
+
+    public ShareProductData getShareProductData(){
+        return this.shareProductData ;
+    }
+
+    public boolean isActive(){
+        return this.summary.isActive();
+    }
+
+
 }

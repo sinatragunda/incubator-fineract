@@ -228,12 +228,24 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     @Override
     public CommandProcessingResult applyAddtionalShares(final Long accountId, JsonCommand jsonCommand) {
         try {
+
+            System.err.println("-------------------------------------apply additional shares--------------");
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);
+
+            System.err.println("----------------------------------------stage 1-----------------");
+
             ShareAccountTransaction transaction = null;
             if (!changes.isEmpty()) {
+                
+                System.err.println("-----------------------------------save share transaction----------------");
                 this.shareAccountRepository.save(account);
+
+                System.err.println("---------------------------------this didnt bring error---------------------");
+
                 transaction = (ShareAccountTransaction) changes.get(ShareAccountApiConstants.additionalshares_paramname);
+                
+                System.err.println("-------------------------------share account transaction-----------------");
                 transaction = account.getShareAccountTransaction(transaction);
                 if (transaction != null) {
                     changes.clear();
@@ -250,6 +262,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                     .with(changes) //
                     .build();
         } catch (final DataIntegrityViolationException dve) {
+
+            System.err.println("-------------------------------------------data integrity ---------"+dve.getMessage());
             handleDataIntegrityIssues(jsonCommand, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }
@@ -397,10 +411,16 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     @Override
     public CommandProcessingResult approveAdditionalShares(Long accountId, JsonCommand jsonCommand) {
 
+        System.err.println("-------------approve shares--------------"+accountId);
         try {
+
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
+            
+            System.err.println("-----------------findOneWithNotFoundDetection----------------------");
+
             Map<String, Object> changes = this.accountDataSerializer.validateAndApproveAddtionalShares(jsonCommand, account);
             if (!changes.isEmpty()) {
+                System.err.println("-------------------------------save transaction-------------");
                 this.shareAccountRepository.save(account);
                 ArrayList<Long> transactionIds = (ArrayList<Long>) changes.get(ShareAccountApiConstants.requestedshares_paramname);
                 Long totalSubscribedShares = new Long(0) ;

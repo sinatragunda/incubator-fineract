@@ -175,6 +175,21 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         return data;
     }
 
+    @Override    
+    public Collection<ShareAccountData> retrieveAllForProduct(final Long productId) {
+
+        ShareAccountMapper mapper = new ShareAccountMapper(null, null);
+        String query = "select " + mapper.schema() + "where sa.product_id=?";
+        Collection<AccountData> accountDataList = this.jdbcTemplate.query(query, mapper, new Object[] { productId });
+        List<ShareAccountData> shareAccountDataList = new ArrayList<>();
+        for(AccountData a : accountDataList){
+            ShareAccountData shareAccountData  = (ShareAccountData)a ;
+            shareAccountDataList.add(shareAccountData);
+        }
+
+        return (Collection)shareAccountDataList ;
+    }
+
     private Collection<ShareAccountDividendData> retrieveAssociatedDividends(final Long shareAccountId) {
         ShareAccountDividendRowMapper mapper = new ShareAccountDividendRowMapper();
         String query = "select " + mapper.schema() + "where sadd.account_id=?";
@@ -264,6 +279,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
                     .append("sa.submitted_date as submittedDate, sbu.username as submittedByUsername, ")
                     .append("sbu.firstname as submittedByFirstname, sbu.lastname as submittedByLastname, ")
                     .append("sa.rejected_date as rejectedDate, rbu.username as rejectedByUsername, ")
+                    .append("sa.monthly_deposit_date as monthlyDepositDate, ")
                     .append("rbu.firstname as rejectedByFirstname, rbu.lastname as rejectedByLastname, ")
                     .append("sa.approved_date as approvedDate, abu.username as approvedByUsername, ")
                     .append("abu.firstname as approvedByFirstname, abu.lastname as approvedByLastname, ")
@@ -328,11 +344,13 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final String closedByFirstname = rs.getString("closedByFirstname");
             final String closedByLastname = rs.getString("closedByLastname");
 
+            final LocalDate monthlyDepositDate = JdbcSupport.getLocalDate(rs ,"monthlyDepositDate");
+
             final ShareAccountApplicationTimelineData timeline = new ShareAccountApplicationTimelineData(submittedOnDate,
                     submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername,
                     rejectedByFirstname, rejectedByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname,
                     activatedOnDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate, closedByUsername,
-                    closedByFirstname, closedByLastname);
+                    closedByFirstname, closedByLastname ,monthlyDepositDate);
 
             final String currencyCode = rs.getString("currencyCode");
             final String currencyName = rs.getString("currencyName");
@@ -360,7 +378,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
 
             final String shortProductName = null;
             final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
-                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline,null);
             return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName,
                     productId, productName, status, timeline, currency, summary, charges, purchasedShares, lockinPeriodFrequency,
                     lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, allowdividendsforinactiveclients);
@@ -428,7 +446,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             }
 
             final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
-                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline,null);
 
             return new ShareAccountData(id, accountNo, externalId, clientId, clientName, productId, shortProductName, productId,
                     shortProductName, status, timeline, currency, summary, charges, purchasedSharesData, lockinPeriod, lockPeriodTypeEnum,
@@ -445,7 +463,8 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             StringBuffer buff = new StringBuffer()
                     .append("saps.id as purchasedId, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice, ")
                     .append("saps.status_enum as purchaseStatus, saps.type_enum as purchaseType, saps.amount as amount, saps.charge_amount as chargeamount, ")
-                    .append("saps.amount_paid as amountPaid ");
+                    .append("saps.amount_paid as amountPaid, ")
+                    .append("saps.is_monthly_deposit as isMonthlyDeposit");
             
             schema = buff.toString();
         }
@@ -464,8 +483,9 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amount");
             final BigDecimal chargeAmount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "chargeamount");
             final BigDecimal amountPaid = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amountPaid");
+            final Boolean isMonthlyDeposit = rs.getBoolean("isMonthlyDeposit");
             return new ShareAccountTransactionData(id, accountId, transactionDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount,
-                    chargeAmount, amountPaid);
+                    chargeAmount, amountPaid ,isMonthlyDeposit);
         }
 
         public String schema() {

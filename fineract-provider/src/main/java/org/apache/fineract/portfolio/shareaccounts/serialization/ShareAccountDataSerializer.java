@@ -141,6 +141,11 @@ public class ShareAccountDataSerializer {
         ShareProduct shareProduct = this.shareProductRepository.findOneWithNotFoundDetection(productId);
         final LocalDate submittedDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.submitteddate_paramname,
                 element);
+
+        // added 05/11/2020
+        final LocalDate monthlyDepositDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.monthlyDepositDateParam,
+                element);
+
         baseDataValidator.reset().parameter(ShareAccountApiConstants.submitteddate_paramname).value(submittedDate).notNull();
 
         final String externalId = this.fromApiJsonHelper.extractStringNamed(ShareAccountApiConstants.externalid_paramname, element);
@@ -214,7 +219,7 @@ public class ShareAccountDataSerializer {
         ShareAccount account = new ShareAccount(client, shareProduct, externalId, currency, savingsAccount, accountNo, approvedShares,
                 pendingShares, sharesPurchased, allowdividendsForInactiveClients, lockinPeriod, lockPeriodEnum, minimumActivePeriod,
                 minimumActivePeriodEnum, charges, submittedBy, submittedDate.toDate(), approvedBy, approvedDate, rejectedBy, rejectedDate,
-                activatedBy, activatedDate, closedBy, closedDate, modifiedBy, modifiedDate);
+                activatedBy, activatedDate, closedBy, closedDate, modifiedBy, modifiedDate ,monthlyDepositDate.toDate());
 
         for (ShareAccountTransaction pur : sharesPurchased) {
             pur.setShareAccount(account);
@@ -650,17 +655,21 @@ public class ShareAccountDataSerializer {
     }
 
     public Map<String, Object> validateAndApplyAddtionalShares(JsonCommand jsonCommand, ShareAccount account) {
+
         Map<String, Object> actualChanges = new HashMap<>();
         if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, jsonCommand.json(),
                 addtionalSharesParameters);
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("sharesaccount");
         JsonElement element = jsonCommand.parsedJson();
+        
         if(!account.status().equals(ShareAccountStatusType.ACTIVE.getValue())) {
             baseDataValidator.failWithCodeNoParameterAddedToErrorCode("is.not.in.active.state") ;
         }
+
         LocalDate requestedDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.requesteddate_paramname, element);
         baseDataValidator.reset().parameter(ShareAccountApiConstants.requesteddate_paramname).value(requestedDate).notNull();
         final Long sharesRequested = this.fromApiJsonHelper.extractLongNamed(ShareAccountApiConstants.requestedshares_paramname, element);
@@ -675,15 +684,25 @@ public class ShareAccountDataSerializer {
         }
         boolean isTransactionBeforeExistingTransactions = false ;
         Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions() ;
+
         for(ShareAccountTransaction transaction: transactions) {
+
             if(!transaction.isChargeTransaction()) {
+            
                 LocalDate transactionDate = new LocalDate(transaction.getPurchasedDate()) ;
                 if(requestedDate.isBefore(transactionDate)) {
-                    isTransactionBeforeExistingTransactions = true ;
+
+                    if(transaction.isPurchaseRejectedTransaction()){
+                        continue ;
+                    }
+                    
+                    isTransactionBeforeExistingTransactions = true ;                                      
                     break ;
                 }    
             }
         }
+
+
         if(isTransactionBeforeExistingTransactions) {
             baseDataValidator.reset().parameter(ShareAccountApiConstants.requesteddate_paramname)
             .value(requestedDate)

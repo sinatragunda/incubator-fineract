@@ -37,6 +37,7 @@ public interface ShareAccountApiConstants {
 	String APPLY_ADDITIONALSHARES_COMMAND = "applyadditionalshares";
 	String APPROVE_ADDITIONSHARES_COMMAND = "approveadditionalshares";
 	String REJECT_ADDITIONSHARES_COMMAND = "rejectadditionalshares";
+	String MONTHLY_DEPOSIT_COMMAND = "monthlydeposit";
 
 	//
 	String locale_paramname = "locale" ;
@@ -95,13 +96,19 @@ public interface ShareAccountApiConstants {
 	
 	public String additionalshares_paramname = "additionalshares" ;
 	
-	public String closeddate_paramname = "closedDate" ;
+	public String closeddate_paramname = "closedDate";
+
+	public static final String shareEntityType = "share";
+
+	// created 05/11/2020
+	// added 27/06/2020 
+	String monthlyDepositDateParam = "monthlyDepositDate";
 	
 	Set<String> supportedParameters = new HashSet<>(Arrays.asList(locale_paramname, dateformat_paramname, id_paramname,clientid_paramname, productid_paramname,
 	        submitteddate_paramname,approveddate_paramname, externalid_paramname, currency_paramname, digitsafterdecimal_paramname,
 	        inmultiplesof_paramname, requestedshares_paramname,savingsaccountid_paramname,lockinperiod_paramname,
 	        lockperiodfrequencytype_paramname,minimumactiveperiod_paramname, minimumactiveperiodfrequencytype_paramname,
 	        allowdividendcalculationforinactiveclients_paramname, charges_paramname, applicationdate_param,
-	        purchaseddate_paramname,numberofshares_paramname,purchasedprice_paramname));
+	        purchaseddate_paramname,numberofshares_paramname,purchasedprice_paramname ,monthlyDepositDateParam));
 
 }

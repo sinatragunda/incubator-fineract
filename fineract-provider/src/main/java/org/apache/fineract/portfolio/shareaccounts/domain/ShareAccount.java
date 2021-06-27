@@ -155,6 +155,13 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     @Transient
     protected boolean accountNumberRequiresAutoGeneration = false;
 
+
+    /// created 05/11/2020
+    /// added 27/06/2021
+    @Temporal(TemporalType.DATE)
+    @Column(name = "monthly_deposit_date", nullable = true)
+    private Date monthlyDepositDate ;
+
     protected ShareAccount() {
 
     }
@@ -165,7 +172,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
             final Integer lockinPeriodFrequency, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriodFrequency,
             final PeriodFrequencyType minimumActivePeriodType, Set<ShareAccountCharge> charges, AppUser submittedBy,
             final Date submittedDate, AppUser approvedBy, Date approvedDate, AppUser rejectedBy, Date rejectedDate, AppUser activatedBy,
-            Date activatedDate, AppUser closedBy, Date closedDate, AppUser modifiedBy, Date modifiedDate) {
+            Date activatedDate, AppUser closedBy, Date closedDate, AppUser modifiedBy, Date modifiedDate ,Date monthlyDepositDate) {
 
         this.client = client;
         this.shareProduct = shareProduct;
@@ -199,6 +206,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         this.closedBy = closedBy;
         this.modifiedBy = modifiedBy;
         this.modifiedDate = modifiedDate;
+        this.monthlyDepositDate = monthlyDepositDate ;
         this.status = ShareAccountStatusType.SUBMITTED_AND_PENDING_APPROVAL.getValue();
     }
 
@@ -219,6 +227,17 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         boolean toReturn = false;
         if (!this.submittedDate.equals(submittedDate)) {
             this.submittedDate = submittedDate;
+            toReturn = true;
+        }
+        return toReturn;
+    }
+
+
+    /// added 05/11/2020
+    public boolean setMonthlyDepositDate(final Date monthlyDepositDate) {
+        boolean toReturn = false;
+        if (!this.monthlyDepositDate.equals(monthlyDepositDate)) {
+            this.monthlyDepositDate = monthlyDepositDate;
             toReturn = true;
         }
         return toReturn;
@@ -370,7 +389,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void updateRequestedShares(ShareAccountTransaction purchased) {
-    	for(ShareAccountTransaction transaction: this.shareAccountTransactions) {
+        for(ShareAccountTransaction transaction: this.shareAccountTransactions) {
             if(!transaction.isChargeTransaction() && transaction.getId().equals(purchased.getId())) {
                 transaction.update(purchased.getPurchasedDate(), purchased.getTotalShares(), purchased.getPurchasePrice());    
             }
@@ -570,5 +589,9 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     
     public Integer status() {
         return this.status ;
+    }
+
+    public Date getMonthlyDepositDate(){
+        return this.monthlyDepositDate ;
     }
 }
