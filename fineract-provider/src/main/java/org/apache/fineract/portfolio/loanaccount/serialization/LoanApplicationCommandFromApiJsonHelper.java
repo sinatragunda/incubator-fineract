@@ -93,7 +93,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.linkAccountIdParameterName, LoanApiConstants.disbursementDataParameterName,
             LoanApiConstants.emiAmountParameterName, LoanApiConstants.maxOutstandingBalanceParameterName,
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -394,6 +394,14 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             final String revolvingAccountId = this.fromApiJsonHelper.extractStringNamed(LoanApiConstants.revolvingAccountIdParam, element);
             baseDataValidator.reset().parameter(LoanApiConstants.revolvingAccountIdParam).value(revolvingAccountId).ignoreIfNull();
         }
+
+        // Added 02/07/2021
+
+        if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.autoSettlementAtDisbursementParamName, element)) {
+            final Boolean autoSettlementAtDisbursement = this.fromApiJsonHelper.extractBooleanNamed(LoanApiConstants.autoSettlementAtDisbursementParamName, element);
+            baseDataValidator.reset().parameter(LoanApiConstants.autoSettlementAtDisbursementParamName).value(autoSettlementAtDisbursement).ignoreIfNull ();
+        }
+
 
         final String createSiAtDisbursementParameterName = "createStandingInstructionAtDisbursement";
         if (this.fromApiJsonHelper.parameterExists(createSiAtDisbursementParameterName, element)) {

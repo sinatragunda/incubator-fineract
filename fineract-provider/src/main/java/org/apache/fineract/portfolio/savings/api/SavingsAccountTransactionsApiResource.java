@@ -132,7 +132,9 @@ public class SavingsAccountTransactionsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String transaction(@PathParam("savingsId") final Long savingsId, @QueryParam("command") final String commandParam,
             final String apiRequestBodyAsJson) {
+
         try {
+
             final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
             CommandProcessingResult result = null;

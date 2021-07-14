@@ -288,7 +288,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             ///do the whole revolve loan thing here 
 
             final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
-            
             if(revolvingAccountIds!=null){
 
                 StringTokenizer token = new StringTokenizer(revolvingAccountIds ,",");
@@ -298,7 +297,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     final Loan revolvingLoanAccount = this.loanAssembler.assembleFrom(id);
                     list.add(revolvingLoanAccount);
                 }
-                
                 RevolvingLoanHelper.validateApplication(list ,newLoanApplication);   
                 
             }

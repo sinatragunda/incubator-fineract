@@ -17,7 +17,5 @@
 -- under the License.
 -- added 04/03/2021 by Sinatra Gunda 
 
-UPDATE m_currency SET code = 'ZMW' WHERE code = 'ZMK'; 
-
-
-UPDATE m_organisation_currency SET code='ZMW' WHERE code ='ZMK';
+UPDATE m_currency SET code = 'ZMK' WHERE code = 'ZMW'; 
+UPDATE m_organisation_currency SET code='ZMK' WHERE code ='ZMW';

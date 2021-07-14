@@ -56,6 +56,11 @@ import java.util.concurrent.Callable ;
 import java.util.concurrent.Future ;
 import org.json.JSONObject;
 
+
+// added 12/07/2021
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+
+
 /* 
     Change log 
     added 01/02/2021 new function code phase a
@@ -139,7 +144,7 @@ public class RunreportsApiResource {
     @Path("{reportName}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/vnd.ms-excel", "application/pdf", "text/html" })
-    public Response runReport(@PathParam("reportName") final String reportName, @Context final UriInfo uriInfo) {
+    public Response runReport(@PathParam("reportName") String reportName, @Context final UriInfo uriInfo) {
 
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
@@ -151,28 +156,41 @@ public class RunreportsApiResource {
 
         checkUserPermissionForReport(reportName, parameterType);
 
+        /// added 12/07/2021
+        /// customized customer reporting ...
+        String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
+        String reportCustomized = String.format("%s %s",reportName ,tenant);
     
-
         // phase a
         //added 01/02/2021 used for bulk reports those that take long to run and usually times out 
         if(runAsBulkReport){
-
             ///we need some callable here son
             final Map<String, String> reportParams = getReportParams(queryParams); 
             Callable callable = this.readExtraDataAndReportingService.retrieveGenericResultsetCallable(reportName,
                     "report", reportParams);
             
             String json = BulkReportHelper.runBulkReport(callable).toString();
-
             return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
-
         }
 
 
         String parameterTypeValue = null;
         if (!parameterType) {
             parameterTypeValue = "report";
-            String reportType = this.readExtraDataAndReportingService.getReportType(reportName);
+            String reportType = null ;
+
+            // modified 12/07/2021
+            // to find the report type of the customized report if error raised then report is not there 
+            try{
+                reportType = this.readExtraDataAndReportingService.getReportType(reportCustomized);
+                reportName = reportCustomized;
+                System.err.println("-----------------------change report name as well to-------------"+reportName);
+            }
+            catch(Exception n){
+                System.err.println("-----------------------new report not found stick to old one----------"+reportCustomized);
+                reportType = this.readExtraDataAndReportingService.getReportType(reportName);
+            }
+            
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
             if (reportingProcessService != null){
                 return reportingProcessService.processRequest(reportName, queryParams); 

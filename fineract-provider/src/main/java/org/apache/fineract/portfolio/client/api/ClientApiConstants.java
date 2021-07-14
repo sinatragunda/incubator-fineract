@@ -188,6 +188,10 @@ public class ClientApiConstants {
     public static final String datatables = "datatables";
 
 
+    // added 03/07/2021 
+    public static final String shareProductIdParamName = "shareProductId";
+
+
     /**
      * These parameters will match the class level parameters of
      * {@link ClientData}. Where possible, we try to get response parameters to

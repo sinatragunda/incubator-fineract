@@ -130,4 +130,7 @@ public interface LoanApiConstants {
 
     ///added 26/05/2021
     public static final String revolvingAccountIdParam = "revolvingAccountId";
+
+    // added 02/07/2021
+    public static final String autoSettlementAtDisbursementParamName = "autoSettlementAtDisbursement";
 }

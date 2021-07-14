@@ -15,8 +15,4 @@
 -- KIND, either express or implied. See the License for the
 -- specific language governing permissions and limitations
 -- under the License.
--- added 04/03/2021 by Sinatra Gunda 
-
-
-UPDATE m_currency SET code = 'ZMW' WHERE code = 'ZMK'; 
-UPDATE m_organisation_currency SET code='ZMW' WHERE code ='ZMK';
+ALTER TABLE `m_client` ADD COLUMN `default_share_product` INT(20) DEFAULT NULL;

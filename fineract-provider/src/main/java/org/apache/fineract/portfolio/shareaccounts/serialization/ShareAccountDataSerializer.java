@@ -151,7 +151,7 @@ public class ShareAccountDataSerializer {
                 .longGreaterThanZero();
         final Long requestedShares = this.fromApiJsonHelper.extractLongNamed(ShareAccountApiConstants.requestedshares_paramname, element);
         baseDataValidator.reset().parameter(ShareAccountApiConstants.requestedshares_paramname).value(requestedShares).notNull()
-                .longGreaterThanZero();
+                .longZeroOrGreater();
         
         if(shareProduct.getMinimumClientShares() != null && requestedShares < shareProduct.getMinimumClientShares()) {
             baseDataValidator.reset().parameter(ShareAccountApiConstants.requestedshares_paramname).value(requestedShares)
@@ -667,7 +667,9 @@ public class ShareAccountDataSerializer {
         baseDataValidator.reset().parameter(ShareAccountApiConstants.requestedshares_paramname).value(sharesRequested).notNull();
         ShareProduct shareProduct = account.getShareProduct();
         if (sharesRequested != null) {
+            System.err.println("----------------------requestedshares----------------"+sharesRequested);
             Long totalSharesAfterapproval = account.getTotalApprovedShares() + sharesRequested;
+            System.err.println("-------------------totalSharesAfter-----------"+totalSharesAfterapproval);
             if(shareProduct.getMaximumClientShares() != null && totalSharesAfterapproval > shareProduct.getMaximumClientShares()) {
                 baseDataValidator.reset().parameter(ShareAccountApiConstants.requestedshares_paramname).value(sharesRequested)
                 .failWithCode("exceeding.maximum.limit.defined.in.the.shareproduct", "Existing and requested shares count is more than product definition");

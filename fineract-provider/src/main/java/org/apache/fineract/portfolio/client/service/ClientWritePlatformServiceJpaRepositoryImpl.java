@@ -97,6 +97,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonElement;
 
+
+// added 03/07/2021
+
+import com.google.gson.Gson;
+import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
+import org.apache.fineract.portfolio.shareproducts.exception.SharesProductNotFoundException;
+import org.apache.fineract.portfolio.shareproducts.service.ShareProductWritePlatformService;
+import  org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepository;
+import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
+import org.apache.fineract.portfolio.shareproducts.service.ShareProductReadPlatformServiceImpl;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
+import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
+import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+
+
 @Service
 public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWritePlatformService {
 
@@ -125,6 +142,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService;
+    private final ShareProductWritePlatformService shareProductWritePlatformService ;
+    private final ShareProductRepository shareProductRepository;
+    private final ShareAccountWritePlatformService shareAccountWritePlatformService ;
+    private final ProductReadPlatformService shareProductReadPlatformService ;
+    
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
@@ -138,7 +160,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper,
             final ConfigurationReadPlatformService configurationReadPlatformService,
             final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService,
-            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService) {
+            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService ,
+            final ShareProductWritePlatformService shareProductWritePlatformService ,
+            final ShareProductRepository shareProductRepository,
+            final ShareAccountWritePlatformService shareAccountWritePlatformService,
+            final ShareProductReadPlatformServiceImpl shareProductReadPlatformService
+    ) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientNonPersonRepository = clientNonPersonRepository;
@@ -162,6 +189,10 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.clientFamilyMembersWritePlatformService=clientFamilyMembersWritePlatformService;
         this.businessEventNotifierService = businessEventNotifierService;
         this.entityDatatableChecksWritePlatformService = entityDatatableChecksWritePlatformService;
+        this.shareProductWritePlatformService = shareProductWritePlatformService ;
+        this.shareProductRepository = shareProductRepository;
+        this.shareAccountWritePlatformService = shareAccountWritePlatformService;
+        this.shareProductReadPlatformService = shareProductReadPlatformService;
     }
 
     @Transactional
@@ -272,12 +303,23 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                         ClientApiConstants.CLIENT_CLASSIFICATION, clientClassificationId);
             }
 
-           
+            
+            /// this option is used for creating savings 
             final Long savingsProductId = command.longValueOfParameterNamed(ClientApiConstants.savingsProductIdParamName);
             if (savingsProductId != null) {
                 SavingsProduct savingsProduct = this.savingsProductRepository.findOne(savingsProductId);
                 if (savingsProduct == null) { throw new SavingsProductNotFoundException(savingsProductId); }
             }
+
+            /// added 03/07/2021 
+            final Long shareProductId = command.longValueOfParameterNamed(ClientApiConstants.shareProductIdParamName);
+            if (shareProductId != null) {
+                ShareProduct shareProduct = this.shareProductRepository.findOne(shareProductId);
+                if(shareProduct == null){ 
+                    throw new SharesProductNotFoundException(shareProductId); 
+                }
+            }
+
             
             final Integer legalFormParamValue = command.integerValueOfParameterNamed(ClientApiConstants.legalFormIdParamName);
             boolean isEntity = false;
@@ -293,7 +335,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
             
             final Client newClient = Client.createNew(currentUser, clientOffice, clientParentGroup, staff, savingsProductId, gender,
-                    clientType, clientClassification, legalFormValue, command);
+                    clientType, clientClassification, legalFormValue, command ,shareProductId);
             this.clientRepository.save(newClient);
             boolean rollbackTransaction = false;
             if (newClient.isActive()) {
@@ -319,7 +361,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             CommandProcessingResult result = openSavingsAccount(newClient, fmt);
             if (result.getSavingsId() != null) {
                 this.clientRepository.save(newClient);
-                
+                ///we now have a savings account son better time to create a share account
+                openShareAccount(newClient ,result.getSavingsId(), fmt); 
+                this.clientRepository.save(newClient);
             }
             
             if(isEntity) {
@@ -618,6 +662,41 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         return commandProcessingResult;
     }
+
+    // added 03/07/2021 
+    private CommandProcessingResult openShareAccount(final Client client,final Long savingsAccountId ,final DateTimeFormatter fmt) {
+        
+        CommandProcessingResult commandProcessingResult = CommandProcessingResult.empty();
+        if (client.isActive() && client.shareProductId() != null){
+            ObjectNode node = ObjectNodeHelper.objectNode();
+            ShareProductData shareProduct = (ShareProductData)this.shareProductReadPlatformService.retrieveOne(client.shareProductId() ,false);
+            node.put("clientId" ,client.getId());
+            node.put("savingsAccountId" ,savingsAccountId);
+            node.put("locale", "en");
+            node.put("dateFormat", "dd MMMM yyyy");
+            node.put("applicationDate" ,client.getActivationLocalDate().toString(fmt));
+            node.put("submittedDate" ,client.getActivationLocalDate().toString(fmt));
+            node.put("unitPrice",shareProduct.getUnitPrice());
+            node.put("requestedShares",shareProduct.getMinimumShares());
+            node.put("productId" ,client.shareProductId());
+
+            Gson gson = new Gson();
+            String jsonBody = node.toString();
+            JsonElement jsonElement = gson.fromJson(jsonBody ,JsonElement.class);
+
+            final JsonCommand jsonCommand = JsonCommand.from(jsonBody,jsonElement, this.fromApiJsonHelper, null, null, null, null, null,
+                null, null, null, null, null,null,null);
+       
+            commandProcessingResult = shareAccountWritePlatformService.createShareAccount(jsonCommand);
+
+            if(commandProcessingResult.resourceId() !=null){
+                client.updateShareAccount(commandProcessingResult.resourceId());
+            }
+        }
+        return commandProcessingResult;
+    }
+
+
 
     private void logAsErrorUnexpectedDataIntegrityException(final Exception dve) {
         logger.error(dve.getMessage(), dve);

@@ -379,6 +379,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             sqlBuilder.append("c.default_savings_product as savingsProductId, sp.name as savingsProductName, ");
             sqlBuilder.append("c.default_savings_account as savingsAccountId, ");
 
+            // added 03/07/2021
+            sqlBuilder.append("c.default_share_account as shareAccountId, ");
+            sqlBuilder.append("c.default_share_product as shareProductId,");
+
+
             sqlBuilder.append("c.submittedon_date as submittedOnDate, ");
             sqlBuilder.append("sbu.username as submittedByUsername, ");
             sqlBuilder.append("sbu.firstname as submittedByFirstname, ");
@@ -507,6 +512,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String mainBusinessLineValue = rs.getString("mainBusinessLineValue");
             final CodeValueData mainBusinessLine = CodeValueData.instance(mainBusinessLineId, mainBusinessLineValue);
             final String remarks = rs.getString("remarks");
+
+            final Long shareAccountId = rs.getLong("shareAccountId");
+            final Long shareProductId = rs.getLong("shareProductId");
+            
             
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
@@ -517,7 +526,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId);
 
         }
     }
@@ -587,6 +596,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append("c.activation_date as activationDate, c.image_id as imageId, ");
             builder.append("c.staff_id as staffId, s.display_name as staffName, ");
             builder.append("c.default_savings_product as savingsProductId, sp.name as savingsProductName, ");
+            
+            // added 03/07/2021
+            builder.append("c.default_share_account as shareAccountId, ");
+            builder.append("c.default_share_product as shareProductId ,");
             builder.append("c.default_savings_account as savingsAccountId ");
             builder.append("from m_client c ");
             builder.append("join m_office o on o.id = c.office_id ");
@@ -692,6 +705,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final CodeValueData mainBusinessLine = CodeValueData.instance(mainBusinessLineId, mainBusinessLineValue);
             final String remarks = rs.getString("remarks");
             
+            // added 03/07/2021
+            final Long shareAccountId = rs.getLong("shareAccountId");
+            final Long shareProductId = rs.getLong("shareProductId");
+
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
             final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
@@ -701,7 +718,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId);
 
         }
     }

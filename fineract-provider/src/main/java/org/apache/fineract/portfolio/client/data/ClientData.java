@@ -119,6 +119,10 @@ final public class ClientData implements Comparable<ClientData> {
     private Long legalFormId;
     private LocalDate submittedOnDate;
 
+    // added 03/07/2021
+    private Long shareAccountId ;
+    private Long shareProductId;
+
     public static ClientData importClientEntityInstance(Long legalFormId,Integer rowIndex,String fullname,Long officeId, Long clientTypeId,
             Long clientClassificationId,Long staffId,Boolean active,LocalDate activationDate,LocalDate submittedOnDate,
             String externalId,LocalDate dateOfBirth,String mobileNo,ClientNonPersonData clientNonPersonDetails,
@@ -203,6 +207,8 @@ final public class ClientData implements Comparable<ClientData> {
         this.datatables = null;
         this.familyMemberOptions=null;
         this.emailAddress = null;
+        this.shareAccountId= null ;
+        this.shareProductId = null ;
     }
 
 
@@ -258,12 +264,15 @@ final public class ClientData implements Comparable<ClientData> {
         final EnumOptionData legalForm = null;
 		final Boolean isStaff = false;
         final ClientNonPersonData clientNonPersonDetails = null;
+
+        final Long shareProductId = null ;
+        final Long shareAccountId = null ;
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, joinedDate, imageId, staffId,
                 staffName, officeOptions, groups, staffOptions, narrations, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPersonDetails, clientLegalFormOptions,familyMemberOptions, legalForm,address, isAddressEnabled, datatables, isStaff);
+                clientNonPersonDetails, clientLegalFormOptions,familyMemberOptions, legalForm,address, isAddressEnabled, datatables, isStaff ,shareProductId ,shareAccountId);
 
     }
 
@@ -278,7 +287,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingsProductName, clientData.savingsAccountId, clientData.savingAccountOptions, clientData.clientType,
                 clientData.clientClassification, templateData.clientTypeOptions, templateData.clientClassificationOptions, 
                 templateData.clientNonPersonConstitutionOptions, templateData.clientNonPersonMainBusinessLineOptions, clientData.clientNonPersonDetails,
-                templateData.clientLegalFormOptions,templateData.familyMemberOptions, clientData.legalForm, clientData.address,clientData.isAddressEnabled, null, clientData.isStaff);
+                templateData.clientLegalFormOptions,templateData.familyMemberOptions, clientData.legalForm, clientData.address,clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId);
 
     }
 
@@ -294,7 +303,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingsProductName, clientData.savingsAccountId, savingAccountOptions, clientData.clientType,
                 clientData.clientClassification, clientData.clientTypeOptions, clientData.clientClassificationOptions,
                 clientData.clientNonPersonConstitutionOptions, clientData.clientNonPersonMainBusinessLineOptions, clientData.clientNonPersonDetails,
-                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff);
+                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId);
 
     }
 
@@ -308,7 +317,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingAccountOptions, clientData.clientType, clientData.clientClassification, clientData.clientTypeOptions,
                 clientData.clientClassificationOptions, clientData.clientNonPersonConstitutionOptions, clientData.clientNonPersonMainBusinessLineOptions, 
                 clientData.clientNonPersonDetails, clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address,
-				clientData.isAddressEnabled, null, clientData.isStaff);
+				clientData.isAddressEnabled, null, clientData.isStaff,null ,clientData.shareAccountId);
 
     }
 
@@ -350,12 +359,15 @@ final public class ClientData implements Comparable<ClientData> {
         final EnumOptionData legalForm = null;
 		final Boolean isStaff = false;
         final ClientNonPersonData clientNonPerson = null;
+
+        final Long shareProductId = null ;
+        final Long shareAccountId =null ;
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate, imageId, staffId,
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff);
+                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,shareProductId ,shareAccountId);
     }
 
     public static ClientData lookup(final Long id, final String displayName, final Long officeId, final String officeName) {
@@ -404,7 +416,7 @@ final public class ClientData implements Comparable<ClientData> {
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff);
+                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,null ,null);
 
     }
     
@@ -420,7 +432,7 @@ final public class ClientData implements Comparable<ClientData> {
             final String externalId, final String mobileNo, final String emailAddress, final LocalDate dateOfBirth, final CodeValueData gender,
             final LocalDate activationDate, final Long imageId, final Long staffId, final String staffName,
             final ClientTimelineData timeline, final Long savingsProductId, final String savingsProductName, final Long savingsAccountId,
-            final CodeValueData clientType, final CodeValueData clientClassification, final EnumOptionData legalForm, final ClientNonPersonData clientNonPerson, final Boolean isStaff) {
+            final CodeValueData clientType, final CodeValueData clientClassification, final EnumOptionData legalForm, final ClientNonPersonData clientNonPerson, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId) {
 
         final Collection<OfficeData> allowedOffices = null;
         final Collection<GroupGeneralData> groups = null;
@@ -439,7 +451,7 @@ final public class ClientData implements Comparable<ClientData> {
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, null, clientType, clientClassification, clientTypeOptions,
                 clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientNonPerson,
-                clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff);
+                clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff,shareProductId ,shareAccountId);
 
     }
 
@@ -457,7 +469,7 @@ final public class ClientData implements Comparable<ClientData> {
             final Collection<CodeValueData> clientClassificationOptions, final Collection<CodeValueData> clientNonPersonConstitutionOptions,
             final Collection<CodeValueData> clientNonPersonMainBusinessLineOptions, final ClientNonPersonData clientNonPerson,
             final List<EnumOptionData> clientLegalFormOptions,final ClientFamilyMembersData familyMemberOptions, final EnumOptionData legalForm, final AddressData address,
-            final Boolean isAddressEnabled, final List<DatatableData> datatables, final Boolean isStaff) {
+            final Boolean isAddressEnabled, final List<DatatableData> datatables, final Boolean isStaff ,final Long shareProductId ,final Long shareAccountId) {
         this.accountNo = accountNo;
         this.status = status;
         if (status != null) {
@@ -523,6 +535,10 @@ final public class ClientData implements Comparable<ClientData> {
       	this.address = address;
 		this.isAddressEnabled = isAddressEnabled;
         this.datatables = datatables;
+
+
+        this.shareProductId =shareProductId ;
+        this.shareAccountId = shareAccountId;
 
     }
 

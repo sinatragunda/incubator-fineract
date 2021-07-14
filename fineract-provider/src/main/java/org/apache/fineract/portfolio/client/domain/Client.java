@@ -232,9 +232,17 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "reopened_by_userid", nullable = true)
     private AppUser reopenedBy;
 
+    // added 03/07/2021 
+    @Column(name = "default_share_account", nullable = true)
+    private Long shareAccountId;
+
+    @Column(name = "default_share_product", nullable = true) 
+    private Long shareProductId ;
+
+
     public static Client createNew(final AppUser currentUser, final Office clientOffice, final Group clientParentGroup, final Staff staff,
             final Long savingsProductId, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification,
-            final Integer legalForm, final JsonCommand command) {
+            final Integer legalForm, final JsonCommand command ,final Long shareProductId) {
 
         final String accountNo = command.stringValueOfParameterNamed(ClientApiConstants.accountNoParamName);
         final String externalId = command.stringValueOfParameterNamed(ClientApiConstants.externalIdParamName);
@@ -272,9 +280,10 @@ public final class Client extends AbstractPersistableCustom<Long> {
             submittedOnDate = command.localDateValueOfParameterNamed(ClientApiConstants.submittedOnDateParamName);
         }
         final Long savingsAccountId = null;
+        final Long shareAccountId = null;
         return new Client(currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename, lastname, fullname,
                 activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId, savingsAccountId, dataOfBirth,
-                gender, clientType, clientClassification, legalForm, isStaff);
+                gender, clientType, clientClassification, legalForm, isStaff ,shareProductId ,shareAccountId);
     }
 
     protected Client() {
@@ -285,7 +294,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
             final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname,
             final LocalDate activationDate, final LocalDate officeJoiningDate, final String externalId, final String mobileNo, final String emailAddress,
             final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId, final Long savingsAccountId,
-            final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff) {
+            final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId) {
 
         if (StringUtils.isBlank(accountNo)) {
             this.accountNumber = new RandomPasswordGenerator(19).generate();
@@ -366,6 +375,10 @@ public final class Client extends AbstractPersistableCustom<Long> {
         this.clientType = clientType;
         this.clientClassification = clientClassification;
         this.setLegalForm(legalForm);
+
+        // added 03/07/2021
+        this.shareAccountId = shareAccountId ;
+        this.shareProductId = shareProductId;
 
         deriveDisplayName();
         validate();
@@ -631,6 +644,12 @@ public final class Client extends AbstractPersistableCustom<Long> {
 
             final LocalDate newValue = command.localDateValueOfParameterNamed(ClientApiConstants.submittedOnDateParamName);
             this.submittedOnDate = newValue.toDate();
+        }
+
+        //added 03/07/2021
+        if (command.isChangeInLongParameterNamed(ClientApiConstants.shareProductIdParamName, shareProductId())) {
+            final Long newValue = command.longValueOfParameterNamed(ClientApiConstants.shareProductIdParamName);
+            actualChanges.put(ClientApiConstants.shareProductIdParamName, newValue);
         }
 
         validateUpdate();
@@ -1058,4 +1077,22 @@ public final class Client extends AbstractPersistableCustom<Long> {
     public String getMiddlename(){return this.middlename;}
 
     public String getLastname(){return this.lastname;}
+
+
+    // Added 03/07/2021
+    public Long shareAccountId(){
+        return this.shareAccountId;
+    }
+
+    public Long shareProductId(){
+        return this.shareProductId;
+    }
+
+    public void updateShareProduct(Long id){
+        this.shareProductId = id ;
+    }
+
+    public void updateShareAccount(Long id){
+        this.shareAccountId = id ;
+    }
 }

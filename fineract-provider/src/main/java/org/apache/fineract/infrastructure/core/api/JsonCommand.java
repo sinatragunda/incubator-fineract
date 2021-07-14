@@ -372,6 +372,7 @@ public final class JsonCommand {
     }
 
     public LocalDate localDateValueOfParameterNamed(final String parameterName) {
+        
         return this.fromApiJsonHelper.extractLocalDateNamed(parameterName, this.parsedCommand);
     }
     public LocalDateTime localTimeValueOfParameterNamed(final String parameterName) {

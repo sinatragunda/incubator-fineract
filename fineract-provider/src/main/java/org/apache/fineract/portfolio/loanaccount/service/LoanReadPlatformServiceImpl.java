@@ -610,6 +610,10 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
                     // added 28/05/2021
                     + " l.revolving_account_id as revolvingAccountId,"
+
+                    // added 02/07/2021
+                    + " l.auto_settlement_at_disbursement as autoSettlementAtDisbursement ,"
+
                     + " l.total_outstanding_derived as totalOutstanding,"
                     + " l.total_overpaid_derived as totalOverpaid,"
                     + " l.fixed_emi_amount as fixedEmiAmount,"
@@ -961,9 +965,6 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                             isCompoundingToBePostedAsTransaction, allowCompoundingOnEod);
                 }
                 catch(NullPointerException n){
-
-                    System.err.println("-------------------------------------we catching errors now---------------------"+n.getMessage());
-
                 }
             }
 
@@ -975,6 +976,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
             // added 28/05/2021
             final String revolvingAccountId = rs.getString("revolvingAccountId");
+
+            // added 02/07/2021
+            final Boolean autoSettlementAtDisbursement = rs.getBoolean("autoSettlementAtDisbursement");
 
             return LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
@@ -989,7 +993,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     loanProductCounter, multiDisburseLoan, canDefineInstallmentAmount, fixedEmiAmount, outstandingLoanBalance, inArrears,
                     graceOnArrearsAgeing, isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
                     interestRecalculationData, createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap,
-                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId);
+                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement);
         }
     }
 

@@ -189,14 +189,9 @@ public final class LoanProductDataValidator {
         }
 
 
-        System.err.println("---------------------------------saccoLoanLockInt-----------------"+saccoLoanLockInt);
-
-
         final SACCO_LOAN_LOCK saccoLoanLock = SACCO_LOAN_LOCK.fromInt(saccoLoanLockInt);
         
         /// added 24/05/2021
-
-        System.err.println("----------------------------SACCO_LOAN_LOCK------------"+saccoLoanLock);
 
         boolean allowMultipleInstances = false;
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.allowMultipleInstancesParam, element)) {

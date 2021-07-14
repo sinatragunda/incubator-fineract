@@ -98,5 +98,9 @@ public class PaymentType extends AbstractPersistableCustom<Long> {
 	public Boolean isCashPayment() {
 		return isCashPayment;
 	}
+
+    public Long position(){
+        return this.position;
+    }
 	
 }

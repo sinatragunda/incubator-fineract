@@ -15,8 +15,9 @@
 -- KIND, either express or implied. See the License for the
 -- specific language governing permissions and limitations
 -- under the License.
--- added 04/03/2021 by Sinatra Gunda 
+--
 
 
-UPDATE m_currency SET code = 'ZMW' WHERE code = 'ZMK'; 
-UPDATE m_organisation_currency SET code='ZMW' WHERE code ='ZMK';
+ALTER TABLE `m_product_loan` ADD COLUMN `is_sacco_product` smallint(5) DEFAULT 0 ;
+ALTER TABLE `m_product_loan` ADD COLUMN `loan_factor` int(20) DEFAULT 0 ;
+ALTER TABLE `m_product_loan` ADD COLUMN `saving_account_validity` int(20) DEFAULT 0 ;

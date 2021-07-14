@@ -36,6 +36,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.persistence.Id;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerator;
@@ -50,6 +51,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name = "m_share_account")
 public class ShareAccount extends AbstractPersistableCustom<Long> {
+
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
@@ -129,10 +131,10 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     private Boolean allowDividendCalculationForInactiveClients;
 
     @ManyToOne
-    @JoinColumn(name = "savings_account_id", nullable = true)
+    @JoinColumn(name = "savings_account_id", nullable = false)
     private SavingsAccount savingsAccount;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.LAZY)
     private Set<ShareAccountTransaction> shareAccountTransactions;
 
     @Column(name = "lockin_period_frequency")
@@ -149,7 +151,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     @Column(name = "minimum_active_period_frequency_enum", nullable = true)
     private PeriodFrequencyType minimumActivePeriodFrequencyType;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.LAZY)
     private Set<ShareAccountCharge> charges;
 
     @Transient
