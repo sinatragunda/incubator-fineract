@@ -47,6 +47,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+
+// added 18/07/2021 
+import java.io.File ;
+
 @Service
 @ReportService(type = "Pentaho")
 public class PentahoReportingProcessServiceImpl implements ReportingProcessService {
@@ -67,6 +72,57 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
         this.context = context;
     }
+
+    @Override
+    public File processRequestEx(final String reportName, final MultivaluedMap<String, String> queryParams) {
+
+        final String outputTypeParam = queryParams.getFirst("output-type");
+        final Map<String, String> reportParams = getReportParams(queryParams);
+        final Locale locale = ApiParameterHelper.extractLocale(queryParams);
+
+        String outputType = "HTML";
+        if (StringUtils.isNotBlank(outputTypeParam)) {
+            outputType = outputTypeParam;
+        }
+
+        if (!(outputType.equalsIgnoreCase("HTML") || outputType.equalsIgnoreCase("PDF") || outputType.equalsIgnoreCase("XLS")
+                || outputType.equalsIgnoreCase("XLSX") || outputType.equalsIgnoreCase("CSV"))) { throw new PlatformDataIntegrityException(
+                "error.msg.invalid.outputType", "No matching Output Type: " + outputType); }
+
+        if (this.noPentaho) { throw new PlatformDataIntegrityException("error.msg.no.pentaho", "Pentaho is not enabled",
+                "Pentaho is not enabled"); }
+
+       
+        final String reportPath = MIFOS_BASE_DIR + File.separator + "pentahoReports" + File.separator + reportName + ".prpt";
+        
+        logger.info("Report path: " + reportPath);
+
+        // load report definition
+        final ResourceManager manager = new ResourceManager();
+        manager.registerDefaults();
+        Resource res;
+        try {
+            res = manager.createDirectly(reportPath, MasterReport.class);  
+            final MasterReport masterReport = (MasterReport) res.getResource();
+            final DefaultReportEnvironment reportEnvironment = (DefaultReportEnvironment) masterReport.getReportEnvironment();
+            
+            if (locale != null) {
+                reportEnvironment.setLocale(locale);
+            }
+
+            addParametersToReport(masterReport, reportParams);
+
+            final File file = new File(reportName);
+            if ("PDF".equalsIgnoreCase(outputType)) {
+                PdfReportUtil.createPDF(masterReport,file);
+                return file ;
+            }
+        } catch (final ResourceException e) {
+            throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
+        }
+        throw new PlatformDataIntegrityException("error.msg.invalid.outputType", "No matching Output Type: " + outputType);
+    }
+
 
     @Override
     public Response processRequest(final String reportName, final MultivaluedMap<String, String> queryParams) {

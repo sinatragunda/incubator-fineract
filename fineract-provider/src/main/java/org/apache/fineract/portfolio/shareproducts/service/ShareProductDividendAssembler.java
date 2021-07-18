@@ -86,9 +86,10 @@ public class ShareProductDividendAssembler {
                 long numberOfShareDaysPerAccount = numberOfSharesdaysPerAccount.get(accountData.getId());
                 double amountForAccount = numberOfShareDaysPerAccount * amountPerShareDay;
                 
-                if(dividendLowerLimit.doubleValue() > amountForAccount){
-                    continue ;
-                }
+                // implement dividend lower limit                 
+                // if(dividendLowerLimit.doubleValue() > amountForAccount){
+                //     continue ;
+                // }
 
                 final Money accountAmount = Money.of(currency, BigDecimal.valueOf(amountForAccount));
                 ShareAccountDividendDetails dividendDetails = new ShareAccountDividendDetails(accountData.getId(),
