@@ -790,5 +790,10 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
     
 	public boolean isAmountOnHoldNotReleased() {
 		return (isAmountOnHold() && getReleaseIdOfHoldAmountTransaction() == null);
-	}	    
+	}
+
+    public Date getTransactionDate(){
+        return this.dateOf;
+    }
+    
 }

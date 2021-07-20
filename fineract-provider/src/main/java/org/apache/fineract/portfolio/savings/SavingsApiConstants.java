@@ -187,4 +187,7 @@ public class    SavingsApiConstants {
     public static final String datatables = "datatables";
     
     public static final String ERROR_MSG_SAVINGS_ACCOUNT_NOT_ACTIVE = "not.in.active.state";
+
+    // Added 20/07/2018
+    public static final String monthlyDepositParam = "monthlyDeposit";
 }

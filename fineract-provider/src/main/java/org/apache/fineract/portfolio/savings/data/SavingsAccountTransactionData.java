@@ -222,4 +222,12 @@ public class SavingsAccountTransactionData {
                 savingsAccountTransactionData.transfer, savingsAccountTransactionData.paymentTypeOptions,
                 savingsAccountTransactionData.interestedPostedAsOn,savingsAccountTransactionData.submittedByUsername, savingsAccountTransactionData.note);
     }
+
+    public LocalDate getTransactionDate(){
+        return this.transactionDate ;
+    }
+
+    public BigDecimal getAmount(){
+        return this.amount;
+    }
 }

@@ -49,6 +49,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+// Added 20/07/2021
+import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
+//import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDepositRepository;
+
+
 @Service
 public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainService {
 
@@ -60,6 +66,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     private final ConfigurationDomainService configurationDomainService;
     private final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
+    private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository;
 
     @Autowired
     public SavingsAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository,
@@ -68,7 +75,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final JournalEntryWritePlatformService journalEntryWritePlatformService,
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
-            final BusinessEventNotifierService businessEventNotifierService) {
+            final BusinessEventNotifierService businessEventNotifierService ,
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -77,6 +85,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.context = context;
         this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
         this.businessEventNotifierService = businessEventNotifierService;
+        this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
     }
 
     @Transactional
@@ -149,6 +158,9 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType) {
+        
+        System.err.println("-------------------------handle deposit --------------"+isAccountTransfer);
+
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
         account.validateForCreditBlock();
@@ -181,6 +193,12 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         saveTransactionToGenerateTransactionId(deposit);
 
         this.savingsAccountRepository.saveAndFlush(account);
+
+
+        /// added 20/07/2021
+        /// here we add new value to save this transaction to monthly deposit
+        
+        SavingsMonthlyDepositHelper.handleDeposit(savingsAccountMonthlyDepositRepository ,account ,transactionAmount);
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer);
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_DEPOSIT,

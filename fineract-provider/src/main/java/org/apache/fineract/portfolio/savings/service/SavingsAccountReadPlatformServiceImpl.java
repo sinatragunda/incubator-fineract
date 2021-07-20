@@ -84,6 +84,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+
+// added 20/07/2021
+import java.util.Date;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDeposit;
+
 @Service
 public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountReadPlatformService {
 
@@ -108,6 +113,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
     private final EntityDatatableChecksReadService entityDatatableChecksReadService;
     private final ColumnValidator columnValidator;
+    private static JdbcTemplate jdbcTemplateStatic = null ;
 
     @Autowired
     public SavingsAccountReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource,
@@ -118,6 +124,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             final EntityDatatableChecksReadService entityDatatableChecksReadService, final ColumnValidator columnValidator) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplateStatic = this.jdbcTemplate;
         this.clientReadPlatformService = clientReadPlatformService;
         this.groupReadPlatformService = groupReadPlatformService;
         this.savingsProductReadPlatformService = savingProductReadPlatformService;
@@ -230,6 +237,44 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             throw new SavingsAccountNotFoundException(accountId);
         }
     }
+
+    // Added 20/07/2021
+
+    private static final class SavingsAccountMonthlyDepositMapper implements RowMapper<SavingsAccountMonthlyDeposit> {
+
+        private final String schemaSql;
+
+        public SavingsAccountMonthlyDepositMapper(Long id){
+
+            final StringBuilder sqlBuilder = new StringBuilder(400);
+            sqlBuilder.append("select ");
+            sqlBuilder.append("sa.id as id,");
+            sqlBuilder.append("sa.amount as amount, ");
+            sqlBuilder.append("sa.start_date as startDate,");
+            sqlBuilder.append("sa.savings_account_id as savingsId ");
+
+            sqlBuilder.append("from m_savings_account_monthly_deposit sa where sa.savings_account_id = "+id);
+           
+            this.schemaSql = sqlBuilder.toString();
+        }
+
+        public String schema() {
+            return this.schemaSql;
+        }
+
+        @Override
+        public SavingsAccountMonthlyDeposit mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+
+            final Long id = rs.getLong("id");
+            final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"amount");
+            final Date startDate = rs.getDate("startDate");
+            final Long savingsId = rs.getLong("savingsId");
+
+            return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,amount);
+        
+        }
+    }
+
 
     private static final class SavingAccountMapper implements RowMapper<SavingsAccountData> {
 
@@ -550,13 +595,16 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                 taxGroupData = TaxGroupData.lookup(taxGroupId, taxGroupName);
             }
 
+            // added 20/07/2021
+            List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = savingsAccountMonthly(id);
+
             return SavingsAccountData.instance(id, accountNo, depositType, externalId, groupId, groupName, clientId, clientName, productId,
                     productName, fieldOfficerId, fieldOfficerName, status, subStatus, timeline, currency,
                     nominalAnnualInterestRate, interestCompoundingPeriodType, interestPostingPeriodType, interestCalculationType,
                     interestCalculationDaysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers,
                     summary, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                     minBalanceForInterestCalculation, onHoldFunds, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax, 
-                    taxGroupData, lastActiveTransactionDate, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat, onHoldAmount);
+                    taxGroupData, lastActiveTransactionDate, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat, onHoldAmount,savingsAccountMonthlyDepositList);
         }
     }
 
@@ -755,6 +803,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                 + " where sa.id = ? and sa.deposit_type_enum = ? order by tr.transaction_date DESC, tr.created_date DESC, tr.id DESC";
 
         return this.jdbcTemplate.query(sql, this.transactionsMapper, new Object[] { savingsId, depositAccountType.getValue() });
+    
     }
 
     @Override
@@ -1109,7 +1158,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                     interestCalculationDaysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers,
                     summary, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                     minBalanceForInterestCalculation, onHoldFunds, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax, 
-                    taxGroupData, lastActiveTransactionDate, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat, savingsAmountOnHold);
+                    taxGroupData, lastActiveTransactionDate, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat, savingsAmountOnHold,null);
         }
     }
 
@@ -1248,4 +1297,12 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
      * return SavingsAccountAnnualFeeData.instance(id, accountNo,
      * annualFeeNextDueDate); } }
      */
+
+    public static List<SavingsAccountMonthlyDeposit> savingsAccountMonthly(Long id){
+
+        SavingsAccountMonthlyDepositMapper savingsAccountMonthlyDepositMapper = new SavingsAccountMonthlyDepositMapper(id);
+        String smdSql = savingsAccountMonthlyDepositMapper.schema();
+        List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = jdbcTemplateStatic.query(smdSql,savingsAccountMonthlyDepositMapper);
+        return savingsAccountMonthlyDepositList;
+    }
 }
