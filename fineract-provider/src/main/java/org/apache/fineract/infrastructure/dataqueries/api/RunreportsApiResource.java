@@ -184,10 +184,8 @@ public class RunreportsApiResource {
             try{
                 reportType = this.readExtraDataAndReportingService.getReportType(reportCustomized);
                 reportName = reportCustomized;
-                System.err.println("-----------------------change report name as well to-------------"+reportName);
             }
             catch(Exception n){
-                System.err.println("-----------------------new report not found stick to old one----------"+reportCustomized);
                 reportType = this.readExtraDataAndReportingService.getReportType(reportName);
             }
             
