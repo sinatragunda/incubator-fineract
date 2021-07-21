@@ -67,9 +67,11 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountSummaryData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountSubStatusEnum;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
+import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.Days;
@@ -240,6 +242,18 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
     // Added 20/07/2021
 
+    @Override
+    public List<SavingsAccountData> retrieveAllForPortfolio(final Long productId) {
+
+        try {
+            final String sql = "select " + this.savingAccountMapper.schema() + " where sa.product_id = ?";
+
+            return this.jdbcTemplate.query(sql, this.savingAccountMapper, new Object[] { productId });
+        } catch (final EmptyResultDataAccessException e) {
+            throw new SavingsProductNotFoundException(productId);
+        }
+    }
+
     private static final class SavingsAccountMonthlyDepositMapper implements RowMapper<SavingsAccountMonthlyDeposit> {
 
         private final String schemaSql;
@@ -271,7 +285,43 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             final Long savingsId = rs.getLong("savingsId");
 
             return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,amount);
-        
+        }
+    }
+
+
+    private static final class EquityGrowthOnSavingsAccountMapper implements RowMapper<EquityGrowthOnSavingsAccount> {
+
+        private final String schemaSql;
+
+        public EquityGrowthOnSavingsAccountMapper(Long accountId){
+
+            final StringBuilder sqlBuilder = new StringBuilder(400);
+            sqlBuilder.append("select ");
+            sqlBuilder.append("sa.id as id,");
+            sqlBuilder.append("sa.amount as amount, ");
+            sqlBuilder.append("sa.equity_growth_dividends_id as equityGrowthDividendsId, ");
+            sqlBuilder.append("sa.percent_of_profits as percentageOfProfits,");
+            sqlBuilder.append("sa.savings_account_id as savingsAccountId ");
+
+            sqlBuilder.append("from m_savings_account_monthly_deposit sa where sa.savings_account_id = "+accountId);
+
+            this.schemaSql = sqlBuilder.toString();
+        }
+
+        public String schema() {
+            return this.schemaSql;
+        }
+
+        @Override
+        public EquityGrowthOnSavingsAccount mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+
+            final Long id = rs.getLong("id");
+            final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"amount");
+            final Date startDate = rs.getDate("startDate");
+            final Long savingsId = rs.getLong("savingsId");
+
+            return null ;
+            //return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,amount);
         }
     }
 
