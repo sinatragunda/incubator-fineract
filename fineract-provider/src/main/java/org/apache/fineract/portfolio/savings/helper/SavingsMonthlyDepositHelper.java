@@ -20,44 +20,27 @@ public class SavingsMonthlyDepositHelper{
 
 	//// monthly duration thing here 
 	//// if month is 2021-07-01
-	public static BigDecimal currentMonthDeposit(SavingsAccount savingsAccount){
-
-		Date now = TimeHelper.dateNow();
-		List<SavingsAccountTransaction> transactionsList = savingsAccount.getTransactions();
-		
-		Predicate<SavingsAccountTransaction> filterByMonth = (e)->{
-			SavingsAccountTransaction transaction = e ;
-			Date transactionDate = e.getTransactionDate();
-			boolean isSameMonth = TimeHelper.sameMonth(transactionDate ,now);
-			return isSameMonth ;
-		};
-
-		List<SavingsAccountTransaction> filteredList = transactionsList.stream().filter(filterByMonth).collect(Collectors.toList());
-		BigDecimal monthlyDeposit = filteredList.stream().map(SavingsAccountTransaction::getAmount).reduce(BigDecimal.ZERO ,BigDecimal::add);
-		return monthlyDeposit ;
-	}
-
-	public static BigDecimal currentMonthDeposit(Collection<SavingsAccountTransactionData> transactionsList){
-
-		Date now = TimeHelper.dateNow();
-		
-		Predicate<SavingsAccountTransactionData> filterByMonth = (e)->{
-			SavingsAccountTransactionData transaction = e ;
-			Date transactionDate = e.getTransactionDate().toDate();
-			boolean isSameMonth = TimeHelper.sameMonth(transactionDate ,now);
-			return isSameMonth ;
-		};
-
-		List<SavingsAccountTransactionData> filteredList = transactionsList.stream().filter(filterByMonth).collect(Collectors.toList());
-		BigDecimal monthlyDeposit = filteredList.stream().map(e -> e.getAmount()).reduce(BigDecimal.ZERO ,BigDecimal::add);
-		return monthlyDeposit ;
-	}
+//
+//	public static BigDecimal currentMonthDeposit(Collection<SavingsAccountTransactionData> transactionsList){
+//
+//		Date now = TimeHelper.dateNow();
+//
+//		Predicate<SavingsAccountTransactionData> filterByMonth = (e)->{
+//			SavingsAccountTransactionData transaction = e ;
+//			Date transactionDate = e.getTransactionDate().toDate();
+//			boolean isSameMonth = TimeHelper.sameMonth(transactionDate ,now);
+//			return isSameMonth ;
+//		};
+//
+//		List<SavingsAccountTransactionData> filteredList = transactionsList.stream().filter(filterByMonth).collect(Collectors.toList());
+//		BigDecimal monthlyDeposit = filteredList.stream().map(e -> e.getAmount()).reduce(BigDecimal.ZERO ,BigDecimal::add);
+//		return monthlyDeposit ;
+//	}
 
 
 	public static BigDecimal currentMonthDeposit(List<SavingsAccountMonthlyDeposit> transactionsList){
 
 		Date now = TimeHelper.dateNow();
-		
 		Predicate<SavingsAccountMonthlyDeposit> filterByMonth = (e)->{
 			SavingsAccountMonthlyDeposit transaction = e ;
 			Date startDate = e.getStartDate();

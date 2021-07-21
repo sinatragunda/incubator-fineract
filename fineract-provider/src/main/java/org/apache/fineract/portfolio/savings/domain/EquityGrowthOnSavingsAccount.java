@@ -6,17 +6,28 @@
 */
 package org.apache.fineract.portfolio.savings.domain;
 
-import org.apache.fineract.portfolio.savings.domain.interest.EquityGrowthDividends;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.JoinColumn;
+
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+
+
 @Entity
 @Table(name="m_equity_growth_savings_account")
-public class EquityGrowthOnSavingsAccount{
+public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long>{
 
 
-    @Column(name="equity_growth_dividends_id")
+    @Column(name="equity_growth_dividend_id")
+    @JoinColumn(name = "equity_growth_dividend_id", nullable = false)
     private EquityGrowthDividends equityGrowthDividends;
 
     @Column(name="savings_account_id")
@@ -50,7 +61,6 @@ public class EquityGrowthOnSavingsAccount{
     public void setSavingsAccountId(Long savingsAccountId) {
         this.savingsAccountId = savingsAccountId;
     }
-
 
 
 

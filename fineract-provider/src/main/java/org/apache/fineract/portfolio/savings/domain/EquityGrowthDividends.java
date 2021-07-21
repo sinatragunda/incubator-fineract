@@ -9,9 +9,18 @@ package org.apache.fineract.portfolio.savings.domain;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+
+
 @Entity
 @Table(name="equity_growth_dividends")
-public class EquityGrowthDividends {
+public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
     @Column(name="start_period")
     private Date startPeriod ;
@@ -24,6 +33,11 @@ public class EquityGrowthDividends {
 
     @Column(name="beneficiaries")
     private int beneficiaries;
+
+    @Column(name="savings_product_id")
+    private Long savingsProductId;
+
+
 
 
     public EquityGrowthDividends(){}

@@ -20,10 +20,10 @@ public class SavingsProductPortfolioHelper {
 
         System.err.println("----------------total balance for these number of products ------------"+savingsAccountDataList.size());
 
-        BigDecimal totalBalance = savingsAccountDataList.stream().map(SavingsAccountData::getAccountBalance).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        BigDecimal totalBalance = BigDecimal.ZERO ;
 
+        totalBalance = savingsAccountDataList.stream().map(SavingsAccountData::getAccountBalance).reduce(BigDecimal.ZERO ,BigDecimal::add);
         System.err.println("-------------------------total account balances is -------------------------"+totalBalance);
-
 
         return totalBalance ;
     }
