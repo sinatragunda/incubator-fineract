@@ -418,10 +418,8 @@ public class SavingsProductData {
         this.daysToInactive = daysToInactive;
         this.daysToDormancy = daysToDormancy;
         this.daysToEscheat = daysToEscheat;
-
-
         // put something here to calculate portfolio balance
-        this.portfolioBalance = portfolioBalance;
+        this.portfolioBalance = null;
     }
 
     public boolean hasAccountingEnabled() {
@@ -509,6 +507,10 @@ public class SavingsProductData {
 
     public boolean isWithdrawalFeeForTransfers() {
         return withdrawalFeeForTransfers;
+    }
+
+    public void setPortfolioBalance(BigDecimal amount){
+        this.portfolioBalance = amount ;
     }
 
 
