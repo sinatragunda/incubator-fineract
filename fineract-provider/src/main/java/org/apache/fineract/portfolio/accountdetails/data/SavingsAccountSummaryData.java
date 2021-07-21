@@ -70,4 +70,8 @@ public class SavingsAccountSummaryData {
         this.subStatus = subStatus;
         this.lastActiveTransactionDate = lastActiveTransactionDate;
     }
+
+    public BigDecimal getAccountBalance(){
+        return this.accountBalance ;
+    }
 }

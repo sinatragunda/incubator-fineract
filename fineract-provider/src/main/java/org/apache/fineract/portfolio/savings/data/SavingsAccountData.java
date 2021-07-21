@@ -805,8 +805,12 @@ public class SavingsAccountData {
             return SavingsMonthlyDepositHelper.currentMonthDeposit(this.savingsAccountMonthlyDeposits);
         }
         catch(NullPointerException n){
-            System.err.println("------------------------transactions are still null here--------------------------");
         }
         return BigDecimal.ZERO;
+    }
+
+
+    public BigDecimal getAccountBalance(){
+        return summary.getAccountBalance();
     }
 }

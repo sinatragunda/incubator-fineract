@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.portfolio.savings.helper.SavingsProductPortfolioHelper;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 
 /**
@@ -91,6 +92,10 @@ public class SavingsProductData {
 	private final Long daysToInactive;
 	private final Long daysToDormancy;
 	private final Long daysToEscheat;
+
+	//added 21/07/2021
+    private BigDecimal portfolioBalance ;
+
 
     public static SavingsProductData template(final CurrencyData currency, final EnumOptionData interestCompoundingPeriodType,
             final EnumOptionData interestPostingPeriodType, final EnumOptionData interestCalculationType,
@@ -413,6 +418,10 @@ public class SavingsProductData {
         this.daysToInactive = daysToInactive;
         this.daysToDormancy = daysToDormancy;
         this.daysToEscheat = daysToEscheat;
+
+
+        // put something here to calculate portfolio balance
+        this.portfolioBalance = portfolioBalance;
     }
 
     public boolean hasAccountingEnabled() {
@@ -500,5 +509,10 @@ public class SavingsProductData {
 
     public boolean isWithdrawalFeeForTransfers() {
         return withdrawalFeeForTransfers;
+    }
+
+
+    public BigDecimal getPortfolioBalance() {
+        return portfolioBalance;
     }
 }
