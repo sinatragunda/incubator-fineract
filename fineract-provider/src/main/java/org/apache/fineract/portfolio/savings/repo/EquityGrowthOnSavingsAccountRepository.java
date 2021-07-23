@@ -17,6 +17,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface EquityGrowthOnSavingsAccountRepository extends JpaRepository<EquityGrowthOnSavingsAccount ,Long> ,JpaSpecificationExecutor<EquityGrowthOnSavingsAccount>{
 
     EquityGrowthOnSavingsAccount findOneBySavingsAccountId(Long id);
-    EquityGrowthOnSavingsAccount findOneByProductId(Long id);
     List<EquityGrowthOnSavingsAccount> findByEquityGrowthDividendsId(Long id);
 }

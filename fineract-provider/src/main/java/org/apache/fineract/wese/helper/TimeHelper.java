@@ -1,6 +1,7 @@
 package org.apache.fineract.wese.helper ;
 
 
+import java.time.Duration;
 import java.util.Date;
 import java.time.Instant ;
 import java.time.LocalDate;
@@ -12,9 +13,7 @@ public class TimeHelper{
 	// start date to mark the start of a month 
 	public static Date startDate(){
 		Date date = dateNow();
-		System.err.println("-------------first date is------------"+date.toString());
 		date.setDate(1); 
-		System.err.println("-------------updated date is------------"+date.toString());
 		return date ;
 	}
 
@@ -23,6 +22,15 @@ public class TimeHelper{
         Instant instant = Instant.now();
         Date date = Date.from(instant);
         return date ;
+    }
+
+    public static int periodDuration(Date start ,Date end){
+
+		Duration duration = Duration.between(start.toInstant() ,end.toInstant());
+    	Long daysBetween = duration.toDays();
+
+    	int months = daysBetween.intValue() / 30 ;
+    	return months;
     }
 
 

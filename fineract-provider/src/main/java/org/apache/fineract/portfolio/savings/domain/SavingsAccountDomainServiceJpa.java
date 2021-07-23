@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.exception.DepositAccountTransactionNotAllowedException;
+import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
@@ -52,7 +53,7 @@ import java.util.Set;
 
 // Added 20/07/2021
 import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
-//import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDepositRepository;
+//import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 
 
 @Service
@@ -67,6 +68,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     private final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
     private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository;
+    private final SavingsAccountAssembler savingsAccountAssembler ;
 
     @Autowired
     public SavingsAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository,
@@ -76,7 +78,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
             final BusinessEventNotifierService businessEventNotifierService ,
-            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository) {
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -86,6 +88,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.depositAccountOnHoldTransactionRepository = depositAccountOnHoldTransactionRepository;
         this.businessEventNotifierService = businessEventNotifierService;
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
+        this.savingsAccountAssembler = savingsAccountAssembler ;
     }
 
     @Transactional
@@ -154,12 +157,35 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 savingsAccountTransactionType);
     }
 
+
+    @Transactional
+    @Override
+    public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId , final DateTimeFormatter fmt ,LocalDate transactionDate , BigDecimal transactionAmount){
+        AppUser user = getAppUserIfPresent();
+        Integer accountType = null;
+        PaymentDetail paymentDetail = null ;
+
+        System.err.println("-------------------------handle deposit lite --------------");
+
+        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+
+        final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
+                paymentDetail, new Date(), user, accountType);
+
+        SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
+
+        final SavingsAccountTransaction deposit = savingsAccount.deposit(transactionDTO, savingsAccountTransactionType);
+
+        return handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);
+
+    
+    }
+
     private SavingsAccountTransaction handleDeposit(final SavingsAccount account, final DateTimeFormatter fmt,
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType) {
         
-        System.err.println("-------------------------handle deposit --------------"+isAccountTransfer);
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();

@@ -34,6 +34,11 @@ public interface SavingsAccountDomainService {
     SavingsAccountTransaction handleDeposit(SavingsAccount account, DateTimeFormatter fmt, LocalDate transactionDate,
             BigDecimal transactionAmount, PaymentDetail paymentDetail, boolean isAccountTransfer, boolean isRegularTransaction);
 
+    
+    // Added 22/07/2021
+    SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,DateTimeFormatter fmt ,LocalDate transactionDate , BigDecimal transactionAmount);
+   
+
     void postJournalEntries(SavingsAccount savingsAccount, Set<Long> existingTransactionIds, Set<Long> existingReversedTransactionIds);
 
     SavingsAccountTransaction handleDividendPayout(SavingsAccount account, LocalDate transactionDate, BigDecimal transactionAmount);

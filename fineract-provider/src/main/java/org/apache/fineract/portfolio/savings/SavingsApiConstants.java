@@ -26,7 +26,7 @@ import org.apache.fineract.accounting.common.AccountingConstants.SAVINGS_PRODUCT
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 
-public class    SavingsApiConstants {
+public class SavingsApiConstants {
 
     public static final String SAVINGS_PRODUCT_RESOURCE_NAME = "savingsproduct";
     public static final String SAVINGS_ACCOUNT_RESOURCE_NAME = "savingsaccount";
@@ -190,4 +190,7 @@ public class    SavingsApiConstants {
 
     // Added 20/07/2018
     public static final String monthlyDepositParam = "monthlyDeposit";
+    
+    // added 22/07/2021 
+    public static final String portfolioBalanceParam = "portfolioBalance";
 }

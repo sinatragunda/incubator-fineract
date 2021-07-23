@@ -813,4 +813,17 @@ public class SavingsAccountData {
     public BigDecimal getAccountBalance(){
         return summary.getAccountBalance();
     }
+
+    // added 22/07/2021
+    public Long getId(){
+        return this.id ;
+    }
+
+    public Long getSavingsProductId(){
+        return this.savingsProductId;
+    }
+
+    public SavingsAccount toSavingsAccount(){
+        return new SavingsAccount(new Client(clientId) ,null ,new SavingsProduct(savingsProductId),null ,accountNo ,null ,null ,null ,null ,null ,null ,null ,null ,null ,null,null ,null ,null ,null);
+    }
 }

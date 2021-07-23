@@ -33,6 +33,12 @@ public class SavingsApiSetConstants extends SavingsApiConstants {
 	 * {@link SavingsProductData}. Where possible, we try to get response
 	 * parameters to match those of request parameters.
 	 */
+
+
+	protected static final Set<String> SAVINGS_PRODUCT_PORTFOLIO = new HashSet<>(Arrays.asList("startDate" ,"endDate"));
+
+
+
 	protected static final Set<String> SAVINGS_PRODUCT_RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList(
 			idParamName, nameParamName, shortNameParamName, descriptionParamName, "currency",
 			digitsAfterDecimalParamName, inMultiplesOfParamName, nominalAnnualInterestRateParamName,
@@ -45,7 +51,7 @@ public class SavingsApiSetConstants extends SavingsApiConstants {
 			"interestCalculationDaysInYearTypeOptions", "lockinPeriodFrequencyTypeOptions", "withdrawalFeeTypeOptions",
 			nominalAnnualInterestRateOverdraftParamName, minOverdraftForInterestCalculationParamName,
 			withHoldTaxParamName, taxGroupIdParamName, isDormancyTrackingActiveParamName, daysToInactiveParamName,
-			daysToDormancyParamName, daysToInactiveParamName));
+			daysToDormancyParamName, daysToInactiveParamName ,portfolioBalanceParam));
 
 	/**
 	 * These parameters will match the class level parameters of

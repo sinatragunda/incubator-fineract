@@ -35,7 +35,9 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 		this.amount =amount ;
 	}
 
-
+	public Long getSavingsAccountId() {
+		return savingsAccountId;
+	}
 
 	public void setStartDate(Date date){
 		this.startDate = date;

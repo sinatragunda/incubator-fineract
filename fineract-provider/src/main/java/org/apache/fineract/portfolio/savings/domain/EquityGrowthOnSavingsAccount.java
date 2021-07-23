@@ -39,19 +39,58 @@ public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long
     @Column(name="amount")
     private BigDecimal amount ;
 
+    @Column(name="average_savings")
+    private BigDecimal averageSavings;
+
     @Column(name="note")
     private String note ;
+
+    private String clientName;
 
 
     public EquityGrowthOnSavingsAccount(){}
 
 
-    public EquityGrowthOnSavingsAccount(EquityGrowthDividends equityGrowthDividends, Long savingsAccountId,BigDecimal amount,Double pecentage, String note) {
+    public EquityGrowthOnSavingsAccount(EquityGrowthDividends equityGrowthDividends, Long savingsAccountId,BigDecimal averageSavings, BigDecimal amount,Double pecentage, String note ,String clientName) {
         this.equityGrowthDividends = equityGrowthDividends;
         this.savingsAccountId = savingsAccountId;
         this.amount = amount;
         this.note = note;
         this.percentageOfProfit = pecentage;
+        this.clientName = clientName ;
+        this.averageSavings = averageSavings;
+    }
+
+    public BigDecimal getAverageSavings() {
+        return averageSavings;
+    }
+
+    public void setAverageSavings(BigDecimal averageSavings) {
+        this.averageSavings = averageSavings;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public EquityGrowthDividends getEquityGrowthDividends() {
+        return equityGrowthDividends;
+    }
+
+    public void setEquityGrowthDividends(EquityGrowthDividends equityGrowthDividends) {
+        this.equityGrowthDividends = equityGrowthDividends;
+    }
+
+    public Double getPercentageOfProfit() {
+        return percentageOfProfit;
+    }
+
+    public void setPercentageOfProfit(Double percentageOfProfit) {
+        this.percentageOfProfit = percentageOfProfit;
     }
 
     public Long getSavingsAccountId() {

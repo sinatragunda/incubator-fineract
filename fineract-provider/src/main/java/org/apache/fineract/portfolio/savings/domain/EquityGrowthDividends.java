@@ -22,13 +22,16 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Table(name="equity_growth_dividends")
 public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
+    @Column(name="id")
+    private Long id ;
+
     @Column(name="start_period")
     private Date startPeriod ;
 
     @Column(name="end_period")
     private Date endPeriod ;
 
-    @Column(name="amount")
+    @Column(name="total_profits")
     private BigDecimal amount ;
 
     @Column(name="beneficiaries")
@@ -38,8 +41,6 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
     private Long savingsProductId;
 
 
-
-
     public EquityGrowthDividends(){}
 
     public EquityGrowthDividends(Date startPeriod, Date endPeriod, BigDecimal amount, int beneficiaries) {
@@ -47,6 +48,16 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
         this.endPeriod = endPeriod;
         this.amount = amount;
         this.beneficiaries = beneficiaries;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Date getStartPeriod() {
@@ -79,5 +90,13 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
     public void setBeneficiaries(int beneficiaries) {
         this.beneficiaries = beneficiaries;
+    }
+
+    public Long getSavingsProductId() {
+        return savingsProductId;
+    }
+
+    public void setSavingsProductId(Long savingsProductId) {
+        this.savingsProductId = savingsProductId;
     }
 }

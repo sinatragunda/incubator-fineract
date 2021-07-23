@@ -51,6 +51,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
@@ -63,8 +64,16 @@ import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodTyp
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYearType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
+import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
+
+import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TOTAL_CALC_CRITERIA;
+import org.apache.fineract.portfolio.savings.helper.EquityGrowthHelper;
 import org.apache.fineract.portfolio.savings.helper.SavingsProductPortfolioHelper;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
+import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
@@ -75,6 +84,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+// added 22/07/2021
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.joda.time.LocalDate;
+
+
+// added 23/07/2021
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
+
 
 @Path("/savingsproducts")
 @Component
@@ -94,6 +117,10 @@ public class SavingsProductsApiResource {
     private final PaymentTypeReadPlatformService paymentTypeReadPlatformService;
     private final TaxReadPlatformService taxReadPlatformService;
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService ;
+    private final FromJsonHelper fromJsonHelper ;
+    private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ;
+    private final SavingsAccountDomainService savingsAccountDomainService ;
+    private final EquityGrowthDividendsRepository equityGrowthDividendsRepository ;
 
     @Autowired
     public SavingsProductsApiResource(final SavingsProductReadPlatformService savingProductReadPlatformService,
@@ -105,7 +132,7 @@ public class SavingsProductsApiResource {
             final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService,
             final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService,
             final ChargeReadPlatformService chargeReadPlatformService, PaymentTypeReadPlatformService paymentTypeReadPlatformService,
-            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
+            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository) {
         this.savingProductReadPlatformService = savingProductReadPlatformService;
         this.dropdownReadPlatformService = dropdownReadPlatformService;
         this.currencyReadPlatformService = currencyReadPlatformService;
@@ -119,6 +146,10 @@ public class SavingsProductsApiResource {
         this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
         this.taxReadPlatformService = taxReadPlatformService;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
+        this.fromJsonHelper = fromJsonHelper ;
+        this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
+        this.savingsAccountDomainService = savingsAccountDomainService ;
+        this.equityGrowthDividendsRepository = equityGrowthDividendsRepository ;
     }
 
     @POST
@@ -147,6 +178,66 @@ public class SavingsProductsApiResource {
         return this.toApiJsonSerializer.serialize(result);
 
     }
+
+    // Added 21/07/2021 ...Calculates the portfolio balance for savings account
+    @POST
+    @Path("/balance/{productId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String portfolioBalance(@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(apiRequestBodyAsJson);
+
+        //int calculationMethod = fromJsonHelper.extractIntegerNamed("calcCriteria" ,jsonElement);
+        //SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromInt(calculationMethod);
+        LocalDate startDate = fromJsonHelper.extractLocalDateNamed("startDate" ,jsonElement);
+        LocalDate endDate = fromJsonHelper.extractLocalDateNamed("endDate" ,jsonElement);
+
+        // set account balance here
+        BigDecimal balance = SavingsProductPortfolioHelper.portfolioBalanceDated(savingsAccountReadPlatformService ,savingsAccountMonthlyDepositRepository, startDate.toDate() ,endDate.toDate() ,null ,productId);
+        //savingProductData.setPortfolioBalance(balance);
+        return ObjectNodeHelper.statusNode(true).put("portfolioBalance",balance).toString();
+    }
+
+    // Added 21/07/2021 ...Calculates the portfolio balance for savings account
+    @POST
+    @Path("/equitygrowth/{productId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<EquityGrowthOnSavingsAccount> equityGrowth(@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(apiRequestBodyAsJson);
+
+        //calculate equity growth here son
+        List<SavingsAccountData> savingsAccountDataList = savingsAccountReadPlatformService.retrieveAllForPortfolio(productId);
+
+        //int calculationMethod = fromJsonHelper.extractIntegerNamed("calcCriteria" ,jsonElement);
+        //SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromInt(calculationMethod);
+        LocalDate startDate = fromJsonHelper.extractLocalDateNamed("startDate" ,jsonElement);
+        LocalDate endDate = fromJsonHelper.extractLocalDateNamed("endDate" ,jsonElement);
+        BigDecimal portfolioBalance = fromJsonHelper.extractBigDecimalWithLocaleNamed("portfolioBalance",jsonElement);
+        BigDecimal profitAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("profit" ,jsonElement);
+        Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
+
+        EquityGrowthDividends equityGrowthDividends = null ;
+        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  EquityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository ,savingsAccountDataList,equityGrowthDividends ,startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
+
+        if(transferEarning){
+            /// do something here that does transfer earnings to the said accounts son
+            System.err.println("-----------------does our equity dividends has something ?   "+equityGrowthDividends.getAmount());
+            equityGrowthDividendsRepository.save(equityGrowthDividends);
+            EquityGrowthHelper.save(equityGrowthRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
+            EquityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
+        }
+
+        return equityGrowthOnSavingsAccountList ;
+
+    }
+
 
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })

@@ -1,19 +1,13 @@
 package org.apache.fineract.portfolio.savings.helper; 
 
 import java.util.Date ;
-import java.time.LocalDate;
 import java.util.List ;
-import java.util.Collection;
 import java.util.stream.Collectors;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.math.BigDecimal;
 import java.util.function.Predicate;
 import org.apache.fineract.wese.helper.TimeHelper ;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData ;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDepositRepository;
+import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDeposit;
 
 public class SavingsMonthlyDepositHelper{
