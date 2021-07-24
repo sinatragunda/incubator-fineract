@@ -234,7 +234,6 @@ public class SavingsProductsApiResource {
             /// do something here that does transfer earnings to the said accounts son
             EquityGrowthDividends equityGrowthDividends = equityGrowthHelper.getEquityGrowthDividends();
             equityGrowthDividends = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
-            //equityGrowthDividends.setId(id);
             equityGrowthHelper.flushToDatabase(equityGrowthOnSavingsAccountRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
             equityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
         }
@@ -249,10 +248,8 @@ public class SavingsProductsApiResource {
     public List<EquityGrowthDividends> equityGrowthDividends(@PathParam("productId") final Long productId) {
 
         //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
-
         List<EquityGrowthDividends> equityGrowthDividendsList = equityGrowthDividendsRepository.findBySavingsProductId(productId);
         return equityGrowthDividendsList ;
-
     }
 
     @GET
@@ -264,19 +261,16 @@ public class SavingsProductsApiResource {
         //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO)
 
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = equityGrowthOnSavingsAccountRepository.findByEquityGrowthDividendsId(id);
-
         Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
             SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e.getSavingsAccountId());
-            e.setClientName(e.getClientName());
+            System.err.println("-----------------------setting savings account name-----------------"+savingsAccount.getClient().getDisplayName());
+            String name = savingsAccount.getClient().getDisplayName();
+            e.setClientName(name);
         };
 
         equityGrowthOnSavingsAccountList.stream().forEach(consumer);
-
         return equityGrowthOnSavingsAccountList;
-
     }
-
-
 
 
     @GET
