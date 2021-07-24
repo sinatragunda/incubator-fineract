@@ -171,12 +171,21 @@ public class SavingsAccountsApiResource {
 
         final SavingsAccountData savingsAccount = this.savingsAccountReadPlatformService.retrieveOne(accountId);
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList  = equityGrowthOnSavingsAccountRepository.findBySavingsAccountId(accountId);
+
+        System.err.println("------------------------savings account data for equity---------"+savingsAccount.getId());
+        System.err.println("-------------------------we have this many equities-------------"+equityGrowthOnSavingsAccountList.size());
+
         savingsAccount.setEquityGrowthOnSavingsAccounts(equityGrowthOnSavingsAccountList);
+
+
 
 
         final Set<String> mandatoryResponseParameters = new HashSet<>();
         final SavingsAccountData savingsAccountTemplate = populateTemplateAndAssociations(accountId, savingsAccount,
                 staffInSelectedOfficeOnly, chargeStatus, uriInfo, mandatoryResponseParameters);
+
+        System.err.println("---------------------we have reset on template here-----------");
+        savingsAccountTemplate.setEquityGrowthOnSavingsAccounts(equityGrowthOnSavingsAccountList);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters(),
                 mandatoryResponseParameters);

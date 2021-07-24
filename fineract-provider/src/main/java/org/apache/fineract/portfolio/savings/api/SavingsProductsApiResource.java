@@ -259,7 +259,6 @@ public class SavingsProductsApiResource {
     public List<EquityGrowthOnSavingsAccount> viewEquityDividends(@PathParam("id") final Long id) {
 
         //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO)
-
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = equityGrowthOnSavingsAccountRepository.findByEquityGrowthDividendsId(id);
         Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
             SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e.getSavingsAccountId());
@@ -267,7 +266,6 @@ public class SavingsProductsApiResource {
             String name = savingsAccount.getClient().getDisplayName();
             e.setClientName(name);
         };
-
         equityGrowthOnSavingsAccountList.stream().forEach(consumer);
         return equityGrowthOnSavingsAccountList;
     }
@@ -296,7 +294,6 @@ public class SavingsProductsApiResource {
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_RESOURCE_NAME);
 
         SavingsProductData savingProductData = this.savingProductReadPlatformService.retrieveOne(productId);
-
         // set account balance here
         BigDecimal balance = SavingsProductPortfolioHelper.portfolioBalance(savingsAccountReadPlatformService , productId);
         savingProductData.setPortfolioBalance(balance);
