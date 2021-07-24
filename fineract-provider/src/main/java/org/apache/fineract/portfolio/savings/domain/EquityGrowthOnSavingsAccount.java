@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.JoinColumn;
+import javax.persistence.Transient;
+import javax.persistence.ManyToOne;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
@@ -26,11 +28,11 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long>{
 
 
-    @Column(name="equity_growth_dividend_id")
-    @JoinColumn(name = "equity_growth_dividend_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name ="equity_growth_dividends_id", nullable = false)
     private EquityGrowthDividends equityGrowthDividends;
 
-    @Column(name="savings_account_id")
+    @Column(name="savings_account_id" ,nullable=false)
     private Long savingsAccountId;
 
     @Column(name="percentage_of_profit")
@@ -45,13 +47,15 @@ public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long
     @Column(name="note")
     private String note ;
 
+
+    @Transient
     private String clientName;
 
 
     public EquityGrowthOnSavingsAccount(){}
 
 
-    public EquityGrowthOnSavingsAccount(EquityGrowthDividends equityGrowthDividends, Long savingsAccountId,BigDecimal averageSavings, BigDecimal amount,Double pecentage, String note ,String clientName) {
+    public EquityGrowthOnSavingsAccount(EquityGrowthDividends equityGrowthDividends,Long savingsAccountId,BigDecimal averageSavings, BigDecimal amount,Double pecentage, String note ,String clientName) {
         this.equityGrowthDividends = equityGrowthDividends;
         this.savingsAccountId = savingsAccountId;
         this.amount = amount;
@@ -100,8 +104,6 @@ public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long
     public void setSavingsAccountId(Long savingsAccountId) {
         this.savingsAccountId = savingsAccountId;
     }
-
-
 
     public BigDecimal getAmount() {
         return amount;

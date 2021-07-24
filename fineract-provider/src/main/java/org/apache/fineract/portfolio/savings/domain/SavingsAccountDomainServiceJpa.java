@@ -43,18 +43,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 // Added 20/07/2021
 import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
 //import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
-
+import org.joda.time.format.DateTimeFormat;
 
 @Service
 public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainService {
@@ -160,12 +155,14 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId , final DateTimeFormatter fmt ,LocalDate transactionDate , BigDecimal transactionAmount){
+    public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount){
         AppUser user = getAppUserIfPresent();
         Integer accountType = null;
         PaymentDetail paymentDetail = null ;
 
         System.err.println("-------------------------handle deposit lite --------------");
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
 
         SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
 

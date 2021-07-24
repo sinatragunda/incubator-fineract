@@ -331,6 +331,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         //
     }
 
+
     public static SavingsAccount createNewApplicationForSubmittal(final Client client, final Group group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final String externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,

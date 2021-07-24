@@ -19,10 +19,7 @@
 package org.apache.fineract.portfolio.savings.api;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -62,6 +59,9 @@ import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +82,7 @@ public class SavingsAccountsApiResource {
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
+    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ;
 
     @Autowired
     public SavingsAccountsApiResource(final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
@@ -90,7 +91,8 @@ public class SavingsAccountsApiResource {
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
             final BulkImportWorkbookService bulkImportWorkbookService,
-            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService) {
+            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService ,
+                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository) {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -99,6 +101,7 @@ public class SavingsAccountsApiResource {
         this.savingsAccountChargeReadPlatformService = savingsAccountChargeReadPlatformService;
         this.bulkImportWorkbookService=bulkImportWorkbookService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
+        this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
     }
 
     @GET
@@ -140,6 +143,7 @@ public class SavingsAccountsApiResource {
 				SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
 
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -166,6 +170,9 @@ public class SavingsAccountsApiResource {
                 "status", chargeStatus, new Object[] { "all", "active", "inactive" }); }
 
         final SavingsAccountData savingsAccount = this.savingsAccountReadPlatformService.retrieveOne(accountId);
+        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList  = equityGrowthOnSavingsAccountRepository.findBySavingsAccountId(accountId);
+        savingsAccount.setEquityGrowthOnSavingsAccounts(equityGrowthOnSavingsAccountList);
+
 
         final Set<String> mandatoryResponseParameters = new HashSet<>();
         final SavingsAccountData savingsAccountTemplate = populateTemplateAndAssociations(accountId, savingsAccount,

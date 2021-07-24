@@ -29,6 +29,7 @@ import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.joda.time.LocalDate;
 
@@ -118,6 +119,9 @@ public class SavingsAccountData {
     // Added 20/07/2021
     private BigDecimal monthlyDeposit;
     private List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDeposits ;
+
+    // Added 23/07/2021
+    private List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccounts;
 
     public static SavingsAccountData importInstanceIndividual(Long clientId, Long productId, Long fieldOfficerId,LocalDate submittedOnDate,
             BigDecimal nominalAnnualInterestRate, EnumOptionData interestCompoundingPeriodTypeEnum,
@@ -737,6 +741,7 @@ public class SavingsAccountData {
         this.savingsAmountOnHold = savingsAmountOnHold;
         this.savingsAccountMonthlyDeposits = savingsAccountMonthlyDepositList;
         this.monthlyDeposit = monthlyDeposit();
+        this.equityGrowthOnSavingsAccounts = new ArrayList<>() ;
     }
 
     private SavingsAccountChargeData getWithdrawalFee() {
@@ -823,7 +828,11 @@ public class SavingsAccountData {
         return this.savingsProductId;
     }
 
-    public SavingsAccount toSavingsAccount(){
-        return new SavingsAccount(new Client(clientId) ,null ,new SavingsProduct(savingsProductId),null ,accountNo ,null ,null ,null ,null ,null ,null ,null ,null ,null ,null,null ,null ,null ,null);
+    public List<EquityGrowthOnSavingsAccount> getEquityGrowthOnSavingsAccounts() {
+        return equityGrowthOnSavingsAccounts;
+    }
+
+    public void setEquityGrowthOnSavingsAccounts(List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccounts) {
+        this.equityGrowthOnSavingsAccounts = equityGrowthOnSavingsAccounts;
     }
 }

@@ -36,7 +36,7 @@ public interface SavingsAccountDomainService {
 
     
     // Added 22/07/2021
-    SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,DateTimeFormatter fmt ,LocalDate transactionDate , BigDecimal transactionAmount);
+    SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount);
    
 
     void postJournalEntries(SavingsAccount savingsAccount, Set<Long> existingTransactionIds, Set<Long> existingReversedTransactionIds);

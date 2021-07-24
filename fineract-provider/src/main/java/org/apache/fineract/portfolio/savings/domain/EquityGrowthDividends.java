@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.portfolio.savings.domain;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -19,11 +20,9 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 
 @Entity
-@Table(name="equity_growth_dividends")
+@Table(name="m_equity_growth_dividends")
 public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
-    @Column(name="id")
-    private Long id ;
 
     @Column(name="start_period")
     private Date startPeriod ;
@@ -43,22 +42,14 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
     public EquityGrowthDividends(){}
 
-    public EquityGrowthDividends(Date startPeriod, Date endPeriod, BigDecimal amount, int beneficiaries) {
+    public EquityGrowthDividends(Long savingsProductId , Date startPeriod, Date endPeriod, BigDecimal amount, int beneficiaries) {
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.amount = amount;
         this.beneficiaries = beneficiaries;
+        this.savingsProductId = savingsProductId ;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Date getStartPeriod() {
         return startPeriod;

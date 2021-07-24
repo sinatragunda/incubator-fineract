@@ -18,4 +18,5 @@ public interface EquityGrowthOnSavingsAccountRepository extends JpaRepository<Eq
 
     EquityGrowthOnSavingsAccount findOneBySavingsAccountId(Long id);
     List<EquityGrowthOnSavingsAccount> findByEquityGrowthDividendsId(Long id);
+    List<EquityGrowthOnSavingsAccount> findBySavingsAccountId(Long id);
 }

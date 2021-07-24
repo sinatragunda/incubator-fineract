@@ -7,11 +7,9 @@
 package org.apache.fineract.portfolio.savings.helper;
 
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDeposit;
+import org.apache.fineract.portfolio.savings.domain.*;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.wese.helper.TimeHelper;
 
@@ -28,38 +26,39 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class EquityGrowthHelper {
 
-    public static void transferEarnings(SavingsAccountDomainService savingsAccountDomainService ,List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
+    private EquityGrowthDividends equityGrowthDividends ;
+
+    public void transferEarnings(SavingsAccountDomainService savingsAccountDomainService ,List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
         for(EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount : equityGrowthOnSavingsAccountList){
 
             Long id = equityGrowthOnSavingsAccount.getSavingsAccountId();
             BigDecimal amount = equityGrowthOnSavingsAccount.getAmount();
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-            savingsAccountDomainService.handleDepositLite(id ,dateTimeFormatter ,new LocalDate(),amount);
+            //DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+            savingsAccountDomainService.handleDepositLite(id ,new LocalDate(),amount);
         }
     }
 
-    public static void flushToDatabase(EquityGrowthDividendsRepository equityGrowthDividendsRepository ,EquityGrowthDividends equityGrowthDividends ,List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
+    public void flushToDatabase(EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , EquityGrowthDividends equityGrowthDividends , List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
 
         Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
-            //e.setEquityGrowthDividends(equityGrowthDividends);
-            System.err.println("--------does it have the updated value----- "+e.getEquityGrowthDividends().getId());
-            equityGrowthDividendsRepository.save(e);
+            e.setEquityGrowthDividends(equityGrowthDividends);
+            equityGrowthOnSavingsAccountRepository.save(e);
         };
-
         equityGrowthOnSavingsAccountList.stream().forEach(consumer);
     }
 
-    public static List<EquityGrowthOnSavingsAccount> calculateEquity(SavingsAccountMonthlyDepositRepository monthlyDepositRepository, List<SavingsAccountData> savingsAccountDataList ,EquityGrowthDividends equityGrowthDividends, Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit){
+    public List<EquityGrowthOnSavingsAccount> calculateEquity(SavingsAccountMonthlyDepositRepository monthlyDepositRepository, List<SavingsAccountData> savingsAccountDataList,Long savingsProductId , Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit){
 
         /// calculate equity ,filter by period
         int beneficiaries = savingsAccountDataList.size();
-        equityGrowthDividends = new EquityGrowthDividends(startDate ,endDate ,profit ,beneficiaries);
+        equityGrowthDividends = new EquityGrowthDividends(savingsProductId, startDate ,endDate ,profit ,beneficiaries);
 
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = new ArrayList<>();
 
         for(SavingsAccountData savingsAccountData : savingsAccountDataList){
 
             Long savingsAccountId = savingsAccountData.getId();
+
             List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = monthlyDepositRepository.findBySavingsAccountId(savingsAccountId);
 
             BigDecimal averageSavings = calculateSavingsAccountAverage(savingsAccountMonthlyDepositList ,startDate ,endDate);
@@ -77,7 +76,7 @@ public class EquityGrowthHelper {
 
     }
 
-    public static BigDecimal profitPerClient(List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList ,Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit ,BigDecimal averageSavings){
+    public BigDecimal profitPerClient(List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList ,Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit ,BigDecimal averageSavings){
 
         System.err.println("   average savings is         "+averageSavings.doubleValue());
 
@@ -87,19 +86,13 @@ public class EquityGrowthHelper {
 
         BigDecimal clientProfit = multiplier.multiply(profit);
 
-
         System.err.println("----------------client profit is --------"+clientProfit.doubleValue());
 
         clientProfit.setScale(2);
-        // 750 /
-
-        System.err.println("-----------------------scaled client profit is-------------"+clientProfit.doubleValue());
-
-
         return clientProfit;
     }
 
-    public static BigDecimal calculateSavingsAccountAverage(List<SavingsAccountMonthlyDeposit> savingsMonthlyDepositList , Date startDate , Date endDate){
+    public BigDecimal calculateSavingsAccountAverage(List<SavingsAccountMonthlyDeposit> savingsMonthlyDepositList , Date startDate , Date endDate){
 
         int periodCount = TimeHelper.periodDuration(startDate ,endDate);
         BigDecimal total = BigDecimal.ZERO ;
@@ -108,12 +101,16 @@ public class EquityGrowthHelper {
         return total.divide(new BigDecimal(periodCount) ,2 ,BigDecimal.ROUND_HALF_UP);
     }
 
-    public static Double percentage(Double value ,Double of){
+    public Double percentage(Double value ,Double of){
 
         /// (value / of ) * 100
         Double percentage = (value / of) * 100 ;
         Double floated = Double.valueOf(String.format("%.2f" ,percentage));
         return floated ;
+    }
+
+    public EquityGrowthDividends getEquityGrowthDividends(){
+        return equityGrowthDividends ;
     }
 
 

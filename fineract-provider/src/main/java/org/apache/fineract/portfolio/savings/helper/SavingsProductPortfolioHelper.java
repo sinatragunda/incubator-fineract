@@ -68,7 +68,6 @@ public class SavingsProductPortfolioHelper {
 
         for(SavingsAccountData s : savingsAccountDataList){
             if(accountId.equals(s.getId())){
-                System.err.println("--------------------------savingsproductid---------------"+s.getSavingsProductId());
                 return productId.equals(s.getSavingsProductId());
             }
         }

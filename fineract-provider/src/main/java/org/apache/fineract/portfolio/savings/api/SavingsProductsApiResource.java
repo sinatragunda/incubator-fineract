@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -66,13 +67,13 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
+import org.apache.fineract.portfolio.savings.domain.*;
 
 import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TOTAL_CALC_CRITERIA;
 import org.apache.fineract.portfolio.savings.helper.EquityGrowthHelper;
 import org.apache.fineract.portfolio.savings.helper.SavingsProductPortfolioHelper;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
@@ -96,7 +97,6 @@ import org.joda.time.LocalDate;
 
 
 // added 23/07/2021
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 
 
 @Path("/savingsproducts")
@@ -121,6 +121,8 @@ public class SavingsProductsApiResource {
     private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ;
     private final SavingsAccountDomainService savingsAccountDomainService ;
     private final EquityGrowthDividendsRepository equityGrowthDividendsRepository ;
+    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository;
+    private final SavingsAccountAssembler savingsAccountAssembler;
 
     @Autowired
     public SavingsProductsApiResource(final SavingsProductReadPlatformService savingProductReadPlatformService,
@@ -132,7 +134,7 @@ public class SavingsProductsApiResource {
             final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService,
             final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService,
             final ChargeReadPlatformService chargeReadPlatformService, PaymentTypeReadPlatformService paymentTypeReadPlatformService,
-            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository) {
+            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository ,final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountAssembler savingsAccountAssembler) {
         this.savingProductReadPlatformService = savingProductReadPlatformService;
         this.dropdownReadPlatformService = dropdownReadPlatformService;
         this.currencyReadPlatformService = currencyReadPlatformService;
@@ -150,6 +152,8 @@ public class SavingsProductsApiResource {
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
         this.savingsAccountDomainService = savingsAccountDomainService ;
         this.equityGrowthDividendsRepository = equityGrowthDividendsRepository ;
+        this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository ;
+        this.savingsAccountAssembler = savingsAccountAssembler;
     }
 
     @POST
@@ -223,20 +227,56 @@ public class SavingsProductsApiResource {
         BigDecimal profitAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("profit" ,jsonElement);
         Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
 
-        EquityGrowthDividends equityGrowthDividends = null ;
-        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  EquityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository ,savingsAccountDataList,equityGrowthDividends ,startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
+        EquityGrowthHelper equityGrowthHelper = new EquityGrowthHelper();
+        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  equityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository, savingsAccountDataList ,productId, startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
 
         if(transferEarning){
             /// do something here that does transfer earnings to the said accounts son
-            System.err.println("-----------------does our equity dividends has something ?   "+equityGrowthDividends.getAmount());
-            equityGrowthDividendsRepository.save(equityGrowthDividends);
-            EquityGrowthHelper.save(equityGrowthRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
-            EquityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
+            EquityGrowthDividends equityGrowthDividends = equityGrowthHelper.getEquityGrowthDividends();
+            equityGrowthDividends = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
+            //equityGrowthDividends.setId(id);
+            equityGrowthHelper.flushToDatabase(equityGrowthOnSavingsAccountRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
+            equityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
         }
-
         return equityGrowthOnSavingsAccountList ;
+    }
+
+
+    // Added 23/07/2021 ...Calculates the portfo
+    @GET
+    @Path("/equitygrowth/{productId}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<EquityGrowthDividends> equityGrowthDividends(@PathParam("productId") final Long productId) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
+
+        List<EquityGrowthDividends> equityGrowthDividendsList = equityGrowthDividendsRepository.findBySavingsProductId(productId);
+        return equityGrowthDividendsList ;
 
     }
+
+    @GET
+    @Path("/equitydividends/{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<EquityGrowthOnSavingsAccount> viewEquityDividends(@PathParam("id") final Long id) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO)
+
+        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = equityGrowthOnSavingsAccountRepository.findByEquityGrowthDividendsId(id);
+
+        Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
+            SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e.getSavingsAccountId());
+            e.setClientName(e.getClientName());
+        };
+
+        equityGrowthOnSavingsAccountList.stream().forEach(consumer);
+
+        return equityGrowthOnSavingsAccountList;
+
+    }
+
+
 
 
     @GET
