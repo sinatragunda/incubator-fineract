@@ -238,13 +238,12 @@ public class SavingsProductsApiResource {
         BigDecimal profitAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("profit" ,jsonElement);
         Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
         String calculationCriteria = fromJsonHelper.extractStringNamed("calcCriteria" ,jsonElement);
+        Boolean includeZeroBeneficiaries = fromJsonHelper.extractBooleanNamed("zeroBeneficiaries" ,jsonElement);
 
 
         SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromString(calculationCriteria);
 
-        System.err.println("------------------savings total calc criteria is-------------- "+savingsTotalCalcCriteria);
-
-        EquityGrowthHelper equityGrowthHelper = new EquityGrowthHelper();
+        EquityGrowthHelper equityGrowthHelper = new EquityGrowthHelper(includeZeroBeneficiaries);
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  equityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository, savingsAccountDataList ,savingsTotalCalcCriteria , productId, startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
 
         if(transferEarning){
@@ -253,6 +252,7 @@ public class SavingsProductsApiResource {
             equityGrowthDividends = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
             equityGrowthHelper.flushToDatabase(equityGrowthOnSavingsAccountRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
             equityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
+
         }
         return equityGrowthOnSavingsAccountList ;
     }

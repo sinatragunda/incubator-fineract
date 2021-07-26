@@ -169,19 +169,14 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         System.err.println("-------------------------handle deposit lite --------------");
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
-
         SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
 
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
 
         SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
-
-        final SavingsAccountTransaction deposit = savingsAccount.deposit(transactionDTO, savingsAccountTransactionType);
-
-        return handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);
-
-    
+        System.err.println("-------------------double transaction here being recorded-------------");
+        return handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);    
     }
 
     private SavingsAccountTransaction handleDeposit(final SavingsAccount account, final DateTimeFormatter fmt,

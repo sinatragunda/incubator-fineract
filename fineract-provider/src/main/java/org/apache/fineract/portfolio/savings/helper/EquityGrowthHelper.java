@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
@@ -29,16 +31,39 @@ import org.joda.time.format.DateTimeFormatter;
 public class EquityGrowthHelper {
 
     private EquityGrowthDividends equityGrowthDividends ;
+    private Boolean includeZeroBeneficiaries ;
 
-    public void transferEarnings(SavingsAccountDomainService savingsAccountDomainService ,List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
-        for(EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount : equityGrowthOnSavingsAccountList){
-
-            Long id = equityGrowthOnSavingsAccount.getSavingsAccountId();
-            BigDecimal amount = equityGrowthOnSavingsAccount.getAmount();
-            //DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-            savingsAccountDomainService.handleDepositLite(id ,new LocalDate(),amount);
-        }
+    public EquityGrowthHelper(boolean arg){
+        this.includeZeroBeneficiaries = arg;
     }
+
+    private Predicate<EquityGrowthOnSavingsAccount> zeroBeneficiariesPredicate = (e)->{
+
+        if(includeZeroBeneficiaries){
+            return true ;
+        }
+
+        int cmp = e.getAmount().compareTo(BigDecimal.ZERO);
+        if(cmp <= 0){
+            System.err.println("------------balance is less here---------"+e.getAmount().doubleValue());
+            return false;
+        }
+        return true;
+    };
+
+    public void transferEarnings(SavingsAccountDomainService savingsAccountDomainService ,List<EquityGrowthOnSavingsAccount> list){
+
+        Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
+            Long id = e.getSavingsAccountId();
+            BigDecimal amount = e.getAmount();
+            savingsAccountDomainService.handleDepositLite(id ,new LocalDate(),amount);
+        };
+
+        list.stream().filter(zeroBeneficiariesPredicate).forEach(consumer);
+
+
+    }
+
 
     public void flushToDatabase(EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , EquityGrowthDividends equityGrowthDividends , List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList){
 
@@ -46,7 +71,7 @@ public class EquityGrowthHelper {
             e.setEquityGrowthDividends(equityGrowthDividends);
             equityGrowthOnSavingsAccountRepository.save(e);
         };
-        equityGrowthOnSavingsAccountList.stream().forEach(consumer);
+        equityGrowthOnSavingsAccountList.stream().filter(zeroBeneficiariesPredicate).forEach(consumer);
     }
 
     public List<EquityGrowthOnSavingsAccount> calculateEquity(SavingsAccountMonthlyDepositRepository monthlyDepositRepository, List<SavingsAccountData> savingsAccountDataList,SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria , Long savingsProductId , Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit){
@@ -83,9 +108,6 @@ public class EquityGrowthHelper {
         System.err.println("   average savings is         "+averageSavings.doubleValue());
 
         BigDecimal multiplier = averageSavings.divide(totalSavings ,3, BigDecimal.ROUND_HALF_UP);
-
-        System.err.println("----------------multiplier is--------"+multiplier.doubleValue());
-
         BigDecimal clientProfit = multiplier.multiply(profit);
 
         System.err.println("----------------client profit is --------"+clientProfit.doubleValue());
