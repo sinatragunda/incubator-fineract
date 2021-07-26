@@ -23,16 +23,32 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 	@Column(name="start_date" ,nullable=false)
 	private Date startDate ;
 	
-	@Column(name="amount" ,nullable=false)
-	private BigDecimal amount ;
+	@Column(name="deposit" ,nullable = false)
+	private BigDecimal deposit = BigDecimal.ZERO;
+
+
+	@Column(name="withdraw" ,nullable =false)
+	private BigDecimal withdraw = BigDecimal.ZERO;
 
 
 	protected SavingsAccountMonthlyDeposit(){}
 
-	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal amount){
+	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal amount ,boolean isDeposit){
 		this.savingsAccountId = savingsAccountId ;
 		this.startDate = startDate ;
-		this.amount =amount ;
+		if(isDeposit){
+			deposit = amount;
+		}
+		else {
+			withdraw = amount;
+		}
+	}
+
+	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal deposit ,BigDecimal withdraw){
+		this.savingsAccountId = savingsAccountId ;
+		this.startDate = startDate ;
+		this.deposit = deposit;
+		this.withdraw = withdraw;
 	}
 
 	public Long getSavingsAccountId() {
@@ -43,12 +59,21 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 		this.startDate = date;
 	}
 
-	// public void setId(Long id){
-	// 	this.id = id ;
-	// }
 
-	public void setAmount(BigDecimal amount){
-		this.amount = amount;
+	public BigDecimal getDeposit() {
+		return deposit;
+	}
+
+	public void setDeposit(BigDecimal deposit) {
+		this.deposit = deposit;
+	}
+
+	public BigDecimal getWithdraw() {
+		return withdraw;
+	}
+
+	public void setWithdraw(BigDecimal withdraw) {
+		this.withdraw = withdraw;
 	}
 
 	public void setSavingsAccountId(Long id){
@@ -59,12 +84,5 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 		return this.startDate;
 	}
 
-	public BigDecimal getAmount(){
-		return this.amount;
-	}
-
-	// public Long id(){
-	// 	return this.id;
-	// }
 
 }

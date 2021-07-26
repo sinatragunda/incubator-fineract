@@ -194,16 +194,27 @@ public class SavingsProductsApiResource {
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(apiRequestBodyAsJson);
 
-        //int calculationMethod = fromJsonHelper.extractIntegerNamed("calcCriteria" ,jsonElement);
-        //SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromInt(calculationMethod);
+        String calculationMethod = fromJsonHelper.extractStringNamed("calcCriteria" ,jsonElement);
+        SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromString(calculationMethod);
         LocalDate startDate = fromJsonHelper.extractLocalDateNamed("startDate" ,jsonElement);
         LocalDate endDate = fromJsonHelper.extractLocalDateNamed("endDate" ,jsonElement);
 
         // set account balance here
-        BigDecimal balance = SavingsProductPortfolioHelper.portfolioBalanceDated(savingsAccountReadPlatformService ,savingsAccountMonthlyDepositRepository, startDate.toDate() ,endDate.toDate() ,null ,productId);
+        BigDecimal balance = SavingsProductPortfolioHelper.portfolioBalanceDated(savingsAccountReadPlatformService ,savingsAccountMonthlyDepositRepository, startDate.toDate() ,endDate.toDate() ,savingsTotalCalcCriteria ,productId);
         //savingProductData.setPortfolioBalance(balance);
         return ObjectNodeHelper.statusNode(true).put("portfolioBalance",balance).toString();
     }
+
+    @GET
+    @Path("/balance/{productId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<String> portfolioBalanceTemplate(@PathParam("productId") final Long productId) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
+        return SAVINGS_TOTAL_CALC_CRITERIA.getList();
+    }
+
 
     // Added 21/07/2021 ...Calculates the portfolio balance for savings account
     @POST
@@ -226,9 +237,15 @@ public class SavingsProductsApiResource {
         BigDecimal portfolioBalance = fromJsonHelper.extractBigDecimalWithLocaleNamed("portfolioBalance",jsonElement);
         BigDecimal profitAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("profit" ,jsonElement);
         Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
+        String calculationCriteria = fromJsonHelper.extractStringNamed("calcCriteria" ,jsonElement);
+
+
+        SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromString(calculationCriteria);
+
+        System.err.println("------------------savings total calc criteria is-------------- "+savingsTotalCalcCriteria);
 
         EquityGrowthHelper equityGrowthHelper = new EquityGrowthHelper();
-        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  equityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository, savingsAccountDataList ,productId, startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
+        List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  equityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository, savingsAccountDataList ,savingsTotalCalcCriteria , productId, startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
 
         if(transferEarning){
             /// do something here that does transfer earnings to the said accounts son

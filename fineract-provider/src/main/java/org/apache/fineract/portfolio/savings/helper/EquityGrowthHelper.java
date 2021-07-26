@@ -8,6 +8,7 @@ package org.apache.fineract.portfolio.savings.helper;
 
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.*;
+import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TOTAL_CALC_CRITERIA;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
@@ -47,7 +49,7 @@ public class EquityGrowthHelper {
         equityGrowthOnSavingsAccountList.stream().forEach(consumer);
     }
 
-    public List<EquityGrowthOnSavingsAccount> calculateEquity(SavingsAccountMonthlyDepositRepository monthlyDepositRepository, List<SavingsAccountData> savingsAccountDataList,Long savingsProductId , Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit){
+    public List<EquityGrowthOnSavingsAccount> calculateEquity(SavingsAccountMonthlyDepositRepository monthlyDepositRepository, List<SavingsAccountData> savingsAccountDataList,SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria , Long savingsProductId , Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit){
 
         /// calculate equity ,filter by period
         int beneficiaries = savingsAccountDataList.size();
@@ -61,7 +63,7 @@ public class EquityGrowthHelper {
 
             List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = monthlyDepositRepository.findBySavingsAccountId(savingsAccountId);
 
-            BigDecimal averageSavings = calculateSavingsAccountAverage(savingsAccountMonthlyDepositList ,startDate ,endDate);
+            BigDecimal averageSavings = calculateSavingsAccountAverage(savingsAccountMonthlyDepositList ,savingsTotalCalcCriteria , startDate ,endDate);
             BigDecimal profitPerClient =  profitPerClient(savingsAccountMonthlyDepositList ,startDate ,endDate ,totalSavings, profit ,averageSavings);
             Double percentage = percentage(profitPerClient.doubleValue() ,totalSavings.doubleValue());
 
@@ -92,12 +94,27 @@ public class EquityGrowthHelper {
         return clientProfit;
     }
 
-    public BigDecimal calculateSavingsAccountAverage(List<SavingsAccountMonthlyDeposit> savingsMonthlyDepositList , Date startDate , Date endDate){
+    public BigDecimal calculateSavingsAccountAverage(List<SavingsAccountMonthlyDeposit> savingsMonthlyDepositList , SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria, Date startDate , Date endDate){
 
         int periodCount = TimeHelper.periodDuration(startDate ,endDate);
         BigDecimal total = BigDecimal.ZERO ;
 
-        total = savingsMonthlyDepositList.stream().map(SavingsAccountMonthlyDeposit::getAmount).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDeposit = (e)->{
+            BigDecimal net = e.getDeposit().subtract(e.getWithdraw());
+            System.err.println("----------net balance is=--------"+net.doubleValue());
+            return net;
+        };
+
+
+        switch (savingsTotalCalcCriteria){
+            case DEPOSITS:
+                total = savingsMonthlyDepositList.stream().map(SavingsAccountMonthlyDeposit::getDeposit).reduce(BigDecimal.ZERO ,BigDecimal::add);
+                break;
+            case NET_BALANCES:
+                total = savingsMonthlyDepositList.stream().map(netDeposit).reduce(BigDecimal.ZERO ,BigDecimal::add);
+
+        }
+
         return total.divide(new BigDecimal(periodCount) ,2 ,BigDecimal.ROUND_HALF_UP);
     }
 

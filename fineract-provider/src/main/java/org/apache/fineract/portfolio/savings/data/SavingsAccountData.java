@@ -807,7 +807,7 @@ public class SavingsAccountData {
 
     public BigDecimal monthlyDeposit(){
         try{
-            return SavingsMonthlyDepositHelper.currentMonthDeposit(this.savingsAccountMonthlyDeposits);
+            return SavingsMonthlyDepositHelper.currentMonthTransactions(this.savingsAccountMonthlyDeposits ,true);
         }
         catch(NullPointerException n){
         }

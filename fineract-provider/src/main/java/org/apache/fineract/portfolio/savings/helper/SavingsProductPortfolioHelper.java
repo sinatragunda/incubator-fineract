@@ -15,6 +15,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformS
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.persistence.Temporal;
@@ -49,7 +50,6 @@ public class SavingsProductPortfolioHelper {
 
         Predicate<SavingsAccountMonthlyDeposit> filterByProductId = (e)->{
             boolean sameProduct = accountBelongsToProductCatalog(savingsAccountDataList ,productId ,e.getSavingsAccountId());
-            System.err.println("--------------------product id------"+productId+"--------------vs ");
             return sameProduct ;
         };
 
@@ -57,7 +57,20 @@ public class SavingsProductPortfolioHelper {
 
         BigDecimal totalBalance = BigDecimal.ZERO ;
 
-        totalBalance = savingsAccountMonthlyDepositList.stream().filter(filterByProductId).map(SavingsAccountMonthlyDeposit::getAmount).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDepositMapper = (e)->{
+            BigDecimal netDeposit = e.getDeposit().subtract(e.getWithdraw());
+            return netDeposit ;
+        };
+
+        System.err.println("----------------calc criteria here---------------------- "+calcCriteria);
+
+        switch (calcCriteria){
+            case DEPOSITS:
+                totalBalance = savingsAccountMonthlyDepositList.stream().filter(filterByProductId).map(SavingsAccountMonthlyDeposit::getDeposit).reduce(BigDecimal.ZERO ,BigDecimal::add);
+                break;
+            case NET_BALANCES:
+                totalBalance = savingsAccountMonthlyDepositList.stream().map(netDepositMapper).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        }
 
         System.err.println("-------------------------total account balances is -------------------------"+totalBalance);
 

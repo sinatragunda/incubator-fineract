@@ -263,7 +263,8 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             final StringBuilder sqlBuilder = new StringBuilder(400);
             sqlBuilder.append("select ");
             sqlBuilder.append("sa.id as id,");
-            sqlBuilder.append("sa.amount as amount, ");
+            sqlBuilder.append("sa.withdraw as withdraw, ");
+            sqlBuilder.append("sa.deposit as deposit, ");
             sqlBuilder.append("sa.start_date as startDate,");
             sqlBuilder.append("sa.savings_account_id as savingsId ");
 
@@ -280,11 +281,12 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         public SavingsAccountMonthlyDeposit mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
 
             final Long id = rs.getLong("id");
-            final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"amount");
+            final BigDecimal deposit = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs,"deposit");
             final Date startDate = rs.getDate("startDate");
             final Long savingsId = rs.getLong("savingsId");
+            final BigDecimal withdraw = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs ,"withdraw");
 
-            return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,amount);
+            return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,deposit ,withdraw);
         }
     }
 

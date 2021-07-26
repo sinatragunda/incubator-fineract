@@ -14,25 +14,8 @@ public class SavingsMonthlyDepositHelper{
 
 	//// monthly duration thing here 
 	//// if month is 2021-07-01
-//
-//	public static BigDecimal currentMonthDeposit(Collection<SavingsAccountTransactionData> transactionsList){
-//
-//		Date now = TimeHelper.dateNow();
-//
-//		Predicate<SavingsAccountTransactionData> filterByMonth = (e)->{
-//			SavingsAccountTransactionData transaction = e ;
-//			Date transactionDate = e.getTransactionDate().toDate();
-//			boolean isSameMonth = TimeHelper.sameMonth(transactionDate ,now);
-//			return isSameMonth ;
-//		};
-//
-//		List<SavingsAccountTransactionData> filteredList = transactionsList.stream().filter(filterByMonth).collect(Collectors.toList());
-//		BigDecimal monthlyDeposit = filteredList.stream().map(e -> e.getAmount()).reduce(BigDecimal.ZERO ,BigDecimal::add);
-//		return monthlyDeposit ;
-//	}
 
-
-	public static BigDecimal currentMonthDeposit(List<SavingsAccountMonthlyDeposit> transactionsList){
+	public static BigDecimal currentMonthTransactions(List<SavingsAccountMonthlyDeposit> transactionsList ,boolean isDeposit){
 
 		Date now = TimeHelper.dateNow();
 		Predicate<SavingsAccountMonthlyDeposit> filterByMonth = (e)->{
@@ -42,12 +25,19 @@ public class SavingsMonthlyDepositHelper{
 			return isSameMonth ;
 		};
 
+		BigDecimal amount = BigDecimal.ZERO ;
 		List<SavingsAccountMonthlyDeposit> filteredList = transactionsList.stream().filter(filterByMonth).collect(Collectors.toList());
-		BigDecimal monthlyDeposit = filteredList.stream().map(e -> e.getAmount()).reduce(BigDecimal.ZERO ,BigDecimal::add);
-		return monthlyDeposit ;
+
+		if(isDeposit) {
+			amount = filteredList.stream().map(e -> e.getDeposit()).reduce(BigDecimal.ZERO, BigDecimal::add);
+		}
+		else {
+			amount = filteredList.stream().map(e-> e.getWithdraw()).reduce(BigDecimal.ZERO ,BigDecimal::add);
+		}
+		return amount ;
 	}
 
-	public static void handleDeposit(SavingsAccountMonthlyDepositRepository repository ,SavingsAccount savingsAccount ,BigDecimal amount){
+	public static void handleDepositOrWithdraw(SavingsAccountMonthlyDepositRepository repository ,SavingsAccount savingsAccount ,BigDecimal amount ,boolean isDeposit){
 
 		Long id = savingsAccount.getId();
 		Date startDate = TimeHelper.startDate();
@@ -68,14 +58,24 @@ public class SavingsMonthlyDepositHelper{
 			
 			if(!newList.isEmpty()){
 				savingsAccountMonthlyDeposit = newList.get(0);
-				BigDecimal amountUpdate = amount.add(savingsAccountMonthlyDeposit.getAmount());
-				savingsAccountMonthlyDeposit.setAmount(amountUpdate);
+				BigDecimal amountUpdate = BigDecimal.ZERO;
+				if(!isDeposit){
+
+					amountUpdate = amount.add(savingsAccountMonthlyDeposit.getWithdraw());
+					savingsAccountMonthlyDeposit.setWithdraw(amountUpdate);
+					repository.save(savingsAccountMonthlyDeposit);
+					return ;
+				}
+
+				amountUpdate = amount.add(savingsAccountMonthlyDeposit.getDeposit());
+				savingsAccountMonthlyDeposit.setDeposit(amountUpdate);
 				repository.save(savingsAccountMonthlyDeposit);
 				return ; 
+
 			}
 		}
 		// create new value here
-		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount);
+		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount ,isDeposit);
 		repository.save(savingsAccountMonthlyDeposit);
 	}	
 }
