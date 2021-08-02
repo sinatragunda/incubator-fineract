@@ -59,6 +59,7 @@ public class SavingsProductPortfolioHelper {
 
         Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDepositMapper = (e)->{
             BigDecimal netDeposit = e.getDeposit().subtract(e.getWithdraw());
+            System.err.println("-----------------------------new deposit is--------- "+netDeposit.doubleValue());
             return netDeposit ;
         };
 
@@ -69,7 +70,7 @@ public class SavingsProductPortfolioHelper {
                 totalBalance = savingsAccountMonthlyDepositList.stream().filter(filterByProductId).map(SavingsAccountMonthlyDeposit::getDeposit).reduce(BigDecimal.ZERO ,BigDecimal::add);
                 break;
             case NET_BALANCES:
-                totalBalance = savingsAccountMonthlyDepositList.stream().map(netDepositMapper).reduce(BigDecimal.ZERO ,BigDecimal::add);
+                totalBalance = savingsAccountMonthlyDepositList.stream().filter(filterByProductId).map(netDepositMapper).reduce(BigDecimal.ZERO ,BigDecimal::add);
         }
 
         System.err.println("-------------------------total account balances is -------------------------"+totalBalance);
