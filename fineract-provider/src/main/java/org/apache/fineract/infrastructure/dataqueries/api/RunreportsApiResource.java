@@ -195,8 +195,8 @@ public class RunreportsApiResource {
             
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
             if (reportingProcessService != null){
-                File file = reportingProcessService.processRequestEx(reportName ,queryParams);
-
+                Map map = getReportParams(queryParams);
+                File file = reportingProcessService.processRequestEx(reportName ,map);
                 /// send some file here son
                 System.err.println("------------file name is---------------"+file.getName());
 
