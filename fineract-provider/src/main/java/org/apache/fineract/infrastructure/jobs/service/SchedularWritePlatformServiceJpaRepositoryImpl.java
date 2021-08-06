@@ -71,7 +71,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @Transactional
     @Override
     public void saveOrUpdate(final ScheduledJobDetail scheduledJobDetails) {
-        this.scheduledJobDetailsRepository.save(scheduledJobDetails);
+        this.scheduledJobDetailsRepository.saveAndFlush(scheduledJobDetails);
     }
 
     @Transactional

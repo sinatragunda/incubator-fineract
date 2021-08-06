@@ -76,6 +76,9 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     @Override
     public File processRequestEx(final String reportName, final MultivaluedMap<String, String> queryParams) {
 
+
+        System.err.println("-------------------------private report procesing-----------------");
+
         final String outputTypeParam = queryParams.getFirst("output-type");
         final Map<String, String> reportParams = getReportParams(queryParams);
         final Locale locale = ApiParameterHelper.extractLocale(queryParams);

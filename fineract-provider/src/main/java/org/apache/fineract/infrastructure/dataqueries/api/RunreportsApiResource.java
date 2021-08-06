@@ -47,6 +47,8 @@ import org.apache.fineract.infrastructure.report.service.ReportingProcessService
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.wese.helper.ReportsEmailHelper;
+import org.apache.fineract.wese.service.WeseEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -78,19 +80,21 @@ public class RunreportsApiResource {
     private final ReadReportingService readExtraDataAndReportingService;
     private final GenericDataService genericDataService;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
+    private final WeseEmailService weseEmailService ;
 
     @Autowired
     public RunreportsApiResource(final PlatformSecurityContext context, final ReadReportingService readExtraDataAndReportingService,
             final GenericDataService genericDataService, final ToApiJsonSerializer<ReportData> toApiJsonSerializer,
-            final ReportingProcessServiceProvider reportingProcessServiceProvider) {
+            final ReportingProcessServiceProvider reportingProcessServiceProvider ,final WeseEmailService weseEmailService) {
         this.context = context;
         this.readExtraDataAndReportingService = readExtraDataAndReportingService;
         this.genericDataService = genericDataService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.reportingProcessServiceProvider = reportingProcessServiceProvider;
+        this.weseEmailService = weseEmailService ;
     }
 
-     @GET
+    @GET
     @Path("/bulkReport/{referenceId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/vnd.ms-excel", "application/pdf", "text/html" })
@@ -191,7 +195,15 @@ public class RunreportsApiResource {
             
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
             if (reportingProcessService != null){
-                return reportingProcessService.processRequest(reportName, queryParams); 
+                File file = reportingProcessService.processRequestEx(reportName ,queryParams);
+
+                /// send some file here son
+                System.err.println("------------file name is---------------"+file.getName());
+
+                ReportsEmailHelper.testSend(weseEmailService ,file.getAbsolutePath() ,"Scheduled Reports with absolute path");
+                ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Reports without absolute path");
+
+                return reportingProcessService.processRequest(reportName, queryParams);
             }
         } 
         else {

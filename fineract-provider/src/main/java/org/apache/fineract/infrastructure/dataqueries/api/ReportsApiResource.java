@@ -134,6 +134,23 @@ public class ReportsApiResource {
         return this.toApiJsonSerializer.serialize(result);
     }
 
+    // Added 04/08/2021  Monthly Report Schedule Creater
+
+    @POST
+    @Path("/schedule")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String createScheduledReport(final String apiRequestBodyAsJson) {
+
+        System.err.println("-----------------create monthly report schedule son --------------------");
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createReport().withJson(apiRequestBodyAsJson).build();
+
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.toApiJsonSerializer.serialize(result);
+
+    }
     @PUT
     @Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })

@@ -50,11 +50,13 @@ public enum JobName {
 	SEND_MESSAGES_TO_EMAIL_GATEWAY("Send messages to Email gateway"),
     UPDATE_EMAIL_OUTBOUND_WITH_CAMPAIGN_MESSAGE("Update Email Outbound with campaign message"),
     EXECUTE_EMAIL("Execute Email"),
-    CLIENT_REPORTS_EMAIL_SEND("Generate Client Reports (Email as PDF)");
+    SCHEDULED_EMAIL_CLIENT_REPORTS("Scheduled Email Client Reports");
 
 
     // added 17/07/2021 ,this one for monthly email notifications for customers 
 
+    //05/08/2011 Added new email reports for clients ,specifically made for Nkwazi
+ 
 
     private final String name;
 

@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.jobs.api.SchedulerJobApiConstants;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.wese.helper.TimeHelper;
 
 @Entity
 @Table(name = "job")
@@ -87,6 +88,18 @@ public class ScheduledJobDetail extends AbstractPersistableCustom<Long> {
 
     protected ScheduledJobDetail() {
 
+    }
+
+    public ScheduledJobDetail(String jobName, String jobDisplayName, String cronExpression) {
+        this.jobName = jobName;
+        this.jobDisplayName = jobDisplayName;
+        this.cronExpression = cronExpression;
+        this.createTime = TimeHelper.dateNow();
+        this.taskPriority = 5;
+        this.activeSchedular = true;
+        this.currentlyRunning = false;
+        this.updatesAllowed = true;
+        this.schedulerGroup = 0;
     }
 
     public String getJobName() {

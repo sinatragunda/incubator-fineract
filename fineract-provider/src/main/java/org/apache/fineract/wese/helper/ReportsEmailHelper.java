@@ -7,9 +7,9 @@ import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 
 public class ReportsEmailHelper{
 	
-	public static void testSend(WeseEmailService weseEmailService ,String path){
+	public static void testSend(WeseEmailService weseEmailService ,String path ,String body){
 
-		EmailDetail emailDetail = new EmailDetail("Pdf" ,"Test" ,"treyviis@gmail.com" ,"Nkwazi Test");
+		EmailDetail emailDetail = new EmailDetail("Pdf" ,body ,"treyviis@gmail.com" ,"Nkwazi Test");
 		weseEmailService.sendAttached(emailDetail ,path ,"Testing Pdf Attachments");
 
 	}

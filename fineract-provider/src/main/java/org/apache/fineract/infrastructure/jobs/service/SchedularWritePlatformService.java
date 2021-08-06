@@ -26,6 +26,9 @@ import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistory;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetail;
 
+
+/// Modified 06/07/2021 changed return value for saveOrUpdate from void to Long line 40
+
 public interface SchedularWritePlatformService {
 
     public List<ScheduledJobDetail> retrieveAllJobs();
