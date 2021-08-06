@@ -13,11 +13,14 @@ import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.Gson ;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
@@ -31,13 +34,14 @@ public class ScheduledReportHelper {
 
     public static void createScheduledReport(ScheduledReportRepository scheduledReportRepository , FromJsonHelper fromJsonHelper , SchedularWritePlatformService schedularWritePlatformService, String apiRequestBody){
 
-        Gson gson = new Gson();
-        JsonElement jsonElement = gson.parse(apiRequestBody);
-
+        JsonElement jsonElement = new JsonParser().parse(apiRequestBody);
         String reportName = fromJsonHelper.extractStringNamed("reportName" ,jsonElement);
         JsonObject jsonObject = fromJsonHelper.extractJsonObjectNamed("parameters" ,jsonElement);
 
-        String parameters = jsonObject.toString();
+        String parameters = fromJsonHelper.extractStringNamed("parameters" ,jsonElement);
+
+
+        //String parameters = jsonObject.get("parameters").getAsString();
 
 
         JobName jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS;
@@ -46,44 +50,48 @@ public class ScheduledReportHelper {
         ScheduledJobDetail scheduledJobDetail = new ScheduledJobDetail(name ,displayName ,"0 0 0 1/1 * ? *'");
         schedularWritePlatformService.saveOrUpdate(scheduledJobDetail);
 
-
         System.err.println("-----------------does it bring id ? ---   "+scheduledJobDetail.getId());
 
 
         System.err.println("---------------------json string here is---------------"+parameters);
+
+        Long jobId = scheduledJobDetail.getId();
 
         ScheduledReport scheduledReport = new ScheduledReport(reportName ,parameters ,jobId);
         scheduledReportRepository.save(scheduledReport);
 
     }
 
-    public static MultivaluedMap<String ,String> reportParameters(ScheduledReportRepository scheduledReportRepository ,Long jobId){
+    public static Map<String ,String> reportParameters(ScheduledReportRepository scheduledReportRepository ,Long jobId){
 
-        ScheduledReport scheduledReport = scheduledReportRepository.findByJodbId(jobId);
+        ScheduledReport scheduledReport = scheduledReportRepository.findByJobId(jobId);
 
         String parameters = scheduledReport.getParameters();
         String reportName = scheduledReport.getReportName();
 
-        MultivaluedMap<String ,String> multiValuedMap = new HashMap<>();
-        Iterator<String> keys = jsonObject.keys();
+        Map<String ,String> map = new HashMap();
 
-        multiValuedMap.add("reportName" ,reportName);
+        JsonElement jsonElement = new JsonParser().parse(parameters);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-        while (keys.hasNext()){
-            String key = keys.next();
-            String value = jsonObject.getString(key);
-            multiValuedMap.add(key ,value);
-            // this is to run it l guess
+        map.put("reportName" ,reportName);
+
+        Set<String> set = jsonObject.keySet();
+
+        for(String key : set){
+            String value = jsonObject.get(key).getAsString();
+            map.put(key ,value);
         }
-        return multiValuedMap;
 
+        return map;
     }
 
     public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepository scheduledReportRepository, Long jobId){
 
-        MultivaluedMap<String ,String> queryParams = reportParameters(scheduledReportRepository ,jobId);
-        String reportName = params.get("reportName");
-        File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
+        Map<String ,String> queryParams = reportParameters(scheduledReportRepository ,jobId);
+        String reportName = queryParams.get("reportName");
+       // queryParams = (MultivaluedMap<String, String>) c ;
+        File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
         ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Client Reports");
 
     }

@@ -17,7 +17,7 @@ public class LoanFactoringHelper{
     public boolean loanMaximumReached(ProductBindingRepository productBindingRepository){
 
         // id is always one there
-        List<ProductBinding> productBindingList = productBindingRepository.findByProductBindingRootId(1);
+        //List<ProductBinding> productBindingList = productBindingRepository.findByProductBindingRootId(1);
 
         /// find all loans where product id matches ......
 

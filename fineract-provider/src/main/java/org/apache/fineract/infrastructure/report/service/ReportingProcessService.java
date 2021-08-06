@@ -21,12 +21,13 @@ package org.apache.fineract.infrastructure.report.service;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.File ;
+import java.util.Map;
 
 public interface ReportingProcessService {
 
     Response processRequest(String reportName, MultivaluedMap<String, String> queryParams);
 
     // added 18/07/2021 with
-    File processRequestEx(String reportName ,MultivaluedMap<String,String> queryParams);
+    File processRequestEx(String reportName ,Map<String,String> queryParams);
 
 }

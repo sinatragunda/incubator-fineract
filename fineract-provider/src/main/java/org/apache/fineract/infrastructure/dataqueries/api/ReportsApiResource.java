@@ -41,9 +41,14 @@ import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformS
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.apache.fineract.infrastructure.core.serialization.FromApiJsonDeserializer;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
+import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
+import org.apache.fineract.infrastructure.dataqueries.repo.ScheduledReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -63,17 +68,23 @@ public class ReportsApiResource {
     private final ReadReportingService readReportingService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
+    private final FromJsonHelper fromJsonHelper ;
+    private final SchedularWritePlatformService schedularWritePlatformService ;
+    private final ScheduledReportRepository scheduledReportRepository ;
 
     @Autowired
     public ReportsApiResource(final PlatformSecurityContext context, final ReadReportingService readReportingService,
-            final ToApiJsonSerializer<ReportData> toApiJsonSerializer,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            final ApiRequestParameterHelper apiRequestParameterHelper) {
+                              final ToApiJsonSerializer<ReportData> toApiJsonSerializer,
+                              final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+                              final ApiRequestParameterHelper apiRequestParameterHelper , final FromJsonHelper fromJsonHelper , final SchedularWritePlatformService schedularWritePlatformService , final ScheduledReportRepository scheduledReportRepository) {
         this.context = context;
         this.readReportingService = readReportingService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.schedularWritePlatformService = schedularWritePlatformService ;
+        this.fromJsonHelper = fromJsonHelper ;
+        this.scheduledReportRepository = scheduledReportRepository;
     }
 
     @GET
@@ -144,11 +155,9 @@ public class ReportsApiResource {
 
         System.err.println("-----------------create monthly report schedule son --------------------");
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createReport().withJson(apiRequestBodyAsJson).build();
+        ScheduledReportHelper.createScheduledReport(scheduledReportRepository ,fromJsonHelper ,schedularWritePlatformService ,apiRequestBodyAsJson);
 
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
-        return this.toApiJsonSerializer.serialize(result);
+        return null ;
 
     }
     @PUT

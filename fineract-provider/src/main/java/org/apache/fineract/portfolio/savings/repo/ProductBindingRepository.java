@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
-public class ProductBindingRepository extends JpaRepository<ProductBinding, Long>,
+public interface ProductBindingRepository extends JpaRepository<ProductBinding, Long>,
         JpaSpecificationExecutor<ProductBinding> {
 
     List<ProductBinding> findByProductBindingRootId(Long id);

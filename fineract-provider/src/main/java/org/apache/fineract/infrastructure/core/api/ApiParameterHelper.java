@@ -107,6 +107,16 @@ public class ApiParameterHelper {
         return locale;
     }
 
+
+    public static Locale extractLocale(final Map<String, String> queryParams) {
+        Locale locale = null;
+        if (queryParams.get("locale") != null) {
+            final String localeAsString = queryParams.get("locale");
+            locale = JsonParserHelper.localeFromString(localeAsString);
+        }
+        return locale;
+    }
+
     public static boolean exportCsv(final MultivaluedMap<String, String> queryParams) {
         boolean exportCsv = false;
         if (queryParams.getFirst("exportCSV") != null) {

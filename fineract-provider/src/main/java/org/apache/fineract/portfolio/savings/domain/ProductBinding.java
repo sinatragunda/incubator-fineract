@@ -8,6 +8,11 @@ package org.apache.fineract.portfolio.savings.domain;
 
 import org.apache.fineract.portfolio.savings.enumerations.BINDING_PRODUCT_TYPE;
 
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 @Entity
 @Table(name ="m_product_binding_mapper")
 public class ProductBinding {

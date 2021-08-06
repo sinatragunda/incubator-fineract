@@ -74,13 +74,13 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     }
 
     @Override
-    public File processRequestEx(final String reportName, final MultivaluedMap<String, String> queryParams) {
-
+    public File processRequestEx(final String reportName, final Map<String, String> queryParams) {
 
         System.err.println("-------------------------private report procesing-----------------");
 
-        final String outputTypeParam = queryParams.getFirst("output-type");
+        final String outputTypeParam = queryParams.get("output-type");
         final Map<String, String> reportParams = getReportParams(queryParams);
+
         final Locale locale = ApiParameterHelper.extractLocale(queryParams);
 
         String outputType = "HTML";
@@ -116,6 +116,11 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             addParametersToReport(masterReport, reportParams);
 
             final File file = new File(reportName);
+
+
+            /// send some file here we see which one should be used for our working
+
+
             if ("PDF".equalsIgnoreCase(outputType)) {
                 PdfReportUtil.createPDF(masterReport,file);
                 return file ;
@@ -300,6 +305,24 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             if (k.startsWith("R_")) {
                 pKey = k.substring(2);
                 pValue = queryParams.get(k).get(0);
+                reportParams.put(pKey, pValue);
+            }
+        }
+        return reportParams;
+    }
+
+
+    private Map<String, String> getReportParams(final Map<String, String> queryParams) {
+
+        final Map<String, String> reportParams = new HashMap<>();
+        final Set<String> keys = queryParams.keySet();
+        String pKey;
+        String pValue;
+        for (final String k : keys) {
+
+            if (k.startsWith("R_")) {
+                pKey = k.substring(2);
+                pValue = queryParams.get(k);
                 reportParams.put(pKey, pValue);
             }
         }
