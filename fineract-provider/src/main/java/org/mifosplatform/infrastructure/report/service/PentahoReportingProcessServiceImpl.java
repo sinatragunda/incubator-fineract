@@ -81,6 +81,14 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
         final String outputTypeParam = queryParams.get("output-type");
         final Map<String, String> reportParams = getReportParams(queryParams);
 
+
+        System.err.println("-----------------------------output type for report here is--------"+outputTypeParam);
+
+
+        System.err.println("--------------non stripped report params ---------------"+queryParams.size());
+
+        System.err.println("--------------stripped report params ---------------"+reportParams.size());
+
         final Locale locale = ApiParameterHelper.extractLocale(queryParams);
 
         String outputType = "HTML";
@@ -117,11 +125,11 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
             final File file = new File(reportName);
 
-
             /// send some file here we see which one should be used for our working
 
 
             if ("PDF".equalsIgnoreCase(outputType)) {
+                System.err.println("---------------create pdf report -------------");
                 PdfReportUtil.createPDF(masterReport,file);
                 return file ;
             }
@@ -230,6 +238,8 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
         final AppUser currentUser = this.context.authenticatedUser();
 
+        System.err.println("--------------------params to report size ------------------- "+queryParams.size());
+
         try {
 
             final ReportParameterValues rptParamValues = report.getParameterValues();
@@ -314,15 +324,17 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
     private Map<String, String> getReportParams(final Map<String, String> queryParams) {
 
+        System.err.println("-------------------------------get Report Params--------");
+
         final Map<String, String> reportParams = new HashMap<>();
         final Set<String> keys = queryParams.keySet();
         String pKey;
         String pValue;
         for (final String k : keys) {
-
             if (k.startsWith("R_")) {
                 pKey = k.substring(2);
                 pValue = queryParams.get(k);
+                System.err.println("---------put these values key----------"+pKey+" -----------and value ---------"+pValue);
                 reportParams.put(pKey, pValue);
             }
         }

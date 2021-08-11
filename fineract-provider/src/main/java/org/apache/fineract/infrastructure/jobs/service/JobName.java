@@ -64,6 +64,10 @@ public enum JobName {
         this.name = name;
     }
 
+    public String getCode(){
+        return this.name;
+    }
+
     @Override
     public String toString() {
         return this.name;

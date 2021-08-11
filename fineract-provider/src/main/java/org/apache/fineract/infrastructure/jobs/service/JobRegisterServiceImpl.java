@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.jobs.annotation.CronMethodParser.Class
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetail;
 import org.apache.fineract.infrastructure.jobs.exception.JobNotFoundException;
+import org.apache.fineract.infrastructure.jobs.helper.ScheduledJobsHelper;
 import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -131,6 +132,9 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
 
     public void executeJob(final ScheduledJobDetail scheduledJobDetail, String triggerType) {
         try {
+
+            System.err.println("-------------------time to execute job son -------------");
+
             final JobDataMap jobDataMap = new JobDataMap();
             if (triggerType == null) {
                 triggerType = SchedulerServiceConstants.TRIGGER_TYPE_APPLICATION;
@@ -148,6 +152,9 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
                 tempScheduler.addJob(jobDetail, true);
                 jobDataMap.put(SchedulerServiceConstants.SCHEDULER_NAME, tempSchedulerName);
                 this.schedulers.put(tempSchedulerName, tempScheduler);
+
+                ScheduledJobsHelper.activeJobId = scheduledJobDetail.getId();
+                System.err.println("----------------what is this key thing ---------"+jobDetail.getKey());
                 tempScheduler.triggerJob(jobDetail.getKey(), jobDataMap);
             } else {
                 scheduler.triggerJob(jobKey, jobDataMap);
@@ -156,6 +163,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         } catch (final Exception e) {
             final String msg = "Job execution failed for job with id:" + scheduledJobDetail.getId();
             logger.error(msg, e);
+            ScheduledJobsHelper.activeJobId = null ;
             throw new PlatformInternalServerException("error.msg.sheduler.job.execution.failed", msg, scheduledJobDetail.getId());
         }
 
@@ -413,9 +421,10 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         return jobKey.getName() + SchedulerServiceConstants.JOB_KEY_SEPERATOR + jobKey.getGroup();
     }
 
-    private JobKey constructJobKey(final String Key) {
-        final String[] keyParams = Key.split(SchedulerServiceConstants.JOB_KEY_SEPERATOR);
-        final JobKey JobKey = new JobKey(keyParams[0], keyParams[1]);
-        return JobKey;
+    private JobKey constructJobKey(final String key) {
+        System.err.println("--------------------job key is ------------------"+key);
+        final String[] keyParams = key.split(SchedulerServiceConstants.JOB_KEY_SEPERATOR);
+        final JobKey jobKey = new JobKey(keyParams[0], keyParams[1]);
+        return jobKey;
     }
 }

@@ -58,10 +58,19 @@ public class ImageWritePlatformServiceJpaRepositoryImpl implements ImageWritePla
     @Override
     public CommandProcessingResult saveOrUpdateImage(String entityName, final Long clientId, final String imageName,
             final InputStream inputStream, final Long fileSize) {
+
+        System.err.println("---------------------create new image here ------------");
+
         Object owner = deletePreviousImage(entityName, clientId);
 
+        System.err.println("-------------------------delete previous image--------------");
+
         final ContentRepository contentRepository = this.contentRepositoryFactory.getRepository();
+
         final String imageLocation = contentRepository.saveImage(inputStream, clientId, imageName, fileSize);
+
+        System.err.println("-------------------image location ----------------"+imageLocation);
+
         return updateImage(owner, imageLocation, contentRepository.getStorageType());
     }
 
@@ -70,7 +79,12 @@ public class ImageWritePlatformServiceJpaRepositoryImpl implements ImageWritePla
     public CommandProcessingResult saveOrUpdateImage(String entityName, final Long clientId, final Base64EncodedImage encodedImage) {
         Object owner = deletePreviousImage(entityName, clientId);
 
+        System.err.println("==================== base 63 image process---------------");
+
         final ContentRepository contenRepository = this.contentRepositoryFactory.getRepository();
+
+        System.err.println("------------------------content repositotry===============");
+
         final String imageLocation = contenRepository.saveImage(encodedImage, clientId, "image");
 
         return updateImage(owner, imageLocation, contenRepository.getStorageType());
@@ -135,6 +149,9 @@ public class ImageWritePlatformServiceJpaRepositoryImpl implements ImageWritePla
     private CommandProcessingResult updateImage(final Object owner, final String imageLocation, final StorageType storageType) {
         Image image = null;
         Long clientId = null;
+
+        System.err.println("-----------------------------update image here---------------");
+
         if (owner instanceof Client) {
             Client client = (Client) owner;
             image = client.getImage();
@@ -151,11 +168,16 @@ public class ImageWritePlatformServiceJpaRepositoryImpl implements ImageWritePla
             this.staffRepositoryWrapper.save(staff);
         }
 
+        System.err.println("------------------------------repository save image ---------------");
+
         this.imageRepository.save(image);
         return new CommandProcessingResult(clientId);
     }
 
     private Image createImage(Image image, final String imageLocation, final StorageType storageType) {
+
+        System.err.println("-------------------------create image-----------------");
+
         if (image == null) {
             image = new Image(imageLocation, storageType);
         } else {

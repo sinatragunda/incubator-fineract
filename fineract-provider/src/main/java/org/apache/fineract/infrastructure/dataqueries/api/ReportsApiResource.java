@@ -41,18 +41,21 @@ import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformS
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
-import org.apache.fineract.infrastructure.core.serialization.FromApiJsonDeserializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
 import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
-import org.apache.fineract.infrastructure.dataqueries.repo.ScheduledReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
+import org.apache.fineract.infrastructure.dataqueries.service.ScheduledReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Path("/reports")
 @Component
@@ -68,23 +71,20 @@ public class ReportsApiResource {
     private final ReadReportingService readReportingService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final FromJsonHelper fromJsonHelper ;
     private final SchedularWritePlatformService schedularWritePlatformService ;
-    private final ScheduledReportRepository scheduledReportRepository ;
 
     @Autowired
     public ReportsApiResource(final PlatformSecurityContext context, final ReadReportingService readReportingService,
                               final ToApiJsonSerializer<ReportData> toApiJsonSerializer,
                               final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-                              final ApiRequestParameterHelper apiRequestParameterHelper , final FromJsonHelper fromJsonHelper , final SchedularWritePlatformService schedularWritePlatformService , final ScheduledReportRepository scheduledReportRepository) {
+                              final ApiRequestParameterHelper apiRequestParameterHelper ,final SchedularWritePlatformService schedularWritePlatformService) {
         this.context = context;
         this.readReportingService = readReportingService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.schedularWritePlatformService = schedularWritePlatformService ;
-        this.fromJsonHelper = fromJsonHelper ;
-        this.scheduledReportRepository = scheduledReportRepository;
+        //this.scheduledReportRepositoryWrapper = scheduledReportRepositoryWrapper;
     }
 
     @GET
@@ -153,13 +153,10 @@ public class ReportsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createScheduledReport(final String apiRequestBodyAsJson) {
 
-        System.err.println("-----------------create monthly report schedule son --------------------");
-
-        ScheduledReportHelper.createScheduledReport(scheduledReportRepository ,fromJsonHelper ,schedularWritePlatformService ,apiRequestBodyAsJson);
-
-        return null ;
-
+        Long id = schedularWritePlatformService.createScheduledReport(apiRequestBodyAsJson);
+        return ObjectNodeHelper.statusNode(true).put("id" ,id).toString();
     }
+
     @PUT
     @Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })

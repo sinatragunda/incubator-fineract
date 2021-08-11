@@ -7,6 +7,8 @@
 package org.apache.fineract.portfolio.savings.domain;
 
 
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,7 +16,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name ="m_product_binding")
-public class ProductBindingRoot {
+public class ProductBindingRoot extends AbstractPersistableCustom<Long> {
 
     @Column(name="loan_factor")
     private int loanFactor ;

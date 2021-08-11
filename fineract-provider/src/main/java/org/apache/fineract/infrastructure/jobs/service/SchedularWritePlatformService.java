@@ -25,6 +25,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistory;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetail;
+import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 
 
 /// Modified 06/07/2021 changed return value for saveOrUpdate from void to Long line 40
@@ -50,5 +51,9 @@ public interface SchedularWritePlatformService {
     public void updateSchedulerDetail(final SchedulerDetail schedulerDetail);
 
     public boolean processJobDetailForExecution(String jobKey, String triggerType);
+
+    // Added 11/08/2021
+    public Long createScheduledReport(String apiBody);
+    public void executeScheduledClientReportMail() throws JobExecutionException;
 
 }

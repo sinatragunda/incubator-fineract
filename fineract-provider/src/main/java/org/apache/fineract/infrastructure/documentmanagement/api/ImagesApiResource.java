@@ -83,12 +83,25 @@ public class ImagesApiResource {
     public String addNewClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             @HeaderParam("Content-Length") final Long fileSize, @FormDataParam("file") final InputStream inputStream,
             @FormDataParam("file") final FormDataContentDisposition fileDetails, @FormDataParam("file") final FormDataBodyPart bodyPart) {
+        
+        System.err.println("-------------------add new client image son-------------"+entityName);
+
         validateEntityTypeforImage(entityName);
         // TODO: vishwas might need more advances validation (like reading magic
         // number) for handling malicious clients
         // and clients not setting mime type
+
+        System.err.println("-----------------------------do something here find error-------");
+
         ContentRepositoryUtils.validateClientImageNotEmpty(fileDetails.getFileName());
+
+
+        System.err.println("-------------------validate image not empty son---------");
+        
         ContentRepositoryUtils.validateImageMimeType(bodyPart.getMediaType().toString());
+
+
+        System.err.println("--------------------validate image mime type---------------");
 
         final CommandProcessingResult result = this.imageWritePlatformService.saveOrUpdateImage(entityName, entityId,
                 fileDetails.getFileName(), inputStream, fileSize);
@@ -104,8 +117,18 @@ public class ImagesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String addNewClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             final String jsonRequestBody) {
+
+        System.err.println("------------------upload as stream data---------------------");
+
         validateEntityTypeforImage(entityName);
+
+
+        System.err.println("--------------------validate for entity----------------------");
+
         final Base64EncodedImage base64EncodedImage = ContentRepositoryUtils.extractImageFromDataURL(jsonRequestBody);
+
+
+        System.err.println("---------------------------base 64 encoding here----------------------");
 
         final CommandProcessingResult result = this.imageWritePlatformService.saveOrUpdateImage(entityName, entityId, base64EncodedImage);
 

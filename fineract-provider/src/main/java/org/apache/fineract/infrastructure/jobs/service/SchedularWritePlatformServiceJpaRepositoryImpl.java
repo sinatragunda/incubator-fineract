@@ -25,6 +25,12 @@ import java.util.Map;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
+import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
+import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReportRepository;
+import org.apache.fineract.infrastructure.dataqueries.service.ScheduledReportRepositoryWrapper;
+import org.apache.fineract.infrastructure.jobs.annotation.CronTarget;
 import org.apache.fineract.infrastructure.jobs.data.JobDetailDataValidator;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetailRepository;
@@ -32,30 +38,42 @@ import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistory;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistoryRepository;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetail;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetailRepository;
+import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.infrastructure.jobs.exception.JobNotFoundException;
+import org.apache.fineract.infrastructure.jobs.helper.ScheduledJobsHelper;
+import org.apache.fineract.wese.service.WeseEmailService;
+import org.mifosplatform.infrastructure.report.service.PentahoReportingProcessServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.apache.fineract.infrastructure.jobs.annotation.CronTarget;
+
 
 @Service
 public class SchedularWritePlatformServiceJpaRepositoryImpl implements SchedularWritePlatformService {
 
     private final ScheduledJobDetailRepository scheduledJobDetailsRepository;
-
     private final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository;
-
     private final SchedulerDetailRepository schedulerDetailRepository;
-
     private final JobDetailDataValidator dataValidator;
+    private final FromJsonHelper fromJsonHelper;
+    private final ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper;
+    private final PentahoReportingProcessServiceImpl pentahoReportingProcessService;
+    private final WeseEmailService weseEmailService ;
 
     @Autowired
     public SchedularWritePlatformServiceJpaRepositoryImpl(final ScheduledJobDetailRepository scheduledJobDetailsRepository,
             final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository, final JobDetailDataValidator dataValidator,
-            final SchedulerDetailRepository schedulerDetailRepository) {
+            final SchedulerDetailRepository schedulerDetailRepository ,final FromJsonHelper fromJsonHelper ,final  ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper ,final WeseEmailService weseEmailService ,final PentahoReportingProcessServiceImpl pentahoReportingProcessService) {
         this.scheduledJobDetailsRepository = scheduledJobDetailsRepository;
         this.scheduledJobRunHistoryRepository = scheduledJobRunHistoryRepository;
         this.schedulerDetailRepository = schedulerDetailRepository;
         this.dataValidator = dataValidator;
+        this.fromJsonHelper = fromJsonHelper ;
+        this.scheduledReportRepositoryWrapper = scheduledReportRepositoryWrapper;
+        this.pentahoReportingProcessService = pentahoReportingProcessService ;
+        this.weseEmailService = weseEmailService;
     }
 
     @Override
@@ -149,5 +167,36 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
         this.scheduledJobDetailsRepository.save(scheduledJobDetail);
         return isStopExecution;
     }
+
+
+    // Added 11/08/2021 for scheduling pdf reports sent to mails
+
+    @Override
+    public Long createScheduledReport(String apiBody){
+        return ScheduledReportHelper.createScheduledReport(scheduledReportRepositoryWrapper ,fromJsonHelper,this ,apiBody);
+    }
+
+    @Override
+    @CronTarget(jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS)
+    public void executeScheduledClientReportMail() throws JobExecutionException{
+
+        Long jobId = ScheduledJobsHelper.activeJobId;
+
+        System.err.println("-------------active job id is -------------"+jobId);
+
+        if (jobId !=null){
+
+            System.err.println("---------------how do we get id of report needing to be generated now---------------"+jobId);
+
+            //ScheduledReport scheduledReport =  scheduledReportRepositoryWrapper.findOneByJobId(jobId);
+
+            ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper , jobId);
+        }
+
+
+
+    }
+
+
 
 }

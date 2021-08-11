@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.portfolio.savings.domain;
 
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.savings.enumerations.BINDING_PRODUCT_TYPE;
 
 
@@ -15,7 +16,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name ="m_product_binding_mapper")
-public class ProductBinding {
+public class ProductBinding extends AbstractPersistableCustom<Long> {
 
 
     @Column(name="product_binding_root_id")

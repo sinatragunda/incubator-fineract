@@ -6,15 +6,12 @@
 */
 package org.apache.fineract.infrastructure.dataqueries.domain;
 
-
-import jdk.nashorn.internal.ir.annotations.Immutable;
-import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+
 
 @Table(name ="m_scheduled_report")
 @Entity
@@ -27,11 +24,9 @@ public class ScheduledReport extends AbstractPersistableCustom<Long> {
     private String parameters ;
 
     @Column(name="job_id")
-    //@Column(name="")
     private Long jobId;
 
     public ScheduledReport(){}
-
 
     public ScheduledReport(String reportName, String parameters, Long jobId) {
         this.reportName = reportName;

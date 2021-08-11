@@ -26,8 +26,6 @@ public class ObjectNodeHelper{
     }
 
 
-
-
     public static ObjectNode statusNode(boolean status){
 	    return objectNode().put("status",status);
     }
