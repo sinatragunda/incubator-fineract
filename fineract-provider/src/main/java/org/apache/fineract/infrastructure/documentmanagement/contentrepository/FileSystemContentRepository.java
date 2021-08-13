@@ -49,17 +49,10 @@ public class FileSystemContentRepository implements ContentRepository {
         final String uploadDocumentLocation = generateFileParentDirectory(documentCommand.getParentEntityType(),
                 documentCommand.getParentEntityId());
 
-        System.err.println("---------------------------save file-------------");
-
         ContentRepositoryUtils.validateFileSizeWithinPermissibleRange(documentCommand.getSize(), fileName);
-        
-        System.err.println("----------------validate file size etc-------------");
-
         makeDirectories(uploadDocumentLocation);
 
         final String fileLocation = uploadDocumentLocation + File.separator + fileName;
-
-        System.err.println("------------------------file location -----------"+fileLocation);
 
         writeFileToFileSystem(fileName, uploadedInputStream, fileLocation);
         return fileLocation;
@@ -69,13 +62,7 @@ public class FileSystemContentRepository implements ContentRepository {
     public String saveImage(final InputStream uploadedInputStream, final Long resourceId, final String imageName, final Long fileSize) {
         final String uploadImageLocation = generateClientImageParentDirectory(resourceId);
 
-
-        System.err.println("--------------------save image class--------------");
-
         ContentRepositoryUtils.validateFileSizeWithinPermissibleRange(fileSize, imageName);
-        
-        System.err.println("--------------------validate file size -----------");
-
         makeDirectories(uploadImageLocation);
 
         final String fileLocation = uploadImageLocation + File.separator + imageName;

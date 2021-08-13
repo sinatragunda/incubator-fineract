@@ -27,14 +27,8 @@ public class SavingsProductPortfolioHelper {
 
         List<SavingsAccountData> savingsAccountDataList = savingsAccountReadPlatformService.retrieveAllForPortfolio(productId);
 
-        System.err.println("----------------total balance for these number of products ------------"+savingsAccountDataList.size());
-
         BigDecimal totalBalance = BigDecimal.ZERO ;
-
         totalBalance = savingsAccountDataList.stream().map(SavingsAccountData::getAccountBalance).reduce(BigDecimal.ZERO ,BigDecimal::add);
-
-        System.err.println("-------------------------total account balances is -------------------------"+totalBalance);
-
         return totalBalance ;
     }
 
@@ -53,17 +47,11 @@ public class SavingsProductPortfolioHelper {
             return sameProduct ;
         };
 
-        System.err.println("----------------total balance for these number of products in the dated zone------------"+savingsAccountMonthlyDepositList.size());
-
         BigDecimal totalBalance = BigDecimal.ZERO ;
-
         Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDepositMapper = (e)->{
             BigDecimal netDeposit = e.getDeposit().subtract(e.getWithdraw());
-            System.err.println("-----------------------------new deposit is--------- "+netDeposit.doubleValue());
             return netDeposit ;
         };
-
-        System.err.println("----------------calc criteria here---------------------- "+calcCriteria);
 
         switch (calcCriteria){
             case DEPOSITS:
@@ -72,8 +60,6 @@ public class SavingsProductPortfolioHelper {
             case NET_BALANCES:
                 totalBalance = savingsAccountMonthlyDepositList.stream().filter(filterByProductId).map(netDepositMapper).reduce(BigDecimal.ZERO ,BigDecimal::add);
         }
-
-        System.err.println("-------------------------total account balances is -------------------------"+totalBalance);
 
         return totalBalance ;
     }

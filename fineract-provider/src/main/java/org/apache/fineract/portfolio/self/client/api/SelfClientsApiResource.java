@@ -137,6 +137,7 @@ public class SelfClientsApiResource {
 			@QueryParam("maxHeight") final Integer maxHeight,
 			@QueryParam("output") final String output) {
 
+
 		validateAppuserClientsMapping(clientId);
 
 		return this.imagesApiResource.retrieveImage("clients", clientId,

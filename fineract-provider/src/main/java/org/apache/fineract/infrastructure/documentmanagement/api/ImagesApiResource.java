@@ -18,6 +18,9 @@
  */
 package org.apache.fineract.infrastructure.documentmanagement.api;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -34,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.domain.Base64EncodedImage;
@@ -55,59 +59,59 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+// Added 13/08/2021
+//import org.apache.fineract.infrastructure.documentmanagement.api.FileUploadValidator;
+
 @Path("{entity}/{entityId}/images")
 @Component
 @Scope("singleton")
+@Api(value = "DomainName//api//v1//{entity}//{entityId}//images", description = "")
 public class ImagesApiResource {
 
     private final PlatformSecurityContext context;
     private final ImageReadPlatformService imageReadPlatformService;
     private final ImageWritePlatformService imageWritePlatformService;
     private final DefaultToApiJsonSerializer<ClientData> toApiJsonSerializer;
+    //private final FileUploadValidator fileUploadValidator;
 
     @Autowired
     public ImagesApiResource(final PlatformSecurityContext context, final ImageReadPlatformService readPlatformService,
-            final ImageWritePlatformService imageWritePlatformService, final DefaultToApiJsonSerializer<ClientData> toApiJsonSerializer) {
+                             final ImageWritePlatformService imageWritePlatformService, final DefaultToApiJsonSerializer<ClientData> toApiJsonSerializer) {
         this.context = context;
         this.imageReadPlatformService = readPlatformService;
         this.imageWritePlatformService = imageWritePlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
+      //  this.fileUploadValidator = fileUploadValidator;
+
     }
 
     /**
      * Upload images through multi-part form upload
      */
+
     @POST
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
     @Produces({ MediaType.APPLICATION_JSON })
     public String addNewClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
-            @HeaderParam("Content-Length") final Long fileSize, @FormDataParam("file") final InputStream inputStream,
-            @FormDataParam("file") final FormDataContentDisposition fileDetails, @FormDataParam("file") final FormDataBodyPart bodyPart) {
-        
-        System.err.println("-------------------add new client image son-------------"+entityName);
-
+                                    @HeaderParam("Content-Length") final Long fileSize, @FormDataParam("file") final InputStream inputStream,
+                                    @FormDataParam("file") final FormDataContentDisposition fileDetails, @FormDataParam("file") final FormDataBodyPart bodyPart) {
         validateEntityTypeforImage(entityName);
+        //fileUploadValidator.validate(fileSize, inputStream, fileDetails, bodyPart);
         // TODO: vishwas might need more advances validation (like reading magic
         // number) for handling malicious clients
         // and clients not setting mime type
-
-        System.err.println("-----------------------------do something here find error-------");
-
         ContentRepositoryUtils.validateClientImageNotEmpty(fileDetails.getFileName());
-
-
-        System.err.println("-------------------validate image not empty son---------");
-        
         ContentRepositoryUtils.validateImageMimeType(bodyPart.getMediaType().toString());
-
-
-        System.err.println("--------------------validate image mime type---------------");
 
         final CommandProcessingResult result = this.imageWritePlatformService.saveOrUpdateImage(entityName, entityId,
                 fileDetails.getFileName(), inputStream, fileSize);
 
         return this.toApiJsonSerializer.serialize(result);
     }
+
 
     /**
      * Upload image as a Data URL (essentially a base64 encoded stream)
@@ -118,17 +122,8 @@ public class ImagesApiResource {
     public String addNewClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             final String jsonRequestBody) {
 
-        System.err.println("------------------upload as stream data---------------------");
-
         validateEntityTypeforImage(entityName);
-
-
-        System.err.println("--------------------validate for entity----------------------");
-
         final Base64EncodedImage base64EncodedImage = ContentRepositoryUtils.extractImageFromDataURL(jsonRequestBody);
-
-
-        System.err.println("---------------------------base 64 encoding here----------------------");
 
         final CommandProcessingResult result = this.imageWritePlatformService.saveOrUpdateImage(entityName, entityId, base64EncodedImage);
 
@@ -144,6 +139,7 @@ public class ImagesApiResource {
     public Response retrieveImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             @QueryParam("maxWidth") final Integer maxWidth, @QueryParam("maxHeight") final Integer maxHeight,
             @QueryParam("output") final String output) {
+
         validateEntityTypeforImage(entityName);
         if (ENTITY_TYPE_FOR_IMAGES.CLIENTS.toString().equalsIgnoreCase(entityName)) {
             this.context.authenticatedUser().validateHasReadPermission("CLIENTIMAGE");
@@ -204,6 +200,7 @@ public class ImagesApiResource {
     public String updateClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             @HeaderParam("Content-Length") final Long fileSize, @FormDataParam("file") final InputStream inputStream,
             @FormDataParam("file") final FormDataContentDisposition fileDetails, @FormDataParam("file") final FormDataBodyPart bodyPart) {
+
         return addNewClientImage(entityName, entityId, fileSize, inputStream, fileDetails, bodyPart);
     }
 
@@ -218,7 +215,9 @@ public class ImagesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String updateClientImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             final String jsonRequestBody) {
+
         return addNewClientImage(entityName, entityId, jsonRequestBody);
+        //return null ;
     }
 
     @DELETE

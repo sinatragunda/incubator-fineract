@@ -45,7 +45,6 @@ public class EquityGrowthHelper {
 
         int cmp = e.getAmount().compareTo(BigDecimal.ZERO);
         if(cmp <= 0){
-            System.err.println("------------balance is less here---------"+e.getAmount().doubleValue());
             return false;
         }
         return true;

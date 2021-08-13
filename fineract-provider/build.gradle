@@ -61,7 +61,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 project.ext.springBootVersion = '1.1.6.RELEASE'
 project.ext.springVersion = '4.0.7.RELEASE'
 project.ext.springOauthVersion = '2.0.4.RELEASE'
-project.ext.jerseyVersion = '1.17'
+project.ext.jerseyVersion = '1.19'
 project.ext.springDataJpaVersion = '1.7.0.RELEASE' // also change spring-boot-gradle-plugin version above
 
 project.ext.mysqlUser='root'

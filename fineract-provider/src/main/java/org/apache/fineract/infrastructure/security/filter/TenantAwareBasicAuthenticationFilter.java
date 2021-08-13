@@ -123,6 +123,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                                 + "' or add the parameter 'tenantIdentifier' to query string of request URL."); }
 
                 String pathInfo = request.getRequestURI();
+
                 boolean isReportRequest = false;
                 if (pathInfo != null && pathInfo.contains("report")) {
                     isReportRequest = true;
@@ -149,12 +150,11 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                     TenantAwareBasicAuthenticationFilter.firstRequestProcessed = true;
                 }
             }
-
             super.doFilter(req, res, chain);
         } catch (final InvalidTenantIdentiferException e) {
             // deal with exception at low level
-            SecurityContextHolder.getContext().setAuthentication(null);
 
+            SecurityContextHolder.getContext().setAuthentication(null);
             response.addHeader("WWW-Authenticate", "Basic realm=\"" + "Fineract Platform API" + "\"");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } finally {

@@ -279,7 +279,6 @@ public class SavingsProductsApiResource {
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = equityGrowthOnSavingsAccountRepository.findByEquityGrowthDividendsId(id);
         Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
             SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e.getSavingsAccountId());
-            System.err.println("-----------------------setting savings account name-----------------"+savingsAccount.getClient().getDisplayName());
             String name = savingsAccount.getClient().getDisplayName();
             e.setClientName(name);
         };

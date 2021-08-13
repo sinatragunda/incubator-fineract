@@ -121,6 +121,9 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 reportEnvironment.setLocale(locale);
             }
 
+
+            System.err.println("-------------------------add parameters report ----------");
+
             addParametersToReport(masterReport, reportParams);
 
             final File file = new File(reportName);
@@ -280,6 +283,8 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             // passed as parameters to allow multitenant penaho reporting
             // and
             // data scoping
+
+            System.err.println("---------------------data scoping where sdo we fail ?--------");
    
             final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
             final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
@@ -287,6 +292,8 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             final String userhierarchy = currentUser.getOffice().getHierarchy();
             logger.info("db URL:" + tenantUrl + "      userhierarchy:" + userhierarchy);
             rptParamValues.put("userhierarchy", userhierarchy);
+
+            System.err.println("------------------we put getHierarchy now -----------");
 
             final Long userid = currentUser.getId();
             logger.info("db URL:" + tenantUrl + "      userid:" + userid);
