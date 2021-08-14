@@ -178,22 +178,14 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
 
     @Override
     @CronTarget(jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS)
-    public void executeScheduledClientReportMail() throws JobExecutionException{
+    public void executeScheduledClientReportMail(){
 
         Long jobId = ScheduledJobsHelper.activeJobId;
-
-        System.err.println("-------------active job id is -------------"+jobId);
-
         if (jobId !=null){
 
-            System.err.println("---------------how do we get id of report needing to be generated now---------------"+jobId);
-
             //ScheduledReport scheduledReport =  scheduledReportRepositoryWrapper.findOneByJobId(jobId);
-
             ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper , jobId);
         }
-
-
 
     }
 

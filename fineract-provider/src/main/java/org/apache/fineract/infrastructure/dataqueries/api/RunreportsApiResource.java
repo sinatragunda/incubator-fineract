@@ -195,14 +195,14 @@ public class RunreportsApiResource {
             
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
             if (reportingProcessService != null){
-                Map map = getReportParams(queryParams);
-                File file = reportingProcessService.processRequestEx(reportName ,map);
+                //Map map = getReportParams(queryParams);
+
+                //File file = reportingProcessService.processRequestEx(reportName ,map);
                 /// send some file here son
-                System.err.println("------------file name is---------------"+file.getName());
+                //System.err.println("------------file name is---------------"+file.getName());
 
-                ReportsEmailHelper.testSend(weseEmailService ,file.getAbsolutePath() ,"Scheduled Reports with absolute path");
-                ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Reports without absolute path");
-
+                //ReportsEmailHelper.testSend(weseEmailService ,file.getAbsolutePath() ,"Scheduled Reports with absolute path");
+                //ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Reports without absolute path");
                 return reportingProcessService.processRequest(reportName, queryParams);
             }
         } 

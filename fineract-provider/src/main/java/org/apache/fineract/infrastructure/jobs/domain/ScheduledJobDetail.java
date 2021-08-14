@@ -100,6 +100,12 @@ public class ScheduledJobDetail extends AbstractPersistableCustom<Long> {
         this.currentlyRunning = false;
         this.updatesAllowed = true;
         this.schedulerGroup = 0;
+        
+    }
+
+    public void updateJobKey(){
+        String newValue = String.format("%sJobDetail%d _ DEFAULT",jobName ,getId());
+        this.jobKey = newValue;
     }
 
     public String getJobName() {

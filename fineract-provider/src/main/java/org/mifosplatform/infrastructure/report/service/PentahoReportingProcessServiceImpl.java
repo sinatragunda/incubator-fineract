@@ -78,19 +78,10 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
         System.err.println("-------------------------private report procesing-----------------");
 
-        final String outputTypeParam = queryParams.get("output-type");
         final Map<String, String> reportParams = getReportParams(queryParams);
-
-
-        System.err.println("-----------------------------output type for report here is--------"+outputTypeParam);
-
-
-        System.err.println("--------------non stripped report params ---------------"+queryParams.size());
-
-        System.err.println("--------------stripped report params ---------------"+reportParams.size());
+        final String outputTypeParam = reportParams.get("output-type");
 
         final Locale locale = ApiParameterHelper.extractLocale(queryParams);
-
         String outputType = "HTML";
         if (StringUtils.isNotBlank(outputTypeParam)) {
             outputType = outputTypeParam;
@@ -121,19 +112,17 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 reportEnvironment.setLocale(locale);
             }
 
-
-            System.err.println("-------------------------add parameters report ----------");
-
             addParametersToReport(masterReport, reportParams);
 
-            final File file = new File(reportName);
+            String filename = String.format("%s.%s" ,reportName ,outputType.toLowerCase());
+            final File file = new File(filename);
 
             /// send some file here we see which one should be used for our working
-
 
             if ("PDF".equalsIgnoreCase(outputType)) {
                 System.err.println("---------------create pdf report -------------");
                 PdfReportUtil.createPDF(masterReport,file);
+
                 return file ;
             }
         } catch (final ResourceException e) {
@@ -169,37 +158,23 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
         // load report definition
         final ResourceManager manager = new ResourceManager();
-
         manager.registerDefaults();
-        
         Resource res;
 
-     
         try {
             res = manager.createDirectly(reportPath, MasterReport.class);
-
           
-
             final MasterReport masterReport = (MasterReport) res.getResource();
-
-
             final DefaultReportEnvironment reportEnvironment = (DefaultReportEnvironment) masterReport.getReportEnvironment();
-            
-
         
             if (locale != null) {
                 reportEnvironment.setLocale(locale);
             }
 
             addParametersToReport(masterReport, reportParams);
-
-          
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-
-         
             if ("PDF".equalsIgnoreCase(outputType)) {
-
                 PdfReportUtil.createPDF(masterReport, baos);
                 return Response.ok().entity(baos.toByteArray()).type("application/pdf").build();
             }
@@ -255,12 +230,22 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
              * better... currently assuming they come in ok... and if not an
              * error
              */
+
+            System.err.println("-------------param paramsDefinition------");
+
+
             for (final ParameterDefinitionEntry paramDefEntry : paramsDefinition.getParameterDefinitions()) {
+                
                 final String paramName = paramDefEntry.getName();
+                System.err.println("----------------param name here is ------------"+paramName);
+
                 if (!((paramName.equals("tenantUrl")) || (paramName.equals("userhierarchy") || (paramName.equals("username")) || (paramName
                         .equals("password") || (paramName.equals("userid")))))) {
                     logger.info("paramName:" + paramName);
                     final String pValue = queryParams.get(paramName);
+
+                    System.err.println("------------pvalue is ----------------------"+pValue);
+
                     if (StringUtils.isBlank(pValue)) { throw new PlatformDataIntegrityException("error.msg.reporting.error",
                             "Pentaho Parameter: " + paramName + " - not Provided"); }
 
@@ -275,6 +260,8 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                     } else {
                         rptParamValues.put(paramName, pValue);
                     }
+
+                    System.err.println("-----------------done adding report params --------d");
                 }
 
             }
@@ -284,7 +271,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             // and
             // data scoping
 
-            System.err.println("---------------------data scoping where sdo we fail ?--------");
+            System.err.println("---------------------data scoping where do we fail ?--------");
    
             final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
             final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
@@ -307,6 +294,8 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
           
         } catch (final Exception e) {
             logger.error("error.msg.reporting.error:" + e.getMessage());
+            System.err.println("-------------------some integrity error but how come ? -----");
+            e.printStackTrace();
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         }
     }
@@ -318,7 +307,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
         String pKey;
         String pValue;
         for (final String k : keys) {
-
             if (k.startsWith("R_")) {
                 pKey = k.substring(2);
                 pValue = queryParams.get(k).get(0);

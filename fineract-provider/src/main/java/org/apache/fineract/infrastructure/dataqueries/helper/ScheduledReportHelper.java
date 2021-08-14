@@ -51,6 +51,9 @@ public class ScheduledReportHelper {
         ScheduledJobDetail scheduledJobDetail = new ScheduledJobDetail(jobNameStr ,displayName ,"0 0 0 1/1 * ? *'");
         schedularWritePlatformService.saveOrUpdate(scheduledJobDetail);
 
+        scheduledJobDetail.updateJobKey();
+        schedularWritePlatformService.saveOrUpdate(scheduledJobDetail);
+
         Long jobId = scheduledJobDetail.getId();
         ScheduledReport scheduledReport = new ScheduledReport(reportName ,parameters ,jobId);
         scheduledReportRepositoryWrapper.saveOrUpdate(scheduledReport);
@@ -84,11 +87,15 @@ public class ScheduledReportHelper {
 
         Map<String ,String> queryParams = reportParameters(scheduledReportRepositoryWrapper ,jobId);
         String reportName = queryParams.get("reportName");
-       // queryParams = (MultivaluedMap<String, String>) c ;
         File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
+
 
         /// we need to get list of recipients here as well the clients whose reports we need to send
         ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Client Reports");
+
+        file.delete();
+
+        // do for all reciepients here ,if same file then delete if unique then delete
 
     }
 }
