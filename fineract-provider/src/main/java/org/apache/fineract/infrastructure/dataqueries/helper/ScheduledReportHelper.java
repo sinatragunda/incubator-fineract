@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.infrastructure.dataqueries.helper;
 
+import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReportRepository;
@@ -14,6 +15,7 @@ import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +27,12 @@ import com.google.gson.JsonParser;
 
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
+import org.apache.fineract.portfolio.client.domain.EmailRecipients;
+import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
+import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.wese.helper.ReportsEmailHelper;
 import org.apache.fineract.wese.service.WeseEmailService;
 import org.mifosplatform.infrastructure.report.service.PentahoReportingProcessServiceImpl;
@@ -42,6 +50,9 @@ public class ScheduledReportHelper {
         String reportName = jsonObject.get("reportName").getAsString();
         String parameters = jsonObject.get("parameters").toString();
         String name = jsonObject.get("name").getAsString();
+        Long id = jsonObject.get("emailRecipientsKey").getAsLong();
+
+        EmailRecipientsKey emailRecipientKey = new EmailRecipientsKey(id);
 
         JobName jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS;
 
@@ -56,15 +67,16 @@ public class ScheduledReportHelper {
 
         Long jobId = scheduledJobDetail.getId();
         ScheduledReport scheduledReport = new ScheduledReport(reportName ,parameters ,jobId);
+        scheduledReport.setEmailRecipientsKey(emailRecipientKey);
+
         scheduledReportRepositoryWrapper.saveOrUpdate(scheduledReport);
         return jobId ;
 
     }
 
-    public static Map<String ,String> reportParameters(ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper ,Long jobId){
+    public static Map<String ,String> reportParameters(ScheduledReport scheduledReport ,Long jobId){
 
-        ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
-
+       // ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
         String parameters = scheduledReport.getParameters();
         String reportName = scheduledReport.getReportName();
 
@@ -83,19 +95,81 @@ public class ScheduledReportHelper {
         return map;
     }
 
-    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, Long jobId){
+    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService , Long jobId){
 
-        Map<String ,String> queryParams = reportParameters(scheduledReportRepositoryWrapper ,jobId);
+
+        System.err.println("---------------------run scheduled report ----------------");
+
+        ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
+
+        Map<String ,String> queryParams = reportParameters(scheduledReport ,jobId);
+
         String reportName = queryParams.get("reportName");
+        Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
+
+        System.err.println("-------------------recipients id -------------------"+recipientsKey);
+
+        List<EmailRecipients> emailRecipientsList = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
+        boolean clientReport = clientFacingReport(queryParams);
+
+
+        System.err.println("---------------is client report ------------------"+clientReport);
+
+        String subject = String.format("Scheduled Report");
+        String description = String.format("Scheduled %s Report",reportName);
+
+        if(clientReport){
+
+            emailRecipientsList.stream().forEach((e)->{
+
+                // for each item send and generate some report
+                String emailAddress = e.getEmailAddress();
+                String name = e.getName();
+                Long clientId = e.getClientId();
+
+                queryParams.put("R_clientId" ,clientId.toString());
+                File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
+
+                EmailDetail emailDetail = emailDetail(emailAddress ,name ,subject ,description);
+                ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+                file.delete();
+            });
+            return;
+        }
+
+        System.err.println("-------------------send email now -----------------------");
+
         File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
 
 
-        /// we need to get list of recipients here as well the clients whose reports we need to send
-        ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Client Reports");
+        System.err.println("=================email recipients size is============= "+emailRecipientsList.size());
+
+        emailRecipientsList.stream().forEach((e)->{
+            /// we need to get list of recipients here as well the clients whose reports we need to send
+            String emailAddress = e.getEmailAddress();
+            String name = e.getName();
+
+            System.err.println("-------------send mail "+emailAddress+" ----------- and name ---"+name);
+
+            EmailDetail emailDetail = emailDetail(emailAddress,name ,subject ,description);
+            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+
+            System.err.println("---------------email sent here --------------------");
+
+        });
 
         file.delete();
+    }
 
-        // do for all reciepients here ,if same file then delete if unique then delete
+    public static Boolean clientFacingReport(Map<String,String> queryParams){
+
+        boolean has = queryParams.containsKey("R_clientId");
+        return has ;
+    }
+
+    public static EmailDetail emailDetail(String email ,String name ,String subject,String description){
+        EmailDetail emailDetail = new EmailDetail(subject ,description ,email ,name);
+        return emailDetail;
 
     }
 }

@@ -11,6 +11,10 @@ public class ReportsEmailHelper{
 
 		EmailDetail emailDetail = new EmailDetail("Pdf" ,body ,"treyviis@gmail.com" ,"Nkwazi Test");
 		weseEmailService.sendAttached(emailDetail ,path ,"Testing Pdf Attachments");
+	}
 
+
+	public static void sendClientReport(WeseEmailService weseEmailService ,EmailDetail emailDetail ,String path ,String description){
+		weseEmailService.sendAttached(emailDetail ,path ,description);
 	}
 }

@@ -19,10 +19,7 @@
 package org.apache.fineract.portfolio.client.api;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -58,12 +55,22 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.client.domain.EmailRecipients;
+import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
+import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+// added 15/08/2021
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Path("/clients")
 @Component
@@ -80,6 +87,8 @@ public class ClientsApiResource {
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
+    private final EmailRecipientsKeyRepository emailRecipientsKeyRepository ;
+    private final EmailRecipientsRepository emailRecipientsRepository ;
 
     @Autowired
     public ClientsApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,
@@ -90,7 +99,9 @@ public class ClientsApiResource {
             final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
             final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
-            final BulkImportWorkbookService bulkImportWorkbookService) {
+            final BulkImportWorkbookService bulkImportWorkbookService,
+                              final EmailRecipientsKeyRepository emailRecipientsKeyRepository ,
+                              final EmailRecipientsRepository emailRecipientsRepository) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -101,6 +112,8 @@ public class ClientsApiResource {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
         this.bulkImportWorkbookService=bulkImportWorkbookService;
+        this.emailRecipientsKeyRepository = emailRecipientsKeyRepository;
+        this.emailRecipientsRepository = emailRecipientsRepository;
     }
 
     @GET
@@ -321,6 +334,45 @@ public class ClientsApiResource {
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.clientAccountSummaryToApiJsonSerializer.serialize(settings, clientAccount, CLIENT_ACCOUNTS_DATA_PARAMETERS);
+    }
+
+    // Added 15/08/2021
+    @GET
+    @Path("/mailrecipients/{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<EmailRecipients> viewMailRecipient(@PathParam("id") final Long id) {
+
+        List<EmailRecipients> emailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
+        return emailRecipientsList ;
+
+    }
+
+
+    @GET
+    @Path("/mailrecipients")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<EmailRecipientsKey> getMailRecipient(){
+
+        List<EmailRecipientsKey> emailRecipientsKeyList = emailRecipientsKeyRepository.findAll();
+        return emailRecipientsKeyList;
+    }
+
+    // Added 15/08/2021
+    @POST
+    @Path("/mailrecipients")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public ObjectNode createMailRecipient(@RequestBody EmailRecipientsKey emailRecipientsKey){
+
+        Long id = EmailRecipientsHelper.createMailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository, emailRecipientsKey);
+
+        if(id==null){
+            return ObjectNodeHelper.statusNode(false).put("message","Failed to create mail recipients");
+        }
+        return ObjectNodeHelper.statusNode(true).put("id",id);
+
     }
 
     @GET

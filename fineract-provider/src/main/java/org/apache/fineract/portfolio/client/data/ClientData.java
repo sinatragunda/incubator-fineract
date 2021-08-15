@@ -626,4 +626,8 @@ final public class ClientData implements Comparable<ClientData> {
     public Boolean getIsAddressEnabled() {
 		return this.isAddressEnabled;
 	}
+
+    public String getEmailAddress(){
+        return this.emailAddress;
+    }
 }
