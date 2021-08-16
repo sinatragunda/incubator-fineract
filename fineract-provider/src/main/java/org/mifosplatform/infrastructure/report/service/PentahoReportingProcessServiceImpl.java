@@ -24,6 +24,7 @@ import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.report.annotation.ReportService;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -63,20 +64,35 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     private boolean noPentaho = false;
 
     @Autowired private JDBCDriverConfig driverConfig ;
+    private final ReadReportingService readReportingService;
     
     @Autowired
-    public PentahoReportingProcessServiceImpl(final PlatformSecurityContext context) {
+    public PentahoReportingProcessServiceImpl(final PlatformSecurityContext context ,final ReadReportingService readReportingService) {
         // kick off pentaho reports server
         ClassicEngineBoot.getInstance().start();
         this.noPentaho = false;
 
         this.context = context;
+        this.readReportingService = readReportingService ;
     }
 
     @Override
-    public File processRequestEx(final String reportName, final Map<String, String> queryParams) {
+    public File processRequestEx(String reportName, final Map<String, String> queryParams) {
 
         System.err.println("-------------------------private report procesing-----------------");
+
+        try{
+            String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
+            String reportCustomized = String.format("%s %s",reportName ,tenant);
+            String reportType = this.readReportingService.getReportType(reportCustomized);
+
+            System.err.println("---------------report not found error should be thrown here -----------");
+            reportName = reportCustomized;
+            
+        }
+        catch(Exception e){
+            System.err.println("------------- no customized report ------------");
+        }
 
         final Map<String, String> reportParams = getReportParams(queryParams);
         final String outputTypeParam = reportParams.get("output-type");

@@ -115,7 +115,7 @@ public class ScheduledReportHelper {
 
         System.err.println("---------------is client report ------------------"+clientReport);
 
-        String subject = String.format("Scheduled Report");
+        String subject = "Scheduled Report";
         String description = String.format("Scheduled %s Report",reportName);
 
         if(clientReport){
@@ -126,6 +126,9 @@ public class ScheduledReportHelper {
                 String emailAddress = e.getEmailAddress();
                 String name = e.getName();
                 Long clientId = e.getClientId();
+
+                System.err.println("----------------we found this client --------------"+emailAddress);
+
 
                 queryParams.put("R_clientId" ,clientId.toString());
                 File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
@@ -147,12 +150,15 @@ public class ScheduledReportHelper {
         emailRecipientsList.stream().forEach((e)->{
             /// we need to get list of recipients here as well the clients whose reports we need to send
             String emailAddress = e.getEmailAddress();
-            String name = e.getName();
+            String contactName = e.getName();
 
-            System.err.println("-------------send mail "+emailAddress+" ----------- and name ---"+name);
+            System.err.println("-------------send mail "+emailAddress+" ----------- and name ---"+contactName);
 
-            EmailDetail emailDetail = emailDetail(emailAddress,name ,subject ,description);
-            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+            EmailDetail emailDetail =  new EmailDetail(subject,description ,emailAddress ,contactName);
+
+            System.err.println("-------------file path is =------------"+file.getPath());
+            //ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+            ReportsEmailHelper.testSend(weseEmailService,file.getPath() ,"This is some random reports test");
 
             System.err.println("---------------email sent here --------------------");
 
@@ -167,8 +173,8 @@ public class ScheduledReportHelper {
         return has ;
     }
 
-    public static EmailDetail emailDetail(String email ,String name ,String subject,String description){
-        EmailDetail emailDetail = new EmailDetail(subject ,description ,email ,name);
+    public static EmailDetail emailDetail(String email ,String contactName ,String subject,String description){
+        EmailDetail emailDetail = new EmailDetail(subject ,description ,email ,contactName);
         return emailDetail;
 
     }
