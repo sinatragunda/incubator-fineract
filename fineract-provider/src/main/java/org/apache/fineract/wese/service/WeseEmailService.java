@@ -60,6 +60,9 @@ public class WeseEmailService{
     }
 
     public void sendDefinedEmail(EmailDetail emailDetails) {
+
+
+        System.err.println("-------------sending defined email test ,simplistic----------");
         
         Email email = new SimpleEmail();
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
@@ -67,25 +70,53 @@ public class WeseEmailService{
 
         final String authuser = smtpCredentialsData.getUsername();
         final String authpwd = smtpCredentialsData.getPassword();
-
+        final String port  = smtpCredentialsData.getPort();
         // Very Important, Don't use email.setAuthentication()
+
+        System.err.println("------auth user is -----------"+authuser);
+
+        System.err.println("----------------------authpwd ------------- "+authpwd);
+
+
+        System.err.println("-----------System port is -----------------"+port);
 
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
         email.setDebug(false); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
+        System.err.println("-----------set credendtials there =-------");
+
+        email.setSmtpPort(Integer.valueOf(port));
+
         try {
+
+            System.err.println("------------checking if is use tls -------------"+smtpCredentialsData.isUseTLS());
             if(smtpCredentialsData.isUseTLS()){
                 email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
             }
+
+            System.err.println("--------------------some set data -------------");
+
+
             email.setFrom(authuser, authuserName);
 
             email.setSubject(emailDetails.getSubject());
+
+            System.err.println("----------------------------message set here now ---------------");
+
+
             email.setMsg(emailDetails.getBody());
 
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
+
+
+            System.err.println("----------------------------------add ------- to some shit ");
+
             email.send();
+
+            System.err.println("-----------------why does it take long here? ---------------");
         } catch (EmailException e) {
+            e.printStackTrace();
             throw new PlatformEmailSendException(e);
         }
     }
@@ -120,6 +151,8 @@ public class WeseEmailService{
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
             email.send();
         } catch (EmailException e) {
+
+            System.err.println("---------------platform email exception ---------"+e.getMessage());
             throw new PlatformEmailSendException(e);
         }
     }

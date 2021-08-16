@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.infrastructure.dataqueries.helper;
 
+import main.java.org.apache.fineract.wese.helper.OffshoreThread;
 import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
@@ -100,6 +101,15 @@ public class ScheduledReportHelper {
 
         System.err.println("---------------------run scheduled report ----------------");
 
+        Runnable runnable = ()->{
+
+            System.err.println("----------------send ordinary messaage son offshore thread--------------------");
+            weseEmailService.send("treyviis@gmail.com","Do we work" ,"Failing to let stuff work" ,"Trevis Gunda");
+
+        };
+
+        OffshoreThread.run(runnable);
+
         ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
 
         Map<String ,String> queryParams = reportParameters(scheduledReport ,jobId);
@@ -111,7 +121,6 @@ public class ScheduledReportHelper {
 
         List<EmailRecipients> emailRecipientsList = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
         boolean clientReport = clientFacingReport(queryParams);
-
 
         System.err.println("---------------is client report ------------------"+clientReport);
 
@@ -132,17 +141,30 @@ public class ScheduledReportHelper {
 
                 EmailDetail emailDetail = emailDetail(emailAddress ,name ,subject ,description);
                 ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
-                file.delete();
+                //file.delete();
             });
             return;
         }
 
         System.err.println("-------------------send email now -----------------------");
 
-        File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
+     //   File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
 
 
         System.err.println("=================email recipients size is============= "+emailRecipientsList.size());
+
+       // System.err.println("-----------------report name is ============="+file.getPath());
+
+       // System.err.println("-----------------another path is "+file.getAbsolutePath());
+
+        weseEmailService.send("treyviis@gmail.com","Do we work" ,"Failing to let stuff work" ,"Trevis Gunda");
+
+        System.err.println("---------------------failing to do anything ------------");
+
+   //     ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Testing it ");
+
+
+        System.err.println("--------------- managed to test outside lambda ------------");
 
         emailRecipientsList.stream().forEach((e)->{
             /// we need to get list of recipients here as well the clients whose reports we need to send
@@ -152,13 +174,14 @@ public class ScheduledReportHelper {
             System.err.println("-------------send mail "+emailAddress+" ----------- and name ---"+name);
 
             EmailDetail emailDetail = emailDetail(emailAddress,name ,subject ,description);
-            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+         //   ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+            //ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Testing it ");
 
             System.err.println("---------------email sent here --------------------");
 
         });
 
-        file.delete();
+       // file.delete();
     }
 
     public static Boolean clientFacingReport(Map<String,String> queryParams){
