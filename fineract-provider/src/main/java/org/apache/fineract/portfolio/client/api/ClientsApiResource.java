@@ -72,6 +72,10 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.web.bind.annotation.RequestBody;
 
+// added 17/08/2021
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @Path("/clients")
 @Component
 @Scope("singleton")
@@ -341,10 +345,16 @@ public class ClientsApiResource {
     @Path("/mailrecipients/{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public List<EmailRecipients> viewMailRecipient(@PathParam("id") final Long id) {
+    public EmailRecipientsKey viewMailRecipient(@PathParam("id") final Long id) {
 
+        System.err.println("-----------list single entity here ");
+
+        EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(id);
         List<EmailRecipients> emailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
-        return emailRecipientsList ;
+        //emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
+        emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
+
+        return emailRecipientsKey ;
 
     }
 
@@ -364,14 +374,16 @@ public class ClientsApiResource {
     @Path("/mailrecipients")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public ObjectNode createMailRecipient(@RequestBody EmailRecipientsKey emailRecipientsKey){
+    public String createMailRecipient(@RequestBody EmailRecipientsKey emailRecipientsKey){
 
         Long id = EmailRecipientsHelper.createMailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository, emailRecipientsKey);
 
         if(id==null){
-            return ObjectNodeHelper.statusNode(false).put("message","Failed to create mail recipients");
+            return ObjectNodeHelper.statusNode(false).put("message","Failed to create mail recipients").toString();
         }
-        return ObjectNodeHelper.statusNode(true).put("id",id);
+
+        String response = ObjectNodeHelper.statusNode(true).put("id",id).toString();
+        return response;
 
     }
 

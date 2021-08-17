@@ -98,20 +98,14 @@ public class ScheduledReportHelper {
     public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService , Long jobId){
 
 
-        System.err.println("---------------------run scheduled report ----------------");
-
         ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
-
         Map<String ,String> queryParams = reportParameters(scheduledReport ,jobId);
 
         String reportName = queryParams.get("reportName");
         Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
 
-        System.err.println("-------------------recipients id -------------------"+recipientsKey);
-
         List<EmailRecipients> emailRecipientsList = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
         boolean clientReport = clientFacingReport(queryParams);
-
 
         System.err.println("---------------is client report ------------------"+clientReport);
 
@@ -126,24 +120,19 @@ public class ScheduledReportHelper {
                 String emailAddress = e.getEmailAddress();
                 String name = e.getName();
                 Long clientId = e.getClientId();
-
-                System.err.println("----------------we found this client --------------"+emailAddress);
-
-
                 queryParams.put("R_clientId" ,clientId.toString());
+
                 File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
 
                 EmailDetail emailDetail = emailDetail(emailAddress ,name ,subject ,description);
                 ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+
                 file.delete();
             });
             return;
         }
 
-        System.err.println("-------------------send email now -----------------------");
-
         File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
-
 
         System.err.println("=================email recipients size is============= "+emailRecipientsList.size());
 
@@ -156,12 +145,8 @@ public class ScheduledReportHelper {
 
             EmailDetail emailDetail =  new EmailDetail(subject,description ,emailAddress ,contactName);
 
-            System.err.println("-------------file path is =------------"+file.getPath());
-            //ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
-            ReportsEmailHelper.testSend(weseEmailService,file.getPath() ,"This is some random reports test");
-
-            System.err.println("---------------email sent here --------------------");
-
+            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+            //ReportsEmailHelper.testSend(weseEmailService,file.getPath() ,"This is some random reports test");
         });
 
         file.delete();

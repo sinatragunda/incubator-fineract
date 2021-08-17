@@ -85,12 +85,6 @@ public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
     }
 
     public void setEmailRecipientsList(List<EmailRecipients> emailRecipientsList) {
-        
-        System.err.println("-------------add before recipients now "+this.emailRecipientsList.isEmpty());
-
         this.emailRecipientsList = emailRecipientsList;
-
-        System.err.println("--------------------after adding new list size is "+emailRecipientsList.size());
-
     }
 }

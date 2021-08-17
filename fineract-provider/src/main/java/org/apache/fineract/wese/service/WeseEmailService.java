@@ -51,7 +51,6 @@ public class WeseEmailService{
     }
 
     public void sendAttached(EmailDetail emailDetail ,String path ,String description){
-        System.err.println("-------------lets send attached here -------------");
         EmailAttachment emailAttachment = new EmailAttachment();
         emailAttachment.setPath(path);
         emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
@@ -62,10 +61,6 @@ public class WeseEmailService{
 
     public void sendDefinedEmail(EmailDetail emailDetails) {
 
-
-        System.err.println("------------------ send defined mail here now -------------");
-
-        
         Email email = new SimpleEmail();
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
         final String authuserName = smtpCredentialsData.getUsername();
