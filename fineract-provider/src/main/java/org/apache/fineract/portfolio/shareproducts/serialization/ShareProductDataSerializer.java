@@ -64,7 +64,7 @@ import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
 
 /*
     Updated 18/08/2021
-    Updated nominalShares min value so that it can be at least zero or greater 
+    Updated nominalShares min value so that it can be at least zero or greater
 
 */
 @Service
@@ -402,7 +402,7 @@ public class ShareProductDataSerializer {
         if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.minimumshares_paramname, element)) {
             Long minimumClientShares = this.fromApiJsonHelper.extractLongNamed(ShareProductApiConstants.minimumshares_paramname, element);
             baseDataValidator.reset().parameter(ShareProductApiConstants.minimumshares_paramname).value(minimumClientShares).notNull()
-                    .longGreaterThanZero();
+                    .longZeroOrGreater();
             if (product.setMinimumShares(minimumClientShares)) {
                 actualChanges.put(ShareProductApiConstants.minimumshares_paramname, minimumClientShares);
             }
@@ -411,7 +411,7 @@ public class ShareProductDataSerializer {
         if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.nominaltshares_paramname, element)) {
             Long nominalClientShares = this.fromApiJsonHelper.extractLongNamed(ShareProductApiConstants.nominaltshares_paramname, element);
             baseDataValidator.reset().parameter(ShareProductApiConstants.nominaltshares_paramname).value(nominalClientShares).notNull()
-                    .longGreaterThanZero();
+                    .longZeroOrGreater();
             if (product.setNominalShares(nominalClientShares)) {
                 actualChanges.put(ShareProductApiConstants.nominaltshares_paramname, nominalClientShares);
             }
