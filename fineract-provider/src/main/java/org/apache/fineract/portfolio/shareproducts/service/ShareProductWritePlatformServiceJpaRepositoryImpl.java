@@ -103,8 +103,6 @@ public class ShareProductWritePlatformServiceJpaRepositoryImpl implements ShareP
     @Override
     public CommandProcessingResult updateProduct(Long productId, JsonCommand jsonCommand) {
 
-        
-
         try {
             ShareProduct product = this.repository.findOneWithNotFoundDetection(productId);
             final Map<String, Object> changes = this.serializer.validateAndUpdate(jsonCommand, product);

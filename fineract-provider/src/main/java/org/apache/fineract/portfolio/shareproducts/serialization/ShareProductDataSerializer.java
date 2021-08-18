@@ -61,6 +61,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+
+/*
+    Updated 18/08/2021
+    Updated nominalShares min value so that it can be at least zero or greater 
+
+*/
 @Service
 public class ShareProductDataSerializer {
 
@@ -163,8 +169,10 @@ public class ShareProductDataSerializer {
 
         Long minimumClientShares = this.fromApiJsonHelper.extractLongNamed(ShareProductApiConstants.minimumshares_paramname, element);
         Long nominalClientShares = this.fromApiJsonHelper.extractLongNamed(ShareProductApiConstants.nominaltshares_paramname, element);
-        baseDataValidator.reset().parameter(ShareProductApiConstants.nominaltshares_paramname).value(nominalClientShares).notNull()
-                .longGreaterThanZero();
+        /// change here enable clients to have nominal shares of zero or greater
+
+        baseDataValidator.reset().parameter(ShareProductApiConstants.nominaltshares_paramname).value(nominalClientShares).notNull().longZeroOrGreater();
+
         if (minimumClientShares != null && nominalClientShares != null && !minimumClientShares.equals(nominalClientShares)) {
             baseDataValidator.reset().parameter(ShareProductApiConstants.nominaltshares_paramname).value(nominalClientShares)
                     .longGreaterThanNumber(minimumClientShares);
