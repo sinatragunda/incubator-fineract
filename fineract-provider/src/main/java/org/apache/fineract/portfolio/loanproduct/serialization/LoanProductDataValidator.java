@@ -47,6 +47,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanPreClosureInterestCa
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductValueConditionType;
 import org.apache.fineract.portfolio.loanproduct.domain.RecalculationFrequencyType;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.exception.EqualAmortizationUnsupportedFeatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -112,7 +113,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam ,LoanProductConstants.loanFactorSourceAccountTypeParam ,LoanProductConstants.isCrossLinkParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -198,7 +199,26 @@ public final class LoanProductDataValidator {
             allowMultipleInstances = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.allowMultipleInstancesParam, element);
             baseDataValidator.reset().parameter(LoanProductConstants.allowMultipleInstancesParam).value(allowMultipleInstances).ignoreIfNull()
                     .validateForBooleanValue();
-        }        
+        }
+
+
+        // added 21/08/2021
+        final Integer loanFactorSourceAccountTypeInt = this.fromApiJsonHelper.extractIntegerNamed("loanFactorSourceAccountType", element, Locale.getDefault());
+        baseDataValidator.reset().parameter("loanFactorSourceAccountType").value(loanFactorSourceAccountTypeInt).ignoreIfNull().integerZeroOrGreater();
+
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(loanFactorSourceAccountTypeInt);
+
+
+        // added 21/08/2021
+        boolean isCrossLink = false;
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.isCrossLinkParam, element)) {
+            allowMultipleInstances = this.fromApiJsonHelper.extractBooleanNamed(LoanProductConstants.isCrossLinkParam, element);
+            baseDataValidator.reset().parameter(LoanProductConstants.isCrossLinkParam).value(isCrossLink).ignoreIfNull()
+                    .validateForBooleanValue();
+        }
+
+
+
 
 
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.minimumDaysBetweenDisbursalAndFirstRepayment, element)) {

@@ -220,17 +220,37 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     @Override
     public LoanAccountData retrieveLoanByLoanAccount(String loanAccountNumber)
     {
-
-       
             //final AppUser currentUser = this.context.authenticatedUser();
     		this.context.authenticatedUser();
             final LoanMapper rm = new LoanMapper();
-
-            String sql="select "+rm.loanSchema()+" where l.account_no=?"; 
-            
-
+            String sql="select "+rm.loanSchema()+" where l.account_no=?";
             return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { loanAccountNumber });
        
+    }
+
+    // added 21/08/2021
+    @Override
+    public List<LoanAccountData> retrieveAllForClient(Long clientId)
+    {
+        //final AppUser currentUser = this.context.authenticatedUser();
+        this.context.authenticatedUser();
+        final LoanMapper rm = new LoanMapper();
+        String sql="select "+rm.loanSchema()+" where l.client_id=?";
+        return this.jdbcTemplate.query(sql, rm, new Object[] { clientId});
+
+    }
+
+
+    // added 21/08/2021
+    @Override
+    public List<LoanAccountData> retrieveAllForLoanProduct(Long loanProductId)
+    {
+        //final AppUser currentUser = this.context.authenticatedUser();
+        this.context.authenticatedUser();
+        final LoanMapper rm = new LoanMapper();
+        String sql="select "+rm.loanSchema()+" where l.product_id=?";
+        return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId});
+
     }
 
     @Override
@@ -613,6 +633,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
                     // added 02/07/2021
                     + " l.auto_settlement_at_disbursement as autoSettlementAtDisbursement ,"
+                    // added 21/08/2021
+                    + " l.loan_factor_account_id as loanFactorAccountId,"
+
 
                     + " l.total_outstanding_derived as totalOutstanding,"
                     + " l.total_overpaid_derived as totalOverpaid,"
@@ -980,6 +1003,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             // added 02/07/2021
             final Boolean autoSettlementAtDisbursement = rs.getBoolean("autoSettlementAtDisbursement");
 
+            //added 21/08/2021
+            final Long loanFactorAccountId = JdbcSupport.getLongDefaultToNullIfZero(rs ,LoanApiConstants.loanFactorAccountIdParam);
+
             return LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
                     isLoanProductLinkedToFloatingRate, fundId, fundName, loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName,
@@ -993,7 +1019,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     loanProductCounter, multiDisburseLoan, canDefineInstallmentAmount, fixedEmiAmount, outstandingLoanBalance, inArrears,
                     graceOnArrearsAgeing, isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
                     interestRecalculationData, createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap,
-                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement);
+                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
         }
     }
 

@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.EnumOp
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.loanaccount.data.*;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -267,6 +268,8 @@ public class LoanImportHandler implements ImportHandler {
         }
 
         /// bulk imports dont work for revolving accounts 
+        ///added 21/08/2021  ,loanfactoring doesnt work at this stage maybe in the later versions it will work
+        final  Long loanFactorAccountId = null ;
         statuses.add(status);
         if (loanType!=null) {
             if (loanType.equals("individual")) {
@@ -276,7 +279,7 @@ public class LoanImportHandler implements ImportHandler {
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance, repaymentStrategyId,
                         graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged, interestChargedFromDate, firstRepaymentOnDate,
-                        row.getRowNum(), externalId, null, charges, linkAccountId,locale,dateFormat ,null ,false);
+                        row.getRowNum(), externalId, null, charges, linkAccountId,locale,dateFormat ,null ,false ,loanFactorAccountId);
             } else if (loanType.equals("jlg")) {
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
                 return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId,
@@ -284,7 +287,7 @@ public class LoanImportHandler implements ImportHandler {
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance, repaymentStrategyId,
                         graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged, interestChargedFromDate, firstRepaymentOnDate,
-                        row.getRowNum(), externalId, groupId, charges, linkAccountId,locale,dateFormat ,null ,false);
+                        row.getRowNum(), externalId, groupId, charges, linkAccountId,locale,dateFormat ,null ,false ,loanFactorAccountId);
             } else {
                 Long groupIdforGroupLoan =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.GROUP_SHEET_NAME), clientOrGroupName);
                 return LoanAccountData.importInstanceGroup(loanTypeEnumOption, groupIdforGroupLoan, productId, loanOfficerId, submittedOnDate, fundId,
@@ -292,7 +295,7 @@ public class LoanImportHandler implements ImportHandler {
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance,
                         repaymentStrategyId, graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged,
-                        interestChargedFromDate, firstRepaymentOnDate, row.getRowNum(), externalId, linkAccountId,locale,dateFormat ,null ,false);
+                        interestChargedFromDate, firstRepaymentOnDate, row.getRowNum(), externalId, linkAccountId,locale,dateFormat ,null ,false ,loanFactorAccountId);
             }
         }else {
             return null;

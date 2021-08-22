@@ -92,6 +92,9 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final SavingsTransactionBooleanValues transactionBooleanValues) {
 
+
+        System.err.println("-----------------------handle withdrawal lets test deposit now ------------"+transactionAmount.doubleValue());
+
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
         account.validateForDebitBlock();
@@ -107,7 +110,12 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         Integer accountType = null;
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
+
+        System.err.println("---------------------------apply fees --------------"+transactionBooleanValues.isApplyWithdrawFee());
+
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
+
+
         final MathContext mc = MathContext.DECIMAL64;
         if (account.isBeforeLastPostingPeriod(transactionDate)) {
             final LocalDate today = DateUtils.getLocalDateOfTenant();
@@ -132,7 +140,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         /// added 26/07/2021
         /// here we add new value to save this transaction to monthly withdrawals 
         SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,false);
-
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, transactionBooleanValues.isAccountTransfer());
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,

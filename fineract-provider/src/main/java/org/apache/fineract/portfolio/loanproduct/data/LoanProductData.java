@@ -40,10 +40,12 @@ import org.apache.fineract.portfolio.common.service.CommonEnumerations;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateData;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanInterestRecalculationData;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanproduct.domain.AmortizationMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestCalculationPeriodMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableAttributes;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.joda.time.LocalDate;
@@ -203,6 +205,12 @@ public class LoanProductData {
     /// added on 24/05/2021
     private final boolean allowMultipleInstances;
 
+
+    // added on 20/08/2021
+    private final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType ;
+    private final Boolean isCrossLink ;
+
+
     /**
      * Used when returning lookup information about loan product for dropdowns.
      */
@@ -286,6 +294,8 @@ public class LoanProductData {
         final Integer shareAccountValidity = null;
         final SACCO_LOAN_LOCK saccoLoanLock = null ;
        // final boolean isInterestAveragePayments = false;
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = null ;
+        final Boolean isCrossLink = false ;
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
                 minInterestRatePerPeriod, maxInterestRatePerPeriod, annualInterestRate, repaymentFrequencyType, interestRateFrequencyType,
@@ -300,7 +310,7 @@ public class LoanProductData {
                 loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId, floatingRateName,
                 interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate, maxDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
 
     }
 
@@ -386,6 +396,8 @@ public class LoanProductData {
         final SACCO_LOAN_LOCK saccoLoanLock = null ;
        // final boolean isInterestAveragePayments = false ;
         final boolean allowMultipleInstances = false ;
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = null;
+        final Boolean isCrossLink = false ;
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
@@ -401,7 +413,7 @@ public class LoanProductData {
                 loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId, floatingRateName,
                 interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate, maxDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
 
     }
 
@@ -495,6 +507,10 @@ public class LoanProductData {
         final SACCO_LOAN_LOCK saccoLoanLock =null ;
         final boolean allowMultipleInstances = false ;
 
+        //21/08/2021
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType  =null;
+        final Boolean isCrossLink = false;
+
        // final boolean isInterestAveragePayments = false ;
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
@@ -511,7 +527,7 @@ public class LoanProductData {
                 installmentAmountInMultiplesOf, loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId,
                 floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                 maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
 
     }
     
@@ -600,6 +616,10 @@ public class LoanProductData {
         final SACCO_LOAN_LOCK saccoLoanLock = null ;
         final boolean allowMultipleInstances = false ;
 
+        // added 21/08/2021
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType=null;
+        final Boolean isCrossLink = false;
+
 
         return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                 numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
@@ -615,7 +635,7 @@ public class LoanProductData {
                 installmentAmountInMultiplesOf, loanProductConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRateId,
                 floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                 maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGap, maximumGap,
-                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances);
+                syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
 
     }
 
@@ -654,7 +674,7 @@ public class LoanProductData {
             BigDecimal minDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate, BigDecimal maxDifferentialLendingRate,
             boolean isFloatingInterestRateCalculationAllowed, final boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments, 
-            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment ,final boolean isSaccoProduct,final Integer loanFactor ,final Integer shareAccountValidity,final SACCO_LOAN_LOCK saccoLoanLock ,final boolean allowMultipleInstances) {
+            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment ,final boolean isSaccoProduct,final Integer loanFactor ,final Integer shareAccountValidity,final SACCO_LOAN_LOCK saccoLoanLock ,final boolean allowMultipleInstances ,final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType ,final Boolean isCrossLink) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -767,6 +787,9 @@ public class LoanProductData {
         this.allowMultipleInstances = allowMultipleInstances ;
 
     //    this.isInterestAveragePayments = isInterestAveragePayments ;
+        //added 21/08/2021
+        this.loanFactorSourceAccountType = loanFactorSourceAccountType ;
+        this.isCrossLink = isCrossLink;
 
     }
 
@@ -910,6 +933,8 @@ public class LoanProductData {
         this.shareAccountValidity = productData.shareAccountValidity ;
         this.saccoLoanLock = productData.saccoLoanLock ;
         this.allowMultipleInstances = productData.allowMultipleInstances ;
+        this.loanFactorSourceAccountType = productData.loanFactorSourceAccountType;
+        this.isCrossLink = productData.isCrossLink ;
 
        // this.isInterestAveragePayments = productData.isInterestAveragePayments ;
     }
@@ -1328,5 +1353,13 @@ public class LoanProductData {
 
     public boolean allowMultipleInstances(){
         return allowMultipleInstances;
+    }
+
+    public LOAN_FACTOR_SOURCE_ACCOUNT_TYPE getLoanFactorSourceAccountType() {
+        return loanFactorSourceAccountType;
+    }
+
+    public Boolean isCrossLink(){
+        return this.isCrossLink ;
     }
 }

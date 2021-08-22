@@ -93,7 +93,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.linkAccountIdParameterName, LoanApiConstants.disbursementDataParameterName,
             LoanApiConstants.emiAmountParameterName, LoanApiConstants.maxOutstandingBalanceParameterName,
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -400,6 +400,13 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.autoSettlementAtDisbursementParamName, element)) {
             final Boolean autoSettlementAtDisbursement = this.fromApiJsonHelper.extractBooleanNamed(LoanApiConstants.autoSettlementAtDisbursementParamName, element);
             baseDataValidator.reset().parameter(LoanApiConstants.autoSettlementAtDisbursementParamName).value(autoSettlementAtDisbursement).ignoreIfNull ();
+        }
+
+
+        // Added 21/08/2021
+        if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.loanFactorAccountIdParam, element)) {
+            final Long loanFactorAccountId = this.fromApiJsonHelper.extractLongNamed (LoanApiConstants.loanFactorAccountIdParam, element);
+            baseDataValidator.reset().parameter(LoanApiConstants.loanFactorAccountIdParam).value(loanFactorAccountId).ignoreIfNull ();
         }
 
 

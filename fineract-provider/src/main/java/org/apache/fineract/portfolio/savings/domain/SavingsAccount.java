@@ -1015,6 +1015,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         addTransaction(transaction);
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
+
+            System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
+
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
         }
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
@@ -1025,9 +1028,17 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
+
+        System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
+
         for (SavingsAccountCharge charge : this.charges()) {
+            System.err.println("---------product apply charges ----------------");
             if (charge.isWithdrawalFee() && charge.isActive()) {
+
+                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
+
                 charge.updateWithdralFeeAmount(transactionAmoount);
+
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
@@ -2492,6 +2503,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     public void payCharge(final SavingsAccountCharge savingsAccountCharge, final BigDecimal amountPaid, final LocalDate transactionDate,
             final DateTimeFormatter formatter, final AppUser user) {
 
+
+        System.err.println("-------------------time to pay charge -------------------");
+
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
                 .resource(SAVINGS_ACCOUNT_RESOURCE_NAME);
@@ -2564,6 +2578,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("transaction.invalid.charge.amount.paid.in.access");
             if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
         }
+
+        System.err.println("-----------------end of charge payment here ");
 
         this.payCharge(savingsAccountCharge, chargePaid, transactionDate, user);
     }

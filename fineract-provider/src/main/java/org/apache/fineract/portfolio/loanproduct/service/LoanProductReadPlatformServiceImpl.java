@@ -36,12 +36,14 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.common.service.CommonEnumerations;
+import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductBorrowerCycleVariationData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductGuaranteeData;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductInterestRecalculationData;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableAttributes;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductParamType;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,6 +238,10 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + "lp.allow_multiple_instances as allowMultipleInstances ,"
                     + "lp.loan_factor as loanFactor, "
                     + "lp.share_account_validity as shareAccountValidity, "
+                    // added 21/08/2021
+                    + "lp.loan_factor_source_account_type as loanFactorSourceAccountType, "
+                    + "lp.cross_link as crossLink, "
+                    ///
                     + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization "
                     + " from m_product_loan lp "
                     + " left join m_fund f on f.id = lp.fund_id "
@@ -329,7 +335,11 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final Integer loanFactor = JdbcSupport.getInteger(rs, "loanFactor");
             final Integer shareAccountValidity = JdbcSupport.getInteger(rs, "shareAccountValidity");   
 
-            /// added on the 22/10/2020
+            /// added on the 20/08/2021
+
+            final Integer sourceAccountTypeInt = JdbcSupport.getInteger(rs , "loanFactorSourceAccountType");
+            final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(sourceAccountTypeInt);
+            final Boolean isCrossLink = rs.getBoolean(LoanProductConstants.isCrossLinkParam);
 
 
             /// added on the 24/05/2021 
@@ -489,7 +499,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     installmentAmountInMultiplesOf, allowAttributeOverrides, isLinkedToFloatingInterestRates, floatingRateId,
                     floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                     maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableIntallmentsAllowed, minimumGap,
-                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances);
+                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
         }
     }
 

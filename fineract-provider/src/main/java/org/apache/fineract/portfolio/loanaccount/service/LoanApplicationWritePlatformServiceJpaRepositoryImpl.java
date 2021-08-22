@@ -80,6 +80,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.*;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
@@ -89,6 +90,7 @@ import org.apache.fineract.portfolio.loanaccount.serialization.LoanApplicationCo
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanApplicationTransitionApiJsonValidator;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.*;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
@@ -96,6 +98,7 @@ import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -161,6 +164,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final FineractEntityRelationRepository fineractEntityRelationRepository;
     private final AccountDetailsReadPlatformService accountDetailsReadPlatformService;
 
+
+    /// added 21/08/2021
+    private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
+
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
             final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
@@ -183,7 +190,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService) {
+            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -219,6 +226,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.repository = repository;
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
+        this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -241,10 +249,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
-        
+
+            Client client =null ;
             if(clientId !=null){
 
-                Client client= this.clientRepository.findOneWithNotFoundDetection(clientId);
+                client= this.clientRepository.findOneWithNotFoundDetection(clientId);
                 officeSpecificLoanProductValidation( productId,client.getOffice().getId());
                 
                 /// 24/05/2021
@@ -259,8 +268,26 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
             }
 
+            Long loanFactorAccountId  = this.fromJsonHelper.extractLongNamed(LoanApiConstants.loanFactorAccountIdParam ,command.parsedJson());
 
-            
+            if(loanFactorAccountId!=null){
+
+                System.err.println("-------------loan factor account id  ------------"+loanFactorAccountId);
+
+                BigDecimal principal = command.bigDecimalValueOfParameterNamed("principal");
+
+                System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
+
+                LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
+
+                System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
+
+                LoanFactorHelper loanFactorHelper = new LoanFactorHelper(loanFactorSourceAccountType);
+
+                boolean transact = loanFactorHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
+                //if successful just proceed with this loan and throw no errors
+            }
+
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();

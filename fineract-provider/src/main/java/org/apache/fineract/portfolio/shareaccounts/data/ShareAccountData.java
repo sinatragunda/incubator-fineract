@@ -315,4 +315,15 @@ public class ShareAccountData implements AccountData {
     public void setDividends(Collection<ShareAccountDividendData> dividends) {
         this.dividends = dividends ;
     }
+
+    // added 21/08/2021
+    public ShareAccountSummaryData getShareAccountSummaryData(){
+        return this.summary ;
+    }
+
+    // added 21/08/2021
+    public BigDecimal getCurrentMarketPrice(){
+        return this.currentMarketPrice ;
+    }
+
 }

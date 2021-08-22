@@ -60,6 +60,7 @@ import org.apache.fineract.portfolio.floatingrates.domain.FloatingRate;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
+import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.joda.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
@@ -210,6 +211,15 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
      //added 24/05/2021
     @Column(name = "allow_multiple_instances", nullable = true)
     private boolean allowMultipleInstances = true;
+
+
+    //added 24/05/2021
+    @Column(name = "loan_factor_source_account_type", nullable = true)
+    private LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = null;
+
+
+    @Column(name = "cross_link", nullable = true)
+    private boolean isCrossLink = true;
 
 
     public static LoanProduct assembleFromJson(final Fund fund, final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy,
@@ -393,6 +403,14 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         // final boolean isInterestAveragePayments = command.parameterExists(LoanProductConstants.isInterestAveragePaymentsParam) ? command
         //         .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isInterestAveragePaymentsParam) : false;
 
+        // added 21/08/2021
+        final Integer loanFactorSourceAccountTypeInt = command.parameterExists(LoanProductConstants.loanFactorSourceAccountTypeParam) ? command.integerValueOfParameterNamed(LoanProductConstants.loanFactorSourceAccountTypeParam) : null;
+        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(loanFactorSourceAccountTypeInt);
+
+        // 21/08/2021
+        final boolean isCrossLink = command.parameterExists(LoanProductConstants.isCrossLinkParam) ? command
+                .booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCrossLinkParam) : false;
+
 
 
         return new LoanProduct(fund, loanTransactionProcessingStrategy, name, shortName, description, currency, principal, minPrincipal,
@@ -408,7 +426,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 installmentAmountInMultiplesOf, loanConfigurableAttributes, isLinkedToFloatingInterestRates, floatingRate,
                 interestRateDifferential, minDifferentialLendingRate, maxDifferentialLendingRate, defaultDifferentialLendingRate,
                 isFloatingInterestRateCalculationAllowed, isVariableInstallmentsAllowed, minimumGapBetweenInstallments,
-                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances);
+                maximumGapBetweenInstallments, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
 
     }
 
@@ -638,7 +656,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             BigDecimal minDifferentialLendingRate, BigDecimal maxDifferentialLendingRate, BigDecimal defaultDifferentialLendingRate,
             Boolean isFloatingInterestRateCalculationAllowed, final Boolean isVariableInstallmentsAllowed,
             final Integer minimumGapBetweenInstallments, final Integer maximumGapBetweenInstallments,
-            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment,final boolean isSaccoProduct ,final Integer loanFactor ,final Integer shareAccountValidity ,final SACCO_LOAN_LOCK saccoLoanLock ,final boolean allowMultipleInstances) {
+            final boolean syncExpectedWithDisbursementDate, final boolean canUseForTopup, final boolean isEqualAmortization ,final boolean isSettlementPartialPayment,final boolean isSaccoProduct ,final Integer loanFactor ,final Integer shareAccountValidity ,final SACCO_LOAN_LOCK saccoLoanLock ,final boolean allowMultipleInstances ,final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType ,final Boolean isCrossLink) {
         this.fund = fund;
         this.transactionProcessingStrategy = transactionProcessingStrategy;
         this.name = name.trim();
@@ -725,6 +743,10 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         this.saccoLoanLock = saccoLoanLock ;
         this.allowMultipleInstances = allowMultipleInstances ;
      //   this.isInterestAveragePayments = isInterestAveragePayments;
+
+        // added 21/08/2021
+        this.loanFactorSourceAccountType = loanFactorSourceAccountType;
+        this.isCrossLink = isCrossLink;
     }
 
     public MonetaryCurrency getCurrency() {
@@ -1131,7 +1153,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 this.loanFactor)) {
             final Integer newValue = command.integerValueOfParameterNamed("loanFactor");
             actualChanges.put("loanFactor", newValue);
-            actualChanges.put("locale", localeAsInput);
             this.loanFactor = newValue;
         }
 
@@ -1139,7 +1160,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 this.shareAccountValidity)) {
             final Integer newValue = command.integerValueOfParameterNamed("shareAccountValidity");
             actualChanges.put("shareAccountValidity", newValue);
-            actualChanges.put("locale", localeAsInput);
             this.shareAccountValidity = newValue;
         }
 
@@ -1147,7 +1167,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
                 this.saccoLoanLock.ordinal())) {
             final Integer newValue = command.integerValueOfParameterNamed("saccoLoanLock");
             actualChanges.put("saccoLoanLock", newValue);
-            actualChanges.put("locale", localeAsInput);
             this.saccoLoanLock = SACCO_LOAN_LOCK.fromInt(newValue);
         }
 
@@ -1157,6 +1176,23 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.allowMultipleInstancesParam);
             actualChanges.put("allowMultipleInstances", newValue);
             this.allowMultipleInstances = newValue;
+        }
+
+        // 21/08/2020
+
+        if (command.isChangeInIntegerParameterNamed(LoanProductConstants.loanFactorSourceAccountTypeParam,
+                this.loanFactorSourceAccountType.ordinal())) {
+            final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.loanFactorSourceAccountTypeParam);
+            actualChanges.put(LoanProductConstants.loanFactorSourceAccountTypeParam, newValue);
+            this.loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(newValue);
+        }
+
+        // 21/08/2021
+        if(command.isChangeInBooleanParameterNamed(LoanProductConstants.isCrossLinkParam
+                , this.isCrossLink)){
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(LoanProductConstants.isCrossLinkParam);
+            actualChanges.put(LoanProductConstants.isCrossLinkParam, newValue);
+            this.isCrossLink = newValue;
         }
 
 
@@ -1533,4 +1569,12 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     //     return isInterestAveragePayments ;
     // }
 
+
+    public LOAN_FACTOR_SOURCE_ACCOUNT_TYPE getLoanFactorSourceAccountType() {
+        return loanFactorSourceAccountType;
+    }
+
+    public Boolean isCrossLink(){
+        return this.isCrossLink ;
+    }
 }

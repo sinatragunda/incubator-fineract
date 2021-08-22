@@ -147,5 +147,10 @@ public interface LoanProductConstants {
     public static final String allowMultipleInstancesParam = "allowMultipleInstances";
 
 
+    ///added 20/08/2021
+    public static final String loanFactorSourceAccountTypeParam = "loanFactorSourceAccountType";
+    public static final String isCrossLinkParam = "crossLink";
+
+
 
 }

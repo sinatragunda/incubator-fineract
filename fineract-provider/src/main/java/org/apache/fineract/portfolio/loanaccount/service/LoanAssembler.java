@@ -239,6 +239,10 @@ public class LoanAssembler {
         final Boolean autoSettlementAtDisbursement = this.fromApiJsonHelper.extractBooleanNamed("autoSettlementAtDisbursement" ,element);
 
 
+        // added 21/08/2021
+        final Long loanFactorAccountId = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.loanFactorAccountIdParam ,element);
+
+
         if (clientId != null) {
             client = this.clientRepository.findOneWithNotFoundDetection(clientId);
             if (client.isNotActive()) { throw new ClientNotActiveException(clientId); }
@@ -257,21 +261,21 @@ public class LoanAssembler {
             loanApplication = Loan.newIndividualLoanApplicationFromGroup(accountNo, client, group, loanType.getId().intValue(),
                     loanProduct, fund, loanOfficer, loanPurpose, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges,
                     collateral, syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance,
-                    createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement);
+                    createStandingInstructionAtDisbursement, isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
 
         } else if (group != null) {
 
             loanApplication = Loan.newGroupLoanApplication(accountNo, group, loanType.getId().intValue(), loanProduct, fund, loanOfficer,
                     loanPurpose, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges, collateral,
                     syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance,
-                    createStandingInstructionAtDisbursement,isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement);
+                    createStandingInstructionAtDisbursement,isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
 
         } else if (client != null) {
 
             loanApplication = Loan.newIndividualLoanApplication(accountNo, client, loanType.getId().intValue(), loanProduct, fund,
                     loanOfficer, loanPurpose, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges, collateral,
                     fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance, createStandingInstructionAtDisbursement,
-                    isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement);
+                    isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
 
         }
 

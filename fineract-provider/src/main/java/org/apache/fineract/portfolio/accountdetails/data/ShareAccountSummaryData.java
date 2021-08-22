@@ -70,4 +70,8 @@ public class ShareAccountSummaryData {
         return this.accountNo;
     }
 
+    public Long getTotalApprovedShares(){
+    	return this.totalApprovedShares;
+    }
+
 }
