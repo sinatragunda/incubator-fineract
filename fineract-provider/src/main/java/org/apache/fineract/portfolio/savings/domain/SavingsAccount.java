@@ -116,6 +116,7 @@ import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.util.CollectionUtils;
 
 import com.google.gson.JsonArray;
@@ -408,7 +409,11 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
         this.withdrawalFeeApplicableForTransfer = withdrawalFeeApplicableForTransfer;
 
+        System.err.println("---------------------------initialize savings account son "+savingsAccountCharges.size());
+
         if (!CollectionUtils.isEmpty(savingsAccountCharges)) {
+
+            System.err.println("----------------------------associating charges with this account now -----------"+savingsAccountCharges.size());
             this.charges = associateChargesWithThisSavingsAccount(savingsAccountCharges);
         }
 
@@ -1006,6 +1011,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
+
         validateActivityNotBeforeClientOrGroupTransferDate(SavingsEvent.SAVINGS_WITHDRAWAL, transactionDTO.getTransactionDate());
 
         final Money transactionAmountMoney = Money.of(this.currency, transactionDTO.getTransactionAmount());
@@ -1013,6 +1019,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
                 transactionDTO.getCreatedDate(), transactionDTO.getAppUser());
         addTransaction(transaction);
+
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
 
@@ -1030,6 +1037,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
 
         System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
+
+        System.err.println("------------------why there arent any charges in this "+this.charges.size());
 
         for (SavingsAccountCharge charge : this.charges()) {
             System.err.println("---------product apply charges ----------------");
@@ -2344,6 +2353,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             this.charges = new HashSet<>();
         }
         this.charges.clear();
+        System.err.println("-----------------why do we clear charges here -------------?");
         this.charges.addAll(associateChargesWithThisSavingsAccount(newSavingsAccountCharges));
         return true;
     }
@@ -2504,7 +2514,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             final DateTimeFormatter formatter, final AppUser user) {
 
 
-        System.err.println("-------------------time to pay charge -------------------");
+        System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
@@ -2594,8 +2604,14 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             final LocalDate transactionDate, final AppUser user) {
         SavingsAccountTransaction chargeTransaction = null;
 
+
+        System.err.println("-----------------handle pay charge of "+transactionAmount.getAmount().doubleValue());
+
         if (savingsAccountCharge.isWithdrawalFee()) {
+
+            System.err.println("---------------handle this withraw");
             chargeTransaction = SavingsAccountTransaction.withdrawalFee(this, office(), transactionDate, transactionAmount, user);
+
         } else if (savingsAccountCharge.isAnnualFee()) {
             chargeTransaction = SavingsAccountTransaction.annualFee(this, office(), transactionDate, transactionAmount, user);
         } else {
@@ -2618,6 +2634,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 .getAmount(this.getCurrency()).getAmount());
         transaction.getSavingsAccountChargesPaid().add(chargePaidBy);
         this.transactions.add(transaction);
+
+        System.err.println("--------------------------charge added to transactions -----------------"+this.transactions.size());
     }
 
     private SavingsAccountCharge getCharge(final Long savingsAccountChargeId) {

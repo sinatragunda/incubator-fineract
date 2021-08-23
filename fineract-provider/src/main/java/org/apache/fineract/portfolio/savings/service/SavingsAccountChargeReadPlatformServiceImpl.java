@@ -192,8 +192,12 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
     }
 
     @Override
-    public Collection<SavingsAccountChargeData> retrieveSavingsAccountCharges(final Long loanId, final String status) {
+    public Collection<SavingsAccountChargeData> retrieveSavingsAccountCharges(final Long accountId, final String status) {
         this.context.authenticatedUser();
+
+
+        System.err.println("------------------------this is where this shit transaction starts after all--------"+accountId);
+
 
         final SavingsAccountChargeMapper rm = new SavingsAccountChargeMapper();
         final StringBuilder sqlBuilder = new StringBuilder();
@@ -205,7 +209,7 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
         }
         sqlBuilder.append(" order by sc.charge_time_enum ASC, sc.charge_due_date ASC, sc.is_penalty ASC");
 
-        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] { loanId });
+        return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] { accountId });
     }
 
     private static final class SavingsAccountChargeDueMapper implements RowMapper<SavingsAccountAnnualFeeData> {

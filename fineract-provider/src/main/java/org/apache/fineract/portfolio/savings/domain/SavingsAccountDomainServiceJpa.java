@@ -95,6 +95,9 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         System.err.println("-----------------------handle withdrawal lets test deposit now ------------"+transactionAmount.doubleValue());
 
+
+        System.err.println("----------------------this savings account doesnt have charges already my guy ===="+account.charges().size());
+
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
         account.validateForDebitBlock();
@@ -114,6 +117,9 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         System.err.println("---------------------------apply fees --------------"+transactionBooleanValues.isApplyWithdrawFee());
 
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
+
+
+        System.err.println("-----------------------withdraw transaction here of ----"+withdrawal.getAmount().doubleValue());
 
 
         final MathContext mc = MathContext.DECIMAL64;
