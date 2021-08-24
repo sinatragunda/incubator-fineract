@@ -94,6 +94,7 @@ import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -168,6 +169,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     /// added 21/08/2021
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
 
+    // added 23/08/2021
+    private final LoanProductReadPlatformService loanProductReadPlatformService;
+
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
             final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
@@ -190,7 +194,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
+            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final  LoanProductReadPlatformService loanProductReadPlatformService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -227,6 +231,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
+        this.loanProductReadPlatformService = loanProductReadPlatformService;
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -244,6 +249,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
             final Long productId = this.fromJsonHelper.extractLongNamed("productId", command.parsedJson());
             final LoanProduct loanProduct = this.loanProductRepository.findOne(productId);
+
             
 
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
@@ -284,7 +290,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
                 LoanFactorHelper loanFactorHelper = new LoanFactorHelper(loanFactorSourceAccountType);
 
-                boolean transact = loanFactorHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
+                boolean transact = loanFactorHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProductReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
                 //if successful just proceed with this loan and throw no errors
             }
 

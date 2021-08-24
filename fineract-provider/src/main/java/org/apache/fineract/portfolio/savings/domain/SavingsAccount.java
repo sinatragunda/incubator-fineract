@@ -409,11 +409,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
         this.withdrawalFeeApplicableForTransfer = withdrawalFeeApplicableForTransfer;
 
-        System.err.println("---------------------------initialize savings account son "+savingsAccountCharges.size());
-
         if (!CollectionUtils.isEmpty(savingsAccountCharges)) {
 
-            System.err.println("----------------------------associating charges with this account now -----------"+savingsAccountCharges.size());
             this.charges = associateChargesWithThisSavingsAccount(savingsAccountCharges);
         }
 

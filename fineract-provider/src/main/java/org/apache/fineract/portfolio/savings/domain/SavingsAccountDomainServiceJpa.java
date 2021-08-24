@@ -92,12 +92,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final SavingsTransactionBooleanValues transactionBooleanValues) {
 
-
-        System.err.println("-----------------------handle withdrawal lets test deposit now ------------"+transactionAmount.doubleValue());
-
-
-        System.err.println("----------------------this savings account doesnt have charges already my guy ===="+account.charges().size());
-
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
         account.validateForDebitBlock();
@@ -114,13 +108,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
 
-        System.err.println("---------------------------apply fees --------------"+transactionBooleanValues.isApplyWithdrawFee());
-
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
-
-
-        System.err.println("-----------------------withdraw transaction here of ----"+withdrawal.getAmount().doubleValue());
-
 
         final MathContext mc = MathContext.DECIMAL64;
         if (account.isBeforeLastPostingPeriod(transactionDate)) {
