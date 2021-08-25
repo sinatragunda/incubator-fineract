@@ -342,4 +342,10 @@ public class LoanTransactionData {
     public void setWriteOffReasonOptions(Collection<CodeValueData> writeOffReasonOptions){
     	this.writeOffReasonOptions =writeOffReasonOptions;
     }
+
+
+    // added 25/08/2021
+    public LoanTransactionEnumData getTransactionType(){
+        return this.type;
+    }
 }

@@ -31,6 +31,10 @@ import java.util.ArrayList;
 import java.math.BigDecimal ;
 
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.NonAttachedLoanFactorAccountException;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
@@ -54,11 +58,12 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanFactorException ;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
-public class LoanFactorHelper{
+public class LoanFactorSavingsAccountHelper {
 
     private ShareAccountSummaryData shareAccountSummaryData ;
     private ShareAccountData shareAccountData ;
@@ -67,83 +72,158 @@ public class LoanFactorHelper{
     private LoanReadPlatformService loanReadPlatformService ;
     private BigDecimal principal ;
     private Double totalShareValue = null ;
+    private LoanProduct crossLinkLoanProduct = null ;
     private LoanProductRepository loanProductRepository;
     private int loanFactor ;
     private LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccount = null ;
 
 
-    public LoanFactorHelper(ShareAccountData shareAccountData ,LoanReadPlatformService loanReadPlatformService ,LoanProductRepository loanProductRepository, BigDecimal principal){
+    public LoanFactorSavingsAccountHelper(ShareAccountData shareAccountData , LoanReadPlatformService loanReadPlatformService , LoanProductRepository loanProductRepository, BigDecimal principal){
         this.shareAccountData = shareAccountData ;
         this.loanReadPlatformService = loanReadPlatformService ;
         this.principal = principal ;
         this.loanProductRepository = loanProductRepository;
+
+        // init function
+        crossLinking(loanProductRepository);
+
     }
 
-    public LoanFactorHelper(){}
+    public LoanFactorSavingsAccountHelper(){}
 
-    public LoanFactorHelper(LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType){
+    public LoanFactorSavingsAccountHelper(LoanProductRepository loanProductRepository, LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType){
         this.loanFactorSourceAccount = loanFactorSourceAccountType;
+        this.loanProductRepository = loanProductRepository;
+
+        crossLinking(loanProductRepository);
     }
 
-    public boolean transact(SavingsAccountReadPlatformService savingsAccountReadPlatformService ,LoanReadPlatformService loanReadPlatformService ,LoanProductReadPlatformService loanProductReadPlatformService, LoanProduct loanProduct ,Client client ,Long loanFactorAccountId ,BigDecimal principal){
+    public boolean transact(SavingsAccountReadPlatformService savingsAccountReadPlatformService ,LoanReadPlatformService loanReadPlatformService ,LoanProduct loanProduct ,Client client ,Long loanFactorAccountId ,BigDecimal principal){
 
-        switch (loanFactorSourceAccount){
-            case SAVINGS:
-                return savingsAccountBasedLoanFactoring(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProductReadPlatformService,loanProduct ,client ,loanFactorAccountId ,principal);
+        return savingsAccountBasedLoanFactoring(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProductRepository,loanProduct ,client ,loanFactorAccountId ,principal);
 
-        }
-        return false ;
     }
 
 
-    public boolean savingsAccountBasedLoanFactoring(SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanReadPlatformService loanReadPlatformService ,LoanProductReadPlatformService loanProductReadPlatformService , LoanProduct loanProduct , Client client ,Long loanFactorAccountId , BigDecimal principal){
+    public boolean savingsAccountBasedLoanFactoring(SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanReadPlatformService loanReadPlatformService ,LoanProductRepository loanProductRepository , LoanProduct loanProduct , Client client ,Long loanFactorAccountId , BigDecimal principal){
 
 
         this.loanFactor = loanProduct.loanFactor();
         Long loanProductId = loanProduct.getId();
+
         boolean isCrossLink = loanProduct.isCrossLink();
 
         System.err.println("-------------------loan factor to use for all this nonsense is "+this.loanFactor);
-        boolean loopInside = false ;
 
         if(this.loanFactor <= 0){
+
             /// check if other products have their own loan factoring that is cross link
-            LoanProductData loanProductData = crossLinking(loanProductReadPlatformService);
-            this.loanFactor = loanProductData.loanFactor();
-            isCrossLink = loanProductData.isCrossLink();
-            if(loanFactor <=0){
-                return true ;
+            if(hasCrossLink()){
+                System.err.println("-----------product has no loan factor hence using others ");
+                this.loanFactor = crossLinkLoanProduct.loanFactor();
+                isCrossLink = hasCrossLink();
+                if(loanFactor <=0){
+                    return true ;
+                }
+            }
+            else{
+                System.err.println("-----------no cross link configured in this system");
+                return true;
             }
         }
 
         if(loanFactorAccountId==null){
             String message = "Non attached savings account to verify loan factoring process .Please select one ";
-            throw new NonAttachedLoanFactorAccountException(message,message ,null);
+            throw new NonAttachedLoanFactorAccountException(message,message ,"Standard Error");
         }
+
+
+        System.err.println("-----------------at this stage cross link has been set to ? "+isCrossLink);
 
         SavingsAccountData savingsAccountData = savingsAccountReadPlatformService.retrieveOne(loanFactorAccountId);
         BigDecimal savingsAccountBalance = savingsAccountData.getAccountBalance();
 
         /// assemble all clients savings account and get their total balance
+        System.err.println("-------------------client name we dealing with is ----------"+client.getDisplayName()+"-----------and id is "+client.getId());
         Long clientId = client.getId();
         List<LoanAccountData> loanAccountDataList = new ArrayList<>();
 
         //if cross link get all loans and their balances etc
+        loanAccountDataList = loanReadPlatformService.retrieveAllForClient(clientId);
+
         if(isCrossLink){
-            loanAccountDataList = loanReadPlatformService.retrieveAllForClient(clientId);
+            System.err.println("--------------cross link this son----------");
         }
         else{
             // retrieve all where loan product id is equal to something
-            loanAccountDataList = loanReadPlatformService.retrieveAllForLoanProduct(loanProductId);
+            System.err.println("-----------------------cross link false why ? -----------------");
+            List<LoanAccountData> clientLoans = loanAccountDataList;
+
+            Predicate<LoanAccountData> matchLoanProductFilter = (e)->{
+                int cmp = e.loanProductId().compareTo(loanProductId);
+                if(cmp==1){
+                    return true;
+                }
+                return false;
+            };
+
+            loanAccountDataList = clientLoans.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
         }
 
 
         loanAccountDataList.stream().forEach((e)->{
+            System.err.println("--------------some value to be sent is ----------------");
             System.err.println("------loan id steam for "+e.getAccountNo()+"--------- and some total balance of "+e.getTotalOutstandingAmount().doubleValue());
         });
 
-        BigDecimal totalDueBalance = loanAccountDataList.stream().map(LoanAccountData::getTotalOutstandingAmount).reduce(BigDecimal.ZERO ,BigDecimal::add);
-        //BigDecimal totalPrincipal = loanAccountDataList.stream().map(LoanAccountData::getPrincipal).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        Predicate<LoanAccountData> activeLoansFilter = (e)->{
+
+            System.err.println("----------------------is active --------"+e.isActive());
+            return e.isActive();
+        };
+
+        loanAccountDataList.stream();
+
+        /// get loan balances instead
+
+        BigDecimal accrualsBalance = BigDecimal.ZERO;
+
+        Predicate<LoanTransactionData> accrualsPredicate = (e)->{
+            LoanTransactionEnumData loanTransactionEnumData = e.getTransactionType();
+            boolean isAccrual = loanTransactionEnumData.isAccrual();
+            return isAccrual;
+        };
+
+        // purpose is to consume loan accounts list and get all transactions on loan that are accrual only
+        Consumer<LoanAccountData> accrualsTransactionConsumer = (e)->{
+
+            Long loanId = e.getId();
+
+            System.err.println("------------------------------get loan id --------"+loanId);
+
+            Collection<LoanTransactionData> loanTransactionDataList = loanReadPlatformService.retrieveLoanTransactions(loanId);
+
+            System.err.println("-------------------------accruals balance is ---------------"+accrualsBalance.doubleValue());
+
+            loanTransactionDataList.stream().filter(accrualsPredicate).map(LoanTransactionData::getAmount).reduce(accrualsBalance ,BigDecimal::add);
+
+        };
+
+        loanAccountDataList.stream().filter(activeLoansFilter).forEach(accrualsTransactionConsumer);
+
+        System.err.println("----------------------after calculating all accrual balances we get ------- "+accrualsBalance.doubleValue());
+
+        BigDecimal totalDuePrincipalBalance = loanAccountDataList.stream().filter(activeLoansFilter).map(LoanAccountData::getPrincipalDue).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        BigDecimal totalInterestPaid = loanAccountDataList.stream().filter(activeLoansFilter).map(LoanAccountData::getInterestPaid).reduce(BigDecimal.ZERO ,BigDecimal::add);
+
+
+        BigDecimal interestBalance = accrualsBalance.subtract(totalInterestPaid);
+
+        System.err.println("------------------interest balance is ------------"+interestBalance.doubleValue());
+
+        BigDecimal totalDueBalance = totalDuePrincipalBalance.add(interestBalance);
+
+        System.err.println("---------------------------total due balance is -------------"+totalDueBalance.doubleValue());
 
         BigDecimal loanFactorTotalAllowable = savingsAccountBalance.multiply(new BigDecimal(loanFactor));
 
@@ -164,11 +244,16 @@ public class LoanFactorHelper{
         // total due balance as current balance we have
         BigDecimal spillOver = totalDueBalance.add(principal);
 
+
+        System.err.println("------------------------spillover amount here is "+spillOver.doubleValue());
+
         // if spillover is greater than total allowable then get balance
 
         cmp = spillOver.compareTo(loanFactorTotalAllowable);
 
-        if(cmp >= 0){
+        System.err.println("-------------------------------if this equal then error was raised ? "+cmp);
+
+        if(cmp > 0){
 
             totalAllowable = loanFactorTotalAllowable.subtract(totalDueBalance);
             String message = String.format("Your requested loan amount is greater than the maximum possible for this Savings Account Linked Product .Maximum available is %.2f", totalAllowable.doubleValue());
@@ -186,30 +271,38 @@ public class LoanFactorHelper{
 
     }
 
-    public LoanProductData crossLinking(LoanProductReadPlatformService loanProductReadPlatformService){
+    public LoanProduct crossLinking(LoanProductRepository loanProductRepository){
 
-        Collection<LoanProductData> loanProductDataCollection = loanProductReadPlatformService.retrieveAllLoanProducts();
+        List<LoanProduct> loanProductDataCollection = loanProductRepository.findAll();
 
-        Predicate<LoanProductData> crossLinkPredicate = (e)->{
+        System.err.println("----------------we have load all load products now "+loanProductDataCollection.size());
+
+        Predicate<LoanProduct> crossLinkPredicate = (e)->{
             return e.isCrossLink();
         };
-//
-//        Comparator<LoanProductData> loanProductDataComparator = (e1 ,e2)->{
-//            return e1.loanFactor().compareTo(e2.loanFactor());
-//        };
 
-        Comparator<LoanProductData> comparator = Comparator.comparing(LoanProductData::loanFactor);
+        Comparator<LoanProduct> comparator = Comparator.comparing(LoanProduct::loanFactor);
 
-        List<LoanProductData> loanProductDataList = loanProductDataCollection.stream().filter(crossLinkPredicate).sorted(comparator).collect(Collectors.toList());
+        List<LoanProduct> loanProductDataList = loanProductDataCollection.stream().filter(crossLinkPredicate).sorted(comparator).collect(Collectors.toList());
+
+        System.err.println("--------------------we have loan factored this system "+loanProductDataList.size());
 
         if(!loanProductDataList.isEmpty()){
             /// we have selected by top one with highest loan factor
-            LoanProductData loanProductData = loanProductDataList.get(0);
-            return loanProductData;
+            this.crossLinkLoanProduct = loanProductDataList.get(0);
+            return crossLinkLoanProduct;
         }
 
         return null ;
 
+    }
+
+    public Boolean hasCrossLink(){
+
+        if(crossLinkLoanProduct==null){
+            return false;
+        }
+        return true ;
     }
 
 

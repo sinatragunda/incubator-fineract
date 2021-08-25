@@ -448,7 +448,7 @@ CREATE TABLE `m_appuser` (
 
 LOCK TABLES `m_appuser` WRITE;
 /*!40000 ALTER TABLE `m_appuser` DISABLE KEYS */;
-INSERT INTO `m_appuser` VALUES (1,0,1,'mifos','App','Administrator','5787039480429368bf94732aacc771cd0a3ea02bcf504ffe1185ab94213bc63a','demomfi@mifos.org','\0','','','','');
+INSERT INTO `m_appuser` VALUES (1,0,1,'wesecbs','App','Administrator','5787039480429368bf94732aacc771cd0a3ea02bcf504ffe1185ab94213bc63a','taatconsulting.com','\0','','','','');
 /*!40000 ALTER TABLE `m_appuser` ENABLE KEYS */;
 UNLOCK TABLES;
 

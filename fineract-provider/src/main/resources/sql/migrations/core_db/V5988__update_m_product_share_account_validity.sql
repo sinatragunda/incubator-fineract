@@ -17,5 +17,4 @@
 -- under the License.
 --
 
-ALTER TABLE `m_product_loan` DROP COLUMN `share_account_validity`;
 ALTER TABLE `m_product_loan` ADD COLUMN `share_account_validity` int(20) DEFAULT 0 ;

@@ -80,7 +80,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.*;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
-import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorHelper;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorSavingsAccountHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
@@ -94,7 +94,6 @@ import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
-import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -170,7 +169,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
 
     // added 23/08/2021
-    private final LoanProductReadPlatformService loanProductReadPlatformService;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
@@ -194,7 +192,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final  LoanProductReadPlatformService loanProductReadPlatformService) {
+            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -231,7 +229,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
-        this.loanProductReadPlatformService = loanProductReadPlatformService;
+
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -248,9 +246,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final AppUser currentUser = getAppUserIfPresent();
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
             final Long productId = this.fromJsonHelper.extractLongNamed("productId", command.parsedJson());
-            final LoanProduct loanProduct = this.loanProductRepository.findOne(productId);
 
-            
+            final LoanProduct loanProduct = this.loanProductRepository.findOne(productId);
 
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
@@ -265,8 +262,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 /// 24/05/2021
                 /// added new line here allow multiple instances 
                 AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId);
-            
             }
+
             final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
             
             if(groupId != null){
@@ -274,9 +271,31 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
             }
 
-            Long loanFactorAccountId  = this.fromJsonHelper.extractLongNamed(LoanApiConstants.loanFactorAccountIdParam ,command.parsedJson());
 
-            if(loanFactorAccountId!=null){
+            LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
+
+            System.err.println("-----------------loan factor here is ---------------"+loanFactorSourceAccountType);
+
+            LoanFactorSavingsAccountHelper loanFactorSavingsAccountHelper = new LoanFactorSavingsAccountHelper(loanProductRepository ,loanFactorSourceAccountType);
+            boolean doLoanFactor = false;
+
+            switch (loanFactorSourceAccountType){
+                case NONE:
+                    boolean hasCrossLink = loanFactorSavingsAccountHelper.hasCrossLink();
+                    if(hasCrossLink){
+                        doLoanFactor = true;
+                        System.err.println("-----------------system is cross linked - -------------------");
+                    }
+                    break;
+                    ///none factored account then lets check if there is cross link product
+                case SAVINGS:
+                    doLoanFactor = true;
+                    break;
+            }
+
+            if(doLoanFactor){
+
+                Long loanFactorAccountId = this.fromJsonHelper.extractLongNamed(LoanApiConstants.loanFactorAccountIdParam ,command.parsedJson());
 
                 System.err.println("-------------loan factor account id  ------------"+loanFactorAccountId);
 
@@ -284,15 +303,14 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
                 System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
 
-                LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
-
                 System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
 
-                LoanFactorHelper loanFactorHelper = new LoanFactorHelper(loanFactorSourceAccountType);
-
-                boolean transact = loanFactorHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProductReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
+                boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
                 //if successful just proceed with this loan and throw no errors
+
+                System.err.println("------------proceed with transaction -------------"+transact);
             }
+
 
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 

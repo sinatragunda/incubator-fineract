@@ -340,4 +340,10 @@ public final class LoanSummary {
     public BigDecimal getTotalExpectedRepayment() {
         return this.totalExpectedRepayment;
     }
+
+
+    // added 25/08/2021
+    public BigDecimal getPrincipalDue(){
+        return this.getTotalPrincipalOutstanding() ;
+    }
 }

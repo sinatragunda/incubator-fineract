@@ -79,19 +79,14 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     @Override
     public File processRequestEx(String reportName, final Map<String, String> queryParams) {
 
-        System.err.println("-------------------------private report procesing-----------------");
-
         try{
             String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
             String reportCustomized = String.format("%s %s",reportName ,tenant);
             String reportType = this.readReportingService.getReportType(reportCustomized);
-
-            System.err.println("---------------report not found error should be thrown here -----------");
             reportName = reportCustomized;
             
         }
         catch(Exception e){
-            System.err.println("------------- no customized report ------------");
         }
 
         final Map<String, String> reportParams = getReportParams(queryParams);

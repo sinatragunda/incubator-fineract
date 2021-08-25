@@ -63,7 +63,9 @@ public class ClientPersonImportHandler implements ImportHandler {
     }
 
     public void readExcelFile(final String locale, final String dateFormat) {
+        
         Sheet clientSheet=workbook.getSheet(TemplatePopulateImportConstants.CLIENT_PERSON_SHEET_NAME);
+
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(clientSheet,0);
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
             Row row;
@@ -72,9 +74,11 @@ public class ClientPersonImportHandler implements ImportHandler {
                     clients.add(readClient(row,locale,dateFormat));
                 }
         }
+
     }
 
     private ClientData readClient(Row row,final String locale, final String dateFormat) {
+
         Long legalFormId=1L;
         String firstName = ImportHandlerUtils.readAsString(ClientPersonConstants.FIRST_NAME_COL, row);
         String lastName = ImportHandlerUtils.readAsString(ClientPersonConstants.LAST_NAME_COL, row);
@@ -94,6 +98,7 @@ public class ClientPersonImportHandler implements ImportHandler {
         if (ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row)!=null)
             mobileNo = ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row).toString();
         LocalDate dob = ImportHandlerUtils.readAsDate(ClientPersonConstants.DOB_COL, row);
+
 
         String clientType=ImportHandlerUtils.readAsString(ClientPersonConstants.CLIENT_TYPE_COL, row);
         Long clientTypeId = null;
@@ -155,8 +160,18 @@ public class ClientPersonImportHandler implements ImportHandler {
              addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3,
                     city, postalCode, isActiveAddress, stateProvinceId, countryId);
         }
+
+        // 24/08/2021
+        String emailAddress = ImportHandlerUtils.readAsString(ClientPersonConstants.EMAIL_ADDRESS_COL, row);
+
+
+        // added 25/08/2021
+        // added for auto savings account creation and share account creation
+        Long savingsProductId = ImportHandlerUtils.readAsLong(ClientPersonConstants.SAVINGS_PRODUCT_ID_COL ,row);
+        Long shareProductId = ImportHandlerUtils.readAsLong(ClientPersonConstants.SHARES_PRODUCT_ID_COL ,row);
+
         return ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
-                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat);
+                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId);
 
         }
 

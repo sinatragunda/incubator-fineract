@@ -18,7 +18,5 @@
 --
 
 
-ALTER TABLE `m_product_loan` DROP COLUMN `is_settlement_partial_payment`;
-
 ALTER TABLE `m_product_loan`
 ADD COLUMN `is_settlement_partial_payment` smallint(5) DEFAULT 0 ;

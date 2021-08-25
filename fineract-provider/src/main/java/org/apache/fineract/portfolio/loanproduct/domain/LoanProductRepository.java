@@ -29,4 +29,5 @@ public interface LoanProductRepository extends JpaRepository<LoanProduct, Long>,
 
     @Query("select loanProduct from LoanProduct loanProduct, IN(loanProduct.charges) charge where charge.id = :chargeId")
     List<LoanProduct> retrieveLoanProductsByChargeId(@Param("chargeId") Long chargeId);
+    List<LoanProduct> findAll();
 }

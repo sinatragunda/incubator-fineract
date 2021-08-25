@@ -41,6 +41,7 @@ import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWri
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.tika.Tika;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.io.TikaInputStream;
@@ -58,6 +59,10 @@ import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+
+// added 24/08/2021
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 
 @Service
 public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService {
@@ -98,11 +103,50 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 final String fileType = tika.detect(tikaInputStream);
                 final String fileExtension = Files.getFileExtension(fileDetail.getFileName()).toLowerCase();
                 ImportFormatType format = ImportFormatType.of(fileExtension);
-                if (!fileType.contains("msoffice")) {
+
+                System.err.println("--------------------------file extentsion here of "+format);
+
+
+
+                System.err.println("------------------we have file with extension here "+fileType);
+//
+//                if (!fileType.contains("msoffice")) {
+//                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
+//                            "Uploaded file extension is not recognized.");
+//                }
+
+                if(fileType==null){
+
+                    System.err.println("file extension is not null let procedd here ");
                     throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
                             "Uploaded file extension is not recognized.");
                 }
-                Workbook workbook = new HSSFWorkbook(clonedInputStreamWorkbook);
+
+                if(format == ImportFormatType.XLSX_NEW){
+                    System.err.println("-----------------deatling with new format now");
+                }
+
+                Workbook workbook = null;
+
+                switch (format){
+                    case XLSX:
+                    case XLSX_NEW:
+                    case XLS_NEW:
+                        try{
+                            System.err.println("----------------dow we get here or");
+                            workbook = WorkbookFactory.create(clonedInputStreamWorkbook);
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        System.err.println("----------init hssfwork book");
+                        workbook = new HSSFWorkbook(clonedInputStreamWorkbook);
+                        break;
+
+                }
+
                 GlobalEntityType entityType=null;
                 int primaryColumn=0;
                 ImportHandler importHandler = null;
@@ -194,6 +238,9 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 this.securityContext.authenticatedUser().getId(), null, clonedInputStreamWorkbook,
                 URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
         final Document document = this.documentRepository.findOne(documentId);
+
+
+        System.err.println("-------------------------pre document publish -----------------");
 
         final ImportDocument importDocument = ImportDocument.instance(document,
                 DateUtils.getLocalDateTimeOfTenant(), entityType.getValue(),

@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
+import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SanitizeExcelValues;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.*;
 import org.apache.poi.ss.usermodel.*;
@@ -39,6 +40,7 @@ public class ImportHandlerUtils {
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
         Integer noOfEntries = 0;
+
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
         while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
@@ -71,7 +73,11 @@ public class ImportHandlerUtils {
             return ((Double) c.getNumericCellValue()).longValue();
         }
         else {
-            return Long.parseLong(row.getCell(colIndex).getStringCellValue());
+            try{
+                return Long.parseLong(row.getCell(colIndex).getStringCellValue());
+            }
+            catch (NumberFormatException n){
+            }
         }
         return null;
     }
@@ -251,6 +257,7 @@ public class ImportHandlerUtils {
 
     public static Long getIdByName (Sheet sheet, String name) {
         String sheetName = sheet.getSheetName();
+
         if(!sheetName.equals(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME)) {
             for (Row row : sheet) {
                 for (Cell cell : row) {

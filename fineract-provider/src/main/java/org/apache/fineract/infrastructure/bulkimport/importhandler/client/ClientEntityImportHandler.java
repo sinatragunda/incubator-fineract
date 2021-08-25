@@ -23,6 +23,7 @@ import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.bulkimport.constants.ClientEntityConstants;
+import org.apache.fineract.infrastructure.bulkimport.constants.ClientPersonConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.bulkimport.data.Count;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
@@ -65,6 +66,7 @@ public class ClientEntityImportHandler implements ImportHandler {
     public void readExcelFile(final String locale, final String dateFormat) {
         Sheet clientSheet=workbook.getSheet(TemplatePopulateImportConstants.CLIENT_ENTITY_SHEET_NAME);
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(clientSheet,0);
+        
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
             Row row;
                 row=clientSheet.getRow(rowIndex);
@@ -102,6 +104,7 @@ public class ClientEntityImportHandler implements ImportHandler {
             if (clientClassificationAr[1] != null)
                 clientClassicationId = Long.parseLong(clientClassificationAr[1]);
         }
+
         String incorporationNo=ImportHandlerUtils.readAsString(ClientEntityConstants.INCOPORATION_NUMBER_COL,row);
 
         String mainBusinessLine=ImportHandlerUtils.readAsString(ClientEntityConstants.MAIN_BUSINESS_LINE,row);
@@ -168,8 +171,18 @@ public class ClientEntityImportHandler implements ImportHandler {
             addressDataObj = new AddressData(addressTypeId, street, addressLine1, addressLine2, addressLine3,
                     city, postalCode, isActiveAddress, stateProvinceId, countryId);
         }
+
+        // added 24/08/2021
+
+        String emailAddress =ImportHandlerUtils.readAsString(ClientEntityConstants.EMAIL_ADDRESS_COL,row);
+        // added 25/08/2021
+        // added for auto savings account creation and share account creation
+        Long savingsProductId = ImportHandlerUtils.readAsLong(ClientEntityConstants.SAVINGS_PRODUCT_ID_COL ,row);
+        Long shareProductId = ImportHandlerUtils.readAsLong(ClientEntityConstants.SHARES_PRODUCT_ID_COL ,row);
+
+
         return ClientData.importClientEntityInstance(legalFormId,row.getRowNum(),name,officeId,clientTypeId,clientClassicationId,
-                staffId,active,activationDate,submittedOn, externalId,incorportionDate,mobileNo,clientNonPersonData,addressDataObj,locale,dateFormat);
+                staffId,active,activationDate,submittedOn, externalId,incorportionDate,mobileNo,clientNonPersonData,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId);
     }
 
     public Count importEntity(String dateFormat) {

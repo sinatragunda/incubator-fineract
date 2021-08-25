@@ -130,4 +130,12 @@ public class LoanSummaryData {
     public BigDecimal getTotalPaidFeeCharges() {
         return feeChargesPaid ;
     }
+
+    public BigDecimal getTotalInterestRepaid(){
+        return interestPaid;
+    }
+
+    public BigDecimal getTotalPrincipalOutstanding(){
+        return this.principalOutstanding;
+    }
 }

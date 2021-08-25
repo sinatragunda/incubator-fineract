@@ -24,7 +24,11 @@ public enum ImportFormatType {
 
     XLSX ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     XLS ("application/vnd.ms-excel"),
-    ODS ("application/vnd.oasis.opendocument.spreadsheet");
+    ODS ("application/vnd.oasis.opendocument.spreadsheet"),
+
+    /// added 24/08/2021
+    XLS_NEW("xls"),
+    XLSX_NEW("xlsx");
 
 
     private final String format;
@@ -38,6 +42,8 @@ public enum ImportFormatType {
     }
 
     public static ImportFormatType of(String name) {
+
+        System.err.println("--------------------------------------extension here is "+name);
         for(ImportFormatType type : ImportFormatType.values()) {
             if(type.name().equalsIgnoreCase(name)) {
                 return type;

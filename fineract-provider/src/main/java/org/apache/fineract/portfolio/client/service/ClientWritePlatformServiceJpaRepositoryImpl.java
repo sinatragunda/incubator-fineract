@@ -257,7 +257,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final AppUser currentUser = this.context.authenticatedUser();
 
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-            
+
 			final GlobalConfigurationPropertyData configuration = this.configurationReadPlatformService
 					.retrieveGlobalConfiguration("Enable-Address");
 
@@ -278,8 +278,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
 
             Staff staff = null;
+
             final Long staffId = command.longValueOfParameterNamed(ClientApiConstants.staffIdParamName);
-            if (staffId != null) {
+            /// modified 25/08/2021 .We have modified this code inorder for import handlers that put null values to 0
+            /// this would cause a staff not found error to be raised
+            if (staffId != null && staffId != 0) {
                 staff = this.staffRepository.findByOfficeHierarchyWithNotFoundDetection(staffId, clientOffice.getHierarchy());
             }
 

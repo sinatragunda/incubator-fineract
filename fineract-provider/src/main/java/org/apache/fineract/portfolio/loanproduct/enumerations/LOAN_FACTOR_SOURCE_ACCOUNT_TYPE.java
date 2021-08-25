@@ -9,7 +9,8 @@ package org.apache.fineract.portfolio.loanproduct.enumerations;
 public enum  LOAN_FACTOR_SOURCE_ACCOUNT_TYPE {
 
     SAVINGS("Savings Account"),
-    SHARE_ACCOUNT("Share Account");
+    SHARE_ACCOUNT("Share Account"),
+    NONE("None");
 
     private String code ;
 
@@ -22,6 +23,6 @@ public enum  LOAN_FACTOR_SOURCE_ACCOUNT_TYPE {
                 return a ;
             }
         }
-        return null ;
+        return NONE ;
     }
 }

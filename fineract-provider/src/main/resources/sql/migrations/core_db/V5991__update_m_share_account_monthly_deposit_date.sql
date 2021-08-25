@@ -22,6 +22,5 @@
 */
 
 
-ALTER TABLE `m_share_account` DROP COLUMN `monthly_deposit_date`;
 ALTER TABLE `m_share_account` ADD COLUMN `monthly_deposit_date` DATE NULL DEFAULT NULL ;
 

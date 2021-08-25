@@ -29,6 +29,7 @@ import java.util.Set;
 
 import com.google.gson.JsonArray;
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SanitizeExcelValues;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -84,7 +85,7 @@ public final class ClientDataValidator {
 
         if (this.fromApiJsonHelper.parameterExists(ClientApiConstants.staffIdParamName, element)) {
             final Long staffId = this.fromApiJsonHelper.extractLongNamed(ClientApiConstants.staffIdParamName, element);
-            baseDataValidator.reset().parameter(ClientApiConstants.staffIdParamName).value(staffId).ignoreIfNull().longGreaterThanZero();
+            baseDataValidator.reset().parameter(ClientApiConstants.staffIdParamName).value(staffId).ignoreIfNull();
         }
 
         if (this.fromApiJsonHelper.parameterExists(ClientApiConstants.accountNoParamName, element)) {
@@ -162,6 +163,7 @@ public final class ClientDataValidator {
             if (active.booleanValue()) {
                 final LocalDate joinedDate = this.fromApiJsonHelper.extractLocalDateNamed(ClientApiConstants.activationDateParamName,
                         element);
+
                 baseDataValidator.reset().parameter(ClientApiConstants.activationDateParamName).value(joinedDate).notNull();
                 /*if(this.fromApiJsonHelper.parameterExists(ClientApiConstants.datatables,element)){
                     baseDataValidator.reset().parameter(ClientApiConstants.activeParamName).value(active)
@@ -183,6 +185,7 @@ public final class ClientDataValidator {
             baseDataValidator.reset().parameter(ClientApiConstants.dateOfBirthParamName).value(dateOfBirth).notNull()
                     .validateDateBefore(DateUtils.getLocalDateOfTenant());
         }
+
 
         if (this.fromApiJsonHelper.parameterExists(ClientApiConstants.genderIdParamName, element)) {
             final Integer genderId = this.fromApiJsonHelper.extractIntegerSansLocaleNamed(ClientApiConstants.genderIdParamName, element);
@@ -571,6 +574,11 @@ public final class ClientDataValidator {
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
+
+        for(ApiParameterError apiParameterError : dataValidationErrors){
+
+            System.err.println("----------------------"+apiParameterError.getDeveloperMessage()+"----------------"+apiParameterError.getParameterName());
+        }
         if (!dataValidationErrors.isEmpty()) {
             //
             throw new PlatformApiDataValidationException(dataValidationErrors);

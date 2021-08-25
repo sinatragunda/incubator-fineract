@@ -47,6 +47,14 @@ public class ClientPersonConstants {
     public static final int IS_ACTIVE_ADDRESS_COL=25;//Z
     public static final int WARNING_COL = 26;//AA
     public static final int STATUS_COL = 27;//AB
+
+    ///new addition 24/08/2021
+    public static final int EMAIL_ADDRESS_COL = 28 ;//AC
+
+    //added 25/08/2021
+    public static final int SAVINGS_PRODUCT_ID_COL = 29; //AD
+    public static final int SHARES_PRODUCT_ID_COL = 30; // AE
+
     public static final int RELATIONAL_OFFICE_NAME_COL = 35;//AJ
     public static final int RELATIONAL_OFFICE_OPENING_DATE_COL = 36;//AK
     public static final int LOOKUP_GENDER_COL = 37;//AL
@@ -55,4 +63,7 @@ public class ClientPersonConstants {
     public static final int LOOKUP_ADDRESS_TYPE_COL = 40;//AO
     public static final int LOOKUP_STATE_PROVINCE_COL = 41;//AP
     public static final int LOOKUP_COUNTRY_COL = 42;//AQ
+
+
+    /// added 24/08/2021
 }

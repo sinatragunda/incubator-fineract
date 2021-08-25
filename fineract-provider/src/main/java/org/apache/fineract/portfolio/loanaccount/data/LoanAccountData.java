@@ -1849,6 +1849,7 @@ public class LoanAccountData {
         if(status.isActive()){
             return this.summary.getTotalOutstanding();
         }
+
         return BigDecimal.ZERO;
     }
 
@@ -1917,5 +1918,18 @@ public class LoanAccountData {
 
     public Long getLoanFactorAccountId(){
         return this.loanFactorAccountId;
+    }
+
+    // added 25/08/2021
+    public BigDecimal getInterestPaid(){
+        return this.summary.getTotalInterestRepaid();
+    }
+
+    public BigDecimal getPrincipalDue(){
+        return this.summary.getTotalPrincipalOutstanding();
+    }
+
+    public Long getId() {
+        return id;
     }
 }

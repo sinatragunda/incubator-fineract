@@ -126,19 +126,20 @@ final public class ClientData implements Comparable<ClientData> {
     public static ClientData importClientEntityInstance(Long legalFormId,Integer rowIndex,String fullname,Long officeId, Long clientTypeId,
             Long clientClassificationId,Long staffId,Boolean active,LocalDate activationDate,LocalDate submittedOnDate,
             String externalId,LocalDate dateOfBirth,String mobileNo,ClientNonPersonData clientNonPersonDetails,
-            AddressData address,String locale,String dateFormat){
+            AddressData address,String locale,String dateFormat ,String emailAddress,Long savingsProductId ,Long shareProductId){
         return  new ClientData(legalFormId,rowIndex,fullname, null, null, null, submittedOnDate,activationDate,active, externalId,
         		officeId, staffId,mobileNo,dateOfBirth,clientTypeId, null,clientClassificationId,null,
-        		address,clientNonPersonDetails, locale,dateFormat);
+        		address,clientNonPersonDetails, locale,dateFormat,emailAddress ,savingsProductId ,shareProductId);
     }
 
+    // modified 24/08/2021
     public static ClientData importClientPersonInstance(Long legalFormId,Integer rowIndex,String firstName,String lastName,String middleName,
             LocalDate submittedOn,LocalDate activationDate,Boolean active,String externalId,Long officeId,
             Long staffId,String mobileNo, LocalDate dob,Long clientTypeId,Long genderId,
-            Long clientClassificationId, Boolean isStaff, AddressData address,String locale,String dateFormat){
+            Long clientClassificationId, Boolean isStaff, AddressData address,String locale,String dateFormat ,String emailAddress ,Long savingsProductId ,Long shareProductId){
 
         return new ClientData(legalFormId,rowIndex, null, firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
-                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassificationId,isStaff,address, null, locale,dateFormat);
+                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassificationId,isStaff,address, null, locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId);
     }
     
     public static ClientData emptyInstance(Long clientId) {
@@ -149,7 +150,7 @@ final public class ClientData implements Comparable<ClientData> {
             LocalDate submittedOn,LocalDate activationDate,Boolean active,String externalId,Long officeId,
             Long staffId,String mobileNo, LocalDate dob,Long clientTypeId,Long genderId,
             Long clientClassificationId,Boolean isStaff, AddressData address, ClientNonPersonData clientNonPersonDetails,
-            String locale,String dateFormat ) {
+            String locale,String dateFormat ,String emailAddress ,Long savingsProductId ,Long shareProductId ) {
         this.rowIndex=rowIndex;
         this.dateFormat=dateFormat;
         this.locale= locale;
@@ -186,7 +187,6 @@ final public class ClientData implements Comparable<ClientData> {
         this.imagePresent = null;
         this.staffName = null;
         this.timeline = null;
-        this.savingsProductId = null;
         this.savingsProductName = null;
         this.savingsAccountId =null;
         this.legalForm = null;
@@ -206,9 +206,12 @@ final public class ClientData implements Comparable<ClientData> {
         this.isAddressEnabled =null;
         this.datatables = null;
         this.familyMemberOptions=null;
-        this.emailAddress = null;
         this.shareAccountId= null ;
-        this.shareProductId = null ;
+
+        // added 25/08/2021
+        this.savingsProductId = savingsProductId;
+        this.shareProductId = shareProductId ;
+        this.emailAddress = emailAddress;
     }
 
 
@@ -267,6 +270,8 @@ final public class ClientData implements Comparable<ClientData> {
 
         final Long shareProductId = null ;
         final Long shareAccountId = null ;
+
+
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, joinedDate, imageId, staffId,
                 staffName, officeOptions, groups, staffOptions, narrations, genderOptions, timeline, savingProductOptions,
