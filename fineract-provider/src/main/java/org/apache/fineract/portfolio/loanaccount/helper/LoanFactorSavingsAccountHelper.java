@@ -160,7 +160,10 @@ public class LoanFactorSavingsAccountHelper {
             List<LoanAccountData> clientLoans = loanAccountDataList;
 
             Predicate<LoanAccountData> matchLoanProductFilter = (e)->{
+                System.err.println("-------------comparing for loan products ------------");
                 int cmp = e.loanProductId().compareTo(loanProductId);
+
+                System.err.println("----------------cmp between ---"+e.loanProductId()+"-----------and "+loanProductId);
                 if(cmp==1){
                     return true;
                 }
@@ -168,6 +171,8 @@ public class LoanFactorSavingsAccountHelper {
             };
 
             loanAccountDataList = clientLoans.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
+
+            System.err.println("----------------our new product portfolio is --------------"+loanAccountDataList.size());
         }
 
 

@@ -14,7 +14,18 @@ public class ReportsEmailHelper{
 	}
 
 
-	public static void sendClientReport(WeseEmailService weseEmailService ,EmailDetail emailDetail ,String path ,String description){
-		weseEmailService.sendAttached(emailDetail ,path ,description);
+	public static boolean sendClientReport(WeseEmailService weseEmailService ,EmailDetail emailDetail ,String path ,String description){
+		
+		boolean hasSent = false;
+		try{
+			weseEmailService.sendAttached(emailDetail ,path ,description);
+			hasSent = true;
+		}
+		catch(Exception n){
+			hasSent = false;
+			System.err.println("------------------failed to send email for -------"+emailDetail.getContactName());
+			n.printStackTrace();
+		}
+		return hasSent ;
 	}
 }

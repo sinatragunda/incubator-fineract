@@ -105,9 +105,8 @@ public class ScheduledReportHelper {
         Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
 
         List<EmailRecipients> emailRecipientsList = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
-        boolean clientReport = clientFacingReport(queryParams);
 
-        System.err.println("---------------is client report ------------------"+clientReport);
+        boolean clientReport = clientFacingReport(queryParams);
 
         String subject = "Scheduled Report";
         String description = String.format("Scheduled %s Report",reportName);
@@ -124,18 +123,22 @@ public class ScheduledReportHelper {
 
                 File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
 
-                EmailDetail emailDetail = emailDetail(emailAddress ,name ,subject ,description);
-                ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+                System.err.println("-----------------send email to ------------"+emailAddress);
 
+                EmailDetail emailDetail = emailDetail(emailAddress ,name ,subject ,description);
+
+                // throws some send mail error if we fail to send the actual message
+                boolean hasSent =  ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+
+                System.err.println("------------------delivery status is ---------------"+hasSent);
+                e.setDeliveryStatus(hasSent);
                 file.delete();
             });
-            return;
+
+            //return emailRecipientsList;
         }
 
         File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
-
-        System.err.println("=================email recipients size is============= "+emailRecipientsList.size());
-
         emailRecipientsList.stream().forEach((e)->{
             /// we need to get list of recipients here as well the clients whose reports we need to send
             String emailAddress = e.getEmailAddress();
@@ -145,11 +148,14 @@ public class ScheduledReportHelper {
 
             EmailDetail emailDetail =  new EmailDetail(subject,description ,emailAddress ,contactName);
 
-            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
+            boolean hasSent = ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath() ,description);
             //ReportsEmailHelper.testSend(weseEmailService,file.getPath() ,"This is some random reports test");
+            e.setDeliveryStatus(hasSent);
+
         });
 
         file.delete();
+        //return emailRecipientsList;
     }
 
     public static Boolean clientFacingReport(Map<String,String> queryParams){

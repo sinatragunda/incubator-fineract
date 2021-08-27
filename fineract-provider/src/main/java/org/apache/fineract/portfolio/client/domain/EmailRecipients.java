@@ -15,6 +15,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+// added 26/08/2021
+import javax.persistence.Transient;
+
 @Entity
 @Table(name="m_mail_recipients")
 public class EmailRecipients extends AbstractPersistableCustom<Long> {
@@ -34,6 +37,11 @@ public class EmailRecipients extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name="mail_recipients_key_id")
     private EmailRecipientsKey emailRecipientsKey ;
+
+
+    // added 26/08/2021
+    @Transient
+    private boolean deliveryStatus ;
 
     public EmailRecipients(){}
 
@@ -82,5 +90,13 @@ public class EmailRecipients extends AbstractPersistableCustom<Long> {
 
     public void setClientId(Long clientId) {
         this.clientId = clientId;
+    }
+
+    public void setDeliveryStatus(boolean status){
+        this.deliveryStatus = status;
+    }
+
+    public boolean isDeliveryStatus(){
+        return this.deliveryStatus;
     }
 }

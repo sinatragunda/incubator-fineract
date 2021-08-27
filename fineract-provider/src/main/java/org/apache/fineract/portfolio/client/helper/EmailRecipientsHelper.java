@@ -53,12 +53,29 @@ public class EmailRecipientsHelper {
 
         if(selectAllMode){
 
+            mailRecipientsList = new ArrayList<>();
             Long officeId = emailRecipientsKey.getOfficeId();
+
+            Long zero = new Long(0);
             
+            if(officeId==null){
+                officeId = zero ;
+            }
+
+            // some stupid glitch exists here 
             System.err.println("----------------office id is ========="+officeId);
 
-            if(officeId.equals(0)){
+            System.err.println("---------------------compare these two ------------");
+
+            boolean status = officeId.equals(zero);
+            int cmp = officeId.compareTo(zero);
+
+
+            System.err.println("-------------cmp compare is "+cmp+"------------- and status is ----"+status);
+
+            if(officeId.equals(zero)){
                 //we taking all clients
+
                 System.err.println("-------------we sending to all clients that have email address");
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
 
@@ -97,9 +114,9 @@ public class EmailRecipientsHelper {
         String email = clientData.getEmailAddress();
         Long clientId = clientData.getId();
 
-        if(email==null){
-            return null;
-        }
+        // if(email==null){
+        //     return null;
+        // }
 
         return new EmailRecipients(name ,email ,true ,clientId);
 

@@ -131,9 +131,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             /// send some file here we see which one should be used for our working
 
             if ("PDF".equalsIgnoreCase(outputType)) {
-                System.err.println("---------------create pdf report -------------");
                 PdfReportUtil.createPDF(masterReport,file);
-
                 return file ;
             }
         } catch (final ResourceException e) {
@@ -227,8 +225,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
         final AppUser currentUser = this.context.authenticatedUser();
 
-        System.err.println("--------------------params to report size ------------------- "+queryParams.size());
-
         try {
 
             final ReportParameterValues rptParamValues = report.getParameterValues();
@@ -242,21 +238,14 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
              * error
              */
 
-            System.err.println("-------------param paramsDefinition------");
-
-
             for (final ParameterDefinitionEntry paramDefEntry : paramsDefinition.getParameterDefinitions()) {
                 
                 final String paramName = paramDefEntry.getName();
-                System.err.println("----------------param name here is ------------"+paramName);
 
                 if (!((paramName.equals("tenantUrl")) || (paramName.equals("userhierarchy") || (paramName.equals("username")) || (paramName
                         .equals("password") || (paramName.equals("userid")))))) {
                     logger.info("paramName:" + paramName);
                     final String pValue = queryParams.get(paramName);
-
-                    System.err.println("------------pvalue is ----------------------"+pValue);
-
                     if (StringUtils.isBlank(pValue)) { throw new PlatformDataIntegrityException("error.msg.reporting.error",
                             "Pentaho Parameter: " + paramName + " - not Provided"); }
 
@@ -271,8 +260,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                     } else {
                         rptParamValues.put(paramName, pValue);
                     }
-
-                    System.err.println("-----------------done adding report params --------d");
                 }
 
             }
@@ -282,16 +269,12 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             // and
             // data scoping
 
-            System.err.println("---------------------data scoping where do we fail ?--------");
-   
             final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
             final FineractPlatformTenantConnection tenantConnection = tenant.getConnection();
             String tenantUrl = driverConfig.constructProtocol(tenantConnection.getSchemaServer(), tenantConnection.getSchemaServerPort(), tenantConnection.getSchemaName()) ;
             final String userhierarchy = currentUser.getOffice().getHierarchy();
             logger.info("db URL:" + tenantUrl + "      userhierarchy:" + userhierarchy);
             rptParamValues.put("userhierarchy", userhierarchy);
-
-            System.err.println("------------------we put getHierarchy now -----------");
 
             final Long userid = currentUser.getId();
             logger.info("db URL:" + tenantUrl + "      userid:" + userid);
@@ -330,8 +313,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
     private Map<String, String> getReportParams(final Map<String, String> queryParams) {
 
-        System.err.println("-------------------------------get Report Params--------");
-
         final Map<String, String> reportParams = new HashMap<>();
         final Set<String> keys = queryParams.keySet();
         String pKey;
@@ -340,7 +321,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             if (k.startsWith("R_")) {
                 pKey = k.substring(2);
                 pValue = queryParams.get(k);
-                System.err.println("---------put these values key----------"+pKey+" -----------and value ---------"+pValue);
                 reportParams.put(pKey, pValue);
             }
         }
