@@ -5,9 +5,7 @@
  */
 package org.mifosplatform.infrastructure.report.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -201,9 +199,15 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             }
 
             if ("CSV".equalsIgnoreCase(outputType)) {
-                CSVReportUtil.createCSV(masterReport, baos, "UTF-8");
+
+                //CSVReportUtil.createCSV(masterReport, baos, "UTF-8");
+                CSVReportUtil.createCSV(masterReport, baos ,null );
+                String filename = String.format( "%s%s",reportName.replace(" ","") ,".csv");
                 return Response.ok().entity(baos.toByteArray()).type("text/csv")
-                        .header("Content-Disposition", "attachment;filename=" + reportName.replaceAll(" ", "") + ".csv").build();
+                        .header("Content-Disposition", "attachment;filename="+filename).build();
+
+                //return Response.ok().entity((Object)baos.toByteArray()).type("text/csv").build();
+
             }
 
             if ("HTML".equalsIgnoreCase(outputType)) {
@@ -232,7 +236,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
             /*
              * only allow integer, long, date and string parameter types and
-             * assume all mandatory - could go more detailed like Pawel did in
+             * as sume all mandatory - could go more detailed like Pawel did in
              * Mifos later and could match incoming and pentaho parameters
              * better... currently assuming they come in ok... and if not an
              * error

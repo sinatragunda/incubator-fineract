@@ -128,6 +128,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     @Override
     public StreamingOutput retrieveReportCSV(final String name, final String type, final Map<String, String> queryParams) {
 
+
         return new StreamingOutput() {
 
             @Override
@@ -135,6 +136,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                 try {
 
                     final GenericResultsetData result = retrieveGenericResultset(name, type, queryParams);
+
                     final StringBuffer sb = generateCsvFileBuffer(result);
 
                     final InputStream in = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
@@ -146,10 +148,12 @@ public class ReadReportingServiceImpl implements ReadReportingService {
                         out.write(outputByte, 0, readLen);
                         readLen = in.read(outputByte, 0, 4096);
                     }
-                    // in.close();
-                    // out.flush();
-                    // out.close();
+
+                     //in.close();
+                     //out.flush();
+                     //out.close();
                 } catch (final Exception e) {
+                    e.printStackTrace();
                     throw new PlatformDataIntegrityException("error.msg.exception.error", e.getMessage());
                 }
             }
@@ -158,6 +162,9 @@ public class ReadReportingServiceImpl implements ReadReportingService {
 
     private StringBuffer generateCsvFileBuffer(final GenericResultsetData result) {
         final StringBuffer writer = new StringBuffer();
+
+
+        System.err.println("------------------------some generic file buffer class");
 
         final List<ResultsetColumnHeaderData> columnHeaders = result.getColumnHeaders();
         logger.info("NO. of Columns: " + columnHeaders.size());
@@ -202,6 +209,8 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             writer.append('\n');
         }
 
+        System.err.println("------------------out of this function now -----------");
+
         return writer;
     }
 
@@ -210,9 +219,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
 
         final long startTime = System.currentTimeMillis();
         logger.info("STARTING REPORT: " + name + "   Type: " + type);
-
         final String sql = getSQLtoRun(name, type, queryParams);
-
         final GenericResultsetData result = this.genericDataService.fillGenericResultSet(sql);
 
         final long elapsed = System.currentTimeMillis() - startTime;

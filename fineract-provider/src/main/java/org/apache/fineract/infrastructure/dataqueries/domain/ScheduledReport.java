@@ -11,8 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
+import javax.persistence.Transient;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
 
 
@@ -35,6 +37,10 @@ public class ScheduledReport extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name="mail_recipients_key_id")
     private EmailRecipientsKey emailRecipientsKey;
+
+    // Added 02/09/2021
+    @Transient
+    private ScheduledJobDetail scheduledJobDetail ;
 
     public ScheduledReport(){}
 
@@ -82,5 +88,13 @@ public class ScheduledReport extends AbstractPersistableCustom<Long> {
 
     public void setEniqueReport(Boolean eniqueReport) {
         this.eniqueReport = eniqueReport;
+    }
+
+    public ScheduledJobDetail getScheduledJobDetail() {
+        return scheduledJobDetail;
+    }
+
+    public void setScheduledJobDetail(ScheduledJobDetail scheduledJobDetail) {
+        this.scheduledJobDetail = scheduledJobDetail;
     }
 }

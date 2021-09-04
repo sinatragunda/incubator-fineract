@@ -119,7 +119,7 @@ public class LoanFactorSavingsAccountHelper {
 
             /// check if other products have their own loan factoring that is cross link
             if(hasCrossLink()){
-                System.err.println("-----------product has no loan factor hence using others ");
+                System.err.println("-----------product has no loan factor hence using others------------- ");
                 this.loanFactor = crossLinkLoanProduct.loanFactor();
                 isCrossLink = hasCrossLink();
                 if(loanFactor <=0){
@@ -173,17 +173,10 @@ public class LoanFactorSavingsAccountHelper {
             loanAccountDataList = clientLoans.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
 
             System.err.println("----------------our new product portfolio is --------------"+loanAccountDataList.size());
+
         }
 
-
-        loanAccountDataList.stream().forEach((e)->{
-            System.err.println("--------------some value to be sent is ----------------");
-            System.err.println("------loan id steam for "+e.getAccountNo()+"--------- and some total balance of "+e.getTotalOutstandingAmount().doubleValue());
-        });
-
         Predicate<LoanAccountData> activeLoansFilter = (e)->{
-
-            System.err.println("----------------------is active --------"+e.isActive());
             return e.isActive();
         };
 

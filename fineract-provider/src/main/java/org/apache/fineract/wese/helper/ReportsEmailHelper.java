@@ -1,9 +1,13 @@
 
 package org.apache.fineract.wese.helper ;
 
+import org.apache.fineract.wese.enumerations.SEND_MAIL_MESSAGE_STATUS;
+import org.apache.fineract.wese.pojo.EmailSendStatus;
 import org.apache.fineract.wese.service.WeseEmailService;
 import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 
+// added 27/08/2021
+import javax.mail.SendFailedException;
 
 public class ReportsEmailHelper{
 	
@@ -16,16 +20,22 @@ public class ReportsEmailHelper{
 
 	public static boolean sendClientReport(WeseEmailService weseEmailService ,EmailDetail emailDetail ,String path ,String description){
 		
-		boolean hasSent = false;
-		try{
-			weseEmailService.sendAttached(emailDetail ,path ,description);
-			hasSent = true;
+		SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = weseEmailService.sendAttached(emailDetail ,path ,description);
+
+		boolean hasSent = false ;
+		switch (sendMailMessageStatus){
+			case SUCCESS:
+				hasSent = true;
+				break;
+			default:
+				hasSent= false;
 		}
-		catch(Exception n){
-			hasSent = false;
-			System.err.println("------------------failed to send email for -------"+emailDetail.getContactName());
-			n.printStackTrace();
-		}
+
+		EmailSendStatus emailSendStatus = new EmailSendStatus(sendMailMessageStatus ,emailDetail);
+		EmailDeliveryHelper.add(emailSendStatus);
+
+		System.err.println("------------------failed to send email for -------"+emailDetail.getContactName());
 		return hasSent ;
+
 	}
 }

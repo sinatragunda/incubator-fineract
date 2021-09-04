@@ -1814,10 +1814,12 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         /// after revolving accounts then comes auto settle and diburse 
         ///
 
+
         boolean shouldCreateStandingInstructionAtDisbursement = loan.shouldCreateStandingInstructionAtDisbursement();
         boolean disburseLoanToSavingsAutoSettlement = loan.autoSettlementAtDisbursement();
 
         if(disburseLoanToSavingsAutoSettlement){
+
             Set<LoanCharge> chargesList = loan.charges();
             BigDecimal totalCharges = BigDecimal.ZERO;
             if(shouldCreateStandingInstructionAtDisbursement){
@@ -1831,8 +1833,12 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             }
 
             BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
+
+            //200
             BigDecimal principal = amount.getAmount();
-            ///error there since money hasnt been yet disbursed ,or it has been ? 
+            ///error there since money hasnt been yet disbursed ,or it has been ?
+            //5000
+
             int cmp = principal.compareTo(balanceToDeduct);
 
             // if principal is greater than balance to deduct thats total of all charges etc 
@@ -1850,7 +1856,6 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 node.put("transactionDate" ,transactionDate.toString(fmt));
                 node.put("note","Disbursement Settlement");
 
-              
                 String apiRequestBodyAsJson = node.toString();
                 Long savingsAccountId = portfolioAccountData.accountId();
 

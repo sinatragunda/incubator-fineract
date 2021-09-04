@@ -25,7 +25,6 @@ public class SessionIDGenerator{
 		stringBuilder.append(id);
 
 		return stringBuilder.toString();
-
 	}
 
 

@@ -104,7 +104,6 @@ public class RunreportsApiResource {
         int reportStatus = BulkReportHelper.bulkReportStatus(referenceId);
         
         if(reportStatus==1){
-
             ///report done processing now lets build output son
             Future future = BulkReportHelper.getBulkReport(referenceId);
             
@@ -153,8 +152,8 @@ public class RunreportsApiResource {
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
-        final boolean exportCsv = ApiParameterHelper.exportCsv(uriInfo.getQueryParameters());
-        final boolean parameterType = ApiParameterHelper.parameterType(uriInfo.getQueryParameters());
+        boolean exportCsv = ApiParameterHelper.exportCsv(uriInfo.getQueryParameters());
+        boolean parameterType = ApiParameterHelper.parameterType(uriInfo.getQueryParameters());
         final boolean exportPdf = ApiParameterHelper.exportPdf(uriInfo.getQueryParameters());
         final boolean runAsBulkReport = ApiParameterHelper.runAsBulkReport(uriInfo.getQueryParameters());
 
@@ -164,7 +163,8 @@ public class RunreportsApiResource {
         /// customized customer reporting ...
         String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
         String reportCustomized = String.format("%s %s",reportName ,tenant);
-    
+
+        String outputType = queryParams.getFirst("output-type");
         // phase a
         //added 01/02/2021 used for bulk reports those that take long to run and usually times out 
         if(runAsBulkReport){
@@ -172,7 +172,7 @@ public class RunreportsApiResource {
             final Map<String, String> reportParams = getReportParams(queryParams); 
             Callable callable = this.readExtraDataAndReportingService.retrieveGenericResultsetCallable(reportName,
                     "report", reportParams);
-            
+
             String json = BulkReportHelper.runBulkReport(callable).toString();
             return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
         }
@@ -180,6 +180,7 @@ public class RunreportsApiResource {
 
         String parameterTypeValue = null;
         if (!parameterType) {
+
             parameterTypeValue = "report";
             String reportType = null ;
 
@@ -195,14 +196,6 @@ public class RunreportsApiResource {
             
             ReportingProcessService reportingProcessService = this.reportingProcessServiceProvider.findReportingProcessService(reportType);
             if (reportingProcessService != null){
-                //Map map = getReportParams(queryParams);
-
-                //File file = reportingProcessService.processRequestEx(reportName ,map);
-                /// send some file here son
-                //System.err.println("------------file name is---------------"+file.getName());
-
-                //ReportsEmailHelper.testSend(weseEmailService ,file.getAbsolutePath() ,"Scheduled Reports with absolute path");
-                //ReportsEmailHelper.testSend(weseEmailService ,file.getPath() ,"Scheduled Reports without absolute path");
                 return reportingProcessService.processRequest(reportName, queryParams);
             }
         } 
@@ -211,7 +204,6 @@ public class RunreportsApiResource {
         }
  
         // PDF format
-
         if (exportPdf) {
             final Map<String, String> reportParams = getReportParams(queryParams);
             final String pdfFileName = this.readExtraDataAndReportingService
@@ -252,7 +244,6 @@ public class RunreportsApiResource {
         }
 
         // CSV Export
-
         final Map<String, String> reportParams = getReportParams(queryParams);
         final StreamingOutput result = this.readExtraDataAndReportingService
                 .retrieveReportCSV(reportName, parameterTypeValue, reportParams);

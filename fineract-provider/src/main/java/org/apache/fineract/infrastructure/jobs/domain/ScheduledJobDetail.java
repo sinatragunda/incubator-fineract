@@ -28,6 +28,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.jobs.api.SchedulerJobApiConstants;
@@ -86,6 +88,10 @@ public class ScheduledJobDetail extends AbstractPersistableCustom<Long> {
     @Column(name = "is_misfired")
     private boolean triggerMisfired;
 
+
+    @Transient
+    private String code ;
+
     protected ScheduledJobDetail() {
 
     }
@@ -107,6 +113,8 @@ public class ScheduledJobDetail extends AbstractPersistableCustom<Long> {
         String newValue = String.format("%sJobDetail%d _ DEFAULT",jobName ,getId());
         this.jobKey = newValue;
     }
+
+
 
     public String getJobName() {
         return this.jobName;
@@ -198,5 +206,26 @@ public class ScheduledJobDetail extends AbstractPersistableCustom<Long> {
     public void updateTriggerMisfired(final boolean triggerMisfired) {
         this.triggerMisfired = triggerMisfired;
     }
+
+    // Added 02/09/2021
+    public String getDisplayName(){
+        return this.jobDisplayName;
+    }
+
+    // Added 02/09/2021
+    public String getCode(){
+
+        if(this.currentlyRunning){
+            this.code ="Active";
+            return code ;
+        }
+        return this.code = "Closed";
+    }
+
+    // Added 03/09/2021
+    public Date getPreviousRunTime(){
+        return this.previousRunStartTime ;
+    }
+
 
 }

@@ -190,6 +190,11 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @CronTarget(jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS)
     public void executeScheduledClientReportMail(){
 
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Long jobId = ScheduledJobsHelper.activeJobId;
         if (jobId !=null){
             ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper ,emailRecipientsKeyRepository ,emailRecipientsRepository ,clientReadPlatformService , jobId);

@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.wese.service;
 
+import org.apache.fineract.wese.enumerations.SEND_MAIL_MESSAGE_STATUS;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -34,6 +35,13 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.mail.*;
 import org.apache.fineract.infrastructure.core.service.PlatformEmailSendException;
 
+// added 27/08/2021
+import com.sun.mail.smtp.SMTPAddressFailedException;
+
+import javax.mail.SendFailedException;
+import com.sun.mail.smtp.SMTPSendFailedException ;
+
+import java.net.UnknownHostException;
 
 @Service
 public class WeseEmailService{
@@ -50,13 +58,13 @@ public class WeseEmailService{
 	    sendDefinedEmail(emailDetail);
     }
 
-    public void sendAttached(EmailDetail emailDetail ,String path ,String description){
+    public SEND_MAIL_MESSAGE_STATUS sendAttached(EmailDetail emailDetail ,String path ,String description){
         EmailAttachment emailAttachment = new EmailAttachment();
         emailAttachment.setPath(path);
         emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
         emailAttachment.setDescription(description);
-        sendDefinedEmail(emailDetail ,emailAttachment);
-
+        SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = sendDefinedEmail(emailDetail ,emailAttachment);
+        return sendMailMessageStatus ;
     }
 
     public void sendDefinedEmail(EmailDetail emailDetails) {
@@ -91,7 +99,7 @@ public class WeseEmailService{
     }
 
 
-    public void sendDefinedEmail(EmailDetail emailDetails,EmailAttachment emailAttachment) {
+    public SEND_MAIL_MESSAGE_STATUS sendDefinedEmail(EmailDetail emailDetails, EmailAttachment emailAttachment) {
         
         MultiPartEmail email = new MultiPartEmail();
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
@@ -119,8 +127,34 @@ public class WeseEmailService{
         
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
             email.send();
-        } catch (EmailException e) {
+
+            System.err.println("-------------non of the errors have been caught here ------------");
+            return SEND_MAIL_MESSAGE_STATUS.SUCCESS;
+
+        }
+
+        catch (EmailException e) {
+
+            System.err.println("-----------we want to catch specific error here--------");
+
+            Throwable throwable = e.getCause();
+
+            boolean smtError = throwable instanceof SMTPSendFailedException;
+
+            System.err.println("-----------------------------instance of that smtpsendfailedexception "+smtError);
+
+            boolean sendFailed = throwable instanceof SendFailedException ;
+
+            System.err.println("-----------------------------instance of that endfailedexception "+sendFailed);
+
+
+            boolean unkownHost = throwable instanceof UnknownHostException ;
+
+            System.err.println("-------------unkown host exception "+unkownHost);
+
             throw new PlatformEmailSendException(e);
         }
+
+        //return SEND_MAIL_MESSAGE_STATUS.ERROR ;
     }
 }

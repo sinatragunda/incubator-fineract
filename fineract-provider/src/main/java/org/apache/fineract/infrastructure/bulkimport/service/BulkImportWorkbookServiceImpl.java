@@ -103,12 +103,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 final String fileType = tika.detect(tikaInputStream);
                 final String fileExtension = Files.getFileExtension(fileDetail.getFileName()).toLowerCase();
                 ImportFormatType format = ImportFormatType.of(fileExtension);
-
-                System.err.println("--------------------------file extentsion here of "+format);
-
-
-
-                System.err.println("------------------we have file with extension here "+fileType);
 //
 //                if (!fileType.contains("msoffice")) {
 //                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
@@ -116,15 +110,10 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 //                }
 
                 if(fileType==null){
-
-                    System.err.println("file extension is not null let procedd here ");
                     throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
                             "Uploaded file extension is not recognized.");
                 }
 
-                if(format == ImportFormatType.XLSX_NEW){
-                    System.err.println("-----------------deatling with new format now");
-                }
 
                 Workbook workbook = null;
 
@@ -133,7 +122,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     case XLSX_NEW:
                     case XLS_NEW:
                         try{
-                            System.err.println("----------------dow we get here or");
                             workbook = WorkbookFactory.create(clonedInputStreamWorkbook);
                         }
                         catch (Exception e){
@@ -141,7 +129,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                         }
                         break;
                     default:
-                        System.err.println("----------init hssfwork book");
                         workbook = new HSSFWorkbook(clonedInputStreamWorkbook);
                         break;
 

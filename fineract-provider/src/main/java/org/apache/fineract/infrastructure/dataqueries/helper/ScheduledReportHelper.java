@@ -8,16 +8,13 @@ package org.apache.fineract.infrastructure.dataqueries.helper;
 
 import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledMailSession;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
-import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.service.ScheduledReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.gson.Gson ;
 import com.google.gson.JsonElement;
@@ -27,6 +24,7 @@ import com.google.gson.JsonParser;
 
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
+import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.EmailRecipients;
 import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
 import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
@@ -96,7 +94,6 @@ public class ScheduledReportHelper {
     }
 
     public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService , Long jobId){
-
 
         ScheduledReport scheduledReport = scheduledReportRepositoryWrapper.findOneByJobId(jobId);
         Map<String ,String> queryParams = reportParameters(scheduledReport ,jobId);
@@ -169,4 +166,25 @@ public class ScheduledReportHelper {
         return emailDetail;
 
     }
+
+    public static String validateEmailAddressForClients(ClientReadPlatformService clientReadPlatformService, Long clientId){
+
+        ClientData clientData = clientReadPlatformService.retrieveOne(clientId);
+        Optional<String> emailAddress = Optional.ofNullable(clientData).map(ClientData::getEmailAddress);
+        return emailAddress.get();
+
+    }
+
+    public static ScheduledMailSession scheduledMailSessionResults(SchedularWritePlatformService schedularWritePlatformService , Long scheduleId){
+
+        // get scheduling id here of running status and their results
+        ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId(scheduleId);
+
+        // get some results from static container here
+
+        ScheduledMailSession scheduledMailSession = new ScheduledMailSession();
+        scheduledMailSession.setScheduledJobDetail(scheduledJobDetail);
+        return scheduledMailSession;
+    }
+
 }

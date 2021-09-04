@@ -17,6 +17,9 @@ import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class EmailRecipientsHelper {
 
@@ -41,19 +44,14 @@ public class EmailRecipientsHelper {
 
     public static List<EmailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository ,EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
 
-
-        System.err.println("----------find all with key "+keyId);
         EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(keyId);
 
         // if true then get office id and fill lists with recipients of clients
         boolean selectAllMode = emailRecipientsKey.getSelectAllMode();
-        List<EmailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
-
-        System.err.println("-----------------selectAllMode is -------------"+selectAllMode);
 
         if(selectAllMode){
 
-            mailRecipientsList = new ArrayList<>();
+            List<EmailRecipients> mailRecipientsList = new ArrayList<>();
             Long officeId = emailRecipientsKey.getOfficeId();
 
             Long zero = new Long(0);
@@ -61,50 +59,59 @@ public class EmailRecipientsHelper {
             if(officeId==null){
                 officeId = zero ;
             }
+            // we need to implement new nullable stuff here
 
-            // some stupid glitch exists here 
-            System.err.println("----------------office id is ========="+officeId);
-
-            System.err.println("---------------------compare these two ------------");
+            // some stupid glitch exists here
+            //Optional.ofNullable(officeId)
 
             boolean status = officeId.equals(zero);
             int cmp = officeId.compareTo(zero);
 
-
-            System.err.println("-------------cmp compare is "+cmp+"------------- and status is ----"+status);
-
             if(officeId.equals(zero)){
                 //we taking all clients
 
-                System.err.println("-------------we sending to all clients that have email address");
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
-
-                for(ClientData clientData : clientDataList.getPageItems()){
+                Consumer<ClientData> mailRecipientsConsumer = (clientData) ->{
                     EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    if(emailRecipients==null){
-                        continue;
-                    }
-                    mailRecipientsList.add(emailRecipients);
-                }
+                    Consumer<EmailRecipients> addNew = (e)-> mailRecipientsList.add(e);
+                    Optional.ofNullable(emailRecipients).ifPresent(addNew);
+                };
+
+                clientDataList.getPageItems().stream().forEach(mailRecipientsConsumer);
             }
             else{
 
                 System.err.println("------- else not select all----------------");
                 String lookUpCriteria = String.format("office_id=%d",officeId);
-                Collection<ClientData> clientDataList = clientReadPlatformService.retrieveAllForLookup(lookUpCriteria);
 
-                for (ClientData clientData : clientDataList){
+                Collection<ClientData> clientDataList = clientReadPlatformService.retrieveAllForLookup(lookUpCriteria);
+                Consumer<ClientData> clientDataConsumer = (clientData)->{
 
                     EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    if(emailRecipients==null){
-                        continue;
-                    }
-                    mailRecipientsList.add(emailRecipients);
-                }  
+                    Consumer<EmailRecipients> addNew = (e)-> mailRecipientsList.add(e);
+                    Optional.ofNullable(emailRecipients).ifPresent(addNew);
+
+                };
+
+                clientDataList.stream().forEach(clientDataConsumer);
+
             }
+
+            /// update email addressed here son
+
+            Consumer<EmailRecipients> updateEmails = (e)->{
+                Long clientId = e.getClientId();
+                ClientData clientData = clientReadPlatformService.retrieveOne(clientId);
+                String emailCurrent = clientData.getEmailAddress();
+                System.err.println("------------current email is -----------"+emailCurrent);
+                e.setEmailAddress(emailCurrent);
+            };
+
+            mailRecipientsList.stream().forEach(updateEmails);
+            return mailRecipientsList ;
         }
- 
-        System.err.println("------------------email recipients should be 4 here "+mailRecipientsList.size());
+
+        List<EmailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
         return mailRecipientsList ;
     }
 
@@ -113,10 +120,6 @@ public class EmailRecipientsHelper {
         String name = clientData.displayName();
         String email = clientData.getEmailAddress();
         Long clientId = clientData.getId();
-
-        // if(email==null){
-        //     return null;
-        // }
 
         return new EmailRecipients(name ,email ,true ,clientId);
 

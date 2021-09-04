@@ -347,8 +347,6 @@ public class ClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public EmailRecipientsKey viewMailRecipient(@PathParam("id") final Long id) {
 
-        System.err.println("-----------list single entity here ");
-
         EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(id);
         List<EmailRecipients> emailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
         //emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
