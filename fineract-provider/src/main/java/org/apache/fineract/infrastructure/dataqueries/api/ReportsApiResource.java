@@ -190,7 +190,6 @@ public class ReportsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public ScheduledMailSession viewScheduledReportSessions(@PathParam("id") Long id){
 
-        System.err.println("-----------------------dit it call this shit old list or ?");
         ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(schedularWritePlatformService, id);
         return scheduledMailSession;
 
