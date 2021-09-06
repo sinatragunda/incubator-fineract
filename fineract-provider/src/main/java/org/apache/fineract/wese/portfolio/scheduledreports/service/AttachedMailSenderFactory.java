@@ -20,11 +20,12 @@ public class AttachedMailSenderFactory {
         Long id = new Long(1);
         MailServerSettings mailServerSettings = mailServerSettingsRepository.findOne(id);
 
-        IAttachedMailSender attachedMailSender = new AttachedMailSenderNonMetered();
+        IAttachedMailSender attachedMailSender = new AttachedMailSenderNonMetered(weseEmailService);
 
         if(mailServerSettings !=null){
             boolean isTimedServer = mailServerSettings.isTimedServer();
             if (isTimedServer){
+                System.err.println("---------------------mail sender metered --------------");
                 attachedMailSender = new AttachedMailSenderMetered(weseEmailService ,mailServerSettings);
             }
         }

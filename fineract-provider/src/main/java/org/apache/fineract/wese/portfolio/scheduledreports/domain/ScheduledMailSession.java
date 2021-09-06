@@ -113,6 +113,8 @@ public class ScheduledMailSession {
 
     public void updateEmailSendList(EmailSendStatus emailSendStatus){
 
+        System.err.println("--------------update mail session here son-----------------");
+
         synchronized (emailSendStatusList){
             emailSendStatusList.add(emailSendStatus);
             updateCount();
@@ -128,6 +130,8 @@ public class ScheduledMailSession {
                     break;
             }
         }
+
+        System.err.println("-------------count is ---------------------"+emailSendStatusList.size());
     }
 
     public void closeSession(){

@@ -112,7 +112,11 @@ public class ScheduledReportHelper {
         ScheduledMailSession scheduledMailSession = new ScheduledMailSession(scheduledReport);
         ScheduledSendableSession scheduledSendableSession = new ScheduledSendableSession(scheduledMailSession ,sendableReport);
 
+        System.err.println("------------------is client facing --------"+clientReport);
+
         if(clientReport){
+
+
 
             ScheduledMailInitializer.getInstance().addNewSession(weseEmailService ,mailServerSettingsRepository, scheduledSendableSession);
             return ;
