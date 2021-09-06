@@ -54,6 +54,7 @@ public class ExcelWriter {
                     cell.setCellValue((String)o);
                 }
                 catch (ClassCastException c){
+                    String message = c.getMessage();
                     if(message.contains("Double")){
                         cell.setCellValue((Double)o);
                     }

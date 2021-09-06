@@ -58,10 +58,12 @@ public class WeseEmailService{
 	    sendDefinedEmail(emailDetail);
     }
 
-    public SEND_MAIL_MESSAGE_STATUS sendAttached(EmailDetail emailDetail ,String path ,String description){
+    public SEND_MAIL_MESSAGE_STATUS sendAttached(EmailDetail emailDetail ,String path){
         EmailAttachment emailAttachment = new EmailAttachment();
         emailAttachment.setPath(path);
         emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
+
+        String description = emailDetail.getBody();
         emailAttachment.setDescription(description);
         SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = sendDefinedEmail(emailDetail ,emailAttachment);
         return sendMailMessageStatus ;

@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface ScheduledReportRepository extends JpaRepository<ScheduledReport, Long>, JpaSpecificationExecutor<ScheduledReport>{
 
-    //public ScheduledReport findById(Long id);
+    ScheduledReport findOne(Long id);
     ScheduledReport findOneByJobId(Long id);
     List<ScheduledReport> findAll();
 

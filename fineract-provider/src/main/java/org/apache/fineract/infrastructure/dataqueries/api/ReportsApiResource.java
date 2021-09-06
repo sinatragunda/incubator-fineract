@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.api;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -41,8 +43,8 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
-import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledMailSession;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
@@ -56,6 +58,13 @@ import org.springframework.stereotype.Component;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+// Added 05/9/2021
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+// Added 06/05/2021
+import org.apache.fineract.wese.portfolio.scheduledreports.domain.ScheduledMailSession;
 
 
 @Path("/reports")
@@ -188,10 +197,42 @@ public class ReportsApiResource {
     @GET
     @Path("/schedule/{id}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public ScheduledMailSession viewScheduledReportSessions(@PathParam("id") Long id){
+    public ScheduledMailSession viewScheduledReportSessions(@PathParam("id") Long scheduledReportId){
 
-        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(schedularWritePlatformService, id);
+        System.err.println("-------------------report id is --------"+scheduledReportId);
+
+        ScheduledReport scheduledReport = scheduledReportRepository.findOne(scheduledReportId);
+
+        Long jobId = scheduledReport.getJobId();
+        ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId(jobId);
+        scheduledReport.setScheduledJobDetail(scheduledJobDetail);
+        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(schedularWritePlatformService, scheduledReportId);
+        scheduledMailSession = Optional.ofNullable(scheduledMailSession).orElseGet(ScheduledMailSession::new);
+        scheduledMailSession.setScheduledReport(scheduledReport);
         return scheduledMailSession;
+
+    }
+
+    // Added 05/09/2021 .New function to export excel results out
+    @GET
+    @Path("/schedule/{id}/{report}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response exportScheduledReportResults(@PathParam("id") Long id ,@PathParam("report")String report){
+
+//        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.exportResults(id);
+//        String filename = report + DateUtils.getLocalDateOfTenant().toString() + ".xls";
+//        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        try {
+//            workbook.write(baos);
+//        } catch (IOException e) {
+//            LOG.error("Problem occurred in buildResponse function", e);
+//        }
+//
+//        final ResponseBuilder response = Response.ok(baos.toByteArray());
+//        response.header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+//        response.header("Content-Type", "application/vnd.ms-excel");
+//        return response.build();
+        return null ;
 
     }
 

@@ -14,10 +14,7 @@ import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -42,18 +39,17 @@ public class EmailRecipientsHelper {
 
     }
 
-    public static List<EmailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository ,EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
+    public static Queue<EmailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
 
         EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(keyId);
 
         // if true then get office id and fill lists with recipients of clients
         boolean selectAllMode = emailRecipientsKey.getSelectAllMode();
+        Queue<EmailRecipients> mailRecipientsQueue = new LinkedList<>();
 
         if(selectAllMode){
 
-            List<EmailRecipients> mailRecipientsList = new ArrayList<>();
             Long officeId = emailRecipientsKey.getOfficeId();
-
             Long zero = new Long(0);
             
             if(officeId==null){
@@ -67,14 +63,16 @@ public class EmailRecipientsHelper {
             boolean status = officeId.equals(zero);
             int cmp = officeId.compareTo(zero);
 
+            Consumer<EmailRecipients> addNewToQueue = (e)-> mailRecipientsQueue.add(e);
+                    
             if(officeId.equals(zero)){
                 //we taking all clients
 
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
                 Consumer<ClientData> mailRecipientsConsumer = (clientData) ->{
                     EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    Consumer<EmailRecipients> addNew = (e)-> mailRecipientsList.add(e);
-                    Optional.ofNullable(emailRecipients).ifPresent(addNew);
+                    //Consumer<EmailRecipients> addNew = (e)-> mailRecipientsQueue.put(e);
+                    Optional.ofNullable(emailRecipients).ifPresent(addNewToQueue);
                 };
 
                 clientDataList.getPageItems().stream().forEach(mailRecipientsConsumer);
@@ -88,8 +86,7 @@ public class EmailRecipientsHelper {
                 Consumer<ClientData> clientDataConsumer = (clientData)->{
 
                     EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    Consumer<EmailRecipients> addNew = (e)-> mailRecipientsList.add(e);
-                    Optional.ofNullable(emailRecipients).ifPresent(addNew);
+                    Optional.ofNullable(emailRecipients).ifPresent(addNewToQueue);
 
                 };
 
@@ -103,16 +100,19 @@ public class EmailRecipientsHelper {
                 Long clientId = e.getClientId();
                 ClientData clientData = clientReadPlatformService.retrieveOne(clientId);
                 String emailCurrent = clientData.getEmailAddress();
-                System.err.println("------------current email is -----------"+emailCurrent);
                 e.setEmailAddress(emailCurrent);
             };
 
-            mailRecipientsList.stream().forEach(updateEmails);
-            return mailRecipientsList ;
+            mailRecipientsQueue.stream().forEach(updateEmails);
+            return mailRecipientsQueue ;
         }
 
         List<EmailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
-        return mailRecipientsList ;
+        mailRecipientsList.stream().forEach((e)->{
+            mailRecipientsQueue.add(e);
+        });
+        
+        return mailRecipientsQueue ;
     }
 
     public static EmailRecipients createMailRecipientObject(ClientData clientData){

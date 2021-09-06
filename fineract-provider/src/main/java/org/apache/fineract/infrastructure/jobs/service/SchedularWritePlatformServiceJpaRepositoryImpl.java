@@ -44,6 +44,7 @@ import org.apache.fineract.infrastructure.jobs.helper.ScheduledJobsHelper;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.spm.repository.MailServerSettingsRepository;
 import org.apache.fineract.wese.service.WeseEmailService;
 import org.mifosplatform.infrastructure.report.service.PentahoReportingProcessServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +68,13 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     private final ClientReadPlatformService clientReadPlatformService ;
     private final EmailRecipientsKeyRepository emailRecipientsKeyRepository ;
     private final EmailRecipientsRepository emailRecipientsRepository;
+    private final MailServerSettingsRepository mailServerSettingsRepository ;
 
 
     @Autowired
     public SchedularWritePlatformServiceJpaRepositoryImpl(final ScheduledJobDetailRepository scheduledJobDetailsRepository,
-            final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository, final JobDetailDataValidator dataValidator,
-            final SchedulerDetailRepository schedulerDetailRepository ,final FromJsonHelper fromJsonHelper ,final  ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper ,final WeseEmailService weseEmailService ,final PentahoReportingProcessServiceImpl pentahoReportingProcessService ,final EmailRecipientsKeyRepository emailRecipientsKeyRepository ,final ClientReadPlatformService clientReadPlatformService ,final EmailRecipientsRepository emailRecipientsRepository) {
+                                                          final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository, final JobDetailDataValidator dataValidator,
+                                                          final SchedulerDetailRepository schedulerDetailRepository , final FromJsonHelper fromJsonHelper , final  ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper , final WeseEmailService weseEmailService , final PentahoReportingProcessServiceImpl pentahoReportingProcessService , final EmailRecipientsKeyRepository emailRecipientsKeyRepository , final ClientReadPlatformService clientReadPlatformService , final EmailRecipientsRepository emailRecipientsRepository , final MailServerSettingsRepository mailServerSettingsRepository) {
         this.scheduledJobDetailsRepository = scheduledJobDetailsRepository;
         this.scheduledJobRunHistoryRepository = scheduledJobRunHistoryRepository;
         this.schedulerDetailRepository = schedulerDetailRepository;
@@ -84,6 +86,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
         this.emailRecipientsKeyRepository = emailRecipientsKeyRepository;
         this.clientReadPlatformService = clientReadPlatformService;
         this.emailRecipientsRepository = emailRecipientsRepository;
+        this.mailServerSettingsRepository = mailServerSettingsRepository ;
     }
 
     @Override
@@ -190,18 +193,12 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @CronTarget(jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS)
     public void executeScheduledClientReportMail(){
 
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Long jobId = ScheduledJobsHelper.activeJobId;
+        ScheduledJobDetail scheduledJobDetail = findByJobId(jobId);
+
         if (jobId !=null){
-            ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper ,emailRecipientsKeyRepository ,emailRecipientsRepository ,clientReadPlatformService , jobId);
+            ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper ,emailRecipientsKeyRepository ,emailRecipientsRepository ,mailServerSettingsRepository, clientReadPlatformService ,scheduledJobDetail);
         }
 
     }
-
-
-
 }
