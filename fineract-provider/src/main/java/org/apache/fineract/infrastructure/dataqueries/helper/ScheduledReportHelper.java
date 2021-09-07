@@ -31,7 +31,9 @@ import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.spm.repository.EmailSendStatusRepository;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
+import org.apache.fineract.spm.repository.ScheduledMailSessionRepository;
 import org.apache.fineract.wese.helper.ReportsEmailHelper;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.PentahoReportGenerator;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.ScheduledSendableSession;
@@ -83,7 +85,7 @@ public class ScheduledReportHelper {
 
     }
 
-    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , MailServerSettingsRepository mailServerSettingsRepository , ClientReadPlatformService clientReadPlatformService , ScheduledJobDetail scheduledJobDetail){
+    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , MailServerSettingsRepository mailServerSettingsRepository , ScheduledMailSessionRepository scheduledMailSessionRepository , EmailSendStatusRepository emailSendStatusRepository, ClientReadPlatformService clientReadPlatformService , ScheduledJobDetail scheduledJobDetail){
 
         Long jobId = scheduledJobDetail.getId();
         
@@ -116,9 +118,7 @@ public class ScheduledReportHelper {
 
         if(clientReport){
 
-
-
-            ScheduledMailInitializer.getInstance().addNewSession(weseEmailService ,mailServerSettingsRepository, scheduledSendableSession);
+            ScheduledMailInitializer.getInstance().addNewSession(weseEmailService ,mailServerSettingsRepository,scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
             return ;
 
         }
@@ -156,12 +156,13 @@ public class ScheduledReportHelper {
 
     }
 
-    public static ScheduledMailSession scheduledMailSessionResults(SchedularWritePlatformService schedularWritePlatformService , Long scheduledReportId){
+    public static ScheduledMailSession scheduledMailSessionResults(ScheduledMailSessionRepository scheduledMailSessionRepository ,EmailSendStatusRepository emailSendStatusRepository, ScheduledReport scheduledReport){
 
         // get scheduling id here of running status and their results
         // get some results from static container here
         //ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId();
-        ScheduledMailSession scheduledMailSession = ScheduledMailInitializer.getInstance().getSessionResults(scheduledReportId);
+        //Long scheduledReportId = scheduledReport.getId();
+        ScheduledMailSession scheduledMailSession = ScheduledMailInitializer.getInstance().getSessionResults(scheduledMailSessionRepository ,emailSendStatusRepository , scheduledReport);
 
         // if its null then result might have been flushed to database of which there could only be two off them right ? 
         return scheduledMailSession ;

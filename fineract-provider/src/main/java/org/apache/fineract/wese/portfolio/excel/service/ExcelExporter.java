@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.wese.portfolio.excel.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Map ;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.function.Consumer;
 
 public class ExcelExporter {
 
-    public static File export(List<IExcelExportable> excelExportableList ,IExcelExportable excelExportable ,File file){
+    public static ByteArrayOutputStream export(List<? extends  IExcelExportable> excelExportableList ,IExcelExportable excelExportable){
 
         // get first item then get header ,this time export all
         Map<Integer ,Object[]> rowMap = new HashMap<>();
@@ -31,14 +32,8 @@ public class ExcelExporter {
 
         excelExportableList.stream().forEach(toTemplateObject);
         ExcelWriter excelWriter = new ExcelWriter(0 ,true);
-
-        Consumer<Object> writeFile = (e)->{
-            excelWriter.write(file ,null ,rowMap ,headers ,"");
-        };
-
-        Optional.ofNullable(rowMap).ifPresent(writeFile);
-        return file ;
-
+        ByteArrayOutputStream byteArrayOutputStream = excelWriter.write(rowMap ,headers ,"Default");
+        return byteArrayOutputStream ;
     }
 
 

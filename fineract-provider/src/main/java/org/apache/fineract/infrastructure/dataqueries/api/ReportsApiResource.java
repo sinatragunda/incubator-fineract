@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.dataqueries.api;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -52,7 +53,11 @@ import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingServi
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.spm.repository.EmailSendStatusRepository;
+import org.apache.fineract.spm.repository.ScheduledMailSessionRepository;
 import org.apache.fineract.wese.helper.ObjectNodeHelper;
+import org.apache.fineract.wese.portfolio.excel.service.ExcelExporter;
+import org.apache.fineract.wese.portfolio.scheduledreports.domain.EmailSendStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -83,12 +88,14 @@ public class ReportsApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final SchedularWritePlatformService schedularWritePlatformService ;
     private final ScheduledReportRepository scheduledReportRepository ;
+    private final ScheduledMailSessionRepository scheduledMailSessionRepository ;
+    private final EmailSendStatusRepository emailSendStatusRepository ;
 
     @Autowired
     public ReportsApiResource(final PlatformSecurityContext context, final ReadReportingService readReportingService,
                               final ToApiJsonSerializer<ReportData> toApiJsonSerializer,
                               final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-                              final ApiRequestParameterHelper apiRequestParameterHelper ,final SchedularWritePlatformService schedularWritePlatformService ,final ScheduledReportRepository scheduledReportRepository) {
+                              final ApiRequestParameterHelper apiRequestParameterHelper ,final SchedularWritePlatformService schedularWritePlatformService ,final ScheduledReportRepository scheduledReportRepository ,final ScheduledMailSessionRepository scheduledMailSessionRepository ,final EmailSendStatusRepository emailSendStatusRepository) {
         this.context = context;
         this.readReportingService = readReportingService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -96,6 +103,8 @@ public class ReportsApiResource {
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.schedularWritePlatformService = schedularWritePlatformService ;
         this.scheduledReportRepository = scheduledReportRepository;
+        this.emailSendStatusRepository = emailSendStatusRepository ;
+        this.scheduledMailSessionRepository = scheduledMailSessionRepository ;
     }
 
     @GET
@@ -202,37 +211,57 @@ public class ReportsApiResource {
         System.err.println("-------------------report id is --------"+scheduledReportId);
 
         ScheduledReport scheduledReport = scheduledReportRepository.findOne(scheduledReportId);
+        return getScheduledMailSession(scheduledReport);
+    }
 
+
+    private ScheduledMailSession getScheduledMailSession(ScheduledReport scheduledReport) {
         Long jobId = scheduledReport.getJobId();
         ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId(jobId);
         scheduledReport.setScheduledJobDetail(scheduledJobDetail);
-        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(schedularWritePlatformService, scheduledReportId);
-        scheduledMailSession = Optional.ofNullable(scheduledMailSession).orElseGet(ScheduledMailSession::new);
-        scheduledMailSession.setScheduledReport(scheduledReport);
+        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(scheduledMailSessionRepository ,emailSendStatusRepository, scheduledReport);
+        //scheduledMailSession.setScheduledReport(scheduledReport);
         return scheduledMailSession;
-
     }
 
     // Added 05/09/2021 .New function to export excel results out
     @GET
     @Path("/schedule/{id}/{report}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response exportScheduledReportResults(@PathParam("id") Long id ,@PathParam("report")String report){
+    public Response exportScheduledReportResults(@PathParam("id") Long scheduledReportId ,@PathParam("report")String reportSession){
 
-//        ScheduledMailSession scheduledMailSession = ScheduledReportHelper.exportResults(id);
-//        String filename = report + DateUtils.getLocalDateOfTenant().toString() + ".xls";
-//        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        try {
-//            workbook.write(baos);
-//        } catch (IOException e) {
-//            LOG.error("Problem occurred in buildResponse function", e);
-//        }
-//
-//        final ResponseBuilder response = Response.ok(baos.toByteArray());
-//        response.header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-//        response.header("Content-Type", "application/vnd.ms-excel");
-//        return response.build();
-        return null ;
+        ScheduledReport scheduledReport = scheduledReportRepository.findOne(scheduledReportId);
+        String filename = reportSession + DateUtils.getLocalDateOfTenant().toString() + ".xls";
+
+        ScheduledMailSession scheduledMailSession = getScheduledMailSession(scheduledReport);
+
+        Consumer<ScheduledMailSession> exportResultsConsumer = (e)->{
+            System.err.println("---------------------stuff is not null son ---------------"+reportSession);
+            List<EmailSendStatus> emailSendStatusList = new ArrayList<>();
+            switch (reportSession){
+                case "previous":
+
+                    System.err.println("------------------set previpus items -----------");
+                    emailSendStatusList = e.getPreviousEmailSendStatusList();
+                    e.setActiveEmailSendStatusList(emailSendStatusList);
+                    break;
+            }
+        };
+
+
+        // set if user wish to export previous results or active ones
+        Optional.ofNullable(scheduledMailSession).ifPresent(exportResultsConsumer);
+
+        List<EmailSendStatus> emailSendStatusList = scheduledMailSession.getActiveEmailSendStatusList();
+
+        System.err.println("-------------email send list size is "+emailSendStatusList.size());
+
+        final ByteArrayOutputStream baos = ExcelExporter.export(emailSendStatusList ,new EmailSendStatus());
+
+        final ResponseBuilder response = Response.ok(baos.toByteArray());
+        response.header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        response.header("Content-Type", "application/vnd.ms-excel");
+        return response.build();
 
     }
 

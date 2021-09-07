@@ -142,6 +142,10 @@ public class WeseEmailService{
             email.setSubject(emailDetails.getSubject());
             email.setMsg(emailDetails.getBody());
             email.attach(emailAttachment);
+
+            if(emailDetails.getAddress()==null){
+                return SEND_MAIL_MESSAGE_STATUS.INVALID_ADDRESS ;
+            }
         
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
             System.err.println("----------------sending-----------");

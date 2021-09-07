@@ -21,7 +21,7 @@ public class ScheduledSendableSession {
     public void updateResults(EmailSendStatus emailSendStatus){
         //scheduledMailSession.updateCount();
         //System.err.println();
-        scheduledMailSession.updateEmailSendList(emailSendStatus);
+        scheduledMailSession.updateActiveEmailSendList(emailSendStatus);
     }
 
     public void closeSession(){

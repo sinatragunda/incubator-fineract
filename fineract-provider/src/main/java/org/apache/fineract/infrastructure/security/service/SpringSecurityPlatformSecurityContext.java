@@ -79,8 +79,8 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
             System.err.println("---------------why----we getting such error ?-------------- ");
             boolean raiseCheat = ThreadCheat.isRaise();
 
-            if (raiseCheat) {
-                System.err.println("--------------steal a thread here son"------------);
+            if (raiseCheat){
+                System.err.println("-------------------- steal thread son --------------------");
                 currentUser = ThreadCheat.getStolenUser();
                 return currentUser;
             }

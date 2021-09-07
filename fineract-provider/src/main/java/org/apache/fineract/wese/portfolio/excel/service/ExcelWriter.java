@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,11 +30,13 @@ public class ExcelWriter {
         this.isFirstEntry = isFirstEntry;
     }
 
-    public File write(File file ,XSSFWorkbook xssfWorkbook, Map data ,Object[] headers ,String sheetName){
+    public ByteArrayOutputStream write(Map data ,Object[] headers ,String sheetName){
 
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
         XSSFSheet xssfSheet = xssfSheetWithErrorDetection(xssfWorkbook, sheetName);
-        XSSFRow xssfRow ;
+        XSSFRow xssfRow = null ;
 
+        ByteArrayOutputStream byteArrayOutputStream = null ;
         Map<Integer ,Object[]> rows = new TreeMap<>();
         if(isFirstEntry){
             rows.put(rowId ,headers);
@@ -68,14 +71,15 @@ public class ExcelWriter {
             }
         }
         try{
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            xssfWorkbook.write(fileOutputStream);
-            fileOutputStream.close();
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            xssfWorkbook.write(byteArrayOutputStream);
+            byteArrayOutputStream.close();
         }
         catch (IOException i){
             i.printStackTrace();
         }
-        return file ;
+
+        return byteArrayOutputStream ;
     }
 
     public XSSFSheet xssfSheetWithErrorDetection(XSSFWorkbook xssfWorkbook, String sheetName){
