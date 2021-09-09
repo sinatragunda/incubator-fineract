@@ -7,7 +7,7 @@
 package org.apache.fineract.wese.enumerations;
 
 public enum DURATION_TYPE{
-
+    MINUTES,
     HOURLY,
     DAILY;
 

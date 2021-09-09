@@ -20,6 +20,10 @@ import java.util.function.Consumer;
 
 public class ScheduledMailSessionHelper {
 
+    public static Consumer<EmailSendStatus> nullifyScheduledMailSession = (o)->{
+        o.setScheduledMailSession(null);
+    };
+
     public static void saveResults(ScheduledMailSessionRepository scheduledMailSessionRepository , EmailSendStatusRepository emailSendStatusRepository , ScheduledMailSession scheduledMailSession){
 
         System.err.println("------schedulued report is----------"+scheduledMailSession.getScheduledReport().getReportName());
@@ -31,7 +35,7 @@ public class ScheduledMailSessionHelper {
         List<EmailSendStatus> emailSendStatusList = scheduledMailSession.getActiveEmailSendStatusList();
 
         Consumer<EmailSendStatus> emailSendStatusPersistenceConsumer = (e)->{
-            e.setScheduledMailSession(scheduledMailSession);
+            e.updateScheduledMailSession(scheduledMailSession);
             emailSendStatusRepository.save(e);
         };
 
@@ -42,6 +46,7 @@ public class ScheduledMailSessionHelper {
     public static ScheduledMailSession activeAndPreviousSessions(ScheduledMailSessionRepository scheduledMailSessionRepository , EmailSendStatusRepository emailSendStatusRepository , ScheduledReport scheduledReport , boolean thereIsActiveSession) {
 
         Long scheduledReportId = scheduledReport.getId();
+
         List<ScheduledMailSession> scheduledMailSessionList = scheduledMailSessionRepository.findByScheduledReportId(scheduledReportId);
 
 
@@ -50,20 +55,20 @@ public class ScheduledMailSessionHelper {
         // we only want last two items since they are the most recent ,the others you can delete but so far no solution for deleting
         scheduledMailSessionList.stream().map(ScheduledMailSession::getId).sorted();
 
+
+        // to avoid cylclic redundancies
+
+
         int size = scheduledMailSessionList.size();
 
         Consumer<ScheduledMailSession> addEmailSendStatusConsumer = (e) -> {
+
             Long scheduledMailSessionId = e.getId();
 
             System.err.println("----------------scheduled mail session id is -----------"+scheduledMailSessionId);
             List<EmailSendStatus> emailSendStatusList = emailSendStatusRepository.findByScheduledMailSessionId(scheduledMailSessionId);
 
             System.err.println("-----------------------emailSendStatus size is -------------"+emailSendStatusList.size());
-
-            // to avoid cylclic redunancies
-            Consumer<EmailSendStatus> nullifyScheduledMailSession = (o)->{
-                  o.setScheduledMailSession(null);
-            };
 
             emailSendStatusList.stream().forEach(nullifyScheduledMailSession);
             e.setActiveEmailSendStatusList(emailSendStatusList);
@@ -73,7 +78,7 @@ public class ScheduledMailSessionHelper {
         List<ScheduledMailSession> sortedMailSessions = new ArrayList<>();
 
         if(thereIsActiveSession){
-            return  previousSession(scheduledMailSessionList ,true);
+            return  previousSession(scheduledMailSessionList ,addEmailSendStatusConsumer , true);
         }
 
         if (size >= 2) {
@@ -88,20 +93,17 @@ public class ScheduledMailSessionHelper {
 
             System.err.println("---------------sorted mail sessions size is ------------"+sortedMailSessions.size());
 
-            sortedMailSessions.stream().forEach(addEmailSendStatusConsumer);
-
             List<EmailSendStatus> previousSendList = previousMailSession.getActiveEmailSendStatusList();
 
             activeMailSession.setPreviousEmailSendStatusList(previousSendList);
 
             System.err.println("-------------done setting sessions return now----------------");
             activeMailSession.setActive(true);
-            activeMailSession.setScheduledReport(scheduledReport);
+            //activeMailSession.setScheduledReport(scheduledReport);
             return activeMailSession;
         }
 
         if(size > 0){
-
             System.err.println("------------------size is also greater than 0 ,here we assume its only one item------------- "+size);
             scheduledMailSessionList.stream().forEach(addEmailSendStatusConsumer);
             ScheduledMailSession scheduledMailSession = scheduledMailSessionList.get(0);
@@ -115,16 +117,20 @@ public class ScheduledMailSessionHelper {
 
     }
 
-    public static ScheduledMailSession previousSession(List<ScheduledMailSession> scheduledMailSessions ,boolean hasActive){
+    public static ScheduledMailSession previousSession(List<ScheduledMailSession> scheduledMailSessions ,Consumer<ScheduledMailSession> addEmailSendStatusConsumer, boolean hasActive){
 
         int size = scheduledMailSessions.size();
         if(size > 0){
             int index = 0 ;
 
+
             if(hasActive) {
                 index = size - 1;
+
+                System.err.println("-------------previous session index is "+index);
                 // last item in array
                 ScheduledMailSession scheduledMailSession = scheduledMailSessions.get(index);
+                Optional.ofNullable(scheduledMailSession).ifPresent(addEmailSendStatusConsumer);
                 return scheduledMailSession;
             }
         }

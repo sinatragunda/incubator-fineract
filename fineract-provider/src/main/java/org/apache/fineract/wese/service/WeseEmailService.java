@@ -84,8 +84,6 @@ public class WeseEmailService{
         email.setDebug(true); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
-        System.err.println("----------------entering this try catch phase ------");
-
         try {
             if(smtpCredentialsData.isUseTLS()){
                 email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
@@ -95,15 +93,9 @@ public class WeseEmailService{
             email.setSubject(emailDetails.getSubject());
             email.setMsg(emailDetails.getBody());
 
-
-            System.err.println("-------------catching errors now--------");
-
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
             email.send();
-            /// lets just catch all exceptions with exception 
-        // } catch (EmailException e) {
-        //     throw new PlatformEmailSendException(e);
-        // }
+
         }
         catch(Exception e){
 
@@ -134,8 +126,6 @@ public class WeseEmailService{
                 email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
             }
 
-            System.err.println("---------------set attached message here-----------");
-
 
             email.setFrom(authuser, authuserName);
 
@@ -148,36 +138,20 @@ public class WeseEmailService{
             }
         
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
-            System.err.println("----------------sending-----------");
             email.send();
 
-            System.err.println("-------------non of the errors have been caught here ------------");
             return SEND_MAIL_MESSAGE_STATUS.SUCCESS;
 
         }
 
         catch (Exception e) {
 
-            System.err.println("-----------we want to catch specific error here--------");
             Throwable throwable = e.getCause();
 
-            System.err.println("-------------cause is ------------"+throwable.getMessage());
-
             boolean smtError = throwable instanceof SMTPSendFailedException;
-
-            System.err.println("-----------------------------instance of that smtpsendfailedexception "+smtError);
-
             boolean sendFailed = throwable instanceof SendFailedException ;
-
-            System.err.println("-----------------------------instance of that endfailedexception "+sendFailed);
-
-
             boolean unkownHost = throwable instanceof UnknownHostException ;
-
-            System.err.println("-------------unkown host exception "+unkownHost);
-            //throw new PlatformEmailSendException(e);
         }
-
         return SEND_MAIL_MESSAGE_STATUS.ERROR ;
     }
 }

@@ -41,7 +41,10 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
 
     public synchronized boolean isWithinQuota(){
 
-        if(limitCount > limit){
+        // 10 > 10
+        if(limitCount >= limit){
+            System.err.println("------------limit already reach to stop auto sleep lets reset limitCount now---------");
+            limitCount = 0 ;
             return false ;
         }
         return true ;
@@ -56,7 +59,7 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
         // guard against all other threads continuing
         if(isWithinQuota){
 
-            System.err.println("-------------------quota message ---------------"+limit);
+            System.err.println("-------------------limit count ---------------"+limitCount);
             //send reports here son
             SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath());
             updateLimit();
@@ -72,6 +75,9 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
 
         Duration duration = null ;
         switch (durationType){
+            case MINUTES:
+                duration = Duration.ofMinutes(quotaDuration);
+                break;
             case DAILY:
                 duration = Duration.ofDays(quotaDuration);
                 break;
@@ -80,7 +86,7 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
                 break;
         }
 
-        System.err.println("--------time of duration to wake up is "+duration.toString());
+        System.err.println("--------time of duration to wake up is "+duration.getSeconds());
 
         Long sleepTime = duration.getSeconds();
         return sleepTime;

@@ -220,7 +220,10 @@ public class ReportsApiResource {
         ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId(jobId);
         scheduledReport.setScheduledJobDetail(scheduledJobDetail);
         ScheduledMailSession scheduledMailSession = ScheduledReportHelper.scheduledMailSessionResults(scheduledMailSessionRepository ,emailSendStatusRepository, scheduledReport);
-        //scheduledMailSession.setScheduledReport(scheduledReport);
+
+        Optional.ofNullable(scheduledMailSession).ifPresent((e)->{
+            scheduledMailSession.setScheduledReport(scheduledReport);
+        });
         return scheduledMailSession;
     }
 
@@ -236,12 +239,9 @@ public class ReportsApiResource {
         ScheduledMailSession scheduledMailSession = getScheduledMailSession(scheduledReport);
 
         Consumer<ScheduledMailSession> exportResultsConsumer = (e)->{
-            System.err.println("---------------------stuff is not null son ---------------"+reportSession);
             List<EmailSendStatus> emailSendStatusList = new ArrayList<>();
             switch (reportSession){
                 case "previous":
-
-                    System.err.println("------------------set previpus items -----------");
                     emailSendStatusList = e.getPreviousEmailSendStatusList();
                     e.setActiveEmailSendStatusList(emailSendStatusList);
                     break;
@@ -251,11 +251,7 @@ public class ReportsApiResource {
 
         // set if user wish to export previous results or active ones
         Optional.ofNullable(scheduledMailSession).ifPresent(exportResultsConsumer);
-
         List<EmailSendStatus> emailSendStatusList = scheduledMailSession.getActiveEmailSendStatusList();
-
-        System.err.println("-------------email send list size is "+emailSendStatusList.size());
-
         final ByteArrayOutputStream baos = ExcelExporter.export(emailSendStatusList ,new EmailSendStatus());
 
         final ResponseBuilder response = Response.ok(baos.toByteArray());

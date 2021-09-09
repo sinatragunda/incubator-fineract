@@ -105,7 +105,8 @@ public class ScheduledReportHelper {
         Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
         Queue<EmailRecipients> emailRecipientsQueue = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
 
-        boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
+        int recipientsCount = emailRecipientsQueue.size();
+    
 
         String subject = "Scheduled Report";
         String description = String.format("Scheduled %s Report",reportName);
@@ -114,31 +115,11 @@ public class ScheduledReportHelper {
         ScheduledMailSession scheduledMailSession = new ScheduledMailSession(scheduledReport);
         ScheduledSendableSession scheduledSendableSession = new ScheduledSendableSession(scheduledMailSession ,sendableReport);
 
-        System.err.println("------------------is client facing --------"+clientReport);
+        // update the total job count 
+        scheduledMailSession.setTotalJobCount(recipientsCount);
 
-        if(clientReport){
-
-            ScheduledMailInitializer.getInstance().addNewSession(weseEmailService ,mailServerSettingsRepository,scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
-            return ;
-
-        }
-
-        File file = pentahoReportingProcessService.processRequestEx(reportName , queryParams);
-        emailRecipientsQueue.stream().forEach((e)->{
-            /// we need to get list of recipients here as well the clients whose reports we need to send
-            String emailAddress = e.getEmailAddress();
-            String contactName = e.getName();
-
-            System.err.println("-------------send mail "+emailAddress+" ----------- and name ---"+contactName);
-
-            EmailDetail emailDetail =  new EmailDetail(subject,description ,emailAddress ,contactName);
-
-            ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath());
-            
-        });
-
-        file.delete();
-        //return emailRecipientsList;
+        ScheduledMailInitializer.getInstance().addNewSession(weseEmailService ,mailServerSettingsRepository,scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
+        
     }
 
 
@@ -160,12 +141,10 @@ public class ScheduledReportHelper {
 
         // get scheduling id here of running status and their results
         // get some results from static container here
-        //ScheduledJobDetail scheduledJobDetail = schedularWritePlatformService.findByJobId();
-        //Long scheduledReportId = scheduledReport.getId();
         ScheduledMailSession scheduledMailSession = ScheduledMailInitializer.getInstance().getSessionResults(scheduledMailSessionRepository ,emailSendStatusRepository , scheduledReport);
-
+        
         // if its null then result might have been flushed to database of which there could only be two off them right ? 
-        return scheduledMailSession ;
+        return Optional.ofNullable(scheduledMailSession).orElseGet(ScheduledMailSession::new);
     }
 
 }

@@ -43,7 +43,6 @@ public class ScheduledMailSession extends AbstractPersistableCustom<Long>{
     @Transient
     private List<EmailSendStatus> activeEmailSendStatusList = new ArrayList<>();
 
-
     @Transient
     private List<EmailSendStatus> previousEmailSendStatusList = new ArrayList<>();
 
@@ -68,6 +67,9 @@ public class ScheduledMailSession extends AbstractPersistableCustom<Long>{
 
     @Transient
     private ACTIVE_MAIL_SESSION_STATUS activeMailSessionStatus;
+
+    @Transient
+    private int totalJobCount = 0 ;
 
     public ScheduledMailSession(){}
 
@@ -166,9 +168,15 @@ public class ScheduledMailSession extends AbstractPersistableCustom<Long>{
         this.activeMailSessionStatus = activeMailSessionStatus;
     }
 
-    public void updateActiveEmailSendList(EmailSendStatus emailSendStatus){
+    public int getTotalJobCount() {
+        return totalJobCount;
+    }
 
-        System.err.println("--------------update mail session here son-----------------");
+    public void setTotalJobCount(int totalJobCount) {
+        this.totalJobCount = totalJobCount;
+    }
+
+    public void updateActiveEmailSendList(EmailSendStatus emailSendStatus){
 
         synchronized (activeEmailSendStatusList){
 
@@ -186,6 +194,7 @@ public class ScheduledMailSession extends AbstractPersistableCustom<Long>{
                     break;
             }
         }
+
 
         System.err.println("-------------count is ---------------------"+activeEmailSendStatusList.size());
     }

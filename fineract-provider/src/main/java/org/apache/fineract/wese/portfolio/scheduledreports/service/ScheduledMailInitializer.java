@@ -47,7 +47,7 @@ public class ScheduledMailInitializer {
     }
 
     public ScheduledMailInitializer(){
-        System.err.println("----------init new instance");
+        System.err.println("----------init new instance--------which is suppose to be static");
         scheduledSendableSessionList = new ArrayList<>();
     }
 
@@ -62,13 +62,8 @@ public class ScheduledMailInitializer {
         //start session
             scheduledSendableSession.getScheduledMailSession().init();
 
-            System.err.println("------------a session now here it will call other shit");
-
             System.err.println("---------start a new session here with scheduled report id of ------------"+scheduledSendableSession.getScheduledMailSession().getScheduledReport().getId());
 
-            SendableReport sendableReport = scheduledSendableSession.getSendableReport();
-
-            String sessionId = sendableReport.getSessionId();
             Queue<EmailRecipients> emailRecipientsQueue = scheduledSendableSession.getSendableReport().getEmailRecipientsQueue();
             PentahoReportGenerator pentahoReportGenerator = scheduledSendableSession.getSendableReport().getPentahoReportGenerator();
 
@@ -76,8 +71,9 @@ public class ScheduledMailInitializer {
             String description = String.format("Scheduled %s Report",reportName);
             scheduledSendableSession.getScheduledMailSession().setActiveMailSessionStatus(ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
 
-
             System.err.println("------------------recipients lists ------------------"+emailRecipientsQueue.size());
+
+            boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
 
             //emailRecipientsQueue poll and iterate ,if quota reached return item back to queue
             for(;;){
@@ -98,38 +94,37 @@ public class ScheduledMailInitializer {
                 // for each item send and generate some report
                 Long clientId = emailRecipients.getClientId();
 
-                System.err.println("---------------client id is -----------"+clientId);
+                File file = null ;
+                if(clientReport){
 
-                pentahoReportGenerator.updateQueryParams("R_clientId" ,clientId.toString());
-
-                System.err.println("-----------------process file here son -------------");
-                File file = pentahoReportGenerator.processReport();
-
-                System.err.println("-------------done processing file ,now lets send it somewhere-------");
+                    pentahoReportGenerator.updateQueryParams("R_clientId" ,clientId.toString());
+                    file = pentahoReportGenerator.processReport();
+                }
+                else{
+                    file = pentahoReportGenerator.getReccuringFile();
+                }
 
                 EmailDetail emailDetail = emailDetail(emailRecipients ,description);
-
-
                 SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = attachedMailSender.sendMail(file,emailDetail);
 
                 System.err.println("---------send mail status-------------"+sendMailMessageStatus);
 
-                // File should be deleted to avoid duplicates being created
-                file.delete();
+                // File should be deleted to avoid duplicates being created ,but if its not client facing then keep it for the duration of the process
+                if(clientReport){
+                    file.delete();
+                }
 
                 switch (sendMailMessageStatus){
                     case QOUTA_LIMIT:
+                        // return last polled item to queue ,either back or front but we think its back due to implementation
                         emailRecipientsQueue.add(emailRecipients);
-                        // sleep here we have reach quota
-                        scheduledSendableSession.getScheduledMailSession().setActiveMailSessionStatus(ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
+                        updateScheduledSessionStatus(scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
                         Long sleepTime = attachedMailSender.sleepTime();
                         sleepThread(sleepTime);
+                        updateScheduledSessionStatus(scheduledSendableSession ,ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
                         break;
                     default:
-
-                        System.err.println("-----------------update results-----------");
                         EmailSendStatus emailSendStatus = new EmailSendStatus(emailDetail ,sendMailMessageStatus);
-                        //update some results here
                         scheduledSendableSession.updateResults(emailSendStatus);
                 }
 
@@ -168,9 +163,12 @@ public class ScheduledMailInitializer {
         // flush to database here now
         ScheduledMailSession scheduledMailSession = scheduledSendableSession.getScheduledMailSession();
         scheduledMailSession.closeSession();
-
         ScheduledMailSessionHelper.saveResults(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledMailSession);
 
+    }
+
+    public void updateScheduledSessionStatus(ScheduledSendableSession scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS activeMailSessionStatus){
+        scheduledSendableSession.getScheduledMailSession().setActiveMailSessionStatus(activeMailSessionStatus);
     }
 
     public void sleepThread(Long duration){
@@ -211,19 +209,18 @@ public class ScheduledMailInitializer {
 
 
         ScheduledMailSession scheduledMailSession = scheduledSendableSessions.get(0).getScheduledMailSession();
-        scheduledMailSession.setScheduledReport(scheduledReport);
         scheduledMailSession.setActive(true);
 
         // he we already have an active session right now lets hunt for one in database
-        System.err.println("---------------active session exists now lets just get previous one ,recently stored in database----------");
 
         ScheduledMailSession previousMailSession = ScheduledMailSessionHelper.activeAndPreviousSessions(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledReport ,true);
 
         Consumer<ScheduledMailSession> setPrevious = (e)->{
 
-            System.err.println("------------------where is bean serializer error coming from ----------------");
-            List<EmailSendStatus> previousSession = e.getActiveEmailSendStatusList();
-            scheduledMailSession.setPreviousEmailSendStatusList(previousSession);
+            List<EmailSendStatus> previousSessionEmailSendStatusList = e.getActiveEmailSendStatusList();
+            // nullify scheduled mail session reduncancies
+            previousSessionEmailSendStatusList.stream().forEach(ScheduledMailSessionHelper.nullifyScheduledMailSession);
+            scheduledMailSession.setPreviousEmailSendStatusList(previousSessionEmailSendStatusList);
         };
 
         Optional.ofNullable(previousMailSession).ifPresent(setPrevious);

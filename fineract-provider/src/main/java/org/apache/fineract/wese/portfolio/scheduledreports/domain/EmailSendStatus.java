@@ -22,10 +22,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient ;
-
+import javax.persistence.FetchType;
 
 @Entity
 @Table(name="m_email_send_status")
@@ -40,15 +38,15 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
     @Column(name ="name")
     String name;
 
-    @Column(name ="email_address")
+    @Column(name ="email_address" ,nullable=true)
     String emailAddress;
 
     @Column(name ="status")
     String status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="scheduled_mail_session_id")
-    private ScheduledMailSession scheduledMailSession ;
+    private ScheduledMailSession scheduledMailSession = null;
 
     public EmailSendStatus(){
 
@@ -65,11 +63,18 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
     }
 
     public ScheduledMailSession getScheduledMailSession() {
-        return scheduledMailSession;
+
+        return null ;
     }
 
     public void setScheduledMailSession(ScheduledMailSession scheduledMailSession) {
-        this.scheduledMailSession = scheduledMailSession;
+        //this.scheduledMailSession = scheduledMailSession;
+        System.err.println("---------in which thread is being called ? ");
+
+    }
+
+    public void updateScheduledMailSession(ScheduledMailSession scheduledMailSession){
+        this.scheduledMailSession = scheduledMailSession ;
     }
 
     public SEND_MAIL_MESSAGE_STATUS getSendMailMessageStatus() {
@@ -118,7 +123,6 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
     public Object[] excelHeader() {
 
         return new Object[]{
-                "#",
                 "Contact Name",
                 "Receipient",
                 "Status"
@@ -128,7 +132,6 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
     @Override
     public Object[] excelTemplate() {
         return new Object[]{
-                "",
                 name,
                 emailAddress,
                 status

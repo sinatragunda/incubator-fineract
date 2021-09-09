@@ -25,6 +25,7 @@ public class PentahoReportGenerator {
 
     private String reportName ;
     private Map queryParams ;
+    private File file = null;
     private PentahoReportingProcessServiceImpl pentahoReportingProcessService;
 
 
@@ -68,6 +69,15 @@ public class PentahoReportGenerator {
     public File processReport(){
         File file = pentahoReportingProcessService.processRequestEx(reportName ,queryParams);
         return file;
+    }
+
+    // Reccuring is a non client facing file ,since only one of it is needed its safe to just not delete it
+    public File getReccuringFile(){
+        if(file==null){
+            System.err.println("-----------------creating new non client file ------------");
+            file = processReport();
+        }
+        return file ;
     }
 }
 
