@@ -99,18 +99,12 @@ public class ScheduledReportHelper {
         Optional.ofNullable(scheduledReport).ifPresent(setScheduledJobDetailConsumer);
 
         PentahoReportGenerator pentahoReportGenerator = new PentahoReportGenerator(pentahoReportingProcessService);
-        Map<String ,String> queryParams = pentahoReportGenerator.reportParameters(scheduledReport);
-        String reportName = pentahoReportGenerator.getReportName();
-
+        
         Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
         Queue<EmailRecipients> emailRecipientsQueue = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
 
         int recipientsCount = emailRecipientsQueue.size();
     
-
-        String subject = "Scheduled Report";
-        String description = String.format("Scheduled %s Report",reportName);
-
         SendableReport sendableReport = new SendableReport(pentahoReportGenerator ,emailRecipientsQueue);
         ScheduledMailSession scheduledMailSession = new ScheduledMailSession(scheduledReport);
         ScheduledSendableSession scheduledSendableSession = new ScheduledSendableSession(scheduledMailSession ,sendableReport);

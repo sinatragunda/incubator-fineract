@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ScheduledMailInitializer {
@@ -73,20 +74,21 @@ public class ScheduledMailInitializer {
 
             System.err.println("------------------recipients lists ------------------"+emailRecipientsQueue.size());
 
+            ScheduledMailSession scheduledMailSession = scheduledSendableSession.getScheduledMailSession();
+            ScheduledReport scheduledReport = scheduledMailSession.getScheduledReport();
+            Map<String ,String> queryParams = pentahoReportGenerator.reportParameters(scheduledReport);
             boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
 
             //emailRecipientsQueue poll and iterate ,if quota reached return item back to queue
             for(;;){
 
-
-                System.err.println("-------------starting for many loop and polling------------");
                 EmailRecipients emailRecipients = emailRecipientsQueue.poll();
                 // if no more items in queue then processing is done return
                 boolean isPresent = Optional.ofNullable(emailRecipients).isPresent();
-
                 if(!isPresent){
                     // mark process as over
                     System.err.println("-------------------------close mail session here-------------");
+                    //Logger
                     closeSession(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
                     return ;
                 }
