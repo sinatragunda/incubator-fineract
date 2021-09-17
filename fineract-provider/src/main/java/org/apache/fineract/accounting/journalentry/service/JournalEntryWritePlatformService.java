@@ -50,5 +50,5 @@ public interface JournalEntryWritePlatformService {
 
 
     // Added 12/09/2021
-    void createJournalEntriesForDepriciation(Map<String ,Object> accountingBridgeData);
+    void createJournalEntriesForDepreciation(Map<String ,Object> accountingBridgeData);
 }

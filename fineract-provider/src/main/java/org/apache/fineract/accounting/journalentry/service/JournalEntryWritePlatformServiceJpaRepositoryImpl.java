@@ -517,6 +517,24 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
     }
 
+    // Added 12/09/2021 ,for depriciation stuff 
+    @Transactional
+    @Override
+    public void createJournalEntriesForDepreciation(final Map<String, Object> accountingBridgeData) {
+
+        final boolean cashBasedAccountingEnabled = (Boolean) accountingBridgeData.get("cashBasedAccountingEnabled");
+        final boolean accrualBasedAccountingEnabled = (Boolean) accountingBridgeData.get("accrualBasedAccountingEnabled");
+//
+//        if (cashBasedAccountingEnabled || accrualBasedAccountingEnabled) {
+//            final DepreciationDTO depriciationDTO = this.helper.populateDepreciationDtoFromMap(accountingBridgeData, cashBasedAccountingEnabled,
+//                    accrualBasedAccountingEnabled);
+//            final AccountingProcessorForDepriciation accountingProcessor = this.accountingProcessorForSavingsFactory
+//                    .determineProcessor(depriciationDTO);
+//            accountingProcessor.createJournalEntriesForDepreciation(depriciationDTO);
+//        }
+
+    }
+
     @Transactional
     @Override
     public void createJournalEntriesForShares(final Map<String, Object> accountingBridgeData) {

@@ -18,7 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ScheduledMailSessionHelper {
+
+    private final static Logger logger = LoggerFactory.getLogger(ScheduledMailSessionHelper.class);
+
 
     public static Consumer<EmailSendStatus> nullifyScheduledMailSession = (o)->{
         o.setScheduledMailSession(null);
@@ -34,7 +40,10 @@ public class ScheduledMailSessionHelper {
 
         List<EmailSendStatus> emailSendStatusList = scheduledMailSession.getActiveEmailSendStatusList();
 
+        System.err.println("------------------save results to array now --------"+emailSendStatusList.size());
+
         Consumer<EmailSendStatus> emailSendStatusPersistenceConsumer = (e)->{
+            logger.info("Save item to id scheduled mail session"+scheduledMailSession.getId());
             e.updateScheduledMailSession(scheduledMailSession);
             emailSendStatusRepository.save(e);
         };

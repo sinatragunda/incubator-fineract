@@ -114,6 +114,20 @@ public class CodesApiResource {
         return this.toApiJsonSerializer.serialize(settings, code, this.RESPONSE_DATA_PARAMETERS);
     }
 
+    
+    // Added 12/09/2021 ,retrieve code by name     
+    // @GET
+    // @Path("{{codeId}}/{codeName}")
+    // @Consumes({ MediaType.APPLICATION_JSON })
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public String retrieveCodeByName(@PathParam("codeName") final String codeName, @Context final UriInfo uriInfo) {
+
+    //     final CodeData code = this.readPlatformService.retriveCode(codeName);
+
+    //     final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    //     return this.toApiJsonSerializer.serialize(settings, code, this.RESPONSE_DATA_PARAMETERS);
+    // }
+
     @PUT
     @Path("{codeId}")
     @Consumes({ MediaType.APPLICATION_JSON })
