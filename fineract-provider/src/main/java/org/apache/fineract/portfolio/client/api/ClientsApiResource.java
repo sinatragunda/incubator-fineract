@@ -63,6 +63,8 @@ import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.portfolio.self.registration.exception.LinkedSelfServiceClientNotFound;
+import org.apache.fineract.portfolio.self.registration.service.SelfServiceReadPlatformService;
 import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -93,6 +95,7 @@ public class ClientsApiResource {
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final EmailRecipientsKeyRepository emailRecipientsKeyRepository ;
     private final EmailRecipientsRepository emailRecipientsRepository ;
+    private final SelfServiceReadPlatformService selfServiceReadPlatformService ;
 
     @Autowired
     public ClientsApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,
@@ -103,9 +106,7 @@ public class ClientsApiResource {
             final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
             final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
-            final BulkImportWorkbookService bulkImportWorkbookService,
-                              final EmailRecipientsKeyRepository emailRecipientsKeyRepository ,
-                              final EmailRecipientsRepository emailRecipientsRepository) {
+            final BulkImportWorkbookService bulkImportWorkbookService, final EmailRecipientsKeyRepository emailRecipientsKeyRepository , final EmailRecipientsRepository emailRecipientsRepository, final SelfServiceReadPlatformService selfServiceReadPlatformService) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -118,6 +119,7 @@ public class ClientsApiResource {
         this.bulkImportWorkbookService=bulkImportWorkbookService;
         this.emailRecipientsKeyRepository = emailRecipientsKeyRepository;
         this.emailRecipientsRepository = emailRecipientsRepository;
+        this.selfServiceReadPlatformService = selfServiceReadPlatformService ;
     }
 
     @GET
@@ -204,6 +206,37 @@ public class ClientsApiResource {
             }
         }
 
+        return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
+    }
+
+
+    // Added 21/09/2021 ,for self service particularly for use in webportals or apps
+    @GET
+    @Path("selfservice/{userId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveLinkedSelfServiceClient(@PathParam("userId") final Long userId, @Context final UriInfo uriInfo){
+
+        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        Long clientId = this.selfServiceReadPlatformService.selfServiceUserLinkedClientId(userId);
+        if(clientId==null){
+            throw new LinkedSelfServiceClientNotFound(clientId);
+        }
+        
+        ClientData clientData = this.clientReadPlatformService.retrieveOne(clientId);
+
+        if (settings.isTemplate()) {
+            final ClientData templateData = this.clientReadPlatformService.retrieveTemplate(clientData.officeId(),
+                    false);
+            clientData = ClientData.templateOnTop(clientData, templateData);
+            Collection<SavingsAccountData> savingAccountOptions = this.savingsAccountReadPlatformService.retrieveForLookup(clientId, null);
+            if (savingAccountOptions != null && savingAccountOptions.size() > 0) {
+                clientData = ClientData.templateWithSavingAccountOptions(clientData, savingAccountOptions);
+            }
+        }
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
@@ -351,7 +384,6 @@ public class ClientsApiResource {
         List<EmailRecipients> emailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
         //emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
         emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
-
         return emailRecipientsKey ;
 
     }
