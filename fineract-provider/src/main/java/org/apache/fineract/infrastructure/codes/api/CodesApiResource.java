@@ -116,17 +116,17 @@ public class CodesApiResource {
 
     
     // Added 12/09/2021 ,retrieve code by name     
-    // @GET
-    // @Path("{{codeId}}/{codeName}")
-    // @Consumes({ MediaType.APPLICATION_JSON })
-    // @Produces({ MediaType.APPLICATION_JSON })
-    // public String retrieveCodeByName(@PathParam("codeName") final String codeName, @Context final UriInfo uriInfo) {
+    @GET
+    @Path("name/{codeName}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveCodeByName(@PathParam("codeName") final String codeName, @Context final UriInfo uriInfo) {
 
-    //     final CodeData code = this.readPlatformService.retriveCode(codeName);
+        final CodeData code = this.readPlatformService.retriveCode(codeName);
 
-    //     final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-    //     return this.toApiJsonSerializer.serialize(settings, code, this.RESPONSE_DATA_PARAMETERS);
-    // }
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, code, this.RESPONSE_DATA_PARAMETERS);
+    }
 
     @PUT
     @Path("{codeId}")

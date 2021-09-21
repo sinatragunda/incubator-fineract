@@ -362,6 +362,51 @@ public class AccountingConstants {
         }
     }
 
+
+    /*** Added 19/09/2021
+     * Enum of all accounting related input parameter names used while
+     * creating/updating a depreciation product
+     ***/
+    public static enum DEPRECIATION_PRODUCT_ACCOUNTING_PARAMS {
+        ASSET_COST("assetCostAccountId"),ACCUMULATED_DEPRECIATION("accumulatedDepreciationAccountId"), DEPRECIATION_CHARGE("depreciationChargeAccountId");
+
+        private final String value;
+
+        private LOAN_PRODUCT_ACCOUNTING_PARAMS(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return name().toString().replaceAll("_", " ");
+        }
+
+        public String getValue() {
+            return this.value;
+        }
+    }
+
+
+    // Added 19/09/2021
+    public static enum DEPRECIATION_PRODUCT_ACCOUNTING_DATA_PARAMS {
+        ASSET_COST("assetCostAccount"), ACCUMULATED_DEPRECIATION("accumulatedDepreciationAccount"), DEPRECIATION_CHARGE("depreciationChargeAccount");
+
+        private final String value;
+
+        private LOAN_PRODUCT_ACCOUNTING_DATA_PARAMS(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return name().toString().replaceAll("_", " ");
+        }
+
+        public String getValue() {
+            return this.value;
+        }
+    }
+
     public static final String ASSESTS_TAG_OPTION_CODE_NAME = "AssetAccountTags";
     public static final String LIABILITIES_TAG_OPTION_CODE_NAME = "LiabilityAccountTags";
     public static final String EQUITY_TAG_OPTION_CODE_NAME = "EquityAccountTags";
