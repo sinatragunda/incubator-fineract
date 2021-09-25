@@ -84,10 +84,13 @@ import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.savings.service.SavingsApplicationProcessWritePlatformService;
+import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistration;
+import org.apache.fineract.portfolio.self.registration.service.SelfServiceRegistrationWritePlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +149,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ShareProductRepository shareProductRepository;
     private final ShareAccountWritePlatformService shareAccountWritePlatformService ;
     private final ProductReadPlatformService shareProductReadPlatformService ;
+    private final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService;
     
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -164,7 +168,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final ShareProductWritePlatformService shareProductWritePlatformService ,
             final ShareProductRepository shareProductRepository,
             final ShareAccountWritePlatformService shareAccountWritePlatformService,
-            final ShareProductReadPlatformServiceImpl shareProductReadPlatformService
+            final ShareProductReadPlatformServiceImpl shareProductReadPlatformService,
+                                                       final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService
     ) {
         this.context = context;
         this.clientRepository = clientRepository;
@@ -193,6 +198,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.shareProductRepository = shareProductRepository;
         this.shareAccountWritePlatformService = shareAccountWritePlatformService;
         this.shareProductReadPlatformService = shareProductReadPlatformService;
+        this.selfServiceRegistrationWritePlatformService = selfServiceRegistrationWritePlatformService;
     }
 
     @Transactional
@@ -278,14 +284,17 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             Staff staff = null;
 
             final Long staffId = command.longValueOfParameterNamed(ClientApiConstants.staffIdParamName);
+            
             /// modified 25/08/2021 .We have modified this code inorder for import handlers that put null values to 0
             /// this would cause a staff not found error to be raised
+            
             if (staffId != null && staffId != 0) {
                 staff = this.staffRepository.findByOfficeHierarchyWithNotFoundDetection(staffId, clientOffice.getHierarchy());
             }
 
             CodeValue gender = null;
             final Long genderId = command.longValueOfParameterNamed(ClientApiConstants.genderIdParamName);
+            
             if (genderId != null) {
                 gender = this.codeValueRepository.findOneByCodeNameAndIdWithNotFoundDetection(ClientApiConstants.GENDER, genderId);
             }
@@ -321,6 +330,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 }
             }
 
+            // added 25/09/2021 Option to create self service user automatically .Random password and sending details to their email account 
+            final Boolean isCreateSelfServiceUser = command.booleanObjectValueOfParameterNamed(ClientApiConstants.createSelfServiceUserParam);
+            
             
             final Integer legalFormParamValue = command.integerValueOfParameterNamed(ClientApiConstants.legalFormIdParamName);
             boolean isEntity = false;
@@ -338,6 +350,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Client newClient = Client.createNew(currentUser, clientOffice, clientParentGroup, staff, savingsProductId, gender,
                     clientType, clientClassification, legalFormValue, command ,shareProductId);
             this.clientRepository.save(newClient);
+            
             boolean rollbackTransaction = false;
             if (newClient.isActive()) {
                 validateParentGroupRulesBeforeClientActivation(newClient);
@@ -345,6 +358,10 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 final CommandWrapper commandWrapper = new CommandWrapperBuilder().activateClient(null).build();
                 rollbackTransaction = this.commandProcessingService.validateCommand(commandWrapper, currentUser);
             }
+
+
+            // Added 25/09/202
+            createSelfServiceUser(newClient ,isCreateSelfServiceUser);
 			
             this.clientRepository.save(newClient);
             if (newClient.isActive()) {
@@ -696,6 +713,22 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }
         return commandProcessingResult;
     }
+
+    // added 25/09/2021 
+    private void createSelfServiceUser(final Client client,final Boolean isCreateSelfServiceUser) {
+        
+        if(!isCreateSelfServiceUser){
+            return ;
+        }
+
+        if (client.isActive()){
+            System.err.println("---------------------------------------create self service auto ");
+            selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
+        }
+    }
+
+
+
 
 
 

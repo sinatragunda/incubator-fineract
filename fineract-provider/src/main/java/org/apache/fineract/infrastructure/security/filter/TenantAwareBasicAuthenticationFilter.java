@@ -182,8 +182,6 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
 		boolean isSelfServiceRequest = (pathURL != null && pathURL.contains("/self/"));
 
-		System.err.println("----------------is self service request here man -----------------"+isSelfServiceRequest);
-
 		boolean notAllowed = ((isSelfServiceRequest && !user.isSelfServiceUser())
 				||(!isSelfServiceRequest && user.isSelfServiceUser()));
 		

@@ -169,9 +169,12 @@ public class ClientPersonImportHandler implements ImportHandler {
         // added for auto savings account creation and share account creation
         Long savingsProductId = ImportHandlerUtils.readAsLong(ClientPersonConstants.SAVINGS_PRODUCT_ID_COL ,row);
         Long shareProductId = ImportHandlerUtils.readAsLong(ClientPersonConstants.SHARES_PRODUCT_ID_COL ,row);
+        
+        // added 25/09/2021
+        Boolean createSelfService = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL);
 
         return ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
-                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId);
+                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService);
 
         }
 
