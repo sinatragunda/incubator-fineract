@@ -29,6 +29,8 @@ public class ClientApiConstants {
     public static final String CLIENT_RESOURCE_NAME = "client";
     public static final String CLIENT_CHARGES_RESOURCE_NAME = "CLIENTCHARGE";
 
+    // Self service 
+    public static final String READ_CLIENT  ="READ_CLIENT";
 
     // Client Charge Action Names
     public static final String CLIENT_CHARGE_ACTION_CREATE = "CREATE";

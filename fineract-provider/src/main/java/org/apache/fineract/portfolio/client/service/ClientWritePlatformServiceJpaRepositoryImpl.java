@@ -262,11 +262,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 					.retrieveGlobalConfiguration("Enable-Address");
 
 			final Boolean isAddressEnabled = configuration.isEnabled();
-			
+
 			final Boolean isStaff = command.booleanObjectValueOfParameterNamed(ClientApiConstants.isStaffParamName);
-
             final Long officeId = command.longValueOfParameterNamed(ClientApiConstants.officeIdParamName);
-
             final Office clientOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
 
             final Long groupId = command.longValueOfParameterNamed(ClientApiConstants.groupIdParamName);

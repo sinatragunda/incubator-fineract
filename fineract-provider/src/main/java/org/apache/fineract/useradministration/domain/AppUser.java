@@ -481,8 +481,11 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     public boolean hasNotPermissionForAnyOf(final String... permissionCodes) {
         boolean hasNotPermission = true;
+        
         for (final String permissionCode : permissionCodes) {
+            System.err.println("-----------------check permission code for -------------"+permissionCode);
             final boolean checkPermission = hasPermissionTo(permissionCode);
+            System.err.println("--------------------------checkPermission ----------------"+checkPermission);
             if (checkPermission) {
                 hasNotPermission = false;
                 break;
@@ -513,8 +516,14 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         final String authorizationMessage = "User has no authority to view " + resourceType.toLowerCase() + "s";
         final String matchPermission = "READ_" + resourceType.toUpperCase();
 
-        if (!hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", matchPermission)) { return; }
+        System.err.println("------------------has permission for "+matchPermission);
 
+        if (!hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", matchPermission)) { 
+            System.err.println("-------------lets return here son--------------");
+            return; 
+        }
+
+        System.err.println("---------------throwing authorization error-------------");
         throw new NoAuthorizationException(authorizationMessage);
     }
 
@@ -556,9 +565,10 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
     private boolean hasAnyPermission(final List<String> permissions) {
         boolean hasAtLeastOneOf = false;
-
-        for (final String permissionCode : permissions) {
+        for (final String permissionCode : permissions){
+            System.err.println("--------------------check permission for -------------"+permissionCode);
             if (hasPermissionTo(permissionCode)) {
+                System.err.println("-------------------user has permission for this ------------");
                 hasAtLeastOneOf = true;
                 break;
             }
