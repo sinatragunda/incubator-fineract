@@ -114,10 +114,13 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
     @Override
     public SelfServiceRegistration createRegistrationRequest(String apiRequestBodyAsJson) {
+        
         Gson gson = new Gson();
+        
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("user");
+        
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, apiRequestBodyAsJson,
                 SelfServiceApiConstants.REGISTRATION_REQUEST_DATA_PARAMETERS);
         JsonElement element = gson.fromJson(apiRequestBodyAsJson.toString(), JsonElement.class);
@@ -138,6 +141,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
         // validate password policy
         String password = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.passwordParamName, element);
+        
         final PasswordValidationPolicy validationPolicy = this.passwordValidationPolicy.findActivePasswordValidationPolicy();
         final String regex = validationPolicy.getRegex();
         final String description = validationPolicy.getDescription();
@@ -211,6 +215,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
     }
 
     private void sendAuthorizationMail(SelfServiceRegistration selfServiceRegistration) {
+        
         final String subject = "Authorization token ";
         final String body = "Hi  " + selfServiceRegistration.getFirstName() + "," + "\n" + "To create user, please use following details\n"
                 + "Request Id : " + selfServiceRegistration.getId() + "\n Authentication Token : "
@@ -249,7 +254,9 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
             Long id = this.fromApiJsonHelper.extractLongNamed(SelfServiceApiConstants.requestIdParamName, element);
             baseDataValidator.reset().parameter(SelfServiceApiConstants.requestIdParamName).value(id).notNull().integerGreaterThanZero();
+            
             command = JsonCommand.fromJsonElement(id, element);
+            
             String authenticationToken = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.authenticationTokenParamName,
                     element);
             baseDataValidator.reset().parameter(SelfServiceApiConstants.authenticationTokenParamName).value(authenticationToken).notBlank()
@@ -259,7 +266,11 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
             SelfServiceRegistration selfServiceRegistration = this.selfServiceRegistrationRepository.getRequestByIdAndAuthenticationToken(
                     id, authenticationToken);
-            if (selfServiceRegistration == null) { throw new SelfServiceRegistrationNotFoundException(id, authenticationToken); }
+            
+            if (selfServiceRegistration == null) { 
+                throw new SelfServiceRegistrationNotFoundException(id, authenticationToken);
+            }
+
             username = selfServiceRegistration.getUsername();
             Client client = selfServiceRegistration.getClient();
             final boolean passwordNeverExpire = true;
@@ -273,10 +284,13 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             }else{
                 throw new RoleNotFoundException(SelfServiceApiConstants.SELF_SERVICE_USER_ROLE);
             }
+
             List<Client> clients = new ArrayList<>(Arrays.asList(client));
+            
             User user = new User(selfServiceRegistration.getUsername(), selfServiceRegistration.getPassword(), authorities);
             AppUser appUser = new AppUser(client.getOffice(), user, allRoles, selfServiceRegistration.getEmail(), client.getFirstname(),
                     client.getLastname(), null, passwordNeverExpire, isSelfServiceUser, clients);
+            
             this.userDomainService.create(appUser, true);
             return appUser;
 

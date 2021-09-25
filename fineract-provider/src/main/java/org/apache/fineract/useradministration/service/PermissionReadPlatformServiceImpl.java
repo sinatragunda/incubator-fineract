@@ -57,6 +57,19 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
         return this.jdbcTemplate.query(sql, mapper, new Object[] {});
     }
 
+    // Added 25/09/2021 permissions for reports
+    @Override
+    public Collection<PermissionData> retrieveAllReportPermissions() {
+
+        this.context.authenticatedUser();
+
+        final PermissionUsageDataMapper mapper = new PermissionUsageDataMapper();
+        final String sql = mapper.rolePermissionSchema
+        logger.info("retrieve all report permissions : " + sql);
+        return this.jdbcTemplate.query(sql, mapper, new Object[] {});
+    }
+
+
     @Override
     public Collection<PermissionData> retrieveAllMakerCheckerablePermissions() {
 
@@ -89,14 +102,23 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
             final String entityName = rs.getString("entityName");
             final String actionName = rs.getString("actionName");
             final Boolean selected = rs.getBoolean("selected");
+            final Long id = rs.getLong('id');
 
-            return PermissionData.instance(grouping, code, entityName, actionName, selected);
+            return PermissionData.instance(id ,grouping, code, entityName, actionName, selected);
         }
 
         public String permissionSchema() {
             /* get all non-CHECKER permissions */
-            return "select p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, true as selected"
+            return "select p.id ,p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, true as selected"
                     + " from m_permission p " + " where code not like '%\\_CHECKER'"
+                    + " order by p.grouping, ifnull(entity_name, ''), p.code";
+        }
+
+
+        public String reportPermissionSchema() {
+            /* get all non-CHECKER permissions and are of report grouping */
+            return "select  p.id ,p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, true as selected"
+                    + " from m_permission p " + " where code not like '%\\_CHECKER' and grouping ='report'"
                     + " order by p.grouping, ifnull(entity_name, ''), p.code";
         }
 
@@ -107,13 +129,13 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
              * the CHECKER permissions
              */
 
-            return "select p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, p.can_maker_checker as selected"
+            return "select  p.id ,p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, p.can_maker_checker as selected"
                     + " from m_permission p " + " where grouping != 'special' and code not like 'READ_%' and code not like '%\\_CHECKER'"
                     + " order by p.grouping, ifnull(entity_name, ''), p.code";
         }
 
         public String rolePermissionSchema() {
-            return "select p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, if(isnull(rp.role_id), false, true) as selected "
+            return "select  p.id ,p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, if(isnull(rp.role_id), false, true) as selected "
                     + " from m_permission p "
                     + " left join m_role_permission rp on rp.permission_id = p.id and rp.role_id = ? "
                     + " order by p.grouping, ifnull(entity_name, ''), p.code";

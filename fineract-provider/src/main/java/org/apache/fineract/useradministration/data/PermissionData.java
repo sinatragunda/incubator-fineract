@@ -23,6 +23,9 @@ package org.apache.fineract.useradministration.data;
  */
 public class PermissionData {
 
+
+    private Long id ;
+
     @SuppressWarnings("unused")
     private final String grouping;
     @SuppressWarnings("unused")
@@ -43,12 +46,25 @@ public class PermissionData {
         return new PermissionData(grouping, code, entityName, actionName, selected);
     }
 
-    private PermissionData(final String grouping, final String code, final String entityName, final String actionName,
+    private PermissionData(final Long id ,final String grouping, final String code, final String entityName, final String actionName,
             final Boolean selected) {
         this.grouping = grouping;
         this.code = code;
+        this.id = id ;
         this.entityName = entityName;
         this.actionName = actionName;
         this.selected = selected;
+    }
+
+    public Long getId(){
+        return this.id ;
+    }
+
+    public String getGrouping(){
+        return this.grouping ;
+    }
+
+    public String getEntityName(){
+        return this.entityName ;
     }
 }

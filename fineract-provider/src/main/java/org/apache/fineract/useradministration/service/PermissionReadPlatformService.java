@@ -29,4 +29,8 @@ public interface PermissionReadPlatformService {
     Collection<PermissionData> retrieveAllMakerCheckerablePermissions();
 
     Collection<PermissionData> retrieveAllRolePermissions(Long roleId);
+
+    // Added 25/09/2021
+    Collection<PermissionData> retrieveAllReportPermissions();
+
 }

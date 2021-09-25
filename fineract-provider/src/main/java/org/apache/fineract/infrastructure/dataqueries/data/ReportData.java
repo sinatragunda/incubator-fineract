@@ -52,6 +52,10 @@ final public class ReportData {
     @SuppressWarnings("unused")
     private Collection<ReportParameterData> allowedParameters;
 
+    public static ReportData fromReportName(String reportName){
+        return new ReportData(reportName);
+    }
+
     public ReportData(final Long id, final String reportName, final String reportType, final String reportSubType,
             final String reportCategory, final String description, final String reportSql, final Boolean coreReport,
             final Boolean useReport, final Collection<ReportParameterData> reportParameters) {
@@ -68,6 +72,10 @@ final public class ReportData {
         this.allowedReportTypes = null;
         this.allowedReportSubTypes = null;
         this.allowedParameters = null;
+    }
+
+    public ReportData(String reportName){
+        this.reportName = reportName ;
     }
 
     public ReportData() {
