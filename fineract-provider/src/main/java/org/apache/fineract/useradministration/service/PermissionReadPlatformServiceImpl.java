@@ -64,7 +64,7 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
         this.context.authenticatedUser();
 
         final PermissionUsageDataMapper mapper = new PermissionUsageDataMapper();
-        final String sql = mapper.rolePermissionSchema
+        final String sql = mapper.rolePermissionSchema();
         logger.info("retrieve all report permissions : " + sql);
         return this.jdbcTemplate.query(sql, mapper, new Object[] {});
     }
@@ -102,7 +102,7 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
             final String entityName = rs.getString("entityName");
             final String actionName = rs.getString("actionName");
             final Boolean selected = rs.getBoolean("selected");
-            final Long id = rs.getLong('id');
+            final Long id = rs.getLong("id");
 
             return PermissionData.instance(id ,grouping, code, entityName, actionName, selected);
         }

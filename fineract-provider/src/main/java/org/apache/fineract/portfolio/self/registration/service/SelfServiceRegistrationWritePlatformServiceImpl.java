@@ -179,7 +179,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
     // Added 25/09/2021 ,for creating self service user from client data 
     @Override
-    public SelfServiceRegistration createSelfServiceUserEx(ClientData clientData){
+    public SelfServiceRegistration createSelfServiceUserEx(Client client){
 
         Gson gson = new Gson();
         
@@ -191,23 +191,21 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
                 SelfServiceApiConstants.REGISTRATION_REQUEST_DATA_PARAMETERS);
         JsonElement element = gson.fromJson(apiRequestBodyAsJson.toString(), JsonElement.class);
 
-        String accountNumber = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.accountNumberParamName, element);
+        String accountNumber = client.getAccountNumber();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.accountNumberParamName).value(accountNumber).notNull().notBlank()
                 .notExceedingLengthOf(100);
 
-        String firstName = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.firstNameParamName, element);
+        String firstName = client.getFirstname();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.firstNameParamName).value(firstName).notBlank()
                 .notExceedingLengthOf(100);
 
-        String lastName = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.lastNameParamName, element);
+        String lastName = client.getLastname();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.lastNameParamName).value(lastName).notBlank().notExceedingLengthOf(100);
 
-        String username = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.usernameParamName, element);
+        String username = client.getEmailAddress();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.usernameParamName).value(username).notBlank().notExceedingLengthOf(100);
 
-        // validate password policy
-        String password = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.passwordParamName, element);
-        
+
         final PasswordValidationPolicy validationPolicy = this.passwordValidationPolicy.findActivePasswordValidationPolicy();
         final String regex = validationPolicy.getRegex();
         final String description = validationPolicy.getDescription();
@@ -218,23 +216,18 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         baseDataValidator.reset().parameter(SelfServiceApiConstants.authenticationModeParamName).value(authenticationMode).notBlank()
                 .isOneOfTheseStringValues(SelfServiceApiConstants.emailModeParamName, SelfServiceApiConstants.mobileModeParamName);
 
-        String email = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.emailParamName, element);
+        String email = client.getEmailAddress();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.emailParamName).value(email).notNull().notBlank()
                 .notExceedingLengthOf(100);
 
-        boolean isEmailAuthenticationMode = authenticationMode.equalsIgnoreCase(SelfServiceApiConstants.emailModeParamName);
-        String mobileNumber = null;
-        if (!isEmailAuthenticationMode) {
-            mobileNumber = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.mobileNumberParamName, element);
-            baseDataValidator.reset().parameter(SelfServiceApiConstants.mobileNumberParamName).value(mobileNumber).notNull()
-                    .validatePhoneNumber();
-        }
+        boolean isEmailAuthenticationMode = true;
+        
         validateForDuplicateUsername(username);
 
         throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName, mobileNumber, isEmailAuthenticationMode);
 
         String authenticationToken = randomAuthorizationTokenGeneration();
-        Client client = this.clientRepository.getClientByAccountNumber(accountNumber);
+        
         SelfServiceRegistration selfServiceRegistration = SelfServiceRegistration.instance(client, accountNumber, firstName, lastName,
                 mobileNumber, email, authenticationToken, username, password);
         this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
