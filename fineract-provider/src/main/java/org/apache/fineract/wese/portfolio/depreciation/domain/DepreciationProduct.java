@@ -71,7 +71,7 @@ import com.google.gson.JsonObject;
  * They allow for constraints to be added at product level.
  */
 @Entity
-@Table(name = "m_product_depreciation", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "unq_name"),
+@Table(name = "m_depreciation_product", uniqueConstraints = { @UniqueConstraint(columnNames = { "name" }, name = "unq_name"),
         @UniqueConstraint(columnNames = { "external_id" }, name = "external_id_UNIQUE"),
         @UniqueConstraint(columnNames = { "short_name" }, name = "unq_short_name") })
 public class DepreciationProduct extends AbstractPersistableCustom<Long> {
@@ -136,7 +136,6 @@ public class DepreciationProduct extends AbstractPersistableCustom<Long> {
 
 
     public static DepreciationProduct assembleFromJson(final JsonCommand command) {
-
         final String name = command.stringValueOfParameterNamed("name");
         final String shortName = command.stringValueOfParameterNamed(LoanProductConstants.shortName);
         final String description = command.stringValueOfParameterNamed("description");
@@ -152,7 +151,6 @@ public class DepreciationProduct extends AbstractPersistableCustom<Long> {
         }
 
         final BigDecimal salvageValue = command.bigDecimalValueOfParameterNamed(DepreciationProductConstants.salvageValue);
-
         final BigDecimal rateOfDecay = command.bigDecimalValueOfParameterNamed(DepreciationProductConstants.rateOfDecay);
         final BigDecimal minRateOfDecay = command.bigDecimalValueOfParameterNamed(DepreciationProductConstants.minRateOfDecay);
         final BigDecimal maxRateOfDecay = command.bigDecimalValueOfParameterNamed(DepreciationProductConstants.maxRateOfDecay);

@@ -25,5 +25,6 @@ public class DepreciationProductConstants {
     public static String usefullLifeTimer = "userfullLifeTimer";
     public static String depreciationMethod = "depreciationMethod";
     public static String externalId = "externalId";
+    public static String accountingRule = "accountingRule";
 
 }

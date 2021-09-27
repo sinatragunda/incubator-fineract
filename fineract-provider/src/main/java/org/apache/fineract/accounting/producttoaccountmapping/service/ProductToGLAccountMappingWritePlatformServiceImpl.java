@@ -287,6 +287,38 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
 
     }
 
+    // Added 25/09/2021    
+    @Override
+    @Transactional
+    public Map<String, Object> updateDepreciationProductToGLAccountMapping(final Long depreciationProductId, final JsonCommand command,
+            final boolean accountingRuleChanged, final int accountingRuleTypeId) {
+        /***
+         * Variable tracks all accounting mapping properties that have been
+         * updated
+         ***/
+        Map<String, Object> changes = new HashMap<>();
+        final JsonElement element = this.fromApiJsonHelper.parse(command.json());
+        final AccountingRuleType accountingRuleType = AccountingRuleType.fromInt(accountingRuleTypeId);
+
+        /***
+         * If the accounting rule has been changed, delete all existing mapping
+         * for the product and recreate a new set of mappings
+         ***/
+        if (accountingRuleChanged) {
+            this.deserializer.validateForLoanProductCreate(command.json());
+            this.depreciationProductToGLAccountMappingHelper.deleteDepreciationProductToGLAccountMapping(loanProductId);
+            createLoanProductToGLAccountMapping(depreciationProductId, command);
+            changes = this.depreciationProductToGLAccountMappingHelper.populateChangesForNewDepreciationProductToGLAccountMappingCreation(element,
+                    accountingRuleType);
+        }/*** else examine and update individual changes ***/
+        else {
+            this.depreciationProductToGLAccountMappingHelper.handleChangesToDepreciationProductToGLAccountMappings(loanProductId, changes, element,
+                    accountingRuleType);
+        }
+        return changes;
+    }
+
+
     @Override
     @Transactional
     public Map<String, Object> updateLoanProductToGLAccountMapping(final Long loanProductId, final JsonCommand command,

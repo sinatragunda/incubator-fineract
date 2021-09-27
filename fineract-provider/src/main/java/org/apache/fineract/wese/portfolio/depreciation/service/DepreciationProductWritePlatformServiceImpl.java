@@ -48,18 +48,17 @@ public class DepreciationProductWritePlatformServiceImpl implements Depreciation
 
     @Autowired
     public DepreciationProductWritePlatformServiceImpl(final DepreciationProductRepository depreciationProductRepository , final PlatformSecurityContext context,
-                                                            final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
-                                                            final FineractEntityAccessUtil fineractEntityAccessUtil,
-                                                            final BusinessEventNotifierService businessEventNotifierService ,
-                                                            final DepreciationProductDataValidator fromApiJsonDeserializer) {
+        final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
+        final FineractEntityAccessUtil fineractEntityAccessUtil,
+        final BusinessEventNotifierService businessEventNotifierService ,
+        final DepreciationProductDataValidator fromApiJsonDeserializer) {
+
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
         this.businessEventNotifierService = businessEventNotifierService;
     }
-
-
 
     @Transactional
     @Override
@@ -68,9 +67,7 @@ public class DepreciationProductWritePlatformServiceImpl implements Depreciation
         try {
 
             this.context.authenticatedUser();
-
             this.fromApiJsonDeserializer.validateForCreate(command.json());
-            //validateInputDates(command);
 
             final DepreciationProduct depreciationProduct = DepreciationProduct.assembleFromJson(command);
             this.depreciationProductRepository.save(depreciationProduct);
@@ -113,7 +110,10 @@ public class DepreciationProductWritePlatformServiceImpl implements Depreciation
             this.context.authenticatedUser();
 
             final DepreciationProduct product = this.depreciationProductRepository.findOne(depreciationProductId);
-            if (product == null) { throw new DepreciationProductNotFoundException(depreciationProductId); }
+            
+            if (product == null) { 
+                throw new DepreciationProductNotFoundException(depreciationProductId); 
+            }
 
             this.fromApiJsonDeserializer.validateForUpdate(command.json(), product);
             //validateInputDates(command);
@@ -123,7 +123,7 @@ public class DepreciationProductWritePlatformServiceImpl implements Depreciation
             // accounting related changes
             final boolean accountingTypeChanged = changes.containsKey("accountingRule");
             final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService
-                    .updateLoanProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingType());
+                    .updateDepreciationProductToGLAccountMapping(depreciationProductId, command, accountingTypeChanged, product.getAccountingRule());
             changes.putAll(accountingMappingChanges);
 
             if (!changes.isEmpty()) {
