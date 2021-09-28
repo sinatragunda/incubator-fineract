@@ -92,6 +92,18 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
         return this.jdbcTemplate.query(sql, mapper, new Object[] { roleId });
     }
 
+
+    // Added 28/09/2021 ,added so as to collect only reports user role can view instead of all 
+    @Override
+    public Collection<PermissionData> retrieveAllRolePermissionsEx(final Long roleId) {
+
+        final PermissionUsageDataMapper mapper = new PermissionUsageDataMapper();
+        final String sql = mapper.rolePermissionSchemaWithUnionJoin();
+        logger.info("retrieveAllRolePermissions: " + sql);
+
+        return this.jdbcTemplate.query(sql, mapper, new Object[] { roleId });
+    }
+
     private static final class PermissionUsageDataMapper implements RowMapper<PermissionData> {
 
         @Override
@@ -145,6 +157,13 @@ public class PermissionReadPlatformServiceImpl implements PermissionReadPlatform
             //         + " left join m_role_permission rp on rp.permission_id = p.id and rp.role_id = ? "
             //         + " order by p.grouping, ifnull(entity_name, ''), p.code";
         
+        }
+
+        public String rolePermissionSchemaWithUnionJoin() {
+                return "select  p.id ,p.grouping, p.code, p.entity_name as entityName, p.action_name as actionName, if(isnull(rp.role_id), false, true) as selected "
+                    + " from m_permission p "
+                    + " join m_role_permission rp on rp.permission_id = p.id and rp.role_id = ? "
+                    + " order by p.grouping, ifnull(entity_name, ''), p.code";
         }
     }
 

@@ -54,4 +54,7 @@ public class SavingsConstants {
     public static final int CHARGE_ID_2 = 37;
     public static final int CHARGE_AMOUNT_2 = 38;
     public static final int CHARGE_DUE_DATE_2 = 39;
+
+    public static final int OPENING_BALANCE_COL = 40; 
+
 }

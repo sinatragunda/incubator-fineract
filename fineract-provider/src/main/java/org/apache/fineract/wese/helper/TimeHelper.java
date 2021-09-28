@@ -57,5 +57,11 @@ public class TimeHelper{
 		return Date.from(instant);
 	}
 
+	// Added 28/09/2021
+	public static org.joda.time.LocalDate jodaLocalDateNow(){
+		org.joda.time.LocalDate now = org.joda.time.LocalDate.now();
+		return now ;
+	}
+
 
 }

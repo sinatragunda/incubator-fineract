@@ -49,8 +49,6 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
     private ScheduledMailSession scheduledMailSession = null;
 
     public EmailSendStatus(){
-
-        System.err.println("-------init must be called here");
         //emailDetail = new EmailDetail();
     }
 

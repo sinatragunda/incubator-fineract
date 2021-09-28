@@ -94,6 +94,10 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(SavingsConstants.LOOKUP_ACTIVATION_DATE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(SavingsConstants.EXTERNAL_ID_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
+        // added 28/09/2021
+        worksheet.setColumnWidth(SavingsConstants.OPENING_BALANCE_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
+
+
         worksheet.setColumnWidth(SavingsConstants.ALLOW_OVER_DRAFT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(SavingsConstants.OVER_DRAFT_LIMIT_COL, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
@@ -104,14 +108,16 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         worksheet.setColumnWidth(SavingsConstants.CHARGE_AMOUNT_2, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
         worksheet.setColumnWidth(SavingsConstants.CHARGE_DUE_DATE_2, TemplatePopulateImportConstants.MEDIUM_COL_SIZE);
 
+
+
         writeString(SavingsConstants.OFFICE_NAME_COL, rowHeader, "Office Name*");
         writeString(SavingsConstants.SAVINGS_TYPE_COL, rowHeader, "Individual/Group*");
         writeString(SavingsConstants.CLIENT_NAME_COL, rowHeader, "Client Name*");
         writeString(SavingsConstants.PRODUCT_COL, rowHeader, "Product*");
         writeString(SavingsConstants.FIELD_OFFICER_NAME_COL, rowHeader, "Field Officer*");
-        writeString(SavingsConstants.SUBMITTED_ON_DATE_COL, rowHeader, "Submitted On*");
-        writeString(SavingsConstants.APPROVED_DATE_COL, rowHeader, "Approved On*");
-        writeString(SavingsConstants.ACTIVATION_DATE_COL, rowHeader, "Activation Date*");
+        writeString(SavingsConstants.SUBMITTED_ON_DATE_COL, rowHeader, "Submitted On* (Defaults to Today)");
+        writeString(SavingsConstants.APPROVED_DATE_COL, rowHeader, "Approved On* (Defaults to Today)");
+        writeString(SavingsConstants.ACTIVATION_DATE_COL, rowHeader, "Activation Date* (Defaults to Today)");
         writeString(SavingsConstants.CURRENCY_COL, rowHeader, "Currency");
         writeString(SavingsConstants.DECIMAL_PLACES_COL, rowHeader, "Decimal Places");
         writeString(SavingsConstants.IN_MULTIPLES_OF_COL, rowHeader, "In Multiples Of");
@@ -128,6 +134,10 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(SavingsConstants.LOOKUP_ACTIVATION_DATE_COL, rowHeader, "Client Activation Date");
         writeString(SavingsConstants.EXTERNAL_ID_COL, rowHeader, "External Id");
 
+                // added 28/09/2021
+        writeString(SavingsConstants.OPENING_BALANCE_COL, rowHeader, "Opening Balance*");
+
+
         writeString(SavingsConstants.ALLOW_OVER_DRAFT_COL, rowHeader, "Is Overdraft Allowed ");
         writeString(SavingsConstants.OVER_DRAFT_LIMIT_COL, rowHeader,"  Maximum Overdraft Amount Limit ");
 
@@ -137,6 +147,9 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(SavingsConstants.CHARGE_ID_2,rowHeader,"Charge Id");
         writeString(SavingsConstants.CHARGE_AMOUNT_2, rowHeader, "Charged Amount");
         writeString(SavingsConstants.CHARGE_DUE_DATE_2, rowHeader, "Charged On Date");
+
+
+
 
     }
 

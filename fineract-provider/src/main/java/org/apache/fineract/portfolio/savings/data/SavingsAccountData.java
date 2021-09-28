@@ -123,17 +123,20 @@ public class SavingsAccountData {
     // Added 23/07/2021
     private List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccounts;
 
+    // Added 28/09/2021
+    private BigDecimal openingBalance ;
+
     public static SavingsAccountData importInstanceIndividual(Long clientId, Long productId, Long fieldOfficerId,LocalDate submittedOnDate,
             BigDecimal nominalAnnualInterestRate, EnumOptionData interestCompoundingPeriodTypeEnum,
             EnumOptionData interestPostingPeriodTypeEnum,EnumOptionData interestCalculationTypeEnum,
             EnumOptionData interestCalculationDaysInYearTypeEnum,BigDecimal minRequiredOpeningBalance,
             Integer lockinPeriodFrequency,EnumOptionData lockinPeriodFrequencyTypeEnum, boolean applyWithdrawalFeeForTransfers,
             Integer rowIndex,String externalId,Collection<SavingsAccountChargeData> charges,boolean allowOverdraft,
-            BigDecimal overdraftLimit,String locale, String dateFormat){
+            BigDecimal overdraftLimit,String locale, String dateFormat ,BigDecimal openingBalance){
         return new SavingsAccountData(clientId, productId, fieldOfficerId, submittedOnDate, nominalAnnualInterestRate,
                 interestCompoundingPeriodTypeEnum, interestPostingPeriodTypeEnum, interestCalculationTypeEnum,
                 interestCalculationDaysInYearTypeEnum, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyTypeEnum,
-                applyWithdrawalFeeForTransfers, rowIndex, externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat);
+                applyWithdrawalFeeForTransfers, rowIndex, externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat ,openingBalance);
 
     }
 
@@ -143,7 +146,7 @@ public class SavingsAccountData {
             EnumOptionData interestCalculationDaysInYearType,BigDecimal minRequiredOpeningBalance,
             Integer lockinPeriodFrequency,EnumOptionData lockinPeriodFrequencyType, boolean withdrawalFeeForTransfers,
             Integer rowIndex,String externalId,Collection<SavingsAccountChargeData> charges,boolean allowOverdraft,
-            BigDecimal overdraftLimit,String locale, String dateFormat) {
+            BigDecimal overdraftLimit,String locale, String dateFormat ,BigDecimal openingBalance) {
         this.id = null;
         this.accountNo = null;
         this.depositType = null;
@@ -205,6 +208,9 @@ public class SavingsAccountData {
         this.rowIndex = rowIndex;
         this.submittedOnDate=submittedOnDate;
         this.savingsAmountOnHold=null;
+
+        // Added 28/09/2021 
+        this.openingBalance = openingBalance ;
     }
 
     public static final Comparator<SavingsAccountData> ClientNameComparator = new Comparator<SavingsAccountData>() {
@@ -250,12 +256,12 @@ public class SavingsAccountData {
             boolean applyWithdrawalFeeForTransfers,
             Integer rowIndex,String externalId,Collection<SavingsAccountChargeData> charges,
             boolean allowOverdraft,
-            BigDecimal overdraftLimit,String locale, String dateFormat){
+            BigDecimal overdraftLimit,String locale, String dateFormat ,BigDecimal openingBalance){
 
         return new SavingsAccountData(groupId, productId, fieldOfficerId, submittedOnDate, nominalAnnualInterestRate,
                 interestCompoundingPeriodTypeEnum, interestPostingPeriodTypeEnum, interestCalculationTypeEnum,
                 interestCalculationDaysInYearTypeEnum, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyTypeEnum,
-                applyWithdrawalFeeForTransfers, rowIndex, externalId, charges, allowOverdraft, overdraftLimit,null,locale,dateFormat);
+                applyWithdrawalFeeForTransfers, rowIndex, externalId, charges, allowOverdraft, overdraftLimit,null,locale,dateFormat ,openingBalance);
 
     }
     private SavingsAccountData(Long groupId, Long productId, Long fieldOfficerId,LocalDate submittedOnDate,
@@ -264,7 +270,7 @@ public class SavingsAccountData {
             EnumOptionData interestCalculationDaysInYearType,BigDecimal minRequiredOpeningBalance,
             Integer lockinPeriodFrequency,EnumOptionData lockinPeriodFrequencyType, boolean withdrawalFeeForTransfers,
             Integer rowIndex,String externalId,Collection<SavingsAccountChargeData> charges,boolean allowOverdraft,
-            BigDecimal overdraftLimit,Long id,String locale, String dateFormat) {
+            BigDecimal overdraftLimit,Long id,String locale, String dateFormat ,BigDecimal openingBalance) {
         this.id = id;
         this.accountNo = null;
         this.depositType = null;
@@ -326,6 +332,9 @@ public class SavingsAccountData {
         this.rowIndex = rowIndex;
         this.submittedOnDate=submittedOnDate;
         this.savingsAmountOnHold=null;
+
+        // Added 28/09/2021
+        this.openingBalance = openingBalance;
     }
 
     public Integer getRowIndex() {
@@ -834,5 +843,10 @@ public class SavingsAccountData {
 
     public void setEquityGrowthOnSavingsAccounts(List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccounts) {
         this.equityGrowthOnSavingsAccounts = equityGrowthOnSavingsAccounts;
+    }
+
+    // added 28/09/2021
+    public BigDecimal getOpeningBalance(){
+        return this.openingBalance ;
     }
 }

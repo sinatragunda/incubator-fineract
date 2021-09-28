@@ -37,6 +37,9 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsActivation;
 import org.apache.fineract.portfolio.savings.data.SavingsApproval;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
+import org.apache.fineract.wese.helper.TimeHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +59,13 @@ public class SavingsImportHandler implements ImportHandler {
     private List<String>statuses;
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+    private final SavingsAccountDomainService savingsAccountDomainService ;
 
     @Autowired
     public SavingsImportHandler(final PortfolioCommandSourceWritePlatformService
-            commandsSourceWritePlatformService) {
+            commandsSourceWritePlatformService ,final SavingsAccountDomainService savingsAccountDomainService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.savingsAccountDomainService = savingsAccountDomainService ;
     }
 
     @Override
@@ -73,7 +78,9 @@ public class SavingsImportHandler implements ImportHandler {
         readExcelFile(locale,dateFormat);
         return importEntity(dateFormat);
     }
+
     public void readExcelFile(String locale, String dateFormat) {
+
         Sheet savingsSheet = workbook.getSheet(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(savingsSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
@@ -104,6 +111,7 @@ public class SavingsImportHandler implements ImportHandler {
     }
 
     private SavingsAccountData readSavings(Row row,String locale, String dateFormat) {
+        
         String productName = ImportHandlerUtils.readAsString( SavingsConstants.PRODUCT_COL, row);
         Long productId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME), productName);
         String fieldOfficerName = ImportHandlerUtils.readAsString(SavingsConstants.FIELD_OFFICER_NAME_COL, row);
@@ -226,19 +234,25 @@ public class SavingsImportHandler implements ImportHandler {
         }
         String status = ImportHandlerUtils.readAsString(SavingsConstants.STATUS_COL, row);
         statuses.add(status);
+        
+
+        // Added 28/09/2021
+        Double openingBalanceDb = ImportHandlerUtils.readAsDouble(SavingsConstants.OPENING_BALANCE_COL ,row);
+        BigDecimal openingBalance = new BigDecimal(openingBalanceDb);
+
         if (savingsType!=null) {
-            if (savingsType.equals("individual")) {
+            if (savingsType.equals("individual")){
                 Long clientId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
                 return SavingsAccountData.importInstanceIndividual(clientId, productId, fieldOfficerId, submittedOnDate, nominalAnnualInterestRate,
                         interestCompoundingPeriodTypeEnum, interestPostingPeriodTypeEnum, interestCalculationTypeEnum,
                         interestCalculationDaysInYearTypeEnum, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyTypeEnum,
-                        applyWithdrawalFeeForTransfers, row.getRowNum(), externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat);
+                        applyWithdrawalFeeForTransfers, row.getRowNum(), externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat ,openingBalance);
             }
             Long groupId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.GROUP_SHEET_NAME), clientOrGroupName);
             return  SavingsAccountData.importInstanceGroup(groupId, productId, fieldOfficerId, submittedOnDate, nominalAnnualInterestRate,
                     interestCompoundingPeriodTypeEnum, interestPostingPeriodTypeEnum, interestCalculationTypeEnum,
                     interestCalculationDaysInYearTypeEnum, minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyTypeEnum,
-                    applyWithdrawalFeeForTransfers, row.getRowNum(), externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat);
+                    applyWithdrawalFeeForTransfers, row.getRowNum(), externalId, charges, allowOverdraft, overdraftLimit,locale,dateFormat ,openingBalance);
         }else {
             return  null;
         }
@@ -257,19 +271,29 @@ public class SavingsImportHandler implements ImportHandler {
             Cell statusCell = row.createCell(SavingsConstants.STATUS_COL);
             Cell errorReportCell = row.createCell(SavingsConstants.FAILURE_REPORT_COL);
             try {
+
                 String status = statuses.get(i);
                 progressLevel = getProgressLevel(status);
 
                 if (progressLevel == 0) {
                     CommandProcessingResult result = importSavings(i,dateFormat);
+
+                    System.err.println("---------------savings account import-----------");
+
                     savingsId = result.getSavingsId();;
+
                     progressLevel = 1;
                 } else
+
                     savingsId = ImportHandlerUtils.readAsLong(SavingsConstants.SAVINGS_ID_COL, savingsSheet.getRow(savings.get(i).getRowIndex()));
 
                 if (progressLevel <= 1) progressLevel = importSavingsApproval(savingsId, i,dateFormat);
 
                 if (progressLevel <= 2) progressLevel = importSavingsActivation(savingsId, i,dateFormat);
+
+                // Added 28/09/2021
+                openingBalanceDeposit(savingsId ,savings.get(i));
+
                 successCount++;
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
@@ -336,13 +360,33 @@ public class SavingsImportHandler implements ImportHandler {
         return 2;
     }
 
+    private void openingBalanceDeposit(Long savingsAccountId , SavingsAccountData savingsAccountData){
+
+        BigDecimal openingBalance = savingsAccountData.getOpeningBalance();
+        System.err.println("----------------------this is a savings account deposit -------------"+savingsAccountData.getOpeningBalance().doubleValue());
+
+        int cmp = openingBalance.compareTo(BigDecimal.ZERO);
+
+        if(cmp > 0){
+
+            System.err.println("--------------balance is not zero ");
+            //accountDomainService.handleDepositLite(savingsAccountId ,openingBalance ,null);
+            savingsAccountDomainService.handleDepositLite(savingsAccountId , TimeHelper.jodaLocalDateNow(),openingBalance);
+        }
+
+    }
+
     private CommandProcessingResult importSavings(int i,String dateFormat) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
         gsonBuilder.registerTypeAdapter(EnumOptionData.class,new EnumOptionDataIdSerializer());
         JsonObject savingsJsonob=gsonBuilder.create().toJsonTree(savings.get(i)).getAsJsonObject();
+
         savingsJsonob.remove("isDormancyTrackingActive");
         String payload= savingsJsonob.toString();
+
+        System.err.println("----------------------payload is --------------------"+payload);
+
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createSavingsAccount() //
                 .withJson(payload) //

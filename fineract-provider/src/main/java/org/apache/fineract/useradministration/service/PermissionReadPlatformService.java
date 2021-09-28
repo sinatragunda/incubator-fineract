@@ -33,4 +33,8 @@ public interface PermissionReadPlatformService {
     // Added 25/09/2021
     Collection<PermissionData> retrieveAllReportPermissions();
 
+    // Added 28/09/2021
+    Collection<PermissionData> retrieveAllRolePermissionsEx(Long roleId);
+
+
 }

@@ -36,6 +36,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+
+// Added 28/09/2021
+import org.apache.fineract.wese.helper.TimeHelper;
+
+
 public class ImportHandlerUtils {
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
@@ -126,10 +131,14 @@ public class ImportHandlerUtils {
             return result;
     }
 
+    // should default all dates to today ? 
     public static LocalDate readAsDate(int colIndex, Row row) {
         Cell c = row.getCell(colIndex);
-        if(c == null || c.getCellType() == Cell.CELL_TYPE_BLANK)
-            return null;
+        if(c == null || c.getCellType() == Cell.CELL_TYPE_BLANK){
+               
+            return TimeHelper.jodaLocalDateNow();
+            //return null;
+        }
 
         LocalDate localDate=new LocalDate(c.getDateCellValue());
         return localDate;

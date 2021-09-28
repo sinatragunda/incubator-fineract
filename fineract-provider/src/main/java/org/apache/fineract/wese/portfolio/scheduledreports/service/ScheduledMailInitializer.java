@@ -48,7 +48,6 @@ public class ScheduledMailInitializer {
     }
 
     public ScheduledMailInitializer(){
-        System.err.println("----------init new instance--------which is suppose to be static");
         scheduledSendableSessionList = new ArrayList<>();
     }
 
@@ -63,74 +62,68 @@ public class ScheduledMailInitializer {
         //start session
             scheduledSendableSession.getScheduledMailSession().init();
 
-            System.err.println("---------start a new session here with scheduled report id of ------------"+scheduledSendableSession.getScheduledMailSession().getScheduledReport().getId());
+        Queue<EmailRecipients> emailRecipientsQueue = scheduledSendableSession.getSendableReport().getEmailRecipientsQueue();
+        PentahoReportGenerator pentahoReportGenerator = scheduledSendableSession.getSendableReport().getPentahoReportGenerator();
 
-            Queue<EmailRecipients> emailRecipientsQueue = scheduledSendableSession.getSendableReport().getEmailRecipientsQueue();
-            PentahoReportGenerator pentahoReportGenerator = scheduledSendableSession.getSendableReport().getPentahoReportGenerator();
+        String reportName = pentahoReportGenerator.getReportName();
+        String description = String.format("Scheduled %s Report",reportName);
+        scheduledSendableSession.getScheduledMailSession().setActiveMailSessionStatus(ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
 
-            String reportName = pentahoReportGenerator.getReportName();
-            String description = String.format("Scheduled %s Report",reportName);
-            scheduledSendableSession.getScheduledMailSession().setActiveMailSessionStatus(ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
+        ScheduledMailSession scheduledMailSession = scheduledSendableSession.getScheduledMailSession();
+        ScheduledReport scheduledReport = scheduledMailSession.getScheduledReport();
+        Map<String ,String> queryParams = pentahoReportGenerator.reportParameters(scheduledReport);
+        boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
 
-            System.err.println("------------------recipients lists ------------------"+emailRecipientsQueue.size());
+        //emailRecipientsQueue poll and iterate ,if quota reached return item back to queue
+        for(;;){
 
-            ScheduledMailSession scheduledMailSession = scheduledSendableSession.getScheduledMailSession();
-            ScheduledReport scheduledReport = scheduledMailSession.getScheduledReport();
-            Map<String ,String> queryParams = pentahoReportGenerator.reportParameters(scheduledReport);
-            boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
-
-            //emailRecipientsQueue poll and iterate ,if quota reached return item back to queue
-            for(;;){
-
-                EmailRecipients emailRecipients = emailRecipientsQueue.poll();
-                // if no more items in queue then processing is done return
-                boolean isPresent = Optional.ofNullable(emailRecipients).isPresent();
-                if(!isPresent){
-                    // mark process as over
-                    System.err.println("-------------------------close mail session here-------------");
-                    //Logger
-                    closeSession(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
-                    return ;
-                }
-
-                // for each item send and generate some report
-                Long clientId = emailRecipients.getClientId();
-
-                File file = null ;
-                if(clientReport){
-
-                    pentahoReportGenerator.updateQueryParams("R_clientId" ,clientId.toString());
-                    file = pentahoReportGenerator.processReport();
-                }
-                else{
-                    file = pentahoReportGenerator.getReccuringFile();
-                }
-
-                EmailDetail emailDetail = emailDetail(emailRecipients ,description);
-                SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = attachedMailSender.sendMail(file,emailDetail);
-
-                System.err.println("---------send mail status-------------"+sendMailMessageStatus);
-
-                // File should be deleted to avoid duplicates being created ,but if its not client facing then keep it for the duration of the process
-                if(clientReport){
-                    file.delete();
-                }
-
-                switch (sendMailMessageStatus){
-                    case QOUTA_LIMIT:
-                        // return last polled item to queue ,either back or front but we think its back due to implementation
-                        emailRecipientsQueue.add(emailRecipients);
-                        updateScheduledSessionStatus(scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
-                        Long sleepTime = attachedMailSender.sleepTime();
-                        sleepThread(sleepTime);
-                        updateScheduledSessionStatus(scheduledSendableSession ,ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
-                        break;
-                    default:
-                        EmailSendStatus emailSendStatus = new EmailSendStatus(emailDetail ,sendMailMessageStatus);
-                        scheduledSendableSession.updateResults(emailSendStatus);
-                }
-
+            EmailRecipients emailRecipients = emailRecipientsQueue.poll();
+            // if no more items in queue then processing is done return
+            boolean isPresent = Optional.ofNullable(emailRecipients).isPresent();
+            if(!isPresent){
+                // mark process as over
+                closeSession(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
+                return ;
             }
+
+            // for each item send and generate some report
+            Long clientId = emailRecipients.getClientId();
+
+            File file = null ;
+            if(clientReport){
+
+                pentahoReportGenerator.updateQueryParams("R_clientId" ,clientId.toString());
+                file = pentahoReportGenerator.processReport();
+            }
+            else{
+                file = pentahoReportGenerator.getReccuringFile();
+            }
+
+            EmailDetail emailDetail = emailDetail(emailRecipients ,description);
+            SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = attachedMailSender.sendMail(file,emailDetail);
+
+            System.err.println("---------send mail status-------------"+sendMailMessageStatus);
+
+            // File should be deleted to avoid duplicates being created ,but if its not client facing then keep it for the duration of the process
+            if(clientReport){
+                file.delete();
+            }
+
+            switch (sendMailMessageStatus){
+                case QOUTA_LIMIT:
+                    // return last polled item to queue ,either back or front but we think its back due to implementation
+                    emailRecipientsQueue.add(emailRecipients);
+                    updateScheduledSessionStatus(scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
+                    Long sleepTime = attachedMailSender.sleepTime();
+                    sleepThread(sleepTime);
+                    updateScheduledSessionStatus(scheduledSendableSession ,ACTIVE_MAIL_SESSION_STATUS.ACTIVE);
+                    break;
+                default:
+                    EmailSendStatus emailSendStatus = new EmailSendStatus(emailDetail ,sendMailMessageStatus);
+                    scheduledSendableSession.updateResults(emailSendStatus);
+            }
+
+        }
 
             //attachedMailSender.sendMail();
 
@@ -177,7 +170,6 @@ public class ScheduledMailInitializer {
 
         Long secondsToSleep = 1000 * duration;
         try{
-            System.err.println("--------------We are sleeping this thread now--------------"+secondsToSleep);
             Thread.sleep(secondsToSleep);
         }
         catch (InterruptedException e){
@@ -188,7 +180,6 @@ public class ScheduledMailInitializer {
     public ScheduledMailSession getSessionResults(ScheduledMailSessionRepository scheduledMailSessionRepository ,EmailSendStatusRepository emailSendStatusRepository,ScheduledReport scheduledReport){
 
         Long scheduledReportId = scheduledReport.getId();
-
         Predicate<ScheduledSendableSession> activeSession = (e)->{
             ScheduledMailSession scheduledMailSession = e.getScheduledMailSession();
             ScheduledReport scheduledReport1 = scheduledMailSession.getScheduledReport();
