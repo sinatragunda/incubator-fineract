@@ -194,6 +194,10 @@ public class ClientApiConstants {
     public static final String shareProductIdParamName = "shareProductId";
 
 
+    // added 27/09/2021
+    public static final String createSelfServiceUserParam ="createSelfServiceUser";
+
+
     /**
      * These parameters will match the class level parameters of
      * {@link ClientData}. Where possible, we try to get response parameters to

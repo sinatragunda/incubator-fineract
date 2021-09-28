@@ -1095,4 +1095,9 @@ public final class Client extends AbstractPersistableCustom<Long> {
     public void updateShareAccount(Long id){
         this.shareAccountId = id ;
     }
+
+    // Added 27/09/2021
+    public String getAccountNumber(){
+        return this.accountNumber;
+    }
 }

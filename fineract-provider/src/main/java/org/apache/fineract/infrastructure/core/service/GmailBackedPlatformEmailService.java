@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 public class GmailBackedPlatformEmailService implements PlatformEmailService {
 	
 	private final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService;
+
 	
 	@Autowired
 	public GmailBackedPlatformEmailService(final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService){
@@ -42,17 +43,23 @@ public class GmailBackedPlatformEmailService implements PlatformEmailService {
     public void sendToUserAccount(String organisationName, String contactName,
                                   String address, String username, String unencodedPassword) {
 
-	    final String subject = "Welcome " + contactName + " to " + organisationName;
+	    final String subject = "Welcome " + contactName + " to " + getOrganization();
 	    final String body = "You are receiving this email as your email account: " +
-                address + " has being used to create a user account for an organisation named [" +
-                organisationName + "] on Mifos.\n" +
+                address + " has being used to create a user account for personal banking with our organization \n" +
                 "You can login using the following credentials:\nusername: " + username + "\n" +
                 "password: " + unencodedPassword + "\n" +
-                "You must change this password upon first log in using Uppercase, Lowercase, number and character.\n" +
+                "You can change this password upon first log in using Uppercase, Lowercase, number and character.\n" +
                 "Thank you and welcome to the organisation.";
 
 	    final EmailDetail emailDetail = new EmailDetail(subject, body, address, contactName);
 	    sendDefinedEmail(emailDetail);
+
+    }
+
+    private String getOrganization(){
+
+	    String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
+	    return String.format("%s Banking",tenant);
 
     }
 

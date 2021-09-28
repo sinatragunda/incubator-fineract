@@ -173,7 +173,7 @@ final public class ClientData implements Comparable<ClientData> {
         this.clientTypeId=clientTypeId;
         this.genderId=genderId;
         this.clientClassificationId=clientClassificationId;
-        this.isStaff=isStaff;
+        this.isStaff=isStaff; 
         this.address=address;
         this.id = null;
         this.accountNo = null;
@@ -315,7 +315,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingsProductName, clientData.savingsAccountId, savingAccountOptions, clientData.clientType,
                 clientData.clientClassification, clientData.clientTypeOptions, clientData.clientClassificationOptions,
                 clientData.clientNonPersonConstitutionOptions, clientData.clientNonPersonMainBusinessLineOptions, clientData.clientNonPersonDetails,
-                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId);
+                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId ,clientData.createSelfServiceUser);
 
     }
 

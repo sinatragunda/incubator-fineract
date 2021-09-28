@@ -171,7 +171,7 @@ public class ClientPersonImportHandler implements ImportHandler {
         Long shareProductId = ImportHandlerUtils.readAsLong(ClientPersonConstants.SHARES_PRODUCT_ID_COL ,row);
         
         // added 25/09/2021
-        Boolean createSelfService = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL);
+        Boolean createSelfService = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL ,row);
 
         return ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
                 officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService);

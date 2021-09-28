@@ -24,8 +24,8 @@ import java.util.List;
 
 final public class ReportData {
 
-    @SuppressWarnings("unused")
     private final Long id;
+    
     @SuppressWarnings("unused")
     private final String reportName;
     @SuppressWarnings("unused")
@@ -53,7 +53,7 @@ final public class ReportData {
     private Collection<ReportParameterData> allowedParameters;
 
     public static ReportData fromReportName(String reportName){
-        return new ReportData(reportName);
+        return new ReportData(null ,reportName ,null ,null,null ,null ,null ,null ,null ,null);
     }
 
     public ReportData(final Long id, final String reportName, final String reportType, final String reportSubType,
@@ -74,9 +74,6 @@ final public class ReportData {
         this.allowedParameters = null;
     }
 
-    public ReportData(String reportName){
-        this.reportName = reportName ;
-    }
 
     public ReportData() {
         this.id = null;

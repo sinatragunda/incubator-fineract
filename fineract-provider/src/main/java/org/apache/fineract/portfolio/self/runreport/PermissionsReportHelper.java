@@ -32,26 +32,45 @@ public class PermissionsReportHelper {
         AppUser appUser = platformSecurityContext.authenticatedUser();
 
         Long userId = appUser.getId();
+
         Collection<RoleData> roleDataCollection = roleReadPlatformService.retrieveAppUserRoles(userId);
 
         // for each role find reports that the user has permission by linking with role permission table
 
+        System.err.println("--------this client have these roles ---------------------"+roleDataCollection.size());
+
         Predicate<PermissionData> isReport = (e)->{
+
             return e.getGrouping().equalsIgnoreCase("report");
         };
 
         roleDataCollection.stream().forEach((e)->{
 
+            System.err.println("-----------------------client role is --------------------"+e.getName());
             Long roleId = e.getId();
+
+            System.err.println("-----------------------role id is-----------------------"+roleId);
+
             Collection<PermissionData> permissionDataCollectionTemp =  permissionReadPlatformService.retrieveAllRolePermissions(roleId);
+
+            System.err.println("--------------non filtered list size is ------------------------"+permissionDataCollection.size());
+
             Collection<PermissionData> filteredList =  permissionDataCollectionTemp.stream().filter(isReport).collect(Collectors.toList());
+
+            System.err.println("------------------filtered list is now -----------------"+filteredList.size());
+
             permissionDataCollection.addAll(filteredList);
 
         });
 
+
+        System.err.println("------------------all reports here are ----------------"+permissionDataCollection.size());
+
         Collection<ReportData> reportDataCollection = new ArrayList<>();
 
         permissionDataCollection.stream().forEach((e)->{
+
+            System.err.println("--------------report name ---------------"+e.getEntityName());
             ReportData reportData = ReportData.fromReportName(e.getEntityName());
             reportDataCollection.add(reportData);
         });

@@ -57,6 +57,7 @@ public class ClientPersonConstants {
 
     // added 25/09/2021
     public static final int CREATE_SELF_SERVICE_USER_ID_COL = 31; // AF
+    //public static final int CREATE_SELF_SERVICE_USER_ID_COL = 31
 
     public static final int RELATIONAL_OFFICE_NAME_COL = 35;//AJ
     public static final int RELATIONAL_OFFICE_OPENING_DATE_COL = 36;//AK

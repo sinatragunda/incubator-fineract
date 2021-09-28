@@ -516,7 +516,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final Long shareAccountId = rs.getLong("shareAccountId");
             final Long shareProductId = rs.getLong("shareProductId");
             
-            
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
             final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
@@ -526,7 +525,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false);
 
         }
     }
@@ -718,7 +717,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false);
 
         }
     }

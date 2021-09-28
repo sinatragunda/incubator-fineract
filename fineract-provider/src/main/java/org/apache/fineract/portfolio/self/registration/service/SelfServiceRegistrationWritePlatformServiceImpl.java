@@ -181,16 +181,13 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
     @Override
     public SelfServiceRegistration createSelfServiceUserEx(Client client){
 
-        Gson gson = new Gson();
+        System.err.println("----------------create self service user now --------------------"+client.getFirstname());
+
         
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("user");
         
-        this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, apiRequestBodyAsJson,
-                SelfServiceApiConstants.REGISTRATION_REQUEST_DATA_PARAMETERS);
-        JsonElement element = gson.fromJson(apiRequestBodyAsJson.toString(), JsonElement.class);
-
         String accountNumber = client.getAccountNumber();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.accountNumberParamName).value(accountNumber).notNull().notBlank()
                 .notExceedingLengthOf(100);
@@ -202,21 +199,15 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         String lastName = client.getLastname();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.lastNameParamName).value(lastName).notBlank().notExceedingLengthOf(100);
 
-        String username = client.getEmailAddress();
+        String username = client.emailAddress();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.usernameParamName).value(username).notBlank().notExceedingLengthOf(100);
 
 
         final PasswordValidationPolicy validationPolicy = this.passwordValidationPolicy.findActivePasswordValidationPolicy();
         final String regex = validationPolicy.getRegex();
         final String description = validationPolicy.getDescription();
-        baseDataValidator.reset().parameter(SelfServiceApiConstants.passwordParamName).value(password)
-                .matchesRegularExpression(regex, description).notExceedingLengthOf(100);
 
-        String authenticationMode = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.authenticationModeParamName, element);
-        baseDataValidator.reset().parameter(SelfServiceApiConstants.authenticationModeParamName).value(authenticationMode).notBlank()
-                .isOneOfTheseStringValues(SelfServiceApiConstants.emailModeParamName, SelfServiceApiConstants.mobileModeParamName);
-
-        String email = client.getEmailAddress();
+        String email = client.emailAddress();
         baseDataValidator.reset().parameter(SelfServiceApiConstants.emailParamName).value(email).notNull().notBlank()
                 .notExceedingLengthOf(100);
 
@@ -224,12 +215,15 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         
         validateForDuplicateUsername(username);
 
-        throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName, mobileNumber, isEmailAuthenticationMode);
+        //throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName,null ,false);
 
         String authenticationToken = randomAuthorizationTokenGeneration();
+
+
+        System.err.println("-------------auth token is ----------"+authenticationToken);
         
         SelfServiceRegistration selfServiceRegistration = SelfServiceRegistration.instance(client, accountNumber, firstName, lastName,
-                mobileNumber, email, authenticationToken, username, password);
+                null, email, authenticationToken, username, authenticationToken);
         this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
         sendAuthorizationToken(selfServiceRegistration, isEmailAuthenticationMode);
         return selfServiceRegistration;
