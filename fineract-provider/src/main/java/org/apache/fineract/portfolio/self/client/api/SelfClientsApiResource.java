@@ -113,6 +113,8 @@ public class SelfClientsApiResource {
 				staffInSelectedOfficeOnly);
 	}
 
+
+
 	@GET
 	@Path("{clientId}/accounts")
 	@Consumes({ MediaType.APPLICATION_JSON })

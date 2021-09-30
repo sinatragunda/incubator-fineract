@@ -19,10 +19,7 @@
 package org.apache.fineract.useradministration.api;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -43,11 +40,17 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.GmailBackedPlatformEmailService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.useradministration.data.AppUserData;
+import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.domain.AppUserRepository;
+import org.apache.fineract.useradministration.exception.UserNotFoundException;
+import org.apache.fineract.useradministration.helper.ResetSelfServiceUserPassword;
 import org.apache.fineract.useradministration.service.AppUserReadPlatformService;
+import org.apache.fineract.useradministration.service.AppUserWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -75,13 +78,20 @@ public class UsersApiResource {
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
 
+
+    // Added 30/09/2021
+    private final GmailBackedPlatformEmailService gmailBackedPlatformEmailService ;
+    private final AppUserRepository appUserRepository ;
+    private final AppUserWritePlatformService appUserWritePlatformService ;
+
     @Autowired
     public UsersApiResource(final PlatformSecurityContext context, final AppUserReadPlatformService readPlatformService,
             final OfficeReadPlatformService officeReadPlatformService, final DefaultToApiJsonSerializer<AppUserData> toApiJsonSerializer,
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
             final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
-            final BulkImportWorkbookService bulkImportWorkbookService) {
+            final BulkImportWorkbookService bulkImportWorkbookService, final GmailBackedPlatformEmailService gmailBackedPlatformEmailService ,
+                            final AppUserRepository appUserRepository ,final AppUserWritePlatformService appUserWritePlatformService) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.officeReadPlatformService = officeReadPlatformService;
@@ -90,6 +100,9 @@ public class UsersApiResource {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
         this.bulkImportWorkbookService=bulkImportWorkbookService;
+        this.appUserRepository = appUserRepository ;
+        this.gmailBackedPlatformEmailService = gmailBackedPlatformEmailService ;
+        this.appUserWritePlatformService = appUserWritePlatformService ;
     }
 
     @GET
@@ -123,6 +136,33 @@ public class UsersApiResource {
 
         return this.toApiJsonSerializer.serialize(settings, user, this.RESPONSE_DATA_PARAMETERS);
     }
+
+
+    // Added 30/09/2021
+    @GET
+    @Path("{username}/resetpassword")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveOne(@("username") final String username, @Context final UriInfo uriInfo) {
+
+        // find this username and send reset link there
+        // this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions, userId);
+
+        AppUser appUser = appUserRepository.findAppUserByName(username);
+
+        boolean isPresent = Optional.ofNullable(appUser).isPresent();
+
+        if(!isPresent){
+            throw new UserNotFoundException(username);
+        }
+
+        ResetSelfServiceUserPassword.reset(appUserWritePlatformService , gmailBackedPlatformEmailService ,appUser);
+
+        // to return something here
+        return null;
+    }
+
+
 
     @GET
     @Path("template")

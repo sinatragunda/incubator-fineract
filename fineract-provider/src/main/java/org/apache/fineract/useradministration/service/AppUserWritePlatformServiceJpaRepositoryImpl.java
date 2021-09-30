@@ -282,25 +282,19 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         AppUserPreviousPassword currentPasswordToSaveAsPreview = null;
 
         if (passWordEncodedValue != null) {
-
             PageRequest pageRequest = new PageRequest(0, AppUserApiConstant.numberOfPreviousPasswords, Sort.Direction.DESC, "removalDate");
-
             final List<AppUserPreviousPassword> nLastUsedPasswords = this.appUserPreviewPasswordRepository.findByUserId(user.getId(),
                     pageRequest);
 
             for (AppUserPreviousPassword aPreviewPassword : nLastUsedPasswords) {
 
                 if (aPreviewPassword.getPassword().equals(passWordEncodedValue)) {
-
                 throw new PasswordPreviouslyUsedException();
 
                 }
             }
-
             currentPasswordToSaveAsPreview = new AppUserPreviousPassword(user);
-
         }
-
         return currentPasswordToSaveAsPreview;
 
     }
