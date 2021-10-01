@@ -143,7 +143,7 @@ public class UsersApiResource {
     @Path("{username}/resetpassword")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveOne(@("username") final String username, @Context final UriInfo uriInfo) {
+    public String retrieveOne(@PathParam("username") final String username, @Context final UriInfo uriInfo) {
 
         // find this username and send reset link there
         // this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions, userId);
@@ -157,7 +157,6 @@ public class UsersApiResource {
         }
 
         ResetSelfServiceUserPassword.reset(appUserWritePlatformService , gmailBackedPlatformEmailService ,appUser);
-
         // to return something here
         return null;
     }
