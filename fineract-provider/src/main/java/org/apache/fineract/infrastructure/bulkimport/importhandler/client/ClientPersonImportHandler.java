@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.*;
 import org.apache.fineract.portfolio.address.data.AddressData;
 import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.wese.helper.ExceptionsHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClientPersonImportHandler implements ImportHandler {
@@ -67,11 +69,21 @@ public class ClientPersonImportHandler implements ImportHandler {
         Sheet clientSheet=workbook.getSheet(TemplatePopulateImportConstants.CLIENT_PERSON_SHEET_NAME);
 
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(clientSheet,0);
+
+        System.err.println("---------------------number of entries to talk about here ----------------"+noOfEntries);
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
             Row row;
                 row=clientSheet.getRow(rowIndex);
+
                 if (ImportHandlerUtils.isNotImported(row, ClientPersonConstants.STATUS_COL)){
-                    clients.add(readClient(row,locale,dateFormat));
+
+                    System.err.println("-----------------row index is -------------------"+rowIndex);
+                    ClientData clientData = readClient(row ,locale ,dateFormat);
+                    Optional.ofNullable(clientData).ifPresent(e->{
+                        System.err.println("-------------------add clients here son ,skipping null shit ");
+                        clients.add(e);
+                    });
+                    //clients.add(readClient(row,locale,dateFormat));
                 }
         }
 
@@ -172,6 +184,13 @@ public class ClientPersonImportHandler implements ImportHandler {
         
         // added 25/09/2021
         Boolean createSelfService = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL ,row);
+
+        System.err.println("------------------------is anything null son ----------------");
+        boolean isAnyNull = ExceptionsHelper.isAnyNull(firstName ,lastName);
+
+        if(isAnyNull){
+            return null ;
+        }
 
         return ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
                 officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService);

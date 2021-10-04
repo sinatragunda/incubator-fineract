@@ -198,6 +198,13 @@ public class ClientPersonWorkbookPopulator extends AbstractWorkbookPopulator {
     writeString(ClientPersonConstants.LOOKUP_COUNTRY_COL, rowHeader, "Lookup Country ");
 
 
+    // added 01/10/2021
+    writeString(ClientPersonConstants.EMAIL_ADDRESS_COL, rowHeader, "Email Address ");
+    writeString(ClientPersonConstants.SAVINGS_PRODUCT_ID_COL, rowHeader, "Savings Product Id ");
+    writeString(ClientPersonConstants.SHARES_PRODUCT_ID_COL, rowHeader, "Shares Product Id ");
+    writeString(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL, rowHeader, "Create Self Service User ");
+
+
   }
 
   private void setRules(Sheet worksheet,String dateformat) {

@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.bulkimport.populator.client;
 
 import org.apache.fineract.infrastructure.bulkimport.constants.ClientEntityConstants;
+import org.apache.fineract.infrastructure.bulkimport.constants.ClientPersonConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.bulkimport.populator.AbstractWorkbookPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.OfficeSheetPopulator;
@@ -214,6 +215,13 @@ public class ClientEntityWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(ClientEntityConstants.LOOKUP_STATE_PROVINCE, rowHeader, "Lookup State/Province ");
         writeString(ClientEntityConstants.LOOKUP_COUNTRY, rowHeader, "Lookup Country ");
         writeString(ClientEntityConstants.LOOKUP_MAIN_BUSINESS_LINE,rowHeader,"Lookup Business Line");
+
+        // added 01/10/2021
+        writeString(ClientPersonConstants.EMAIL_ADDRESS_COL, rowHeader, "Email Address ");
+        writeString(ClientPersonConstants.SAVINGS_PRODUCT_ID_COL, rowHeader, "Savings Product Id ");
+        writeString(ClientPersonConstants.SHARES_PRODUCT_ID_COL, rowHeader, "Shares Product Id ");
+        writeString(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL, rowHeader, "Create Self Service User ");
+
 
 
     }

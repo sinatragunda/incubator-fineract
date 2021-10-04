@@ -37,7 +37,13 @@ public class ResetSelfServiceUserPassword {
         String jsonBody = node.toString();
         JsonElement jsonElement = gson.fromJson(jsonBody ,JsonElement.class);
 
+
+        System.err.println("----------------------json body is ---------"+jsonBody);
+
         JsonCommand jsonCommand = JsonCommand.fromJsonElement(new Long(1) ,jsonElement);
+
+        System.err.println("-------------------------------json command initialized now ------");
+        
         appUserWritePlatformService.updateUser(userId ,jsonCommand);
 
         // send email notification now son

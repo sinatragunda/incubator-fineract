@@ -156,6 +156,9 @@ public class UsersApiResource {
             throw new UserNotFoundException(username);
         }
 
+
+        System.err.println("-------------------lets reset password son-----------");
+
         ResetSelfServiceUserPassword.reset(appUserWritePlatformService , gmailBackedPlatformEmailService ,appUser);
         // to return something here
         return null;

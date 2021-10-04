@@ -175,7 +175,7 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
             if(sqlRowSet.first()){
 
                 tenantId = sqlRowSet.getLong("id");
-                String createTenantLink = String.format("INSERT into tenants(identifier ,name,timezone_id,oltp_id ,report_id) VALUES('%s','%s','%s',%i ,%i)",tenantIdentifier ,tenantIdentifier ,timezone ,tenantId ,tenantId);
+                String createTenantLink = String.format("INSERT into tenants(identifier ,name,timezone_id,oltp_id ,report_id) VALUES('%s','%s','%s',%d ,%d)",tenantIdentifier ,tenantIdentifier ,timezone ,tenantId ,tenantId);
                 jdbcTemplate.update(createTenantLink);
             }
         }

@@ -45,6 +45,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 public class LoanImportHandler implements ImportHandler {
@@ -131,12 +133,18 @@ public class LoanImportHandler implements ImportHandler {
         String loanOfficerName =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_OFFICER_NAME_COL, row);
         Long loanOfficerId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME), loanOfficerName);
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
+
+        System.err.println("-----------------read fund name here but why it keeps having error");
         String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
-        Long fundId;
-        if (fundName == null)
-            fundId = null;
-        else
-            fundId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName);
+        
+        final Long[] fundId = new Long[]{new Long(0)} ;
+        System.err.println("---------------------------------------fund name null ");
+
+        Consumer<String> fundNameConsumer = (e)->{
+            fundId[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName);
+        };
+
+        Optional.ofNullable(fundName).ifPresent(fundNameConsumer);
 
         BigDecimal principal = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row) != null)
@@ -273,8 +281,12 @@ public class LoanImportHandler implements ImportHandler {
         statuses.add(status);
         if (loanType!=null) {
             if (loanType.equals("individual")) {
+
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
-                return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId,
+                
+                System.err.println("---------------------------client id is ---------------------"+clientId);
+
+                return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId[0],
                         principal, numberOfRepayments,
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance, repaymentStrategyId,
@@ -282,7 +294,7 @@ public class LoanImportHandler implements ImportHandler {
                         row.getRowNum(), externalId, null, charges, linkAccountId,locale,dateFormat ,null ,false ,loanFactorAccountId);
             } else if (loanType.equals("jlg")) {
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
-                return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId,
+                return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId[0],
                         principal, numberOfRepayments,
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance, repaymentStrategyId,
@@ -290,7 +302,7 @@ public class LoanImportHandler implements ImportHandler {
                         row.getRowNum(), externalId, groupId, charges, linkAccountId,locale,dateFormat ,null ,false ,loanFactorAccountId);
             } else {
                 Long groupIdforGroupLoan =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.GROUP_SHEET_NAME), clientOrGroupName);
-                return LoanAccountData.importInstanceGroup(loanTypeEnumOption, groupIdforGroupLoan, productId, loanOfficerId, submittedOnDate, fundId,
+                return LoanAccountData.importInstanceGroup(loanTypeEnumOption, groupIdforGroupLoan, productId, loanOfficerId, submittedOnDate, fundId[0],
                         principal, numberOfRepayments,
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate,
                         amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance,
@@ -445,6 +457,8 @@ public class LoanImportHandler implements ImportHandler {
         }
         loanJsonOb.remove("isTopup");
         String payload=loanJsonOb.toString();
+
+        System.err.println("----------------payload ------------------"+payload);
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createLoanApplication() //
                 .withJson(payload) //

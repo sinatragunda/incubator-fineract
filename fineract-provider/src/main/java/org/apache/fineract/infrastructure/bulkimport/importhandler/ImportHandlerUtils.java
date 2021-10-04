@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 
 // Added 28/09/2021
@@ -48,9 +49,14 @@ public class ImportHandlerUtils {
 
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
-        while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
+        System.err.println("------------get number of entries here son ----------");
+        while(sheet.getRow(noOfEntries+1) !=null){
             noOfEntries++;
         }
+//
+//        while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
+//            noOfEntries++;
+//        }
 
         return noOfEntries;
     }
@@ -91,13 +97,22 @@ public class ImportHandlerUtils {
     public static String readAsString(int colIndex, Row row) {
 
         Cell c = row.getCell(colIndex);
-        if (c == null || c.getCellType() == Cell.CELL_TYPE_BLANK)
+        if (c == null || c.getCellType() == Cell.CELL_TYPE_BLANK){
             return null;
+        }
+
         FormulaEvaluator eval = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
+        String res = null ;
         if(c.getCellType() == Cell.CELL_TYPE_FORMULA) {
+
             if (eval!=null) {
-                CellValue val = eval.evaluate(c);
-                String res = trimEmptyDecimalPortion(val.getStringValue());
+                try {
+                    CellValue val = eval.evaluate(c);
+                    res = trimEmptyDecimalPortion(val.getStringValue());
+                }
+                catch (NullPointerException n){
+                    n.printStackTrace();
+                }
                 if (res!=null) {
                     if (!res.equals("")) {
                         return res.trim();
@@ -107,12 +122,20 @@ public class ImportHandlerUtils {
                 }else {
                     return null;
                 }
-            }else {
-                return null;
+                }else {
+                    return null;
             }
-        }else if(c.getCellType()==Cell.CELL_TYPE_STRING) {
-            String res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
-            return res.trim();
+        }
+
+        else if(c.getCellType()==Cell.CELL_TYPE_STRING) {
+
+            res = trimEmptyDecimalPortion(c.getStringCellValue().trim());
+            boolean isPresent = Optional.ofNullable(res).isPresent();
+
+            if(isPresent){
+                return res.trim();
+            }
+            return null ;
 
         }else if(c.getCellType()==Cell.CELL_TYPE_NUMERIC) {
             return ((Double) row.getCell(colIndex).getNumericCellValue()).intValue() + "";
@@ -265,7 +288,10 @@ public class ImportHandlerUtils {
     }
 
     public static Long getIdByName (Sheet sheet, String name) {
+
         String sheetName = sheet.getSheetName();
+
+        System.err.println("-------------------name is ---------------------"+sheetName);
 
         if(!sheetName.equals(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME)) {
             for (Row row : sheet) {
