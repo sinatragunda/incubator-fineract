@@ -45,4 +45,10 @@ public interface ClientReadPlatformService {
     Collection<ClientData> retrieveActiveClientMembersOfCenter(final Long centerId);
 
     ClientData retrieveAllNarrations(String clientNarrations);
+
+
+    //Added 03/10/2021
+    ClientData retrieveOneByExternalId(String externalId);
+
 }
+

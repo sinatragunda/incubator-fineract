@@ -26,6 +26,8 @@ import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateI
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SanitizeExcelValues;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.*;
+import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 
@@ -287,11 +289,30 @@ public class ImportHandlerUtils {
         }
     }
 
+    public static Long getIdByExternalId(ClientReadPlatformService clientReadPlatformService ,String externalId){
+
+        // find some client here using external id
+        Long[] clientId = {0L};
+
+        Optional.ofNullable(externalId).ifPresent(e->{
+
+            System.err.println("-------------------Extenal id is present is -------"+e);
+            ClientData clientData = clientReadPlatformService.retrieveOneByExternalId(externalId);
+            Optional.ofNullable(clientData).ifPresent(clientData1 -> {
+                System.err.println("------------------client id found here ----------"+clientData1.getId());
+                clientId[0] = clientData1.getId();
+            });
+
+        });
+
+        return clientId[0] ;
+    }
+
     public static Long getIdByName (Sheet sheet, String name) {
 
         String sheetName = sheet.getSheetName();
 
-        System.err.println("-------------------name is ---------------------"+sheetName);
+        System.err.println("-------------------name is ---------------------"+name);
 
         if(!sheetName.equals(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME)) {
             for (Row row : sheet) {

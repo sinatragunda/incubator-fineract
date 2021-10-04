@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSe
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.EnumOptionDataValueSerializer;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.*;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.poi.ss.usermodel.*;
@@ -59,10 +60,14 @@ public class LoanImportHandler implements ImportHandler {
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
+    // Added 04/10/2021
+    private final ClientReadPlatformService clientReadPlatformService ;
+
     @Autowired
     public LoanImportHandler(final PortfolioCommandSourceWritePlatformService
-            commandsSourceWritePlatformService) {
+            commandsSourceWritePlatformService ,final  ClientReadPlatformService clientReadPlatformService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.clientReadPlatformService = clientReadPlatformService;
     }
     @Override
     public Count process(Workbook workbook, String locale, String dateFormat) {
@@ -126,6 +131,7 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private LoanAccountData readLoan(Row row,String locale,String dateFormat) {
+
         String externalId =  ImportHandlerUtils.readAsString(LoanConstants.EXTERNAL_ID_COL, row);
         String status =  ImportHandlerUtils.readAsString(LoanConstants.STATUS_COL, row);
         String productName =  ImportHandlerUtils.readAsString(LoanConstants.PRODUCT_COL, row);
@@ -135,10 +141,10 @@ public class LoanImportHandler implements ImportHandler {
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
 
         System.err.println("-----------------read fund name here but why it keeps having error");
+
         String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
         
-        final Long[] fundId = new Long[]{new Long(0)} ;
-        System.err.println("---------------------------------------fund name null ");
+        final Long[] fundId = {0L} ;
 
         Consumer<String> fundNameConsumer = (e)->{
             fundId[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName);
@@ -283,9 +289,24 @@ public class LoanImportHandler implements ImportHandler {
             if (loanType.equals("individual")) {
 
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
-                
-                System.err.println("---------------------------client id is ---------------------"+clientId);
+                System.err.println("----------------System always returns this value as id "+clientId);
 
+                int cmp = clientId.compareTo(0L);
+
+                if(cmp <= 0){
+                    System.err.println("-------------------client id is null get using external Id now of "+externalId);
+                    clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,externalId);
+
+                    cmp = clientId.compareTo(0L);
+
+                    if(cmp <= 0){
+                        System.err.println("--------------------------client id is null return empty values ----------");
+                        return null ;
+                    }
+                }
+
+
+                System.err.println("---------------------------client id is ---------------------"+clientId);
                 return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId[0],
                         principal, numberOfRepayments,
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,

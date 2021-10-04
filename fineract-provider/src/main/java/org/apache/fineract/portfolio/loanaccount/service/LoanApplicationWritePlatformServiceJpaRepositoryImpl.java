@@ -253,7 +253,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
 
-            Client client =null ;
+            Client client = null ;
             if(clientId !=null){
 
                 client= this.clientRepository.findOneWithNotFoundDetection(clientId);

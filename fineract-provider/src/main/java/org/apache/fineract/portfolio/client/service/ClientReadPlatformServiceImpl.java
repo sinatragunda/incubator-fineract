@@ -62,6 +62,7 @@ import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.wese.helper.ExceptionsHelper;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -69,6 +70,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+// Added 04/10/2021
+
+import org.springframework.dao.EmptyResultDataAccessException;
+
 
 @Service
 public class ClientReadPlatformServiceImpl implements ClientReadPlatformService {
@@ -85,6 +91,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final ClientLookupMapper lookupMapper = new ClientLookupMapper();
     private final ClientMembersOfGroupMapper membersOfGroupMapper = new ClientMembersOfGroupMapper();
     private final ParentGroupsMapper clientGroupsMapper = new ParentGroupsMapper();
+
+    // Added 04/10/2021
+    private final ClientExternalIdMapper clientExternalIdMapper = new ClientExternalIdMapper();
     
     private final AddressReadPlatformService addressReadPlatformService;
     private final ClientFamilyMembersReadPlatformService clientFamilyMembersReadPlatformService;
@@ -313,6 +322,29 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             this.columnValidator.validateSqlInjection(sql, extraCriteria);
         }        
         return this.jdbcTemplate.query(sql, this.lookupMapper, new Object[] {});
+    }
+
+
+    // Added 04/10/2021
+    @Override
+    public ClientData retrieveOneByExternalId(final String externalId) {
+
+        String sql = "select " + this.clientExternalIdMapper.schema();
+        ClientData clientData = null ;
+
+        if (StringUtils.isNotBlank(externalId)) {
+            System.err.println("Failing to validate sql errors here why ? ");
+            try{
+                //this.columnValidator.validateSqlInjection(sql, externalId);
+                clientData = jdbcTemplate.queryForObject(sql, this.clientExternalIdMapper, new Object[] {externalId});
+            }
+            catch (EmptyResultDataAccessException e){
+              System.err.println("-----------------empty item error caught -------"+e.getMessage());
+              //return null ;
+            }
+        }
+        return clientData ;
+
     }
 
     @Override
@@ -768,6 +800,38 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final String officeName = rs.getString("officeName");
 
             return ClientData.lookup(id, displayName, officeId, officeName);
+        }
+    }
+
+
+
+    // Added 03/10/2021
+    private static final class ClientExternalIdMapper implements RowMapper<ClientData> {
+
+        private final String schema;
+
+        public ClientExternalIdMapper() {
+
+            final StringBuilder builder = new StringBuilder(200);
+
+            builder.append("c.id as id, c.display_name as displayName ");
+            builder.append("from m_client c ");
+            builder.append("where c.external_id = ?");
+
+            this.schema = builder.toString();
+        }
+
+        public String schema() {
+            return this.schema;
+        }
+
+        @Override
+        public ClientData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+
+            final Long id = rs.getLong("id");
+            final String displayName = rs.getString("displayName");
+
+            return ClientData.lookup(id, displayName, null, null);
         }
     }
 
