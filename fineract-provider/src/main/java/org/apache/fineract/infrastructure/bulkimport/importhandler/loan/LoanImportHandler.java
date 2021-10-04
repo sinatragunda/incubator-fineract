@@ -87,11 +87,16 @@ public class LoanImportHandler implements ImportHandler {
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
                 row = loanSheet.getRow(rowIndex);
-                if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
-                    loans.add(readLoan(row,locale,dateFormat));
-                    approvalDates.add(readLoanApproval(row,locale,dateFormat));
-                    disbursalDates.add(readDisbursalData(row,locale,dateFormat));
-                    loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
+                if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)){
+
+                    LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
+                    Optional.ofNullable(loanAccountData).ifPresent(e->{
+                        System.err.println("--------------loan not null son ---------");
+                        loans.add(loanAccountData);
+                        approvalDates.add(readLoanApproval(row,locale,dateFormat));
+                        disbursalDates.add(readDisbursalData(row,locale,dateFormat));
+                        loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
+                    });
                 }
         }
 
