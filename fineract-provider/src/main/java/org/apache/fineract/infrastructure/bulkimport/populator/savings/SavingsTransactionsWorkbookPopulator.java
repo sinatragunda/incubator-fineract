@@ -236,5 +236,9 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
         writeString(TransactionConstants.LOOKUP_PRODUCT_COL, rowHeader, "Lookup Product");
         writeString(TransactionConstants.LOOKUP_OPENING_BALANCE_COL, rowHeader, "Lookup Opening Balance");
         writeString(TransactionConstants.LOOKUP_SAVINGS_ACTIVATION_DATE_COL, rowHeader, "Lookup Savings Activation Date");
+
+        // Added 05/10/2021
+        writeString(TransactionConstants.CLIENT_EXTERNAL_ID_COL, rowHeader, "Client External Id");
+
     }
 }

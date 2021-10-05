@@ -1,0 +1,46 @@
+Meeting Notes 06/10/2021 
+Defining services offered by BPC 
+Terminal management ,defining banks terminals so that termons can acquire merchants upon transactions 
+BPC wont handle pos transactions 
+No merchants on boarded on ansa platfrom 
+
+We will use ATM acquiring 
+Settlement of cards ,exchange of obligations between different patners 
+Visa and Mastercard will have different settlement due to charge back periods 
+Visa will use base2 file for settling and Mastercard will use EOD file so hence thier file formats will be different 
+
+Differences can be found at file level ,since they would have different file names 
+Atm cash plannning ,value of cash loaded in an ATm must be represented in T24 .
+Should there be a way for us to tell t24 that cash has been replenished in a BPC 
+Sending messages to BPC 
+We only doing Debit cards 
+
+Integrating with billers so that we know how to record them in t24 
+
+
+How to identify Visa vs Mastercard transactions 
+
+
+How can T24 invoke card management services in BPC 
+
+Is it async or synchronous transactions ? 
+These need to be answered at base level project 
+
+
+Anything that represent to a bank asset or liability need to be represented in the bank .
+
+Cash planning refers to how we intend to utilize cash resources 
+
+Everything that happens need to sink within T24 
+
+
+We need to have all information in those documents (interface facts finding )
+
+
+
+Action Items 
+
+To review BRDS ,looking at payments mostly 
+
+
+

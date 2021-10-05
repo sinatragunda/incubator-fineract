@@ -40,4 +40,7 @@ public class TransactionConstants {
     public static final int LOOKUP_PRODUCT_COL = 17;
     public static final int LOOKUP_OPENING_BALANCE_COL = 18;
     public static final int LOOKUP_SAVINGS_ACTIVATION_DATE_COL = 19;
+
+    // Added 05/10/2021
+    public static final int CLIENT_EXTERNAL_ID_COL = 20;
 }

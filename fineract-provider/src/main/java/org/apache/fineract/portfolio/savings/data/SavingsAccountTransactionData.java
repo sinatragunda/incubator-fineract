@@ -71,6 +71,9 @@ public class SavingsAccountTransactionData {
     private String receiptNumber;
     private String bankNumber;
 
+    // Added 05/10/2021
+    private String clientExternalId ;
+
     public static SavingsAccountTransactionData importInstance(BigDecimal transactionAmount,LocalDate transactionDate,
             Long paymentTypeId,String accountNumber, String checkNumber, String routingCode,
             String receiptNumber, String bankNumber,Long savingsAccountId,
@@ -229,5 +232,22 @@ public class SavingsAccountTransactionData {
 
     public BigDecimal getAmount(){
         return this.amount;
+    }
+
+    // Added 05/10/2021
+    public void setClientExternalId(String arg){
+        this.clientExternalId = arg ;
+    }
+
+    // Added 05/10/2021
+    public void setId(Long id){
+        this.id = id ;
+    }
+
+
+
+    // Added 05/10/2021
+    public String getClientExternalId(){
+        return this.clientExternalId ;
     }
 }

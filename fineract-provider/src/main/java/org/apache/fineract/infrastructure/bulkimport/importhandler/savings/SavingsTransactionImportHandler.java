@@ -32,8 +32,11 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSe
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SavingsAccountTransactionEnumValueSerialiser;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.*;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SavingsTransactionImportHandler implements ImportHandler {
     private Workbook workbook;
@@ -50,10 +55,16 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
+    // Added 05/10/2021
+    private final ClientReadPlatformService clientReadPlatformService ;
+    private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
+
     @Autowired
     public SavingsTransactionImportHandler(final PortfolioCommandSourceWritePlatformService
-        commandsSourceWritePlatformService) {
-    this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        commandsSourceWritePlatformService ,final ClientReadPlatformService clientReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.clientReadPlatformService = clientReadPlatformService ;
+        this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
     }
 
     @Override
@@ -61,6 +72,24 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         this.workbook=workbook;
         this.savingsTransactions=new ArrayList<>();
         readExcelFile(locale,dateFormat);
+
+        // added new check if savings account is null then set this value only ,some its tedious to list all clients with account numbers and balances
+        // hence generic way has to be used to skip that and just get the client id only
+        // especially if its migrations
+        this.savingsTransactions.stream().filter(e->{
+            boolean isSavingsAccountNumberPresent = Optional.ofNullable(e.getSavingsAccountId()).isPresent();
+            return !isSavingsAccountNumberPresent;
+        }).forEach(f ->{
+
+            String clientExternalId = f.getClientExternalId();
+            SavingsAccountData savingsAccountData = SavingsAccountToClientLinkingHelper.linkBlindlySavingsAccount(clientReadPlatformService ,savingsAccountReadPlatformService ,clientExternalId);
+
+            Optional.ofNullable(savingsAccountData).ifPresent(acc->{
+                Long accountId = acc.id();
+                f.setId(accountId);
+            });
+        });
+
         return importEntity(dateFormat);
     }
 
@@ -76,7 +105,9 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     }
 
     private SavingsAccountTransactionData readSavingsTransaction(Row row,String locale, String dateFormat) {
+
         String savingsAccountIdCheck=null;
+
         if (ImportHandlerUtils.readAsLong(TransactionConstants.SAVINGS_ACCOUNT_NO_COL, row)!=null)
             savingsAccountIdCheck = ImportHandlerUtils.readAsLong(TransactionConstants.SAVINGS_ACCOUNT_NO_COL, row).toString();
         if(savingsAccountIdCheck!=null)
@@ -96,8 +127,17 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         String routingCode = ImportHandlerUtils.readAsString(TransactionConstants.ROUTING_CODE_COL, row);
         String receiptNumber = ImportHandlerUtils.readAsString(TransactionConstants.RECEIPT_NO_COL, row);
         String bankNumber = ImportHandlerUtils.readAsString(TransactionConstants.BANK_NO_COL, row);
-        return SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
+
+        String clientExternalId = ImportHandlerUtils.readAsString(TransactionConstants.CLIENT_EXTERNAL_ID_COL ,row);
+
+        SavingsAccountTransactionData savingsAccountTransactionData = SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, Long.parseLong(savingsAccountId), savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
+
+        Optional.ofNullable(clientExternalId).ifPresent(e->{
+            savingsAccountTransactionData.setClientExternalId(e);
+        });
+
+        return savingsAccountTransactionData ;
 
     }
 
@@ -147,6 +187,5 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         ImportHandlerUtils.writeString(TransactionConstants.STATUS_COL, savingsTransactionSheet.getRow(TransactionConstants.STATUS_COL), TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount,errorCount);
     }
-
 
 }
