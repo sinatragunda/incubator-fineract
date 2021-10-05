@@ -188,13 +188,13 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         final String fundIdParameterName = "fundId";
         if (this.fromApiJsonHelper.parameterExists(fundIdParameterName, element)) {
             final Long fundId = this.fromApiJsonHelper.extractLongNamed(fundIdParameterName, element);
-            baseDataValidator.reset().parameter(fundIdParameterName).value(fundId).ignoreIfNull().integerGreaterThanZero();
+            baseDataValidator.reset().parameter(fundIdParameterName).value(fundId).ignoreIfNull().longZeroOrGreater();
         }
 
         final String loanOfficerIdParameterName = "loanOfficerId";
         if (this.fromApiJsonHelper.parameterExists(loanOfficerIdParameterName, element)) {
             final Long loanOfficerId = this.fromApiJsonHelper.extractLongNamed(loanOfficerIdParameterName, element);
-            baseDataValidator.reset().parameter(loanOfficerIdParameterName).value(loanOfficerId).ignoreIfNull().integerGreaterThanZero();
+            baseDataValidator.reset().parameter(loanOfficerIdParameterName).value(loanOfficerId).ignoreIfNull().longZeroOrGreater();
         }
 
         final String loanPurposeIdParameterName = "loanPurposeId";
@@ -525,7 +525,20 @@ public final class LoanApplicationCommandFromApiJsonHelper {
 
         validateLoanMultiDisbursementdate(element, baseDataValidator, expectedDisbursementDate, principal);
         validatePartialPeriodSupport(interestCalculationPeriodType, baseDataValidator, element, loanProduct);
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        
+        if (!dataValidationErrors.isEmpty()) { 
+
+            System.err.println("------------throwing error at this stage-----------");
+
+            for(ApiParameterError a : dataValidationErrors){
+
+                System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
+
+            }
+
+
+            throw new PlatformApiDataValidationException(dataValidationErrors); 
+        }
     }
 
     public void validateForModify(final String json, final LoanProduct loanProduct, final Loan existingLoanApplication) {

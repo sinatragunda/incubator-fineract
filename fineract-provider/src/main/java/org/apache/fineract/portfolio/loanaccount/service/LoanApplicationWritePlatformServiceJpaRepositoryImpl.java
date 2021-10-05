@@ -80,6 +80,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.*;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorLoanResolver;
 import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorSavingsAccountHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
@@ -253,7 +254,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
 
-            Client client = null ;
+            Client client =null ;
             if(clientId !=null){
 
                 client= this.clientRepository.findOneWithNotFoundDetection(clientId);
@@ -272,46 +273,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
 
 
-            LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
+            // modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
+            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client);
 
-            System.err.println("-----------------loan factor here is ---------------"+loanFactorSourceAccountType);
-
-            LoanFactorSavingsAccountHelper loanFactorSavingsAccountHelper = new LoanFactorSavingsAccountHelper(loanProductRepository ,loanFactorSourceAccountType);
-            boolean doLoanFactor = false;
-
-            switch (loanFactorSourceAccountType){
-                case NONE:
-                    boolean hasCrossLink = loanFactorSavingsAccountHelper.hasCrossLink();
-                    if(hasCrossLink){
-                        doLoanFactor = true;
-                        System.err.println("-----------------system is cross linked - -------------------");
-                    }
-                    break;
-                    ///none factored account then lets check if there is cross link product
-                case SAVINGS:
-                    doLoanFactor = true;
-                    break;
-            }
-
-            if(doLoanFactor){
-
-                Long loanFactorAccountId = this.fromJsonHelper.extractLongNamed(LoanApiConstants.loanFactorAccountIdParam ,command.parsedJson());
-
-                System.err.println("-------------loan factor account id  ------------"+loanFactorAccountId);
-
-                BigDecimal principal = command.bigDecimalValueOfParameterNamed("principal");
-
-                System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
-
-                System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
-
-                boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
-                //if successful just proceed with this loan and throw no errors
-
-                System.err.println("------------proceed with transaction -------------"+transact);
-            }
-
-
+            System.err.println("--------------------done validating now where is error ");
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -505,11 +470,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }catch(final PersistenceException dve) {
-        	Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
+            Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
             handleDataIntegrityIssues(command, throwable, dve);
-         	return CommandProcessingResult.empty();
+            return CommandProcessingResult.empty();
         }
     }
+
 
     private void updateProductRelatedDetails(LoanProductRelatedDetail productRelatedDetail, Loan loan) {
         final Boolean amortization = loan.loanProduct().getLoanProductConfigurableAttributes().getAmortizationBoolean();
@@ -1049,16 +1015,16 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
             
             if ((command.longValueOfParameterNamed(productIdParamName) != null)
-            							|| (command.longValueOfParameterNamed(clientIdParamName) != null) || (command.longValueOfParameterNamed(groupIdParamName) != null)) { 
-            						Long OfficeId = null;
-            						if(existingLoanApplication.getClient() != null){
-            							OfficeId = existingLoanApplication.getClient().getOffice().getId();
-            						}
-            						else if(existingLoanApplication.getGroup() != null){
-            							OfficeId = existingLoanApplication.getGroup().getOffice().getId();
-            						}
-            						officeSpecificLoanProductValidation( existingLoanApplication.getLoanProduct().getId(),OfficeId);
-            							}
+                                        || (command.longValueOfParameterNamed(clientIdParamName) != null) || (command.longValueOfParameterNamed(groupIdParamName) != null)) { 
+                                    Long OfficeId = null;
+                                    if(existingLoanApplication.getClient() != null){
+                                        OfficeId = existingLoanApplication.getClient().getOffice().getId();
+                                    }
+                                    else if(existingLoanApplication.getGroup() != null){
+                                        OfficeId = existingLoanApplication.getGroup().getOffice().getId();
+                                    }
+                                    officeSpecificLoanProductValidation( existingLoanApplication.getLoanProduct().getId(),OfficeId);
+                                        }
 
             // updating loan interest recalculation details throwing null
             // pointer exception after saveAndFlush
@@ -1087,7 +1053,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }catch (final PersistenceException dve) {
             Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
             handleDataIntegrityIssues(command, throwable, dve);
-         	return CommandProcessingResult.empty();
+            return CommandProcessingResult.empty();
         }
     }
 
@@ -1096,7 +1062,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
      * is.
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
-    	
+        
         if (realCause.getMessage().contains("loan_account_no_UNIQUE") || realCause.getCause().getMessage().contains("loan_account_no_UNIQUE")) {
 
             final String accountNo = command.stringValueOfParameterNamed("accountNo");
@@ -1129,11 +1095,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.noteRepository.deleteInBatch(relatedNotes);
 
         final AccountAssociations accountAssociations = this.accountAssociationsRepository.findByLoanIdAndType(loanId,
-				AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
-		if (accountAssociations != null) {
-			this.accountAssociationsRepository.delete(accountAssociations);
-		}
-		
+                AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
+        if (accountAssociations != null) {
+            this.accountAssociationsRepository.delete(accountAssociations);
+        }
+        
         this.loanRepositoryWrapper.delete(loanId);
 
         return new CommandProcessingResultBuilder() //
@@ -1463,19 +1429,19 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     private void officeSpecificLoanProductValidation(final Long productId, final Long officeId) {
-    			final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository
-    					.findOneByNameWithNotFoundDetection(
-    							FineractEntityAccessConstants.GLOBAL_CONFIG_FOR_OFFICE_SPECIFIC_PRODUCTS);
-    			if (restrictToUserOfficeProperty.isEnabled()) {
-    				FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepository
-    						                               .findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.toStr());
-    				FineractEntityToEntityMapping officeToLoanProductMappingList = this.repository.findListByProductId(fineractEntityRelation, productId,
-    						officeId);
-    				if (officeToLoanProductMappingList == null) {
-    					throw new NotOfficeSpecificProductException(productId, officeId);
-    				}
+                final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository
+                        .findOneByNameWithNotFoundDetection(
+                                FineractEntityAccessConstants.GLOBAL_CONFIG_FOR_OFFICE_SPECIFIC_PRODUCTS);
+                if (restrictToUserOfficeProperty.isEnabled()) {
+                    FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepository
+                                                           .findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.toStr());
+                    FineractEntityToEntityMapping officeToLoanProductMappingList = this.repository.findListByProductId(fineractEntityRelation, productId,
+                            officeId);
+                    if (officeToLoanProductMappingList == null) {
+                        throw new NotOfficeSpecificProductException(productId, officeId);
+                    }
     
-    			}
-    		}
+                }
+            }
     
 }

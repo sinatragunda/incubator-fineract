@@ -1006,4 +1006,22 @@ public class DataValidatorBuilder {
         return this;
     }
 
+
+    // Added 04/10/2021 ,ignore fields if value is zero 
+
+    public DataValidatorBuilder ignoreIfZero() {
+        if (this.value == null && this.ignoreNullValue) { return this; }
+
+        if (this.value != null) {
+            final Integer number = Integer.valueOf(this.value.toString());
+            int cmp = number.compareTo(0);
+            if(cmp <= 0){
+                return this ;
+            }
+        }
+        return this;
+    }
+
+
+
 }

@@ -1588,11 +1588,13 @@ public class LoanAccountData {
         this.loanProductName = loanProductName;
         this.loanProductDescription = loanProductDescription;
         this.isLoanProductLinkedToFloatingRate = isLoanProductLinkedToFloatingRate;
-        this.fundId = fundId;
+        
+        // Added 04/10/2021 ,dubios way should be alternate here of ignoring if zero 
+        this.fundId = fundId ;
         this.fundName = fundName;
         this.loanPurposeId = loanPurposeId;
         this.loanPurposeName = loanPurposeName;
-        this.loanOfficerId = loanOfficerId;
+        this.loanOfficerId = loanOfficerId; 
         this.loanOfficerName = loanOfficerName;
         this.currency = currency;
         this.proposedPrincipal = proposedPrincipal;

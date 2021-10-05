@@ -1989,6 +1989,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         if (this.client != null && this.client.isActivatedAfter(submittedOn)) {
             final String errorMessage = "The date on which a loan is submitted cannot be earlier than client's activation date.";
+            System.err.println("-----------------exception masked here");
             throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", errorMessage, submittedOn);
         }
 

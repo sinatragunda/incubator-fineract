@@ -137,6 +137,9 @@ public class LoanImportHandler implements ImportHandler {
 
     private LoanAccountData readLoan(Row row,String locale,String dateFormat) {
 
+        // Added 04/10/2021
+        String clientExternalId = ImportHandlerUtils.readAsString(LoanConstants.CLIENT_EXTERNAL_ID ,row);
+
         String externalId =  ImportHandlerUtils.readAsString(LoanConstants.EXTERNAL_ID_COL, row);
         String status =  ImportHandlerUtils.readAsString(LoanConstants.STATUS_COL, row);
         String productName =  ImportHandlerUtils.readAsString(LoanConstants.PRODUCT_COL, row);
@@ -177,6 +180,8 @@ public class LoanImportHandler implements ImportHandler {
         String loanTermFrequency =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_TERM_FREQUENCY_COL, row);
         EnumOptionData loanTermFrequencyEnum = null;
         if (loanTermFrequency != null) {
+
+            System.err.println("-------------------loan term frequency enum not null ");
             String loanTermFrequencyId = "";
             if (loanTermFrequency.equalsIgnoreCase("Days"))
                 loanTermFrequencyId = "0";
@@ -186,6 +191,7 @@ public class LoanImportHandler implements ImportHandler {
                 loanTermFrequencyId = "2";
             loanTermFrequencyEnum = new EnumOptionData(null, null, loanTermFrequencyId);
         }
+
         BigDecimal nominalInterestRate = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.NOMINAL_INTEREST_RATE_COL, row) != null)
             nominalInterestRate = BigDecimal.valueOf( ImportHandlerUtils.readAsDouble(LoanConstants.NOMINAL_INTEREST_RATE_COL, row));
@@ -294,24 +300,19 @@ public class LoanImportHandler implements ImportHandler {
             if (loanType.equals("individual")) {
 
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
-                System.err.println("----------------System always returns this value as id "+clientId);
 
                 int cmp = clientId.compareTo(0L);
-
                 if(cmp <= 0){
-                    System.err.println("-------------------client id is null get using external Id now of "+externalId);
-                    clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,externalId);
+                    System.err.println("-------------------client id is null get using external Id now of "+clientExternalId);
+                    clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
 
                     cmp = clientId.compareTo(0L);
 
                     if(cmp <= 0){
-                        System.err.println("--------------------------client id is null return empty values ----------");
                         return null ;
                     }
                 }
 
-
-                System.err.println("---------------------------client id is ---------------------"+clientId);
                 return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId[0],
                         principal, numberOfRepayments,
                         repaidEvery, repaidEveryFrequencyEnums, loanTerm, loanTermFrequencyEnum, nominalInterestRate, submittedOnDate,

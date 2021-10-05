@@ -78,6 +78,7 @@ import org.apache.fineract.portfolio.loanproduct.exception.InvalidCurrencyExcept
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -324,19 +325,38 @@ public class LoanAssembler {
     public Fund findFundByIdIfProvided(final Long fundId) {
         Fund fund = null;
         if (fundId != null) {
-            fund = this.fundRepository.findOne(fundId);
-            if (fund == null) { throw new FundNotFoundException(fundId); }
+            
+            // Edited 04/10/2021 ,edit so that not found error wont show up if id is zero 
+            // If true it is equal to 0 but if not then proceed 
+            boolean isZero = ComparatorUtility.compareLong(fundId ,0L);
+            
+            System.err.println("------------this item is 0 ? -------------"+isZero);
+            if(!isZero){
+                fund = this.fundRepository.findOne(fundId);
+                if (fund == null) { throw new FundNotFoundException(fundId); }
+            }
         }
         return fund;
     }
 
+
+    // Edited 04/10/2021 
     public Staff findLoanOfficerByIdIfProvided(final Long loanOfficerId) {
+        
         Staff staff = null;
+
         if (loanOfficerId != null) {
-            staff = this.staffRepository.findOne(loanOfficerId);
-            if (staff == null) {
-                throw new StaffNotFoundException(loanOfficerId);
-            } else if (staff.isNotLoanOfficer()) { throw new StaffRoleException(loanOfficerId, StaffRoleException.STAFF_ROLE.LOAN_OFFICER); }
+            boolean isZero = ComparatorUtility.compareLong(loanOfficerId ,0L);
+
+            if(!isZero){
+                staff = this.staffRepository.findOne(loanOfficerId);
+                if (staff == null) {
+                    throw new StaffNotFoundException(loanOfficerId);
+                } 
+                else if (staff.isNotLoanOfficer()) { 
+                    throw new StaffRoleException(loanOfficerId, StaffRoleException.STAFF_ROLE.LOAN_OFFICER); 
+                }
+            }
         }
         return staff;
     }
