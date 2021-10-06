@@ -12,6 +12,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +33,9 @@ public class SavingsAccountToClientLinkingHelper {
                 Long clientId = c.getId();
                 Collection<SavingsAccountData> clientAccounts = savingsAccountReadPlatformService.retrieveAllForLookup(clientId);
 
-                if(!clientAccounts.isEmpty()){
-                    savingsAccountData[0] = clientAccounts.get(0);
+                List<SavingsAccountData> savingsAccountDataList = new ArrayList<>(clientAccounts);
+                if(!savingsAccountDataList.isEmpty()){
+                    savingsAccountData[0] = savingsAccountDataList.get(0);
                 }
             });
         });

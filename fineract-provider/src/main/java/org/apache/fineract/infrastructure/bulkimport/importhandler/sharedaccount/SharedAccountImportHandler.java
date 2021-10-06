@@ -74,6 +74,7 @@ public class SharedAccountImportHandler implements ImportHandler {
     }
 
     private ShareAccountData readSharedAccount(Row row,String locale, String dateFormat) {
+
         String clientName = ImportHandlerUtils.readAsString(SharedAccountsConstants.CLIENT_NAME_COL, row);
         Long clientId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientName);
 

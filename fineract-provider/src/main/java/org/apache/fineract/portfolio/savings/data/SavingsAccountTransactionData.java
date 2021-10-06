@@ -37,9 +37,9 @@ import org.joda.time.LocalDate;
 @SuppressWarnings("unused")
 public class SavingsAccountTransactionData {
 
-    private final Long id;
+    private Long id;
     private final SavingsAccountTransactionEnumData transactionType;
-    private final Long accountId;
+    private Long accountId;
     private final String accountNo;
     private final LocalDate date;
     private final CurrencyData currency;
@@ -240,8 +240,9 @@ public class SavingsAccountTransactionData {
     }
 
     // Added 05/10/2021
-    public void setId(Long id){
-        this.id = id ;
+    public void setSavingsAccountId(Long id){
+        //this.id = id ;
+        this.savingsAccountId = id ;
     }
 
 

@@ -333,18 +333,15 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         ClientData clientData = null ;
 
         if (StringUtils.isNotBlank(externalId)) {
-            System.err.println("Failing to validate sql errors here why ? ");
             try{
                 //this.columnValidator.validateSqlInjection(sql, externalId);
                 clientData = jdbcTemplate.queryForObject(sql, this.clientExternalIdMapper, new Object[] {externalId});
             }
             catch (EmptyResultDataAccessException e){
               System.err.println("-----------------empty item error caught -------"+e.getMessage());
-              //return null ;
             }
         }
         return clientData ;
-
     }
 
     @Override

@@ -89,12 +89,21 @@ public class FromJsonHelper {
 
         final List<String> unsupportedParameterList = new ArrayList<>();
         for (final String providedParameter : requestMap.keySet()) {
-            if (!supportedParams.contains(providedParameter)) {
+
+            System.err.println("-------------------provided param is -------------"+providedParameter);
+            
+            if (!supportedParams.contains(providedParameter)){
                 unsupportedParameterList.add(providedParameter);
             }
         }
 
-        if (!unsupportedParameterList.isEmpty()) { throw new UnsupportedParameterException(unsupportedParameterList); }
+        if (!unsupportedParameterList.isEmpty()){ 
+            
+            for(String s : unsupportedParameterList){
+                System.err.println("-----------------unsupported param is ---------"+s);
+            }
+            throw new UnsupportedParameterException(unsupportedParameterList); 
+        }
     }
 
     public void checkForUnsupportedParameters(final JsonObject object, final Set<String> supportedParams) {

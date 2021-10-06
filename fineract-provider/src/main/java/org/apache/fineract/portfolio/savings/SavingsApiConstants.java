@@ -193,4 +193,12 @@ public class SavingsApiConstants {
     
     // added 22/07/2021 
     public static final String portfolioBalanceParam = "portfolioBalance";
+
+
+    // added 06/10/2021
+    public static final String clientExternalIdParam ="clientExternalId";
+    public static final String paymentTypeIdParam ="paymentTypeId";
+
+
+
 }

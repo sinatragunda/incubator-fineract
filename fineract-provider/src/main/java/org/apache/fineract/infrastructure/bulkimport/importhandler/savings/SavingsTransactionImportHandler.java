@@ -39,6 +39,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumD
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,7 +87,9 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
             Optional.ofNullable(savingsAccountData).ifPresent(acc->{
                 Long accountId = acc.id();
-                f.setId(accountId);
+                f.setSavingsAccountId(accountId);
+                // so that it doesnt fail validations to do with parameter not supported
+                f.setClientExternalId(null);
             });
         });
 
@@ -107,11 +110,20 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     private SavingsAccountTransactionData readSavingsTransaction(Row row,String locale, String dateFormat) {
 
         String savingsAccountIdCheck=null;
+        Long savingsAccountIdL = null ;
 
         if (ImportHandlerUtils.readAsLong(TransactionConstants.SAVINGS_ACCOUNT_NO_COL, row)!=null)
             savingsAccountIdCheck = ImportHandlerUtils.readAsLong(TransactionConstants.SAVINGS_ACCOUNT_NO_COL, row).toString();
-        if(savingsAccountIdCheck!=null)
-            savingsAccountId = savingsAccountIdCheck;
+        if(savingsAccountIdCheck!=null) {
+            //savingsAccountId = savingsAccountIdCheck;
+            /// value not not null here so try to convert it to long instead of null value
+            try {
+                savingsAccountIdL = Long.parseLong(savingsAccountIdCheck);
+            } catch (NumberFormatException n) {
+                System.err.println("------------------number exception caught for ---------------" + savingsAccountIdCheck);
+            }
+        }
+
         String transactionType = ImportHandlerUtils.readAsString(TransactionConstants.TRANSACTION_TYPE_COL, row);
         SavingsAccountTransactionEnumData savingsAccountTransactionEnumData=new SavingsAccountTransactionEnumData(null,null,transactionType);
 
@@ -130,12 +142,15 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
         String clientExternalId = ImportHandlerUtils.readAsString(TransactionConstants.CLIENT_EXTERNAL_ID_COL ,row);
 
+
         SavingsAccountTransactionData savingsAccountTransactionData = SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
-                checkNumber, routingCode, receiptNumber, bankNumber, Long.parseLong(savingsAccountId), savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
+                checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountIdL, savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
 
         Optional.ofNullable(clientExternalId).ifPresent(e->{
             savingsAccountTransactionData.setClientExternalId(e);
         });
+
+
 
         return savingsAccountTransactionData ;
 
@@ -166,6 +181,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
                             .build(); //
 
                 }else if (transaction.getTransactionType().getValue().equals("Deposit")){
+
+                    System.err.println("--------------------get savings account id -=----------"+transaction.getSavingsAccountId());
                     commandRequest = new CommandWrapperBuilder() //
                             .savingsAccountDeposit(transaction.getSavingsAccountId()) //
                             .withJson(payload) //
