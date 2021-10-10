@@ -28,6 +28,7 @@ import org.apache.fineract.infrastructure.bulkimport.constants.TransactionConsta
 import org.apache.fineract.infrastructure.bulkimport.data.Count;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
+import org.apache.fineract.infrastructure.bulkimport.importhandler.equitygrowth.EquityGrowthImportHandler;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SavingsAccountTransactionEnumValueSerialiser;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -36,6 +37,9 @@ import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
+import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
@@ -60,12 +64,20 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     private final ClientReadPlatformService clientReadPlatformService ;
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
 
+    //Added 08/10/2021
+    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository;
+    private final EquityGrowthDividendsRepository equityGrowthDividendsRepository;
+    private final SavingsAccountAssembler savingsAccountAssembler;
+
     @Autowired
     public SavingsTransactionImportHandler(final PortfolioCommandSourceWritePlatformService
-        commandsSourceWritePlatformService ,final ClientReadPlatformService clientReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
+        commandsSourceWritePlatformService , final ClientReadPlatformService clientReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService , final EquityGrowthDividendsRepository equityGrowthDividendsRepository , final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , final SavingsAccountAssembler savingsAccountAssembler) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.clientReadPlatformService = clientReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
+        this.equityGrowthDividendsRepository = equityGrowthDividendsRepository ;
+        this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
+        this.savingsAccountAssembler = savingsAccountAssembler;
     }
 
     @Override
@@ -100,10 +112,20 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         Sheet savingsTransactionSheet = workbook.getSheet(TemplatePopulateImportConstants.SAVINGS_TRANSACTION_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(savingsTransactionSheet, TransactionConstants.AMOUNT_COL);
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
+
             Row row;
             row = savingsTransactionSheet.getRow(rowIndex);
-            if(ImportHandlerUtils.isNotImported(row, TransactionConstants.STATUS_COL))
-                savingsTransactions.add(readSavingsTransaction(row,locale,dateFormat));
+
+            if(ImportHandlerUtils.isNotImported(row, TransactionConstants.STATUS_COL)) {
+
+                SavingsAccountTransactionData savingsAccountTransactionData = readSavingsTransaction(row, locale, dateFormat);
+
+                Optional.ofNullable(savingsAccountTransactionData).ifPresent(e->{
+                    // does it have any equity transaction ?
+                    savingsTransactions.add(e);
+                });
+
+            }
         }
     }
 
@@ -124,6 +146,7 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             }
         }
 
+
         String transactionType = ImportHandlerUtils.readAsString(TransactionConstants.TRANSACTION_TYPE_COL, row);
         SavingsAccountTransactionEnumData savingsAccountTransactionEnumData=new SavingsAccountTransactionEnumData(null,null,transactionType);
 
@@ -142,6 +165,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
         String clientExternalId = ImportHandlerUtils.readAsString(TransactionConstants.CLIENT_EXTERNAL_ID_COL ,row);
 
+        // Added 08/10/2021
+        Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);
 
         SavingsAccountTransactionData savingsAccountTransactionData = SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountIdL, savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
@@ -150,7 +175,9 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             savingsAccountTransactionData.setClientExternalId(e);
         });
 
-
+        Optional.ofNullable(equityBalance).ifPresent(e->{
+            savingsAccountTransactionData.setEquityBalance(new BigDecimal(equityBalance));
+        });
 
         return savingsAccountTransactionData ;
 
@@ -181,8 +208,6 @@ public class SavingsTransactionImportHandler implements ImportHandler {
                             .build(); //
 
                 }else if (transaction.getTransactionType().getValue().equals("Deposit")){
-
-                    System.err.println("--------------------get savings account id -=----------"+transaction.getSavingsAccountId());
                     commandRequest = new CommandWrapperBuilder() //
                             .savingsAccountDeposit(transaction.getSavingsAccountId()) //
                             .withJson(payload) //
@@ -200,6 +225,11 @@ public class SavingsTransactionImportHandler implements ImportHandler {
                 ImportHandlerUtils.writeErrorMessage(savingsTransactionSheet,transaction.getRowIndex(),errorMessage,TransactionConstants.STATUS_COL);
             }
         }
+
+
+        /// when dome with whole list we should deposit to equity growth if possible
+        EquityGrowthImportHandler.postOpeningBalance(equityGrowthDividendsRepository ,equityGrowthOnSavingsAccountRepository , savingsTransactions ,savingsAccountAssembler ,1L);
+
         savingsTransactionSheet.setColumnWidth(TransactionConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(TransactionConstants.STATUS_COL, savingsTransactionSheet.getRow(TransactionConstants.STATUS_COL), TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount,errorCount);

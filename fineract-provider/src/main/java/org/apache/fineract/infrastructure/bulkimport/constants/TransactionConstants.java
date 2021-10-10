@@ -43,4 +43,8 @@ public class TransactionConstants {
 
     // Added 05/10/2021
     public static final int CLIENT_EXTERNAL_ID_COL = 20;
+
+
+    // Added 08/10/2021
+    public static final int EQUITY_BALANCE_ID_COL = 21;
 }

@@ -6,6 +6,8 @@
 */
 package org.apache.fineract.wese.helper;
 
+import java.math.BigDecimal;
+
 public class ComparatorUtility {
 
     public static boolean compareLong(Long l ,Long r){
@@ -25,6 +27,19 @@ public class ComparatorUtility {
     public static boolean longGreaterThanZero(Long l){
         int cmp = l.compareTo(0L);
         return cmpToBoolean(cmp);
+    }
+
+    // Added 08/10/2021
+    public static boolean isBigDecimalZero(BigDecimal value){
+
+        int cmp = value.compareTo(BigDecimal.ZERO);
+
+        System.err.println("------------comparator value is ------------"+cmp);
+
+        if(cmp <= 0){
+            return true;
+        }
+        return false;
     }
 
 

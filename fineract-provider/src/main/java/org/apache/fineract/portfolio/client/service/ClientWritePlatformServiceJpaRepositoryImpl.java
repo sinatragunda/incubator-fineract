@@ -18,11 +18,7 @@
  */
 package org.apache.fineract.portfolio.client.service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
@@ -30,6 +26,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandProcessingService;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
+import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormat;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
@@ -150,7 +147,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private final ShareAccountWritePlatformService shareAccountWritePlatformService ;
     private final ProductReadPlatformService shareProductReadPlatformService ;
     private final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService;
-    
+
+    // Added 08/10/2021
+    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+
+
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
@@ -169,6 +170,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final ShareProductRepository shareProductRepository,
             final ShareAccountWritePlatformService shareAccountWritePlatformService,
             final ShareProductReadPlatformServiceImpl shareProductReadPlatformService,
+                                                       final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,
                                                        final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService
     ) {
         this.context = context;
@@ -199,6 +201,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.shareAccountWritePlatformService = shareAccountWritePlatformService;
         this.shareProductReadPlatformService = shareProductReadPlatformService;
         this.selfServiceRegistrationWritePlatformService = selfServiceRegistrationWritePlatformService;
+        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService ;
     }
 
     @Transactional
@@ -707,9 +710,34 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
        
             commandProcessingResult = shareAccountWritePlatformService.createShareAccount(jsonCommand);
 
-            if(commandProcessingResult.resourceId() !=null){
-                client.updateShareAccount(commandProcessingResult.resourceId());
-            }
+            Long accountId = commandProcessingResult.resourceId();
+
+            Optional.ofNullable(accountId).ifPresent(e->{
+
+                client.updateShareAccount(e);
+
+                // try to approve the accounts whilst at it
+                String accountType = "share";
+                String[] commands = {"approve","activate"};
+
+                String transactionDate = client.getActivationLocalDate().toString(fmt);
+
+                ObjectNode node1 = ObjectNodeHelper.objectNode();
+                node1.put("dateFormat", "dd MMMM yyyy");
+                node1.put("locale", "en");
+
+                for(String command : commands){
+
+                    String dateArg = String.format("%sdDate",command);
+                    node1.put(dateArg ,transactionDate);
+                    String apiJson = node1.toString();
+                    CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, accountId, command).withJson(apiJson).build();
+                    final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
+                    node1.remove(dateArg);
+                    //this.toApiJsonSerializer.serialize(commandProcessingResult);
+                }
+
+            });
         }
         return commandProcessingResult;
     }
@@ -717,18 +745,14 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     // added 25/09/2021 
     private void createSelfServiceUser(final Client client,final Boolean isCreateSelfServiceUser) {
         
-        if(!isCreateSelfServiceUser){
-            return ;
+        if(isCreateSelfServiceUser){
+            // still other steps can be removed here as well
+            if (client.isActive()){
+                selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
+            }
         }
 
-        if (client.isActive()){
-            System.err.println("---------------------------------------create self service auto ");
-            selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
-        }
     }
-
-
-
 
 
 

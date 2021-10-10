@@ -85,6 +85,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+
+// Added 08/10/2021
+import org.apache.fineract.wese.helper.ComparatorUtility;
+
+
 @Service
 public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements SavingsAccountWritePlatformService {
 
@@ -234,10 +239,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Override
     public CommandProcessingResult deposit(final Long savingsId, final JsonCommand command) {
 
-        this.context.authenticatedUser();
-
-        System.err.println("-----------------------savings account id is ----------"+savingsId);
-        
+        this.context.authenticatedUser();   
         this.savingsAccountTransactionDataValidator.validate(command);
 
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId);
@@ -247,6 +249,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
+
+        boolean isZero = ComparatorUtility.isBigDecimalZero(transactionAmount);
+
+        if(isZero){
+            System.err.println("--------------------------value equal to zero ----------");
+            return null ;
+        }
 
         final Map<String, Object> changes = new LinkedHashMap<>();
         final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);

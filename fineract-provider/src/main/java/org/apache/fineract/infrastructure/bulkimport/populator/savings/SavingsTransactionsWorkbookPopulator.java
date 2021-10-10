@@ -240,5 +240,9 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
         // Added 05/10/2021
         writeString(TransactionConstants.CLIENT_EXTERNAL_ID_COL, rowHeader, "Client External Id");
 
+
+        // Added 08/10/2021
+        writeString(TransactionConstants.EQUITY_BALANCE_ID_COL, rowHeader, "Equity Balance");
+
     }
 }

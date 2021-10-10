@@ -60,7 +60,6 @@ public class EquityGrowthHelper {
 
         list.stream().filter(zeroBeneficiariesPredicate).forEach(consumer);
 
-
     }
 
 
@@ -139,7 +138,7 @@ public class EquityGrowthHelper {
         return total.divide(new BigDecimal(periodCount) ,2 ,BigDecimal.ROUND_HALF_UP);
     }
 
-    public Double percentage(Double value ,Double of){
+    public static Double percentage(Double value ,Double of){
 
         /// (value / of ) * 100
         Double percentage = (value / of) * 100 ;

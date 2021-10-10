@@ -74,6 +74,9 @@ public class SavingsAccountTransactionData {
     // Added 05/10/2021
     private String clientExternalId ;
 
+    // Added 08/10/2021
+    private BigDecimal equityBalance;
+
     public static SavingsAccountTransactionData importInstance(BigDecimal transactionAmount,LocalDate transactionDate,
             Long paymentTypeId,String accountNumber, String checkNumber, String routingCode,
             String receiptNumber, String bankNumber,Long savingsAccountId,
@@ -250,5 +253,15 @@ public class SavingsAccountTransactionData {
     // Added 05/10/2021
     public String getClientExternalId(){
         return this.clientExternalId ;
+    }
+
+    // Added 08/10/2021 
+    public void setEquityBalance(BigDecimal equityBalance){
+        this.equityBalance = equityBalance;
+    }
+
+    // Added 08/10/2021
+    public BigDecimal getEquityBalance(){
+        return this.equityBalance;
     }
 }
