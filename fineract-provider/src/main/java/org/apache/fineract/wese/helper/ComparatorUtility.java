@@ -31,11 +31,7 @@ public class ComparatorUtility {
 
     // Added 08/10/2021
     public static boolean isBigDecimalZero(BigDecimal value){
-
         int cmp = value.compareTo(BigDecimal.ZERO);
-
-        System.err.println("------------comparator value is ------------"+cmp);
-
         if(cmp <= 0){
             return true;
         }

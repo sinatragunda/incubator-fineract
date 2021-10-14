@@ -279,8 +279,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             System.err.println("--------------------done validating now where is error ");
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
+            System.err.println("----------------proceed failed validation -------------------");
+
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+            
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
+
 
             if (loanProduct.useBorrowerCycle()) {
                 Integer cycleNumber = 0;
@@ -296,7 +300,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 this.loanProductCommandFromApiJsonDeserializer.validateMinMaxConstraints(command.parsedJson(), baseDataValidator,
                         loanProduct);
             }
-            if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+            if (!dataValidationErrors.isEmpty()) { 
+                System.err.println("------------error is -------"+dataValidationErrors.get(0).getDeveloperMessage());
+                throw new PlatformApiDataValidationException(dataValidationErrors); 
+            }
 
             final Loan newLoanApplication = this.loanAssembler.assembleFrom(command, currentUser);
 
@@ -1063,6 +1070,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
         
+        System.err.println("-------------------------dve exception ------------"+dve.getMessage());
+        
+        System.err.println("-------------error message -------------"+realCause.getMessage());
+
         if (realCause.getMessage().contains("loan_account_no_UNIQUE") || realCause.getCause().getMessage().contains("loan_account_no_UNIQUE")) {
 
             final String accountNo = command.stringValueOfParameterNamed("accountNo");

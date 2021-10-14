@@ -51,7 +51,6 @@ public class ImportHandlerUtils {
 
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
-        System.err.println("------------get number of entries here son ----------");
         while(sheet.getRow(noOfEntries+1) !=null){
             noOfEntries++;
         }
@@ -296,10 +295,8 @@ public class ImportHandlerUtils {
 
         Optional.ofNullable(externalId).ifPresent(e->{
 
-            System.err.println("-------------------Extenal id is present is -------"+e);
             ClientData clientData = clientReadPlatformService.retrieveOneByExternalId(externalId);
             Optional.ofNullable(clientData).ifPresent(clientData1 -> {
-                System.err.println("------------------client id found here ----------"+clientData1.getId());
                 clientId[0] = clientData1.getId();
             });
 
@@ -311,9 +308,7 @@ public class ImportHandlerUtils {
     public static Long getIdByName (Sheet sheet, String name) {
 
         String sheetName = sheet.getSheetName();
-
-        System.err.println("-------------------name is ---------------------"+name);
-
+        
         if(!sheetName.equals(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME)) {
             for (Row row : sheet) {
                 for (Cell cell : row) {

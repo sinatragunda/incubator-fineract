@@ -113,13 +113,13 @@ public class LoanFactorSavingsAccountHelper {
 
         boolean isCrossLink = loanProduct.isCrossLink();
 
-        System.err.println("-------------------loan factor to use for all this nonsense is "+this.loanFactor);
+        //System.err.println("-------------------loan factor to use for all this nonsense is "+this.loanFactor);
 
         if(this.loanFactor <= 0){
 
             /// check if other products have their own loan factoring that is cross link
             if(hasCrossLink()){
-                System.err.println("-----------product has no loan factor hence using others------------- ");
+                //System.err.println("-----------product has no loan factor hence using others------------- ");
                 this.loanFactor = crossLinkLoanProduct.loanFactor();
                 isCrossLink = hasCrossLink();
                 if(loanFactor <=0){
@@ -127,7 +127,7 @@ public class LoanFactorSavingsAccountHelper {
                 }
             }
             else{
-                System.err.println("-----------no cross link configured in this system");
+                //System.err.println("-----------no cross link configured in this system");
                 return true;
             }
         }
@@ -138,13 +138,13 @@ public class LoanFactorSavingsAccountHelper {
         }
 
 
-        System.err.println("-----------------at this stage cross link has been set to ? "+isCrossLink);
+        //System.err.println("-----------------at this stage cross link has been set to ? "+isCrossLink);
 
         SavingsAccountData savingsAccountData = savingsAccountReadPlatformService.retrieveOne(loanFactorAccountId);
         BigDecimal savingsAccountBalance = savingsAccountData.getAccountBalance();
 
         /// assemble all clients savings account and get their total balance
-        System.err.println("-------------------client name we dealing with is ----------"+client.getDisplayName()+"-----------and id is "+client.getId());
+        //System.err.println("-------------------client name we dealing with is ----------"+client.getDisplayName()+"-----------and id is "+client.getId());
         Long clientId = client.getId();
         List<LoanAccountData> loanAccountDataList = new ArrayList<>();
 
@@ -152,18 +152,18 @@ public class LoanFactorSavingsAccountHelper {
         loanAccountDataList = loanReadPlatformService.retrieveAllForClient(clientId);
 
         if(isCrossLink){
-            System.err.println("--------------cross link this son----------");
+            //System.err.println("--------------cross link this son----------");
         }
         else{
             // retrieve all where loan product id is equal to something
-            System.err.println("-----------------------cross link false why ? -----------------");
+            //System.err.println("-----------------------cross link false why ? -----------------");
             List<LoanAccountData> clientLoans = loanAccountDataList;
 
             Predicate<LoanAccountData> matchLoanProductFilter = (e)->{
-                System.err.println("-------------comparing for loan products ------------");
+                //System.err.println("-------------comparing for loan products ------------");
                 int cmp = e.loanProductId().compareTo(loanProductId);
 
-                System.err.println("----------------cmp between ---"+e.loanProductId()+"-----------and "+loanProductId);
+                //System.err.println("----------------cmp between ---"+e.loanProductId()+"-----------and "+loanProductId);
                 if(cmp==1){
                     return true;
                 }
@@ -172,7 +172,7 @@ public class LoanFactorSavingsAccountHelper {
 
             loanAccountDataList = clientLoans.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
 
-            System.err.println("----------------our new product portfolio is --------------"+loanAccountDataList.size());
+            //System.err.println("----------------our new product portfolio is --------------"+loanAccountDataList.size());
 
         }
 
@@ -197,11 +197,11 @@ public class LoanFactorSavingsAccountHelper {
 
             Long loanId = e.getId();
 
-            System.err.println("------------------------------get loan id --------"+loanId);
+            //System.err.println("------------------------------get loan id --------"+loanId);
 
             Collection<LoanTransactionData> loanTransactionDataList = loanReadPlatformService.retrieveLoanTransactions(loanId);
 
-            System.err.println("-------------------------accruals balance is ---------------"+accrualsBalance.doubleValue());
+            //System.err.println("-------------------------accruals balance is ---------------"+accrualsBalance.doubleValue());
 
             loanTransactionDataList.stream().filter(accrualsPredicate).map(LoanTransactionData::getAmount).reduce(accrualsBalance ,BigDecimal::add);
 
@@ -209,7 +209,7 @@ public class LoanFactorSavingsAccountHelper {
 
         loanAccountDataList.stream().filter(activeLoansFilter).forEach(accrualsTransactionConsumer);
 
-        System.err.println("----------------------after calculating all accrual balances we get ------- "+accrualsBalance.doubleValue());
+        //System.err.println("----------------------after calculating all accrual balances we get ------- "+accrualsBalance.doubleValue());
 
         BigDecimal totalDuePrincipalBalance = loanAccountDataList.stream().filter(activeLoansFilter).map(LoanAccountData::getPrincipalDue).reduce(BigDecimal.ZERO ,BigDecimal::add);
         BigDecimal totalInterestPaid = loanAccountDataList.stream().filter(activeLoansFilter).map(LoanAccountData::getInterestPaid).reduce(BigDecimal.ZERO ,BigDecimal::add);
@@ -217,24 +217,24 @@ public class LoanFactorSavingsAccountHelper {
 
         BigDecimal interestBalance = accrualsBalance.subtract(totalInterestPaid);
 
-        System.err.println("------------------interest balance is ------------"+interestBalance.doubleValue());
+        //System.err.println("------------------interest balance is ------------"+interestBalance.doubleValue());
 
         BigDecimal totalDueBalance = totalDuePrincipalBalance.add(interestBalance);
 
-        System.err.println("---------------------------total due balance is -------------"+totalDueBalance.doubleValue());
+        //System.err.println("---------------------------total due balance is -------------"+totalDueBalance.doubleValue());
 
         BigDecimal loanFactorTotalAllowable = savingsAccountBalance.multiply(new BigDecimal(loanFactor));
 
-        System.err.println("-------------------total allowable balance is "+loanFactorTotalAllowable.doubleValue());
+        //System.err.println("-------------------total allowable balance is "+loanFactorTotalAllowable.doubleValue());
 
         int cmp = totalDueBalance.compareTo(loanFactorTotalAllowable);
 
-        System.err.println("--------------------------- total loan balances are "+totalDueBalance.doubleValue()+"--------cmp value is "+cmp);
+        //System.err.println("--------------------------- total loan balances are "+totalDueBalance.doubleValue()+"--------cmp value is "+cmp);
 
         BigDecimal totalAllowable = BigDecimal.ZERO ;
         if(cmp >= 0){
 
-            System.err.println("--------------------------throw an error here son ---------------");
+            //System.err.println("--------------------------throw an error here son ---------------");
             String message = String.format("Your requested loan amount is greater than the maximum possible for this Savings Account Linked Product .Maximum available is %.2f", totalAllowable.doubleValue());
             throw new LoanFactorException(message ,message ,"Standard Error");
         }
@@ -243,13 +243,13 @@ public class LoanFactorSavingsAccountHelper {
         BigDecimal spillOver = totalDueBalance.add(principal);
 
 
-        System.err.println("------------------------spillover amount here is "+spillOver.doubleValue());
+        //System.err.println("------------------------spillover amount here is "+spillOver.doubleValue());
 
         // if spillover is greater than total allowable then get balance
 
         cmp = spillOver.compareTo(loanFactorTotalAllowable);
 
-        System.err.println("-------------------------------if this equal then error was raised ? "+cmp);
+        //System.err.println("-------------------------------if this equal then error was raised ? "+cmp);
 
         if(cmp > 0){
 
@@ -263,7 +263,7 @@ public class LoanFactorSavingsAccountHelper {
         /// here apply loan as usual
 
         totalDueBalance = totalDueBalance.add(principal);
-        System.err.println("-------------after adding princiapal we get "+totalDueBalance.doubleValue());
+        //System.err.println("-------------after adding princiapal we get "+totalDueBalance.doubleValue());
         ///savings account validity error here but its another job for another day now son
         return true ;
 
@@ -273,7 +273,7 @@ public class LoanFactorSavingsAccountHelper {
 
         List<LoanProduct> loanProductDataCollection = loanProductRepository.findAll();
 
-        System.err.println("----------------we have load all load products now "+loanProductDataCollection.size());
+        //System.err.println("----------------we have load all load products now "+loanProductDataCollection.size());
 
         Predicate<LoanProduct> crossLinkPredicate = (e)->{
             return e.isCrossLink();
@@ -283,7 +283,7 @@ public class LoanFactorSavingsAccountHelper {
 
         List<LoanProduct> loanProductDataList = loanProductDataCollection.stream().filter(crossLinkPredicate).sorted(comparator).collect(Collectors.toList());
 
-        System.err.println("--------------------we have loan factored this system "+loanProductDataList.size());
+        //System.err.println("--------------------we have loan factored this system "+loanProductDataList.size());
 
         if(!loanProductDataList.isEmpty()){
             /// we have selected by top one with highest loan factor

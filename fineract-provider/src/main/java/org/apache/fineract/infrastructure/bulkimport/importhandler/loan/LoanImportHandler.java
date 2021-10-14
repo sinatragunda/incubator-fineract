@@ -91,7 +91,6 @@ public class LoanImportHandler implements ImportHandler {
 
                     LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
                     Optional.ofNullable(loanAccountData).ifPresent(e->{
-                        System.err.println("--------------loan not null son ---------");
                         loans.add(loanAccountData);
                         approvalDates.add(readLoanApproval(row,locale,dateFormat));
                         disbursalDates.add(readDisbursalData(row,locale,dateFormat));
@@ -116,14 +115,18 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private DisbursementData readDisbursalData(Row row,String locale,String dateFormat) {
+
         LocalDate disbursedDate = ImportHandlerUtils.readAsDate(LoanConstants.DISBURSED_DATE_COL, row);
+
         String linkAccountId=null;
-        if ( ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row)!=null)
-         linkAccountId =  ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row).toString();
+        if ( ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row)!=null){
+            linkAccountId =  ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row).toString();
+        }
 
         if (disbursedDate!=null) {
             return DisbursementData.importInstance(disbursedDate,linkAccountId,row.getRowNum(),locale,dateFormat);
         }
+
         return null;
     }
 
@@ -147,8 +150,6 @@ public class LoanImportHandler implements ImportHandler {
         String loanOfficerName =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_OFFICER_NAME_COL, row);
         Long loanOfficerId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME), loanOfficerName);
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
-
-        System.err.println("-----------------read fund name here but why it keeps having error");
 
         String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
         
@@ -181,7 +182,6 @@ public class LoanImportHandler implements ImportHandler {
         EnumOptionData loanTermFrequencyEnum = null;
         if (loanTermFrequency != null) {
 
-            System.err.println("-------------------loan term frequency enum not null ");
             String loanTermFrequencyId = "";
             if (loanTermFrequency.equalsIgnoreCase("Days"))
                 loanTermFrequencyId = "0";
@@ -293,7 +293,8 @@ public class LoanImportHandler implements ImportHandler {
         }
 
         /// bulk imports dont work for revolving accounts 
-        ///added 21/08/2021  ,loanfactoring doesnt work at this stage maybe in the later versions it will work
+        /// added 21/08/2021  ,loanfactoring doesnt work at this stage maybe in the later versions it will work
+        
         final  Long loanFactorAccountId = null ;
         statuses.add(status);
         if (loanType!=null) {
@@ -303,9 +304,8 @@ public class LoanImportHandler implements ImportHandler {
 
                 int cmp = clientId.compareTo(0L);
                 if(cmp <= 0){
-                    System.err.println("-------------------client id is null get using external Id now of "+clientExternalId);
-                    clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
 
+                    clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
                     cmp = clientId.compareTo(0L);
 
                     if(cmp <= 0){
@@ -439,6 +439,8 @@ public class LoanImportHandler implements ImportHandler {
                 final CommandProcessingResult loanDisburseToSavingsResult = commandsSourceWritePlatformService.logCommandSource(commandRequest);
             } else {
                 String payload = gsonBuilder.create().toJson(disbusalData);
+
+                System.err.println("-----------------------diburse loan to not savings ----------------"+payload);
                 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                         .disburseLoanApplication(result.getLoanId()) //
                         .withJson(payload) //
@@ -485,7 +487,7 @@ public class LoanImportHandler implements ImportHandler {
         loanJsonOb.remove("isTopup");
         String payload=loanJsonOb.toString();
 
-        System.err.println("----------------payload ------------------"+payload);
+        System.err.println("----------------loan payload ------------------"+payload);
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createLoanApplication() //
                 .withJson(payload) //

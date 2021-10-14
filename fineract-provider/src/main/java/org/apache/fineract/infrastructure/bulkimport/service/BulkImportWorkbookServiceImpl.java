@@ -226,9 +226,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 URLConnection.guessContentTypeFromName(fileName), fileName, null, fileName);
         final Document document = this.documentRepository.findOne(documentId);
 
-
-        System.err.println("-------------------------pre document publish -----------------");
-
         final ImportDocument importDocument = ImportDocument.instance(document,
                 DateUtils.getLocalDateTimeOfTenant(), entityType.getValue(),
                 this.securityContext.authenticatedUser(),

@@ -3046,6 +3046,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
         }
 
         final LocalDate loanTransactionDate = loanTransaction.getTransactionDate();
+
+        System.err.println("--------------------------loan transaction date is --------------"+loanTransactionDate);
+
         if (loanTransactionDate.isBefore(getDisbursementDate())) {
             final String errorMessage = "The transaction date cannot be before the loan disbursement date: "
                     + getApprovedOnDate().toString();
@@ -3054,6 +3057,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         }
 
         if (loanTransactionDate.isAfter(DateUtils.getLocalDateOfTenant())) {
+
+            System.err.println("-----------transaction date is future ,but which date now ? -----"+loanTransactionDate);
             final String errorMessage = "The transaction date cannot be in the future.";
             throw new InvalidLoanStateTransitionException("transaction", "cannot.be.a.future.date", errorMessage, loanTransactionDate);
         }

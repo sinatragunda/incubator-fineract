@@ -363,8 +363,6 @@ public class SavingsImportHandler implements ImportHandler {
     private void openingBalanceDeposit(Long savingsAccountId , SavingsAccountData savingsAccountData){
 
         BigDecimal openingBalance = savingsAccountData.getOpeningBalance();
-        System.err.println("----------------------this is a savings account deposit -------------"+savingsAccountData.getOpeningBalance().doubleValue());
-
         int cmp = openingBalance.compareTo(BigDecimal.ZERO);
 
         if(cmp > 0){
@@ -384,8 +382,6 @@ public class SavingsImportHandler implements ImportHandler {
 
         savingsJsonob.remove("isDormancyTrackingActive");
         String payload= savingsJsonob.toString();
-
-        System.err.println("----------------------payload is --------------------"+payload);
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createSavingsAccount() //

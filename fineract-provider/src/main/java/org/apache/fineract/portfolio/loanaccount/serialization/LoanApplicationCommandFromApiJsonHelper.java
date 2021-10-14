@@ -526,16 +526,16 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         validateLoanMultiDisbursementdate(element, baseDataValidator, expectedDisbursementDate, principal);
         validatePartialPeriodSupport(interestCalculationPeriodType, baseDataValidator, element, loanProduct);
         
+
+        //System.err.println("------------------------------error values ----------------"+dataValidationErrors.size());
+
         if (!dataValidationErrors.isEmpty()) { 
 
-            System.err.println("------------throwing error at this stage-----------");
+            //System.err.println("------------throwing error at this stage-----------");
 
             for(ApiParameterError a : dataValidationErrors){
-
                 System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
-
             }
-
 
             throw new PlatformApiDataValidationException(dataValidationErrors); 
         }

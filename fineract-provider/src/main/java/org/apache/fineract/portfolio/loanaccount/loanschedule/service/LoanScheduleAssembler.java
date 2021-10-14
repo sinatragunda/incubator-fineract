@@ -1103,7 +1103,9 @@ public class LoanScheduleAssembler {
             final Integer minimumDaysBetweenDisbursalAndFirstRepayment) {
 
         final LocalDate minimumFirstRepaymentDate = disbursalDate.plusDays(minimumDaysBetweenDisbursalAndFirstRepayment);
-        if (firstRepaymentDate.isBefore(minimumFirstRepaymentDate)) { throw new MinDaysBetweenDisbursalAndFirstRepaymentViolationException(
+        if (firstRepaymentDate.isBefore(minimumFirstRepaymentDate)) { 
+
+            throw new MinDaysBetweenDisbursalAndFirstRepaymentViolationException(
                 disbursalDate, firstRepaymentDate, minimumDaysBetweenDisbursalAndFirstRepayment); }
     }
 }
