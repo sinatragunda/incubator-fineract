@@ -164,7 +164,7 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     public CommandProcessingResult submitApplication(final JsonCommand command) {
         try {
 
-            System.err.println("-------------------------create new savings account ---------");
+            //System.err.println("-------------------------create new savings account ---------");
             
             this.savingsAccountDataValidator.validateForSubmit(command.json());
             final AppUser submittedBy = this.context.authenticatedUser();

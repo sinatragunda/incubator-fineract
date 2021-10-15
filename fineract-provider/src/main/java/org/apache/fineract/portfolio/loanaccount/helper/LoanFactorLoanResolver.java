@@ -59,7 +59,7 @@ public class LoanFactorLoanResolver {
 
             System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
 
-            System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
+            //System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
 
             boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
             //if successful just proceed with this loan and throw no errors

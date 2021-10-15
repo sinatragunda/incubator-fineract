@@ -534,7 +534,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             //System.err.println("------------throwing error at this stage-----------");
 
             for(ApiParameterError a : dataValidationErrors){
-                System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
+                //System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
             }
 
             throw new PlatformApiDataValidationException(dataValidationErrors); 

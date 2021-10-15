@@ -1020,8 +1020,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
 
-            System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
-
+            //System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
         }
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
@@ -1033,18 +1032,16 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
 
-        System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
-
-        System.err.println("------------------why there arent any charges in this "+this.charges.size());
+        //System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
+        //System.err.println("------------------why there arent any charges in this "+this.charges.size());
 
         for (SavingsAccountCharge charge : this.charges()) {
-            System.err.println("---------product apply charges ----------------");
+            //System.err.println("---------product apply charges ----------------");
             if (charge.isWithdrawalFee() && charge.isActive()) {
 
-                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
+                //System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
 
                 charge.updateWithdralFeeAmount(transactionAmoount);
-
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
@@ -2350,7 +2347,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             this.charges = new HashSet<>();
         }
         this.charges.clear();
-        System.err.println("-----------------why do we clear charges here -------------?");
+        //System.err.println("-----------------why do we clear charges here -------------?");
         this.charges.addAll(associateChargesWithThisSavingsAccount(newSavingsAccountCharges));
         return true;
     }
@@ -2511,7 +2508,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             final DateTimeFormatter formatter, final AppUser user) {
 
 
-        System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
+        //System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
@@ -2586,7 +2583,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
         }
 
-        System.err.println("-----------------end of charge payment here ");
+        //System.err.println("-----------------end of charge payment here ");
 
         this.payCharge(savingsAccountCharge, chargePaid, transactionDate, user);
     }
@@ -2602,11 +2599,11 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         SavingsAccountTransaction chargeTransaction = null;
 
 
-        System.err.println("-----------------handle pay charge of "+transactionAmount.getAmount().doubleValue());
+        //System.err.println("-----------------handle pay charge of "+transactionAmount.getAmount().doubleValue());
 
         if (savingsAccountCharge.isWithdrawalFee()) {
 
-            System.err.println("---------------handle this withraw");
+          //  System.err.println("---------------handle this withraw");
             chargeTransaction = SavingsAccountTransaction.withdrawalFee(this, office(), transactionDate, transactionAmount, user);
 
         } else if (savingsAccountCharge.isAnnualFee()) {

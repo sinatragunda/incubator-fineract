@@ -330,7 +330,7 @@ public class LoanAssembler {
             // If true it is equal to 0 but if not then proceed 
             boolean isZero = ComparatorUtility.compareLong(fundId ,0L);
             
-            System.err.println("------------this item is 0 ? -------------"+isZero);
+            //System.err.println("------------this item is 0 ? -------------"+isZero);
             if(!isZero){
                 fund = this.fundRepository.findOne(fundId);
                 if (fund == null) { throw new FundNotFoundException(fundId); }

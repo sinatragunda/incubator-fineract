@@ -26,7 +26,7 @@ public class ThreadCheat {
 
     public static synchronized void raise(boolean shouldRaise){
         raise = shouldRaise ;
-        System.err.println("-------------------------steal thread now---------");
+        //System.err.println("-------------------------steal thread now---------");
         if(shouldRaise){
             final SecurityContext context = SecurityContextHolder.getContext();
             if (context != null){
@@ -34,7 +34,7 @@ public class ThreadCheat {
                 if (auth != null) {
                     AppUser currentUser = (AppUser) auth.getPrincipal();
                     stealUser(currentUser);
-                    System.err.println("--------stealing user-----------");
+                   // System.err.println("--------stealing user-----------");
                 }
             }
 
@@ -47,13 +47,13 @@ public class ThreadCheat {
 
     public static void stealUser(AppUser appUser){
         String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
-        System.err.println("--------------get tenant ------------------"+tenant);
+        //System.err.println("--------------get tenant ------------------"+tenant);
         currentUser.put(tenant ,appUser);
     }
 
     public static AppUser getStolenUser(){
         String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
-        System.err.println("--------------------we have a tenant --------------------"+tenant);
+        //System.err.println("--------------------we have a tenant --------------------"+tenant);
 
         return currentUser.get(tenant);
     }

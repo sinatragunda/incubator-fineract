@@ -67,7 +67,7 @@ public class EmailSendStatus extends AbstractPersistableCustom<Long> implements 
 
     public void setScheduledMailSession(ScheduledMailSession scheduledMailSession) {
         //this.scheduledMailSession = scheduledMailSession;
-        System.err.println("---------in which thread is being called ? ");
+        //System.err.println("---------in which thread is being called ? ");
 
     }
 

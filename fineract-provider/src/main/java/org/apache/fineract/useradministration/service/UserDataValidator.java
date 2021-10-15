@@ -89,6 +89,7 @@ public final class UserDataValidator {
             } else {
                 final String password = this.fromApiJsonHelper.extractStringNamed("password", element);
                 final String repeatPassword = this.fromApiJsonHelper.extractStringNamed("repeatPassword", element);
+
                 final PasswordValidationPolicy validationPolicy = this.passwordValidationPolicy.findActivePasswordValidationPolicy();
                 final String regex = validationPolicy.getRegex();
                 final String description = validationPolicy.getDescription();
@@ -150,10 +151,21 @@ public final class UserDataValidator {
     }
 
     public void validateForUpdate(final String json) {
-        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+
+        System.err.println("--------json request is ------------"+json);
+        
+        if (StringUtils.isBlank(json)) { 
+            System.err.println("--------------json is blank son ---------");
+            throw new InvalidJsonException(); 
+        }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+
+        System.err.println("-----------checking for supported params --------");
+
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.supportedParameters);
+
+        System.err.println("-----------checking for supported params  ,done now--------");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("user");
@@ -235,6 +247,11 @@ public final class UserDataValidator {
             		baseDataValidator.reset().parameter(AppUserConstants.CLIENTS).value(clientId).longGreaterThanZero();
             	}
         	}
+        }
+
+        for(ApiParameterError e : dataValidationErrors){
+
+            System.err.println("------------------------error for validation -------"+e.getDeveloperMessage());
         }
 
         throwExceptionIfValidationWarningsExist(dataValidationErrors);

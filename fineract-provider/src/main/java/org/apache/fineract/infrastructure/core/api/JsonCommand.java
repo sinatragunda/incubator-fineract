@@ -122,16 +122,16 @@ public final class JsonCommand {
         this.organisationCreditBureauId=organisationCreditBureauId;
     }
     
-    public static JsonCommand fromJsonElement(final Long resourceId, final JsonElement parsedCommand) {
-        return new JsonCommand(resourceId, parsedCommand);
+    public static JsonCommand fromJsonElement(final Long resourceId, final JsonElement parsedCommand ,final FromJsonHelper fromApiJsonHelper) {
+        return new JsonCommand(resourceId, parsedCommand ,fromApiJsonHelper);
     }
     
-    public JsonCommand(final Long resourceId, final JsonElement parsedCommand) {
+    public JsonCommand(final Long resourceId, final JsonElement parsedCommand ,final FromJsonHelper fromApiJsonHelper) {
         this.parsedCommand = parsedCommand;
         this.resourceId = resourceId;
         this.commandId = null;
         this.jsonCommand = null;        
-        this.fromApiJsonHelper = null;
+        this.fromApiJsonHelper = fromApiJsonHelper;
         this.entityName = null;
         this.subresourceId = null;
         this.groupId = null;
@@ -157,9 +157,11 @@ public final class JsonCommand {
         return this.jsonCommand;
     }
 
+
     public JsonElement parsedJson() {
         return this.parsedCommand;
     }
+
 
     public JsonElement jsonElement(final String paramName) {
         if (this.parsedCommand.getAsJsonObject().has(paramName)) {
@@ -308,10 +310,18 @@ public final class JsonCommand {
     }
 
     public boolean parameterExists(final String parameterName) {
+
+        System.err.println("-------------------which paramaters --------------"+parameterName);
+        
+        if(this.parsedCommand==null){
+            System.err.println("----------------parsed command error------------------");
+        }
+
         return this.fromApiJsonHelper.parameterExists(parameterName, this.parsedCommand);
     }
 
     public boolean hasParameter(final String parameterName) {
+        System.err.println("-----------------call has parameter why error ? ----------");
         return parameterExists(parameterName);
     }
 

@@ -3058,8 +3058,10 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         if (loanTransactionDate.isAfter(DateUtils.getLocalDateOfTenant())) {
 
-            System.err.println("-----------transaction date is future ,but which date now ? -----"+loanTransactionDate);
             final String errorMessage = "The transaction date cannot be in the future.";
+
+            System.err.println("----------------should push date today-------------");
+            
             throw new InvalidLoanStateTransitionException("transaction", "cannot.be.a.future.date", errorMessage, loanTransactionDate);
         }
 

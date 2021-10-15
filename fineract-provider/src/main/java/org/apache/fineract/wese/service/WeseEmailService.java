@@ -98,9 +98,7 @@ public class WeseEmailService{
 
         }
         catch(Exception e){
-
             System.err.println("---------exception ------------"+e.getMessage());
-
         }
     }
 

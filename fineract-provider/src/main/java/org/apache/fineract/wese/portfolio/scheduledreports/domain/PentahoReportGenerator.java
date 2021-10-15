@@ -74,7 +74,7 @@ public class PentahoReportGenerator {
     // Reccuring is a non client facing file ,since only one of it is needed its safe to just not delete it
     public File getReccuringFile(){
         if(file==null){
-            System.err.println("-----------------creating new non client file ------------");
+            //System.err.println("-----------------creating new non client file ------------");
             file = processReport();
         }
         return file ;

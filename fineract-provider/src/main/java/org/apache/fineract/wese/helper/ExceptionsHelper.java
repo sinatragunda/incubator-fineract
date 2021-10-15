@@ -15,7 +15,7 @@ public class ExceptionsHelper {
         for(Object object : args){
             boolean isNull = Objects.isNull(object);
             if(isNull){
-                System.err.println("----------------value is null ");
+                //System.err.println("----------------value is null ");
                 return true ;
             }
         }

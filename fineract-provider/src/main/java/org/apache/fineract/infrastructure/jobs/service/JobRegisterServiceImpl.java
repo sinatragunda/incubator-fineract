@@ -133,8 +133,6 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
     public void executeJob(final ScheduledJobDetail scheduledJobDetail, String triggerType) {
         try {
 
-            System.err.println("-------------------time to execute job son -------------");
-
             final JobDataMap jobDataMap = new JobDataMap();
             if (triggerType == null) {
                 triggerType = SchedulerServiceConstants.TRIGGER_TYPE_APPLICATION;
@@ -154,7 +152,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
                 this.schedulers.put(tempSchedulerName, tempScheduler);
 
                 ScheduledJobsHelper.activeJobId = scheduledJobDetail.getId();
-                System.err.println("----------------what is this key thing ---------"+jobDetail.getKey());
+                //System.err.println("----------------what is this key thing ---------"+jobDetail.getKey());
                 tempScheduler.triggerJob(jobDetail.getKey(), jobDataMap);
             } else {
                 scheduler.triggerJob(jobKey, jobDataMap);

@@ -338,7 +338,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
                 clientData = jdbcTemplate.queryForObject(sql, this.clientExternalIdMapper, new Object[] {externalId});
             }
             catch (EmptyResultDataAccessException e){
-              System.err.println("-----------------empty item error caught -------"+e.getMessage());
+              //System.err.println("-----------------empty item error caught -------"+e.getMessage());
             }
         }
         return clientData ;

@@ -196,7 +196,7 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
         this.context.authenticatedUser();
 
 
-        System.err.println("------------------------this is where this shit transaction starts after all--------"+accountId);
+        //System.err.println("------------------------this is where this shit transaction starts after all--------"+accountId);
 
 
         final SavingsAccountChargeMapper rm = new SavingsAccountChargeMapper();

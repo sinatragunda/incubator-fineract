@@ -37,6 +37,7 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.*;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+// Added 14/10/2021
+import org.apache.fineract.infrastructure.core.service.DateUtils;
+
 
 @Service
 public class LoanImportHandler implements ImportHandler {
@@ -92,9 +97,15 @@ public class LoanImportHandler implements ImportHandler {
                     LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
                     Optional.ofNullable(loanAccountData).ifPresent(e->{
                         loans.add(loanAccountData);
+
                         approvalDates.add(readLoanApproval(row,locale,dateFormat));
                         disbursalDates.add(readDisbursalData(row,locale,dateFormat));
-                        loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
+
+                        LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
+                        Optional.ofNullable(loanTransactionData).ifPresent(e1->{
+                            loanRepayments.add(e1);
+                        });
+                        //loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
                     });
                 }
         }
@@ -106,6 +117,13 @@ public class LoanImportHandler implements ImportHandler {
         if (ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row)!=null)
             repaymentAmount = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row));
         LocalDate lastRepaymentDate = ImportHandlerUtils.readAsDate(LoanConstants.LAST_REPAYMENT_DATE_COL, row);
+        
+        // if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
+        if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
+            //System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
+            lastRepaymentDate = DateUtils.getLocalDateOfTenant();
+        }
+
         String repaymentType = ImportHandlerUtils.readAsString(LoanConstants.REPAYMENT_TYPE_COL, row);
         Long repaymentTypeId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), repaymentType);
         if (repaymentAmount!=null&&lastRepaymentDate!=null&&repaymentType!=null&&repaymentTypeId!=null)
@@ -249,7 +267,12 @@ public class LoanImportHandler implements ImportHandler {
         Integer graceOnInterestPayment =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_INTEREST_PAYMENT_COL, row);
         Integer graceOnInterestCharged =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_INTEREST_CHARGED_COL, row);
         LocalDate interestChargedFromDate =  ImportHandlerUtils.readAsDate(LoanConstants.INTEREST_CHARGED_FROM_COL, row);
-        LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
+        
+        // if first repayment date not around we should just use the one in scheduling not today date
+        //LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
+        
+        LocalDate firstRepaymentOnDate = null ;
+                
         String loanType=null;
         EnumOptionData loanTypeEnumOption=null;
         if ( ImportHandlerUtils.readAsString(LoanConstants.LOAN_TYPE_COL, row)!=null) {
@@ -302,13 +325,17 @@ public class LoanImportHandler implements ImportHandler {
 
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
 
-                int cmp = clientId.compareTo(0L);
-                if(cmp <= 0){
+
+                // returns 0L if value of clientId is null ,so we must search using client external id
+                boolean cmp = ComparatorUtility.isLongZero(clientId);
+                if(cmp){
 
                     clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
-                    cmp = clientId.compareTo(0L);
 
-                    if(cmp <= 0){
+                    cmp = ComparatorUtility.isLongZero(clientId);
+
+                    // if client id is null again lets skip but will have problem in finding out which loans failed or succedded
+                    if(cmp){
                         return null ;
                     }
                 }
@@ -440,7 +467,7 @@ public class LoanImportHandler implements ImportHandler {
             } else {
                 String payload = gsonBuilder.create().toJson(disbusalData);
 
-                System.err.println("-----------------------diburse loan to not savings ----------------"+payload);
+                //System.err.println("-----------------------diburse loan to not savings ----------------"+payload);
                 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                         .disburseLoanApplication(result.getLoanId()) //
                         .withJson(payload) //
@@ -487,7 +514,7 @@ public class LoanImportHandler implements ImportHandler {
         loanJsonOb.remove("isTopup");
         String payload=loanJsonOb.toString();
 
-        System.err.println("----------------loan payload ------------------"+payload);
+        //System.err.println("----------------loan payload ------------------"+payload);
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createLoanApplication() //
                 .withJson(payload) //

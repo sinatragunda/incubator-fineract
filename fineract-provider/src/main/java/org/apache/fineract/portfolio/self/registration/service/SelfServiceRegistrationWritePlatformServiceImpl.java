@@ -181,8 +181,6 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
     @Override
     public SelfServiceRegistration createSelfServiceUserEx(Client client){
 
-        System.err.println("----------------create self service user now --------------------"+client.getFirstname());
-
         
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -219,9 +217,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
         String authenticationToken = randomAuthorizationTokenGeneration();
 
-
-        System.err.println("-------------auth token is ----------"+authenticationToken);
-        
+ 
         SelfServiceRegistration selfServiceRegistration = SelfServiceRegistration.instance(client, accountNumber, firstName, lastName,
                 null, email, authenticationToken, username, authenticationToken);
         this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
@@ -307,7 +303,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             Long id = this.fromApiJsonHelper.extractLongNamed(SelfServiceApiConstants.requestIdParamName, element);
             baseDataValidator.reset().parameter(SelfServiceApiConstants.requestIdParamName).value(id).notNull().integerGreaterThanZero();
             
-            command = JsonCommand.fromJsonElement(id, element);
+            command = JsonCommand.fromJsonElement(id, element ,fromApiJsonHelper);
             
             String authenticationToken = this.fromApiJsonHelper.extractStringNamed(SelfServiceApiConstants.authenticationTokenParamName,
                     element);

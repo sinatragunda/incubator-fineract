@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.GmailBackedPlatformEmailService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
@@ -51,6 +52,7 @@ import org.apache.fineract.useradministration.exception.UserNotFoundException;
 import org.apache.fineract.useradministration.helper.ResetSelfServiceUserPassword;
 import org.apache.fineract.useradministration.service.AppUserReadPlatformService;
 import org.apache.fineract.useradministration.service.AppUserWritePlatformService;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -84,6 +86,9 @@ public class UsersApiResource {
     private final AppUserRepository appUserRepository ;
     private final AppUserWritePlatformService appUserWritePlatformService ;
 
+    // Added 15/10/2021
+    private final FromJsonHelper fromJsonHelper ;
+
     @Autowired
     public UsersApiResource(final PlatformSecurityContext context, final AppUserReadPlatformService readPlatformService,
             final OfficeReadPlatformService officeReadPlatformService, final DefaultToApiJsonSerializer<AppUserData> toApiJsonSerializer,
@@ -91,7 +96,7 @@ public class UsersApiResource {
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
             final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
             final BulkImportWorkbookService bulkImportWorkbookService, final GmailBackedPlatformEmailService gmailBackedPlatformEmailService ,
-                            final AppUserRepository appUserRepository ,final AppUserWritePlatformService appUserWritePlatformService) {
+                            final AppUserRepository appUserRepository ,final AppUserWritePlatformService appUserWritePlatformService ,final FromJsonHelper fromJsonHelper) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.officeReadPlatformService = officeReadPlatformService;
@@ -103,6 +108,7 @@ public class UsersApiResource {
         this.appUserRepository = appUserRepository ;
         this.gmailBackedPlatformEmailService = gmailBackedPlatformEmailService ;
         this.appUserWritePlatformService = appUserWritePlatformService ;
+        this.fromJsonHelper = fromJsonHelper ;
     }
 
     @GET
@@ -156,12 +162,13 @@ public class UsersApiResource {
             throw new UserNotFoundException(username);
         }
 
-
         System.err.println("-------------------lets reset password son-----------");
 
-        ResetSelfServiceUserPassword.reset(appUserWritePlatformService , gmailBackedPlatformEmailService ,appUser);
-        // to return something here
-        return null;
+        boolean status = ResetSelfServiceUserPassword.reset(appUserWritePlatformService , gmailBackedPlatformEmailService ,fromJsonHelper,appUser);
+
+        // to return something here ,true of or false
+        String response =  ObjectNodeHelper.statusNode(status).toString();
+        return response;
     }
 
 
@@ -207,7 +214,6 @@ public class UsersApiResource {
                 .build();
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 

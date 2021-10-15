@@ -276,7 +276,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client);
 
-            System.err.println("--------------------done validating now where is error ");
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
             System.err.println("----------------proceed failed validation -------------------");

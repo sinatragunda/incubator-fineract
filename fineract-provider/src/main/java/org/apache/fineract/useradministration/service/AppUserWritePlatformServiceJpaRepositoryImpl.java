@@ -18,12 +18,7 @@
  */
 package org.apache.fineract.useradministration.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.PersistenceException;
@@ -34,8 +29,10 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.PlatformEmailSendException;
 import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncoder;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -73,6 +70,10 @@ import org.springframework.util.ObjectUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+// added 15/10/2021
+import org.apache.commons.lang.StringUtils;
+
+
 @Service
 public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWritePlatformService {
 
@@ -90,12 +91,15 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
     private final ClientRepositoryWrapper clientRepositoryWrapper;
     private final TopicDomainService topicDomainService;
 
+    // added 15/10/2021
+    private final FromJsonHelper fromJsonHelper ;
+
     @Autowired
     public AppUserWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final AppUserRepository appUserRepository,
             final UserDomainService userDomainService, final OfficeRepositoryWrapper officeRepositoryWrapper, final RoleRepository roleRepository,
             final PlatformPasswordEncoder platformPasswordEncoder, final UserDataValidator fromApiJsonDeserializer,
             final AppUserPreviousPasswordRepository appUserPreviewPasswordRepository, final StaffRepositoryWrapper staffRepositoryWrapper,
-            final ClientRepositoryWrapper clientRepositoryWrapper, final TopicDomainService topicDomainService) {
+            final ClientRepositoryWrapper clientRepositoryWrapper, final TopicDomainService topicDomainService ,final  FromJsonHelper fromJsonHelper) {
         this.context = context;
         this.appUserRepository = appUserRepository;
         this.userDomainService = userDomainService;
@@ -107,6 +111,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         this.staffRepositoryWrapper = staffRepositoryWrapper;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.topicDomainService = topicDomainService;
+        this.fromJsonHelper = fromJsonHelper ;
     }
 
     @Transactional
@@ -191,20 +196,55 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         try {
 
             this.context.authenticatedUser(new CommandWrapperBuilder().updateUser(null).build());
+            String json = command.json();
 
-            this.fromApiJsonDeserializer.validateForUpdate(command.json());
+            if (StringUtils.isBlank(json)) {
 
+                System.err.println("--------------json is blank son ------- ,lets check another value now------------");
+
+                JsonElement jsonElement = command.parsedJson();
+                json = fromJsonHelper.toJson(jsonElement);
+
+                boolean isPresent = Optional.ofNullable(json).isPresent();
+
+                if(!isPresent){
+                    throw new InvalidJsonException();
+                }
+
+                System.err.println("--------------new value to use ---------------"+json);
+            }
+
+            this.fromApiJsonDeserializer.validateForUpdate(json);
+
+            System.err.println("--------------------validate --------------");
+
+        
             final AppUser userToUpdate = this.appUserRepository.findOne(userId);
 
-            if (userToUpdate == null) { throw new UserNotFoundException(userId); }
+            System.err.println("----------------update user--------------");
+
+            boolean isUserFound = Optional.ofNullable(userToUpdate).isPresent();
+
+            if(!isUserFound){
+                System.err.println("==============user not found here ===========");
+                throw new UserNotFoundException(userId); 
+            };
+
+            System.err.println("-------------dome some password thing ---------------");
 
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
-            
+
+            System.err.println("-------------------fails to work from here -----------------");
+
             Collection<Client> clients = null;
+
             boolean isSelfServiceUser = userToUpdate.isSelfServiceUser();
+
             if(command.hasParameter(AppUserConstants.IS_SELF_SERVICE_USER)){
             	isSelfServiceUser = command.booleanPrimitiveValueOfParameterNamed(AppUserConstants.IS_SELF_SERVICE_USER); 
             }
+
+            System.err.println("----------------is self service user --------"+isSelfServiceUser);
             
             if(isSelfServiceUser
             		&& command.hasParameter(AppUserConstants.CLIENTS)){
@@ -241,13 +281,15 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                 userToUpdate.updateRoles(allRoles);
             }
 
+            System.err.println("--------------changes are -----------"+changes.size());
+
             if (!changes.isEmpty()) {
+
                 this.appUserRepository.saveAndFlush(userToUpdate);
 
-                if (currentPasswordToSaveAsPreview != null) {
+                Optional.ofNullable(currentPasswordToSaveAsPreview).ifPresent(e->{
                     this.appUserPreviewPasswordRepository.save(currentPasswordToSaveAsPreview);
-                }
-
+                });
             }
 
             return new CommandProcessingResultBuilder() //
@@ -256,6 +298,9 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
                     .with(changes) //
                     .build();
         } catch (final DataIntegrityViolationException dve) {
+            
+            System.err.println("-----------handle integrity error-----");
+
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }catch (final PersistenceException | AuthenticationServiceException dve) {
@@ -279,9 +324,12 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
         final String passWordEncodedValue = user.getEncodedPassword(command, this.platformPasswordEncoder);
 
+        System.err.println("----------password encoded value ----------"+passWordEncodedValue);
+
         AppUserPreviousPassword currentPasswordToSaveAsPreview = null;
 
         if (passWordEncodedValue != null) {
+
             PageRequest pageRequest = new PageRequest(0, AppUserApiConstant.numberOfPreviousPasswords, Sort.Direction.DESC, "removalDate");
             final List<AppUserPreviousPassword> nLastUsedPasswords = this.appUserPreviewPasswordRepository.findByUserId(user.getId(),
                     pageRequest);
@@ -289,8 +337,7 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
             for (AppUserPreviousPassword aPreviewPassword : nLastUsedPasswords) {
 
                 if (aPreviewPassword.getPassword().equals(passWordEncodedValue)) {
-                throw new PasswordPreviouslyUsedException();
-
+                    throw new PasswordPreviouslyUsedException();
                 }
             }
             currentPasswordToSaveAsPreview = new AppUserPreviousPassword(user);

@@ -83,6 +83,7 @@ public class FromJsonHelper {
     }
 
     public void checkForUnsupportedParameters(final Type typeOfMap, final String json, final Set<String> supportedParams) {
+        
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Map<String, Object> requestMap = this.gsonConverter.fromJson(json, typeOfMap);

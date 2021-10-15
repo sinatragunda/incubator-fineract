@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.security.filter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -169,7 +170,9 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
     		HttpServletResponse response, Authentication authResult)
     		throws IOException {
     	super.onSuccessfulAuthentication(request, response, authResult);
-		AppUser user = (AppUser) authResult.getPrincipal();
+
+    	/// what is happening here man ?
+    	AppUser user = (AppUser) authResult.getPrincipal();
 
         if (notificationReadPlatformService.hasUnreadNotifications(user.getId())) {
             response.addHeader("X-Notification-Refresh", "true");
@@ -179,16 +182,52 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 		
 		String pathURL = request.getRequestURI();
 
+		boolean isSelfServiceRequest[] = {false};
 
-		boolean isSelfServiceRequest = (pathURL != null && pathURL.contains("/self/"));
+        Optional.ofNullable(pathURL).ifPresent(e->{
+            isSelfServiceRequest[0] = (pathURL != null && pathURL.contains("/self/"));
+            if(!isSelfServiceRequest[0]){
+                // check again if its not selfservic request
+                isSelfServiceRequest[0] = pathURL.contains("selfservice");
+            }
+        });
 
-		boolean notAllowed = ((isSelfServiceRequest && !user.isSelfServiceUser())
-				||(!isSelfServiceRequest && user.isSelfServiceUser()));
+
+		// logic here a bit complex to comprehend with all the logical and ors
+		boolean notAllowed = ((isSelfServiceRequest[0] && !user.isSelfServiceUser())
+				||(!isSelfServiceRequest[0]));
+
 		
 		if(notAllowed){
-		    System.err.println("--------------------user not authorized for this shit man -------------");
+
+		    System.err.println("--------------------user not authorized for this shit man -------------"+pathURL);
 			 // we removing this step so that we can implement our self service item
+            boolean isPasswordRequest = passwordResetRequest(pathURL ,response);
+
+            // easy to bypass isSelfServiceRequest here to just proceed
+            if(isPasswordRequest){
+                return ;
+            }
+
+            /// we had blocked this there other day
+            // toxic logic that needs reworking here
 		    //throw new BadCredentialsException("User not authorised to use the requested resource.");
 		}
+    }
+
+
+    public static boolean passwordResetRequest(String url ,HttpServletResponse response){
+
+        boolean isPasswordRequest = url.contains("resetpassword");
+
+        if(isPasswordRequest){
+            try{
+                //response.sendRedirect("/login");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return isPasswordRequest;
     }
 }

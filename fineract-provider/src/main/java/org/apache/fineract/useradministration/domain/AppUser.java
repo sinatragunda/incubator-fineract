@@ -631,14 +631,29 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
     }
 
     public String getEncodedPassword(final JsonCommand command, final PlatformPasswordEncoder platformPasswordEncoder) {
+        
         final String passwordParamName = "password";
         final String passwordEncodedParamName = "passwordEncoded";
+
         String passwordEncodedValue = null;
 
+        if(command==null){
+            System.err.println("--------------------------------jsoncommand null ------------");
+        }
+
+        System.err.println("----------------------where is error-----------------------"+this.password);
+
+        System.err.println(command.hasParameter(passwordParamName));
+
+        System.err.println("-------------why do we have error ----------------------");
+
         if (command.hasParameter(passwordParamName)) {
+
             if (command.isChangeInPasswordParameterNamed(passwordParamName, this.password, platformPasswordEncoder, getId())) {
 
                 passwordEncodedValue = command.passwordValueOfParameterNamed(passwordParamName, platformPasswordEncoder, getId());
+
+                System.err.println("--------------encoded password is -------------"+passwordEncodedValue);
 
             }
         } else if (command.hasParameter(passwordEncodedParamName)) {

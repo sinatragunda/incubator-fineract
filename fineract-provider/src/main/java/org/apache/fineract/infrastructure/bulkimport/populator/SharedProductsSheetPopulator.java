@@ -76,7 +76,15 @@ public class SharedProductsSheetPopulator extends AbstractWorkbookPopulator {
                 writeString(CURRENCY_COL, row, productData.getCurrency().getName().replaceAll("[ ]", "_"));
                 writeInt(DECIMAL_PLACES_COL, row, productData.getCurrency().decimalPlaces());
                 writeBigDecimal(TODAYS_PRICE_COL, row, deriveMarketPrice(productData));
-                writeInt(CURRENCY_IN_MULTIPLES_COL,row,productData.getCurrency().currencyInMultiplesOf());
+
+                //writeInt(CURRENCY_IN_MULTIPLES_COL,row,productData.getCurrency().currencyInMultiplesOf());
+
+                // error raise here so lets correct it for now
+                System.err.println("----------by passing previous found error----------------");
+                Optional.ofNullable(productData.getCurrency().currencyInMultiplesOf()).ifPresent(e->{
+                    writeInt(CURRENCY_IN_MULTIPLES_COL ,row ,e);
+                });
+
                 if (chargesForSharedProducts != null) {
                     int chargeRowIndex=0;
                     for (ChargeData chargeData:chargesForSharedProducts) {

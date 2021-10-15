@@ -278,7 +278,7 @@ public class SavingsImportHandler implements ImportHandler {
                 if (progressLevel == 0) {
                     CommandProcessingResult result = importSavings(i,dateFormat);
 
-                    System.err.println("---------------savings account import-----------");
+                    //System.err.println("---------------savings account import-----------");
 
                     savingsId = result.getSavingsId();;
 
@@ -367,7 +367,7 @@ public class SavingsImportHandler implements ImportHandler {
 
         if(cmp > 0){
 
-            System.err.println("--------------balance is not zero ");
+            //System.err.println("--------------balance is not zero ");
             //accountDomainService.handleDepositLite(savingsAccountId ,openingBalance ,null);
             savingsAccountDomainService.handleDepositLite(savingsAccountId , TimeHelper.jodaLocalDateNow(),openingBalance);
         }

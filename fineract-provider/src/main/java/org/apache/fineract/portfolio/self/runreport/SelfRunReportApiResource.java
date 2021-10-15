@@ -74,11 +74,11 @@ public class SelfRunReportApiResource {
 
         this.context.authenticatedUser();
 
-        System.err.println("-----------------get list of reports ----------------------------");
+        //System.err.println("-----------------get list of reports ----------------------------");
 
         Collection<ReportData> reportDataCollection = PermissionsReportHelper.selfServiceReports(permissionReadPlatformService , roleReadPlatformService ,context);
 
-        System.err.println("----------------we have these reports now -------------------------"+reportDataCollection.size());
+        //System.err.println("----------------we have these reports now -------------------------"+reportDataCollection.size());
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, reportDataCollection, ReportResponseParameters.RESPONSE_DATA_PARAMETERS);
