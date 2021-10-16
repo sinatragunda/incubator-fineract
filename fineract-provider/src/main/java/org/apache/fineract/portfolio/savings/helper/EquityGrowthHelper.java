@@ -90,10 +90,9 @@ public class EquityGrowthHelper {
             BigDecimal profitPerClient =  profitPerClient(savingsAccountMonthlyDepositList ,startDate ,endDate ,totalSavings, profit ,averageSavings);
             Double percentage = percentage(profitPerClient.doubleValue() ,totalSavings.doubleValue());
 
-            System.err.println("--------------------profit for------"+savingsAccountData.getClientName()+"---------------------is "+profitPerClient.doubleValue());
+            //System.err.println("--------------------profit for------"+savingsAccountData.getClientName()+"---------------------is "+profitPerClient.doubleValue());
 
             EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividends ,savingsAccountId ,averageSavings, profitPerClient ,percentage ,"Growth Test",savingsAccountData.getClientName());
-
             equityGrowthOnSavingsAccountList.add(equityGrowthOnSavingsAccount);
         }
 
@@ -103,12 +102,12 @@ public class EquityGrowthHelper {
 
     public BigDecimal profitPerClient(List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList ,Date startDate ,Date endDate ,BigDecimal totalSavings, BigDecimal profit ,BigDecimal averageSavings){
 
-        System.err.println("   average savings is         "+averageSavings.doubleValue());
+        //System.err.println("   average savings is         "+averageSavings.doubleValue());
 
         BigDecimal multiplier = averageSavings.divide(totalSavings ,3, BigDecimal.ROUND_HALF_UP);
         BigDecimal clientProfit = multiplier.multiply(profit);
 
-        System.err.println("----------------client profit is --------"+clientProfit.doubleValue());
+        //System.err.println("----------------client profit is --------"+clientProfit.doubleValue());
 
         clientProfit.setScale(2);
         return clientProfit;
@@ -121,7 +120,7 @@ public class EquityGrowthHelper {
 
         Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDeposit = (e)->{
             BigDecimal net = e.getDeposit().subtract(e.getWithdraw());
-            System.err.println("----------net balance is=--------"+net.doubleValue());
+            //System.err.println("----------net balance is=--------"+net.doubleValue());
             return net;
         };
 

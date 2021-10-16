@@ -22,6 +22,9 @@ import org.apache.fineract.portfolio.accounts.exceptions.ShareAccountNotFoundExc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ShareAccountRepositoryWrapper {
 
@@ -34,7 +37,6 @@ public class ShareAccountRepositoryWrapper {
 	
 	public ShareAccount findOneWithNotFoundDetection(final Long accountId) {
 		
-
 		Long id = new Long(accountId);
 		ShareAccount shareAccount = null ;
 		try{

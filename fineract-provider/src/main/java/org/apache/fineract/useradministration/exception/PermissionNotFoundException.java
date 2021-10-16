@@ -27,5 +27,7 @@ public class PermissionNotFoundException extends AbstractPlatformResourceNotFoun
 
     public PermissionNotFoundException(final String code) {
         super("error.msg.permission.code.invalid", "Permission with Code " + code + " does not exist", code);
+
+        System.err.println("-------------------------permission code is --------------------"+code);
     }
 }

@@ -28,10 +28,18 @@ import org.apache.fineract.infrastructure.bulkimport.data.Count;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
+import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SharesAccountImportHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.*;
+import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
+import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountChargeData;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +48,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SharedAccountImportHandler implements ImportHandler {
     private Workbook workbook;
@@ -48,10 +58,16 @@ public class SharedAccountImportHandler implements ImportHandler {
 
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
+    // added 15/10/2021
+    private final ClientReadPlatformService clientReadPlatformService;
+    private final SavingsAccountReadPlatformService savingsAccountReadPlatformService ;
+
     @Autowired
     public SharedAccountImportHandler(final PortfolioCommandSourceWritePlatformService
-            commandsSourceWritePlatformService) {
+            commandsSourceWritePlatformService ,final ClientReadPlatformService clientReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.clientReadPlatformService = clientReadPlatformService ;
+        this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
     }
     @Override
     public Count process(Workbook workbook, String locale, String dateFormat) {
@@ -65,10 +81,25 @@ public class SharedAccountImportHandler implements ImportHandler {
         Sheet sharedAccountsSheet=workbook.getSheet(TemplatePopulateImportConstants.SHARED_ACCOUNTS_SHEET_NAME);
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(sharedAccountsSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
-            Row row;
+                Row row;
+
                 row=sharedAccountsSheet.getRow(rowIndex);
+
                 if (ImportHandlerUtils.isNotImported(row, SharedAccountsConstants.STATUS_COL)){
-                    shareAccountDataList.add(readSharedAccount(row,locale,dateFormat));
+
+                    System.err.println("------------------row index is ----------------"+rowIndex);
+
+                    ShareAccountData shareAccountData = null ;
+                    try{
+                        shareAccountData = readSharedAccount(row ,locale ,dateFormat);
+                    }
+                    catch (Exception n){
+                        System.err.println("=============================null pointer exception caught here again on index "+rowIndex);
+                    }
+
+                    Optional.ofNullable(shareAccountData).ifPresent(e->{
+                        shareAccountDataList.add(e);
+                    });
                 }
         }
     }
@@ -76,10 +107,24 @@ public class SharedAccountImportHandler implements ImportHandler {
     private ShareAccountData readSharedAccount(Row row,String locale, String dateFormat) {
 
         String clientName = ImportHandlerUtils.readAsString(SharedAccountsConstants.CLIENT_NAME_COL, row);
-        Long clientId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientName);
+
+        Long clientId[] = {ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientName)};
+
+        // if client id not present from using the client name to get it then use the client external id if mentioned ,compare to 0L cause default set to 0L
+        boolean isClientIdPresent = ComparatorUtility.isLongZero(clientId[0]);
+
+        if(!isClientIdPresent){
+
+            String externalId = ImportHandlerUtils.readAsString(SharedAccountsConstants.CLIENT_EXTERNAL_ID_COL ,row);
+            ClientData client = clientReadPlatformService.retrieveOneByExternalId(externalId);
+            Optional.ofNullable(client).ifPresent(e->{
+                clientId[0] = e.getId();
+            });
+        }
 
         String productName = ImportHandlerUtils.readAsString(SharedAccountsConstants.PRODUCT_COL, row);
-        Long productId=ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.SHARED_PRODUCTS_SHEET_NAME),productName);
+
+        Long productId= ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.SHARED_PRODUCTS_SHEET_NAME),productName);
 
         LocalDate submittedOnDate=ImportHandlerUtils.readAsDate(SharedAccountsConstants.SUBMITTED_ON_COL,row);
 
@@ -87,7 +132,35 @@ public class SharedAccountImportHandler implements ImportHandler {
 
         Integer totNoOfShares=ImportHandlerUtils.readAsInt(SharedAccountsConstants.TOTAL_NO_SHARES_COL,row);
 
-        Long defaultSavingsAccountId=ImportHandlerUtils.readAsLong(SharedAccountsConstants.DEFAULT_SAVINGS_AC_COL,row);
+        // added new structure on 15/10/2021
+        Double unitPrice = ImportHandlerUtils.readAsDouble(SharedAccountsConstants.TODAYS_PRICE_COL ,row);
+
+        // if number of shares is not defined then we using the other value ,amount of shares the client has to determine shares
+        boolean numberOfSharesDefined = Optional.ofNullable(totNoOfShares).isPresent();
+
+        if(!numberOfSharesDefined){
+
+            Double amount  = ImportHandlerUtils.readAsDouble(SharedAccountsConstants.SHARE_AMOUNT_COL ,row);
+            totNoOfShares = SharesAccountImportHelper.getTotalNumberOfShares(amount ,unitPrice);
+
+            System.err.println("------------------total number of shares is ------------"+totNoOfShares);
+
+        }
+
+        Long defaultSavingsAccountId[] ={ ImportHandlerUtils.readAsLong(SharedAccountsConstants.DEFAULT_SAVINGS_AC_COL,row)};
+
+        // modify if null or zero
+        boolean isSavingsAccountPresent = Optional.ofNullable(defaultSavingsAccountId[0]).isPresent();
+
+        if(!isSavingsAccountPresent){
+            // hunt for it using that tool
+            Long savingsProductId = ImportHandlerUtils.readAsLong(SharedAccountsConstants.SAVINGS_PRODUCT_ID_COL ,row);
+            SavingsAccountData savingsAccountData = SharesAccountImportHelper.getLinkedAccount(savingsAccountReadPlatformService ,clientId[0] ,savingsProductId);
+
+            Optional.ofNullable(savingsAccountData).ifPresent(e ->{
+                defaultSavingsAccountId[0] = e.getId();
+            });
+        }
 
         Integer minimumActivePeriodDays=ImportHandlerUtils.readAsInt(SharedAccountsConstants.MINIMUM_ACTIVE_PERIOD_IN_DAYS_COL,row);
         Integer minimumActivePeriodFrequencyType=0;
@@ -111,6 +184,7 @@ public class SharedAccountImportHandler implements ImportHandler {
                 lockPeriodFrequencyType = 3;
             }
         }
+
         LocalDate applicationDate=ImportHandlerUtils.readAsDate(SharedAccountsConstants.APPLICATION_DATE_COL,row);
         Boolean allowDividendCalc=ImportHandlerUtils.readAsBoolean(SharedAccountsConstants.ALLOW_DIVIDEND_CALCULATION_FOR_INACTIVE_CLIENTS_COL,row);
 
@@ -129,12 +203,20 @@ public class SharedAccountImportHandler implements ImportHandler {
             ShareAccountChargeData shareAccountChargeData=new ShareAccountChargeData(chargeId,amount);
             charges.add(shareAccountChargeData);
         }
+
         String status=ImportHandlerUtils.readAsString(SharedAccountsConstants.STATUS_COL,row);
+
         statuses.add(status);
 
-        return ShareAccountData.importInstance(clientId,productId,totNoOfShares,externalId,submittedOnDate,minimumActivePeriodDays,
+        // we still need to get default savings account here but to remove scatterness lets put it in a seperate function now son
+
+        ShareAccountData shareAccountData = ShareAccountData.importInstance(clientId[0],productId,totNoOfShares,externalId,submittedOnDate,minimumActivePeriodDays,
                 minimumActivePeriodFrequencyType,lockInPeriod,lockPeriodFrequencyType,applicationDate,allowDividendCalc,charges,
-                defaultSavingsAccountId,row.getRowNum(),locale,dateFormat);
+                defaultSavingsAccountId[0],row.getRowNum(),locale,dateFormat);
+
+        return shareAccountData ;
+
+
     }
 
     public Count importEntity(String dateFormat) {
@@ -152,6 +234,8 @@ public class SharedAccountImportHandler implements ImportHandler {
                         .createAccount("share")//
                         .withJson(payload) //
                         .build(); //
+
+
                 final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
                 Cell statusCell = sharedAccountsSheet.getRow(shareAccountData.getRowIndex())

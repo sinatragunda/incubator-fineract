@@ -375,7 +375,9 @@ public class SavingsImportHandler implements ImportHandler {
     }
 
     private CommandProcessingResult importSavings(int i,String dateFormat) {
+
         GsonBuilder gsonBuilder = new GsonBuilder();
+
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
         gsonBuilder.registerTypeAdapter(EnumOptionData.class,new EnumOptionDataIdSerializer());
         JsonObject savingsJsonob=gsonBuilder.create().toJsonTree(savings.get(i)).getAsJsonObject();

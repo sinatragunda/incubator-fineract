@@ -3132,4 +3132,21 @@ public class CommandWrapperBuilder {
         this.href = "/twofactor/configure";
         return this;
     }
+
+    // added 16/10/2021 ,added to deposit into shares account 
+
+    public CommandWrapperBuilder applyAdditionalShares(Long shareAccountId){
+        this.actionName = "SHAREACCOUNT";
+        this.entityName = "CREATE";
+        this.href = "shareaccount/"+shareAccountId+"?command=applyadditionalshares";
+        return this;
+    }
+
+
+    public CommandWrapperBuilder approveAdditionalShares(Long sharesRequestId){
+        this.actionName = "APPLYADDITIONALSHARES";
+        this.entityName = "SHAREACCOUNT";
+        this.href = "shareaccount/"+sharesRequestId+"?command=approveadditionalshares";
+        return this;
+    }
 }

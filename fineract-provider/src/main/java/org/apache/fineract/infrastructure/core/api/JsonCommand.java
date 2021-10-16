@@ -125,7 +125,7 @@ public final class JsonCommand {
     public static JsonCommand fromJsonElement(final Long resourceId, final JsonElement parsedCommand ,final FromJsonHelper fromApiJsonHelper) {
         return new JsonCommand(resourceId, parsedCommand ,fromApiJsonHelper);
     }
-    
+
     public JsonCommand(final Long resourceId, final JsonElement parsedCommand ,final FromJsonHelper fromApiJsonHelper) {
         this.parsedCommand = parsedCommand;
         this.resourceId = resourceId;
@@ -143,8 +143,10 @@ public final class JsonCommand {
         this.productId = null;
         this.creditBureauId=null;
         this.organisationCreditBureauId=null;
+
     }
-    
+
+  
     public Long getOrganisationCreditBureauId() {
         return this.organisationCreditBureauId;
     }
@@ -310,18 +312,10 @@ public final class JsonCommand {
     }
 
     public boolean parameterExists(final String parameterName) {
-
-        System.err.println("-------------------which paramaters --------------"+parameterName);
-        
-        if(this.parsedCommand==null){
-            System.err.println("----------------parsed command error------------------");
-        }
-
         return this.fromApiJsonHelper.parameterExists(parameterName, this.parsedCommand);
     }
 
     public boolean hasParameter(final String parameterName) {
-        System.err.println("-----------------call has parameter why error ? ----------");
         return parameterExists(parameterName);
     }
 

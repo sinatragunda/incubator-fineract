@@ -21,6 +21,8 @@ package org.apache.fineract.portfolio.shareaccounts.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.List;
+
 
 public interface ShareAccountRepository extends JpaRepository<ShareAccount, Long>, JpaSpecificationExecutor<ShareAccount> {
 

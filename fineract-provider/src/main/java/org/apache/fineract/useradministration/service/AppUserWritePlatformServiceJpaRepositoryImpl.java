@@ -200,8 +200,6 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
             if (StringUtils.isBlank(json)) {
 
-                System.err.println("--------------json is blank son ------- ,lets check another value now------------");
-
                 JsonElement jsonElement = command.parsedJson();
                 json = fromJsonHelper.toJson(jsonElement);
 
@@ -218,7 +216,6 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
             System.err.println("--------------------validate --------------");
 
-        
             final AppUser userToUpdate = this.appUserRepository.findOne(userId);
 
             System.err.println("----------------update user--------------");

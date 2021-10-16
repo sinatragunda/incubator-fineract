@@ -135,6 +135,7 @@ public class SharedAccountWorkBookPopulator extends AbstractWorkbookPopulator {
         productGroup.setRefersToFormula(TemplatePopulateImportConstants.SHARED_PRODUCTS_SHEET_NAME+"!$B$2:$B$"+products.size()+1);
 
         for (Integer i=0;i<products.size();i++) {
+
             Name currecyName=sharedAccountWorkbook.createName();
             Name decimalPlacesName=sharedAccountWorkbook.createName();
             Name todaysPriceName=sharedAccountWorkbook.createName();
@@ -142,6 +143,9 @@ public class SharedAccountWorkBookPopulator extends AbstractWorkbookPopulator {
             Name chargesName1=sharedAccountWorkbook.createName();
             Name chargesName2=sharedAccountWorkbook.createName();
             Name chargesName3=sharedAccountWorkbook.createName();
+
+            // added 15/10/2021
+            Name shareAmount = sharedAccountWorkbook.createName();
 
             String productName=products.get(i).getName().replaceAll("[ ]", "_");
 
@@ -235,6 +239,17 @@ public class SharedAccountWorkBookPopulator extends AbstractWorkbookPopulator {
 
         worksheet.setColumnWidth(SharedAccountsConstants.CHARGES_AMOUNT_3_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
         writeString(SharedAccountsConstants.CHARGES_AMOUNT_3_COL,rowHeader,"Amount 3 ");
+
+
+        // added 15/10/2021
+        worksheet.setColumnWidth(SharedAccountsConstants.CLIENT_EXTERNAL_ID_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+        writeString(SharedAccountsConstants.CLIENT_EXTERNAL_ID_COL,rowHeader,"Client External Id");
+
+        worksheet.setColumnWidth(SharedAccountsConstants.SHARE_AMOUNT_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+        writeString(SharedAccountsConstants.SHARE_AMOUNT_COL,rowHeader,"Share Amount ( Amount / Price)");
+
+        worksheet.setColumnWidth(SharedAccountsConstants.SAVINGS_PRODUCT_ID_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+        writeString(SharedAccountsConstants.SAVINGS_PRODUCT_ID_COL,rowHeader,"Savings Product Id");
 
     }
 }

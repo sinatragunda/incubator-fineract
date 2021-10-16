@@ -152,20 +152,20 @@ public final class UserDataValidator {
 
     public void validateForUpdate(final String json) {
 
-        System.err.println("--------json request is ------------"+json);
+        //System.err.println("--------json request is ------------"+json);
         
         if (StringUtils.isBlank(json)) { 
-            System.err.println("--------------json is blank son ---------");
+            //System.err.println("--------------json is blank son ---------");
             throw new InvalidJsonException(); 
         }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
 
-        System.err.println("-----------checking for supported params --------");
+        //System.err.println("-----------checking for supported params --------");
 
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.supportedParameters);
 
-        System.err.println("-----------checking for supported params  ,done now--------");
+        //System.err.println("-----------checking for supported params  ,done now--------");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("user");

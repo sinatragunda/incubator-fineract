@@ -483,9 +483,7 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         boolean hasNotPermission = true;
         
         for (final String permissionCode : permissionCodes) {
-            System.err.println("-----------------check permission code for -------------"+permissionCode);
             final boolean checkPermission = hasPermissionTo(permissionCode);
-            System.err.println("--------------------------checkPermission ----------------"+checkPermission);
             if (checkPermission) {
                 hasNotPermission = false;
                 break;
@@ -516,14 +514,10 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         final String authorizationMessage = "User has no authority to view " + resourceType.toLowerCase() + "s";
         final String matchPermission = "READ_" + resourceType.toUpperCase();
 
-        System.err.println("------------------has permission for "+matchPermission);
-
         if (!hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", matchPermission)) { 
-            System.err.println("-------------lets return here son--------------");
-            return; 
+            return;
         }
 
-        System.err.println("---------------throwing authorization error-------------");
         throw new NoAuthorizationException(authorizationMessage);
     }
 

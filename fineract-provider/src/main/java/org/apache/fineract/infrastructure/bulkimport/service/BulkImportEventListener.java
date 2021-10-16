@@ -135,6 +135,11 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
             case USERS:
                 importHandler=this.applicationContext.getBean("userImportHandler",ImportHandler.class);
                 break;
+            // added 16/10/2021
+            case SHARE_ACCOUNTS_TRANSACTIONS:
+                importHandler = this.applicationContext.getBean("sharesAccountTransactionImportHandler",ImportHandler.class);
+                break;
+
             default : throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
                     "Unable to find requested resource");
 

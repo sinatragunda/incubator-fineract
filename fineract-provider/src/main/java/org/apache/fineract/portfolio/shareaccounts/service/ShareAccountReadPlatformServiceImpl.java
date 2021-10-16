@@ -144,6 +144,51 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
         return marketValue;
     }
 
+
+    //added 16/10/2021
+
+    @Override
+    public List<AccountData> retrieveForClient(final Long clientId){
+
+        ShareAccountMapper mapper = new ShareAccountMapper(null ,null);
+
+        String query = "select " + mapper.schema() + "where sa.client_id=?";
+        
+        Collection<AccountData> dataList = this.jdbcTemplate.query(query, mapper, new Object[] { clientId });
+
+        System.err.println("------------------account data list is ------------"+dataList);
+
+        List<AccountData> shareAccountDataList = new ArrayList<>(dataList);
+
+        // for(ShareAccountData data : dataList){
+
+        //     String serviceName = "share" + ProductsApiConstants.READPLATFORM_NAME;
+        //     ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
+        //     final ShareProductData productData = (ShareProductData) service.retrieveOne(data.getProductId(), false);
+        //     final BigDecimal currentMarketPrice = deriveMarketPrice(productData);
+        //     data.setCurrentMarketPrice(currentMarketPrice);
+        //     if(!includeTemplate) {
+        //         Collection<ShareAccountDividendData> dividends = this.retrieveAssociatedDividends(id) ;
+        //         data.setDividends(dividends);    
+        //     }
+        //     if (includeTemplate) {
+        //         final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
+        //                 .retrieveLockinPeriodFrequencyTypeOptions();
+        //         final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = lockinPeriodFrequencyTypeOptions;
+        //         final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService
+        //                 .retrieveActiveForLookup(data.getClientId(), DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().code());
+        //         Collection<ProductData> productOptions = service.retrieveAllForLookup();
+        //         final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
+        //         data = ShareAccountData.template(data, productOptions, chargeOptions, clientSavingsAccounts, lockinPeriodFrequencyTypeOptions,
+        //                 minimumActivePeriodFrequencyTypeOptions);
+        //     }
+        // }
+
+        System.err.println("----------------skp the redundancy info ----------"+dataList.size());
+
+        return shareAccountDataList;
+    }  
+
     @Override
     public ShareAccountData retrieveOne(final Long id, final boolean includeTemplate) {
         Collection<ShareAccountChargeData> charges = this.shareAccountChargeReadPlatformService.retrieveAccountCharges(id, "active");

@@ -213,6 +213,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
                             .withJson(payload) //
                             .build();
                 }
+
+
                 final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
                 Cell statusCell = savingsTransactionSheet.getRow(transaction.getRowIndex()).createCell(TransactionConstants.STATUS_COL);

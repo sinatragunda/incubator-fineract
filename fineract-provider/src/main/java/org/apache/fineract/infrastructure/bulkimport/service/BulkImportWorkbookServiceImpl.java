@@ -194,6 +194,11 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 }else if(entity.trim().equalsIgnoreCase(GlobalEntityType.USERS.toString())){
                     entityType = GlobalEntityType.USERS;
                     primaryColumn = 0;
+                }
+                // added 16/10/2021
+                else if(entity.trim().equalsIgnoreCase(GlobalEntityType.SHARE_ACCOUNTS_TRANSACTIONS.toString())){
+                    entityType = GlobalEntityType.SHARE_ACCOUNTS_TRANSACTIONS;
+                    primaryColumn = 0;
                 }else{
                     throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
                             "Unable to find requested resource");
