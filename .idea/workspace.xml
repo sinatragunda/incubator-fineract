@@ -2,31 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b67edfa2-cc53-4f72-b77b-b5eeef9f87c0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/SharesAccountImportHelper.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ApplyAdditionalShares.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/SharedAccountsConstants.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/SharedAccountsConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/data/GlobalEntityType.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/data/GlobalEntityType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsTransactionImportHandler.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsTransactionImportHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharedAccountImportHandler.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharedAccountImportHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/populator/shareaccount/SharedAccountWorkBookPopulator.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/populator/shareaccount/SharedAccountWorkBookPopulator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/service/BulkImportEventListener.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/service/BulkImportEventListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/service/BulkImportWorkbookServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/service/BulkImportWorkbookServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/api/JsonCommand.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/api/JsonCommand.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accounts/api/AccountsApiResource.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accounts/api/AccountsApiResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/EquityGrowthHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/EquityGrowthHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepository.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepository.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformService.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/domain/AppUser.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/domain/AppUser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/exception/PermissionNotFoundException.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/exception/PermissionNotFoundException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/service/AppUserWritePlatformServiceJpaRepositoryImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/service/AppUserWritePlatformServiceJpaRepositoryImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/service/UserDataValidator.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/service/UserDataValidator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -64,46 +41,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SharesAccountTransactionImportHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="256" column="46" lean-forward="false" selection-start-line="256" selection-start-column="46" selection-end-line="256" selection-end-column="46" />
-              <folding>
-                <element signature="e#0#12971#0" expanded="true" />
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="JsonCommandHelper.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="PermissionNotFoundException.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/exception/PermissionNotFoundException.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="30" column="98" lean-forward="false" selection-start-line="30" selection-start-column="98" selection-end-line="30" selection-end-column="98" />
+            <state relative-caret-position="238">
+              <caret line="31" column="5" lean-forward="false" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplyAdditionalShares.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ApplyAdditionalShares.java">
+      <file leaf-file-name="JsonCommandHelper.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="187">
+              <caret line="16" column="36" lean-forward="false" selection-start-line="16" selection-start-column="36" selection-end-line="16" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -111,55 +63,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShareAccountReadPlatformService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformService.java">
+      <file leaf-file-name="ApplyAdditionalShares.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ApplyAdditionalShares.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="43" column="17" lean-forward="false" selection-start-line="43" selection-start-column="17" selection-end-line="43" selection-end-column="17" />
+            <state relative-caret-position="85">
+              <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShareAccountReadPlatformServiceImpl.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformServiceImpl.java">
+      <file leaf-file-name="SharesAccountTransactionImportHandler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1853">
-              <caret line="174" column="37" lean-forward="false" selection-start-line="174" selection-start-column="37" selection-end-line="174" selection-end-column="37" />
+            <state relative-caret-position="129">
+              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="28" selection-end-column="34" />
               <folding>
-                <marker date="1634374328479" expanded="false" signature="20888:20915" ph="/unused/" />
-                <marker date="1634374328479" expanded="false" signature="30898:30925" ph="/unused/" />
+                <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AppUser.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/domain/AppUser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7208">
-              <caret line="520" column="8" lean-forward="false" selection-start-line="520" selection-start-column="8" selection-end-line="520" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BulkImportEventListener.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/service/BulkImportEventListener.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1598">
-              <caret line="136" column="22" lean-forward="false" selection-start-line="136" selection-start-column="22" selection-end-line="136" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AccountsApiResource.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accounts/api/AccountsApiResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2567">
-              <caret line="206" column="128" lean-forward="false" selection-start-line="206" selection-start-column="128" selection-end-line="206" selection-end-column="128" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -167,10 +88,15 @@
       <file leaf-file-name="ShareAccountRepositoryWrapper.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
+            <state relative-caret-position="561">
               <caret line="60" column="5" lean-forward="false" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
               <folding>
-                <marker date="1634369981254" expanded="true" signature="2010:2014" ph="{...}" />
+                <marker date="1634529984151" expanded="true" signature="1477:1781" ph="{...}" />
+                <marker date="1634529984151" expanded="false" signature="1833:1838" ph=" { " />
+                <marker date="1634529984151" expanded="false" signature="1886:1889" ph=" }" />
+                <marker date="1634529984151" expanded="false" signature="1950:1955" ph=" { " />
+                <marker date="1634529984151" expanded="true" signature="2010:2014" ph="{...}" />
+                <marker date="1634529984151" expanded="false" signature="2011:2014" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -494,9 +420,9 @@
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ApplyAdditionalShares.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformServiceImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/SharesAccountImportHelper.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/exception/PermissionNotFoundException.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java" />
       </list>
     </option>
   </component>
@@ -746,6 +672,31 @@
               <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="fineract" type="462c0819:PsiDirectoryNode" />
+              <item name="wese" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
+              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="fineract" type="462c0819:PsiDirectoryNode" />
+              <item name="wese" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="excel" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
+              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -946,7 +897,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="395576000" />
+    <option name="totallyTimeSpent" value="396231000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
@@ -978,11 +929,36 @@
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962178" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2322239" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1081,13 +1057,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsAccountToClientLinkingHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="34" column="0" lean-forward="false" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsAccountToClientLinkingHelper.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/equitygrowth.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/serialization/FromJsonHelper.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1110,13 +1080,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/equitygrowth/EquityGrowthImportHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/equitygrowth/EquityGrowthImportHandler.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/security/filter/TenantAwareBasicAuthenticationFilter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3162">
@@ -1163,19 +1127,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/helper/PasswordHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/helper/PasswordHelper.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/api/RolesApiResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="59" column="13" lean-forward="false" selection-start-line="59" selection-start-column="13" selection-end-line="59" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1197,7 +1153,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="332">
           <caret line="1041" column="17" lean-forward="false" selection-start-line="1041" selection-start-column="17" selection-end-line="1041" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1212,23 +1167,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="214">
           <caret line="306" column="12" lean-forward="false" selection-start-line="306" selection-start-column="12" selection-end-line="306" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/helper/ResetSelfServiceUserPassword.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="61" column="0" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/helper/ResetSelfServiceUserPassword.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/api/UsersApiResource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="145">
           <caret line="152" column="0" lean-forward="false" selection-start-line="152" selection-start-column="0" selection-end-line="152" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1258,7 +1204,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="28" column="13" lean-forward="false" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1266,96 +1211,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="417">
           <caret line="149" column="0" lean-forward="false" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
-          <folding>
-            <marker date="1634366197378" expanded="false" signature="7351:7362" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="7401:7407" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="7448:7459" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="7486:7492" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="7518:7529" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="7597:7608" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="7634:7640" ph=" }" />
-            <marker date="1634366197378" expanded="true" signature="7702:7879" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="7940:8251" ph="{...}" />
-            <marker date="1634366197378" expanded="false" signature="8280:8291" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8351:8362" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8385:8391" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8419:8430" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8453:8459" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8490:8501" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8527:8533" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8563:8574" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8594:8600" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8631:8642" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8663:8669" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8698:8709" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8728:8734" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8766:8777" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8799:8805" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8843:8854" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8880:8886" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8914:8925" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="8941:8947" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="8979:8990" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="9012:9018" ph=" }" />
-            <marker date="1634366197378" expanded="true" signature="9130:9399" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="9503:9772" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="9866:10167" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="10265:10403" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="10497:10890" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="10992:11392" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="11488:11757" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="11822:11919" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="11980:11991" ph=" { " />
-            <marker date="1634366197378" expanded="true" signature="12029:12035" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="12067:12078" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="12127:12133" ph=" }" />
-            <marker date="1634366197378" expanded="false" signature="12161:12172" ph=" { " />
-            <marker date="1634366197378" expanded="false" signature="12217:12223" ph=" }" />
-            <marker date="1634366197378" expanded="true" signature="12327:12602" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="12674:12772" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="12876:13107" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="13239:13563" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="13681:13974" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="14092:14377" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="14459:14571" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="14656:14759" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="14830:14932" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="15004:15236" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="15344:15623" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="15699:15867" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="15955:16055" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="16132:16341" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="16477:16783" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="16899:17186" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="17323:17618" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="17747:18172" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="18248:18420" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="18490:18632" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="18716:18830" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="18935:19047" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="19150:19241" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="19371:19671" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="19781:20062" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="20193:20482" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="20605:21024" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="21102:21213" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="21312:21421" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="21518:21606" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="21726:22017" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="22105:22216" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="22326:22613" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="22619:22690" ph="/**...*/" />
-            <marker date="1634366197378" expanded="true" signature="22773:22874" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="22880:22927" ph="/**...*/" />
-            <marker date="1634366197378" expanded="true" signature="23013:23203" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="23312:23592" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="23669:23768" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="23841:23944" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="24143:24460" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="24627:24907" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="24943:25050" ph="{...}" />
-            <marker date="1634366197378" expanded="true" signature="25180:25289" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1423,10 +1278,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
+        <state relative-caret-position="561">
           <caret line="60" column="5" lean-forward="false" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
           <folding>
-            <marker date="1634369981254" expanded="true" signature="2010:2014" ph="{...}" />
+            <marker date="1634529984151" expanded="true" signature="1477:1781" ph="{...}" />
+            <marker date="1634529984151" expanded="false" signature="1833:1838" ph=" { " />
+            <marker date="1634529984151" expanded="false" signature="1886:1889" ph=" }" />
+            <marker date="1634529984151" expanded="false" signature="1950:1955" ph=" { " />
+            <marker date="1634529984151" expanded="true" signature="2010:2014" ph="{...}" />
+            <marker date="1634529984151" expanded="false" signature="2011:2014" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -1451,7 +1311,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
           <caret line="185" column="0" lean-forward="true" selection-start-line="185" selection-start-column="0" selection-end-line="185" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1459,23 +1318,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1853">
           <caret line="174" column="37" lean-forward="false" selection-start-line="174" selection-start-column="37" selection-end-line="174" selection-end-column="37" />
-          <folding>
-            <marker date="1634374328479" expanded="false" signature="20888:20915" ph="/unused/" />
-            <marker date="1634374328479" expanded="false" signature="30898:30925" ph="/unused/" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/SharesAccountImportHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/SharesAccountImportHelper.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountReadPlatformService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -1484,39 +1331,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="256" column="46" lean-forward="false" selection-start-line="256" selection-start-column="46" selection-end-line="256" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#12971#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/exception/PermissionNotFoundException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="30" column="98" lean-forward="false" selection-start-line="30" selection-start-column="98" selection-end-line="30" selection-end-column="98" />
+        <state relative-caret-position="238">
+          <caret line="31" column="5" lean-forward="false" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ApplyAdditionalShares.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="85">
+          <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/sharedaccount/SharesAccountTransactionImportHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="28" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="16" column="36" lean-forward="false" selection-start-line="16" selection-start-column="36" selection-end-line="16" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
