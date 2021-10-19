@@ -29,6 +29,10 @@ public class ComparatorUtility {
         return cmpToBoolean(cmp);
     }
 
+    public static boolean compare(Object l ,Object r){
+        return l.equals(r);
+    }
+
     // Added 08/10/2021
     public static boolean isBigDecimalZero(BigDecimal value){
 

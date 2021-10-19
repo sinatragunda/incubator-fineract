@@ -41,6 +41,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
@@ -167,6 +168,21 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
         // Added 08/10/2021
         Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);
+
+        // payment type id should default to 1L if 0L is found ,though it will increase scatterness of if elses here so unaatractive
+
+        boolean isZero = ComparatorUtility.compare(paymentTypeId ,0L);
+
+        System.err.println("----------------------------compare valuees is  ----------"+isZero);
+
+        boolean isPaymentIdPresent = Optional.ofNullable(paymentTypeId).isPresent();
+
+
+
+        if(isZero){
+            System.err.println("------------------payment type id is 0 ,set to 1 ----------");
+            paymentTypeId = 1L ;
+        }
 
         SavingsAccountTransactionData savingsAccountTransactionData = SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountIdL, savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
