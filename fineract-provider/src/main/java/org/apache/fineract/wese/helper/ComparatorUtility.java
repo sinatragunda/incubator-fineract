@@ -38,6 +38,10 @@ public class ComparatorUtility {
         return false;
     }
 
+    public static boolean compare(Object l ,Object r){
+        return l.equals(r);
+    }
+
     // Added 08/10/2021
     public static <T> boolean isObjectZero(Object value ,Object comparator){
         return value.equals(comparator);

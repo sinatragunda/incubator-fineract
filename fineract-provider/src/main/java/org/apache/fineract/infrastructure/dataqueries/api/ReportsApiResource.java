@@ -209,7 +209,7 @@ public class ReportsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public ScheduledMailSession viewScheduledReportSessions(@PathParam("id") Long scheduledReportId){
 
-        System.err.println("-------------------report id is --------"+scheduledReportId);
+        //System.err.println("-------------------report id is --------"+scheduledReportId);
 
         ScheduledReport scheduledReport = scheduledReportRepository.findOne(scheduledReportId);
         return getScheduledMailSession(scheduledReport);

@@ -219,7 +219,7 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
                 String commandParam = "applyadditionalshares";
                 String approveCommandParam = "approveadditionalshares";
 
-                System.err.println("-------------share account id -------------"+shareAccountId);
+                //System.err.println("-------------share account id -------------"+shareAccountId);
 
 
                 CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, shareAccountId, commandParam).withJson(payload).build();

@@ -204,9 +204,12 @@ public class ClientPersonImportHandler implements ImportHandler {
         String errorMessage="";
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
-        for (ClientData client: clients) {
+        for (ClientData client : clients) {
             try {
                 String payload=gsonBuilder.create().toJson(client);
+
+                System.err.println("---------------payload for client create is -------------"+payload);
+
                 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                         .createClient() //
                         .withJson(payload) //
@@ -223,6 +226,7 @@ public class ClientPersonImportHandler implements ImportHandler {
                 ImportHandlerUtils.writeErrorMessage(clientSheet,client.getRowIndex(),errorMessage,ClientPersonConstants.STATUS_COL);
             }
         }
+        
         clientSheet.setColumnWidth(ClientPersonConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(ClientPersonConstants.STATUS_COL, clientSheet.
                 getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);

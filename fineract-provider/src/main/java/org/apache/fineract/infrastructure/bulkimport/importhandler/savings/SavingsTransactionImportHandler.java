@@ -41,6 +41,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
@@ -164,6 +165,14 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         String bankNumber = ImportHandlerUtils.readAsString(TransactionConstants.BANK_NO_COL, row);
 
         String clientExternalId = ImportHandlerUtils.readAsString(TransactionConstants.CLIENT_EXTERNAL_ID_COL ,row);
+
+
+        // payment id greater than 0 error workaround added 19/10/2021
+        boolean isZero = ComparatorUtility.compare(paymentTypeId ,0L);
+
+        if(isZero){
+            paymentTypeId = 1L;
+        }
 
         // Added 08/10/2021
         Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);

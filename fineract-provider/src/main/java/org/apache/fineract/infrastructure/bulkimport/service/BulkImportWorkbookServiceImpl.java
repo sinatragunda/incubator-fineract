@@ -115,26 +115,39 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 }
 
 
-                Workbook workbook = null;
+                
+                //System.err.println("---------------what is our format here ,use new creation method  ------------"+format);
 
-                System.err.println("---------------what is our format here ------------"+format);
-
-                switch (format){
-                    case XLSX:
-                    case XLSX_NEW:
-                    case XLS_NEW:
-                        try{
-                            workbook = WorkbookFactory.create(clonedInputStreamWorkbook);
-                        }
-                        catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        break;
-                    default:
-                        workbook = new HSSFWorkbook(clonedInputStreamWorkbook);
-                        break;
+                Workbook workbook = null ;
+                
+                try{
+                    workbook = WorkbookFactory.create(clonedInputStreamWorkbook);
 
                 }
+                catch(Exception i){
+                    System.err.println("-------------invalid format exception --------");
+                }
+
+
+                // switch (format){
+                //     case XLSX:
+                //     case XLSX_NEW:
+                //     case XLS_NEW:
+                //         try{
+                //             workbook = WorkbookFactory.create(clonedInputStreamWorkbook);
+                //         }
+                //         catch (Exception e){
+                //             System.err.println("---------------------work book creation error");
+                //             e.printStackTrace();
+                //         }
+                //         break;
+                //     default:
+                //         workbook = new HSSFWorkbook(clonedInputStreamWorkbook);
+                //         break;
+
+                // }
+
+
 
                 GlobalEntityType entityType=null;
                 int primaryColumn=0;

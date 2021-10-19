@@ -87,7 +87,7 @@ public class SharedAccountImportHandler implements ImportHandler {
 
                 if (ImportHandlerUtils.isNotImported(row, SharedAccountsConstants.STATUS_COL)){
 
-                    System.err.println("------------------row index is ----------------"+rowIndex);
+                    //System.err.println("------------------row index is ----------------"+rowIndex);
 
                     ShareAccountData shareAccountData = null ;
                     try{
@@ -143,7 +143,7 @@ public class SharedAccountImportHandler implements ImportHandler {
             Double amount  = ImportHandlerUtils.readAsDouble(SharedAccountsConstants.SHARE_AMOUNT_COL ,row);
             totNoOfShares = SharesAccountImportHelper.getTotalNumberOfShares(amount ,unitPrice);
 
-            System.err.println("------------------total number of shares is ------------"+totNoOfShares);
+            //System.err.println("------------------total number of shares is ------------"+totNoOfShares);
 
         }
 

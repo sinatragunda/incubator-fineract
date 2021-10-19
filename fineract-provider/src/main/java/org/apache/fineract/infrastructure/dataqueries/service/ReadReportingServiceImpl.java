@@ -163,9 +163,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     private StringBuffer generateCsvFileBuffer(final GenericResultsetData result) {
         final StringBuffer writer = new StringBuffer();
 
-
-        System.err.println("------------------------some generic file buffer class");
-
         final List<ResultsetColumnHeaderData> columnHeaders = result.getColumnHeaders();
         logger.info("NO. of Columns: " + columnHeaders.size());
         final Integer chSize = columnHeaders.size();
