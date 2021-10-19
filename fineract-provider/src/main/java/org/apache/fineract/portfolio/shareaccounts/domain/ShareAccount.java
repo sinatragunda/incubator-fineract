@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.shareaccounts.domain;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -134,8 +135,13 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "savings_account_id", nullable = false)
     private SavingsAccount savingsAccount;
 
+    //@OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.LAZY)
+    //private Set<ShareAccountTransaction> shareAccountTransactions ;
+
+    // modified on 18/10/2021
+    // modified solution to circumvent null pointer exceptions on adding new transactions to account
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.LAZY)
-    private Set<ShareAccountTransaction> shareAccountTransactions;
+    private Set<ShareAccountTransaction> shareAccountTransactions = new HashSet<>();
 
     @Column(name = "lockin_period_frequency")
     private Integer lockinPeriodFrequency;
@@ -152,7 +158,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     private PeriodFrequencyType minimumActivePeriodFrequencyType;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "shareAccount", orphanRemoval = true, fetch=FetchType.LAZY)
-    private Set<ShareAccountCharge> charges;
+    private Set<ShareAccountCharge> charges = new HashSet<>();
 
     @Transient
     protected boolean accountNumberRequiresAutoGeneration = false;
@@ -354,6 +360,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void addAddtionalShares(Set<ShareAccountTransaction> additionalShares) {
+        System.err.println("---------------------is set share empty ---------"+shareAccountTransactions.isEmpty());
         this.shareAccountTransactions.addAll(additionalShares);
     }
 
@@ -372,6 +379,9 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void updateRequestedShares(ShareAccountTransaction purchased) {
+        
+        System.err.println("--------------update requested shares ------------");
+
     	for(ShareAccountTransaction transaction: this.shareAccountTransactions) {
             if(!transaction.isChargeTransaction() && transaction.getId().equals(purchased.getId())) {
                 transaction.update(purchased.getPurchasedDate(), purchased.getTotalShares(), purchased.getPurchasePrice());    
@@ -380,6 +390,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void addAdditionalPurchasedShares(ShareAccountTransaction purchased) {
+
         purchased.setShareAccount(this);
         if (purchased.isRedeemTransaction()) {
             this.totalSharesApproved -= purchased.getTotalShares();
@@ -390,7 +401,17 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
                 this.totalSharesPending += purchased.getTotalShares();
             }
         }
+
+        boolean isShareTransactionPresent  = Optional.ofNullable(this.shareAccountTransactions).isPresent();
+
+        if(!isShareTransactionPresent){
+            this.shareAccountTransactions = new HashSet<>();
+        }
+
+
         this.shareAccountTransactions.add(purchased);
+        System.err.println("---------------add share purchased");
+
     }
 
     public void addShareAccountCharge(ShareAccountCharge charge) {

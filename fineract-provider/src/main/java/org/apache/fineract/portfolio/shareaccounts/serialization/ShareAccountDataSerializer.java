@@ -20,15 +20,7 @@ package org.apache.fineract.portfolio.shareaccounts.serialization;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -650,6 +642,7 @@ public class ShareAccountDataSerializer {
     }
 
     public Map<String, Object> validateAndApplyAddtionalShares(JsonCommand jsonCommand, ShareAccount account) {
+        
         Map<String, Object> actualChanges = new HashMap<>();
         if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -674,34 +667,66 @@ public class ShareAccountDataSerializer {
             }
         }
         boolean isTransactionBeforeExistingTransactions = false ;
+        
+        System.err.println("----------------any exceptions here ----------------");
+
         Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions() ;
-        for(ShareAccountTransaction transaction: transactions) {
-            if(!transaction.isChargeTransaction()) {
-                LocalDate transactionDate = new LocalDate(transaction.getPurchasedDate()) ;
-                if(requestedDate.isBefore(transactionDate)) {
-                    isTransactionBeforeExistingTransactions = true ;
-                    break ;
-                }    
+
+        boolean isPresent  = Optional.ofNullable(transactions).isPresent();
+
+        if(isPresent){
+            for(ShareAccountTransaction transaction: transactions) {
+                if(!transaction.isChargeTransaction()) {
+                    LocalDate transactionDate = new LocalDate(transaction.getPurchasedDate()) ;
+                    if(requestedDate.isBefore(transactionDate)) {
+                        isTransactionBeforeExistingTransactions = true ;
+                        break ;
+                    }
+                }
             }
         }
+
         if(isTransactionBeforeExistingTransactions) {
             baseDataValidator.reset().parameter(ShareAccountApiConstants.requesteddate_paramname)
             .value(requestedDate)
             .failWithCodeNoParameterAddedToErrorCode("purchase.transaction.date.cannot.be.before.existing.transactions");
         }
         
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) { 
+
+            for(ApiParameterError e : dataValidationErrors){
+                System.err.println("-------------error is ---------"+e.getDeveloperMessage());
+            }
+            
+            throw new PlatformApiDataValidationException(dataValidationErrors);
+        }
+
         final BigDecimal unitPrice = shareProduct.deriveMarketPrice(requestedDate.toDate());
+
         ShareAccountTransaction purchaseTransaction = new ShareAccountTransaction(requestedDate.toDate(), sharesRequested, unitPrice);
-        account.addAdditionalPurchasedShares(purchaseTransaction);
+
+        boolean isAccount = Optional.ofNullable(account).isPresent();
+        boolean isPurchasePresent = Optional.ofNullable(purchaseTransaction).isPresent();
+        try{
+            account.addAdditionalPurchasedShares(purchaseTransaction);
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
         handleAdditionalSharesChargeTransactions(account, purchaseTransaction);
+
+        System.err.println("----------------done handling additional shares charge transactions------");
+
         actualChanges.put(ShareAccountApiConstants.additionalshares_paramname, purchaseTransaction);
         return actualChanges;
     }
 
     private void handleAdditionalSharesChargeTransactions(final ShareAccount account, final ShareAccountTransaction purchaseTransaction) {
+        
         Set<ShareAccountCharge> charges = account.getCharges();
         BigDecimal totalChargeAmount = BigDecimal.ZERO;
+
         for (ShareAccountCharge charge : charges) {
             if (charge.isActive() && charge.isSharesPurchaseCharge()) {
                 BigDecimal amount = charge.updateChargeDetailsForAdditionalSharesRequest(purchaseTransaction.amount(), account.getCurrency());
@@ -711,11 +736,16 @@ public class ShareAccountDataSerializer {
             }
         }
         purchaseTransaction.updateChargeAmount(totalChargeAmount);
+
     }
 
     public Map<String, Object> validateAndApproveAddtionalShares(JsonCommand jsonCommand, ShareAccount account) {
         Map<String, Object> actualChanges = new HashMap<>();
-        if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
+        
+        if (StringUtils.isBlank(jsonCommand.json())){
+            throw new InvalidJsonException(); 
+        }
+
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, jsonCommand.json(),
                 addtionalSharesParameters);
@@ -742,7 +772,13 @@ public class ShareAccountDataSerializer {
                 account.updateApprovedShares(new Long(totalShares));
             }
         }
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()){ 
+
+            for(ApiParameterError e : dataValidationErrors){
+                System.err.println("------------error valid ----------"+e.getDeveloperMessage());
+            }
+            throw new PlatformApiDataValidationException(dataValidationErrors);
+        }
         actualChanges.put(ShareAccountApiConstants.requestedshares_paramname, purchasedShares);
         return actualChanges;
     }

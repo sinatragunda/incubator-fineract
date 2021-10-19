@@ -53,7 +53,7 @@ public final class JsonCommand {
     private final String jsonCommand;
     private final JsonElement parsedCommand;
     private final FromJsonHelper fromApiJsonHelper;
-    private final Long commandId;
+    private Long commandId;
     private final Long resourceId;
     private final Long subresourceId;
     private final Long groupId;
@@ -130,7 +130,7 @@ public final class JsonCommand {
         this.parsedCommand = parsedCommand;
         this.resourceId = resourceId;
         this.commandId = null;
-        this.jsonCommand = null;        
+        this.jsonCommand = fromApiJsonHelper.toJson(parsedCommand);;        
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.entityName = null;
         this.subresourceId = null;
@@ -184,6 +184,11 @@ public final class JsonCommand {
     public Long commandId() {
         return this.commandId;
     }
+
+    public void setCommandId(Long id){
+        this.commandId = id ;
+    }
+
 
     public String entityName() {
         return this.entityName;

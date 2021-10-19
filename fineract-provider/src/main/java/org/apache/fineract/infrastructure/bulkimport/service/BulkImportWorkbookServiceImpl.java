@@ -117,6 +117,8 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
                 Workbook workbook = null;
 
+                System.err.println("---------------what is our format here ------------"+format);
+
                 switch (format){
                     case XLSX:
                     case XLSX_NEW:

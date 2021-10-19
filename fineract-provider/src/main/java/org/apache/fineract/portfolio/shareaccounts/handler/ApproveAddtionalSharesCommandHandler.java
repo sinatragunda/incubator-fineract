@@ -38,6 +38,7 @@ public class ApproveAddtionalSharesCommandHandler implements NewCommandSourceHan
     public ApproveAddtionalSharesCommandHandler(final ShareAccountWritePlatformService shareAccountWritePlatformService) {
         this.shareAccountWritePlatformService = shareAccountWritePlatformService ;
     }
+
     @Transactional
     @Override
     public CommandProcessingResult processCommand(JsonCommand jsonCommand) {

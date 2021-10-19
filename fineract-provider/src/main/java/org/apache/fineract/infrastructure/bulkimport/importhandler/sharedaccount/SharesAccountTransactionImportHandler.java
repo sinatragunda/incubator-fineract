@@ -48,6 +48,7 @@ import org.apache.fineract.portfolio.shareaccounts.domain.*;
 import org.apache.fineract.portfolio.shareaccounts.handler.ApplyAddtionalSharesCommandHandler;
 import org.apache.fineract.portfolio.shareaccounts.handler.ApproveAddtionalSharesCommandHandler;
 import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
+import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
 import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.apache.fineract.wese.helper.ObjectNodeHelper;
@@ -78,19 +79,17 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
     private final ClientReadPlatformService clientReadPlatformService;
     private final ShareAccountReadPlatformService shareAccountReadPlatformService;
     private final FromJsonHelper fromJsonHelper ;
-    private final ApplyAddtionalSharesCommandHandler applyAddtionalSharesCommandHandler;
-    private final ApproveAddtionalSharesCommandHandler approveAddtionalSharesCommandHandler;
+    private final ShareAccountWritePlatformService shareAccountWritePlatformService;
 
     @Autowired
-    public SharesAccountTransactionImportHandler(final PortfolioCommandSourceWritePlatformService
-                                              commandsSourceWritePlatformService ,final ClientReadPlatformService clientReadPlatformService ,final ShareAccountReadPlatformService shareAccountReadPlatformService,final ApproveAddtionalSharesCommandHandler approveAddtionalSharesCommandHandler ,final ApplyAddtionalSharesCommandHandler applyAddtionalSharesCommandHandler ,final FromJsonHelper fromJsonHelper) {
+    public SharesAccountTransactionImportHandler(final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, final ClientReadPlatformService clientReadPlatformService ,final ShareAccountReadPlatformService shareAccountReadPlatformService ,final FromJsonHelper fromJsonHelper ,final ShareAccountWritePlatformService shareAccountWritePlatformService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.clientReadPlatformService = clientReadPlatformService ;
         this.shareAccountReadPlatformService = shareAccountReadPlatformService;
         this.fromJsonHelper = fromJsonHelper;
-        this.approveAddtionalSharesCommandHandler = approveAddtionalSharesCommandHandler ;
-        this.applyAddtionalSharesCommandHandler = applyAddtionalSharesCommandHandler;
+        this.shareAccountWritePlatformService = shareAccountWritePlatformService ;
     }
+
     @Override
     public Count process(Workbook workbook, String locale, String dateFormat) {
 
@@ -113,14 +112,11 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
 
             if (ImportHandlerUtils.isNotImported(row, SharedAccountsConstants.STATUS_COL)){
 
-                System.err.println("------------------row index is ----------------"+rowIndex);
-
                 ApplyAdditionalShares applyAdditionalShares = null ;
                 try{
                     applyAdditionalShares = readSharesTransactions(row ,locale ,dateFormat);
                 }
                 catch (Exception n){
-                    System.err.println("=============================null pointer exception caught here again on index "+rowIndex);
                 }
 
                 Optional.ofNullable(applyAdditionalShares).ifPresent(e->{
@@ -193,13 +189,13 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
     public Count importEntity(String dateFormat) {
 
         Sheet sharedAccountTransactionsSheet = workbook.getSheet(TemplatePopulateImportConstants.SHARED_ACCOUNTS_SHEET_NAME);
-        int successCount=0;
-        int errorCount=0;
+        int successCount = 0;
+        int errorCount = 0;
         String errorMessage="";
 
-        ObjectNode node = ObjectNodeHelper.objectNode();
-        node.put("dateFormat" ,"dd MMMM yyyy");
-        node.put("locale","en");
+        ObjectNode objectNode = ObjectNodeHelper.objectNode();
+        objectNode.put("dateFormat" ,"dd MMMM yyyy");
+        objectNode.put("locale","en");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
@@ -216,26 +212,37 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
                 sharesTransactionJson.remove("rowIndex");
 
                 String payload = sharesTransactionJson.toString();
-                JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
 
-                final CommandProcessingResult result = applyAddtionalSharesCommandHandler.processCommand(jsonCommand);
+                /// new version that doesnt use account write platform directly
 
-                System.err.println("-----------payload is -------------"+payload);
+                String accountType = "share";
+                String commandParam = "applyadditionalshares";
+                String approveCommandParam = "approveadditionalshares";
+
+                System.err.println("-------------share account id -------------"+shareAccountId);
+
+
+                CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, shareAccountId, commandParam).withJson(payload).build();
+                final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
 
                 Long additionalSharesId = (Long)result.getChanges().get("additionalshares");
                 //approve sonme shit ass transaction here
                 Optional.ofNullable(additionalSharesId).ifPresent(e->{
 
-                    System.err.println("--------------additional shares id is -----------"+additionalSharesId);
+                    ObjectNode node = ObjectNodeHelper.objectNode();
+                    node.put("id" ,additionalSharesId);
 
-                    ObjectNode objectNode = ObjectNodeHelper.objectNode();
-                    objectNode.put("id" ,additionalSharesId);
-                    node.putPOJO("requestedShares",objectNode);
+                    ArrayNode array  = ObjectNodeHelper.arrayNode();
+                    array.addPOJO(node);
 
-                    System.err.println("--------------approve command is ------------"+node.toString());
+                    objectNode.put("requestedShares" ,array);
 
-                    JsonCommand jsonCommandApproveShares = JsonCommandHelper.jsonCommand(fromJsonHelper ,node.toString());
-                    final CommandProcessingResult result1 = approveAddtionalSharesCommandHandler.processCommand(jsonCommand);
+                    String approvePayload = objectNode.toString();
+
+                    System.err.println("-----------------approve payload is -----------"+approvePayload);
+
+                    CommandWrapper approveCommandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, shareAccountId, approveCommandParam).withJson(approvePayload).build();
+                    final CommandProcessingResult approveResults = this.commandsSourceWritePlatformService.logCommandSource(approveCommandWrapper);
 
                 });
 
