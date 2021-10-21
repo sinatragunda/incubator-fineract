@@ -575,11 +575,12 @@ public final class ClientDataValidator {
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
 
-        for(ApiParameterError apiParameterError : dataValidationErrors){
-            System.err.println("----------------------"+apiParameterError.getDeveloperMessage()+"----------------"+apiParameterError.getParameterName());
-        }
         if (!dataValidationErrors.isEmpty()) {
-            //
+            for(ApiParameterError apiParameterError : dataValidationErrors){
+
+                System.err.println("----------------------"+apiParameterError.getDeveloperMessage()+"----------------"+apiParameterError.getParameterName());
+            }
+
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
     }

@@ -81,14 +81,22 @@ public class LoanImportHandler implements ImportHandler {
         this.approvalDates = new ArrayList<>();
         this.loanRepayments = new ArrayList<>();
         this.disbursalDates = new ArrayList<>();
-        this.statuses=new ArrayList<>();
-        readExcelFile(locale,dateFormat);
-        return importEntity(dateFormat);
+        this.statuses = new ArrayList<>();
+        try{
+            readExcelFile(locale,dateFormat);
+            //return importEntity(dateFormat);
+        }
+        catch (Exception n){
+            System.err.println("---------------what error is caught over there ---------------");
+            n.printStackTrace();
+        }
+        return null ;
     }
 
     public void readExcelFile(final String locale, final String dateFormat) {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row;
                 row = loanSheet.getRow(rowIndex);
@@ -96,19 +104,23 @@ public class LoanImportHandler implements ImportHandler {
 
                     LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
                     Optional.ofNullable(loanAccountData).ifPresent(e->{
+
                         loans.add(loanAccountData);
 
                         approvalDates.add(readLoanApproval(row,locale,dateFormat));
                         disbursalDates.add(readDisbursalData(row,locale,dateFormat));
 
                         LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
+
                         Optional.ofNullable(loanTransactionData).ifPresent(e1->{
                             loanRepayments.add(e1);
                         });
-                        //loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
                     });
+                    System.err.printf("----------------------add new index ---out of entries %d-----%d--\n",rowIndex ,noOfEntries);
                 }
         }
+
+        System.err.println("-----------------done adding indexes -----------where is error ");
 
     }
 
@@ -120,7 +132,7 @@ public class LoanImportHandler implements ImportHandler {
         
         // if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
         if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
-            //System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
+            System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
             lastRepaymentDate = DateUtils.getLocalDateOfTenant();
         }
 
@@ -169,15 +181,21 @@ public class LoanImportHandler implements ImportHandler {
         Long loanOfficerId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME), loanOfficerName);
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
 
-        String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
-        
+        String fundName[] = {null} ;
+        try{
+            fundName[0] = ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
+        }
+        catch (NullPointerException n){
+            System.err.println("--------------------------nullpointer caught here for fund name --------------");
+        }
+
         final Long[] fundId = {0L} ;
 
         Consumer<String> fundNameConsumer = (e)->{
-            fundId[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName);
+            fundId[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName[0]);
         };
 
-        Optional.ofNullable(fundName).ifPresent(fundNameConsumer);
+        Optional.ofNullable(fundName[0]).ifPresent(fundNameConsumer);
 
         BigDecimal principal = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row) != null)
@@ -195,7 +213,21 @@ public class LoanImportHandler implements ImportHandler {
             else if (repaidEveryFrequency.equalsIgnoreCase("Months")) repaidEveryFrequencyId = "2";
             repaidEveryFrequencyEnums = new EnumOptionData(null, null, repaidEveryFrequencyId);
         }
+
         Integer loanTerm =  ImportHandlerUtils.readAsInt(LoanConstants.LOAN_TERM_COL, row);
+
+
+        if(repaidEveryFrequencyId.equalsIgnoreCase("1")){
+            // this is weeks schedule
+            System.err.println("--------------hack account here ,repay every --------"+loanTerm);
+            repaidEvery = 2 ;
+            loanTerm = numberOfRepayments * repaidEvery ;
+
+            System.err.println("--------------hack account here ,repay new term every --------"+loanTerm);
+        }
+
+        // this is a hack should be removed after this
+
         String loanTermFrequency =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_TERM_FREQUENCY_COL, row);
         EnumOptionData loanTermFrequencyEnum = null;
         if (loanTermFrequency != null) {
@@ -369,6 +401,9 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     public Count importEntity(String dateFormat) {
+
+        System.err.println("---------------------start importing entity -------------");
+
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         int successCount=0;
         int errorCount=0;
@@ -467,7 +502,7 @@ public class LoanImportHandler implements ImportHandler {
             } else {
                 String payload = gsonBuilder.create().toJson(disbusalData);
 
-                //System.err.println("-----------------------diburse loan to not savings ----------------"+payload);
+                System.err.println("-----------------------diburse loan to not savings ----------------"+payload);
                 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                         .disburseLoanApplication(result.getLoanId()) //
                         .withJson(payload) //
@@ -493,6 +528,8 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private CommandProcessingResult importLoan(int rowIndex,String dateFormat) {
+
+        System.err.println("--------------import loan class entered ---------------");
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
         gsonBuilder.registerTypeAdapter(EnumOptionData.class,new EnumOptionDataValueSerializer());
@@ -511,14 +548,17 @@ public class LoanImportHandler implements ImportHandler {
                 chargeJsonOb.remove("chargePayable");
             }
         }
+
         loanJsonOb.remove("isTopup");
         String payload=loanJsonOb.toString();
 
-        //System.err.println("----------------loan payload ------------------"+payload);
+        System.err.println("----------------loan payload ------------------"+payload);
+
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createLoanApplication() //
                 .withJson(payload) //
                 .build(); //
+
         final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return result;
     }

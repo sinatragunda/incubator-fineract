@@ -112,6 +112,7 @@ public class ImportHandlerUtils {
                     res = trimEmptyDecimalPortion(val.getStringValue());
                 }
                 catch (NullPointerException n){
+                    System.err.println("-----------------read as string should catch null pointer ");
                     n.printStackTrace();
                 }
                 if (res!=null) {
@@ -223,8 +224,29 @@ public class ImportHandlerUtils {
         } else if (c.getCellType()==Cell.CELL_TYPE_NUMERIC) {
             return row.getCell(colIndex).getNumericCellValue();
         }else {
-            return Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            //error usually thrown here
+            return doubleParserNonThrowing(row ,colIndex);
         }
+    }
+
+    public static Double doubleParserNonThrowing(Row row ,int index){
+
+        String value = row.getCell(index).getStringCellValue();
+        Double d =null ;
+        try{
+            d = Double.parseDouble(value);
+        }
+        catch (NumberFormatException n){
+
+            System.err.println("----------------number formatting error caught at value ----"+value);
+            String strippedVal = value.replace(",","");
+            System.err.println("----------------new stripped value ----"+strippedVal);
+
+            return Double.parseDouble(strippedVal);
+        }
+
+        System.err.println("---------------returning succesffully parse value ------"+d.doubleValue());
+        return d ;
     }
 
     public static void writeString(int colIndex, Row row, String value) {

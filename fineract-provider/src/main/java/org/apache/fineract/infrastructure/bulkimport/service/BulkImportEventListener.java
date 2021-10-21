@@ -147,7 +147,11 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
 
         final Workbook workbook = event.getWorkbook();
         final Count count = importHandler.process(workbook, event.getLocale(), event.getDateFormat());
+
+        System.err.println("-------------------------------count class done --------------");
+
         importDocument.update(DateUtils.getLocalDateTimeOfTenant(), count.getSuccessCount(), count.getErrorCount());
+        
         this.importRepository.save(importDocument);
 
         final Set<String> modifiedParams = new HashSet<>();

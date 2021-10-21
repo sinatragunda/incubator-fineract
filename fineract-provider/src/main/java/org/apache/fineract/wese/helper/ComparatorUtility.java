@@ -49,12 +49,9 @@ public class ComparatorUtility {
 
 
     // Added 15/10/2021
-    public static boolean isLongZero(Long value){
+    public static boolean isLongZero(Long value) {
         int cmp = value.compareTo(0L);
-        if(cmp <= 0){
-            return true;
-        }
-        return false;
+        return cmpToBoolean(cmp);
     }
 
 

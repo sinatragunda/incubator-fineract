@@ -6,6 +6,9 @@
 */
 package org.apache.fineract.infrastructure.bulkimport.importhandler.equitygrowth;
 
+import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
+import org.apache.fineract.organisation.monetary.domain.Money;
+import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
@@ -37,30 +40,31 @@ public class EquityGrowthImportHandler {
         // hard coding this value for now savingsproductid
 
         BigDecimal totalEquity  = savingsAccountTransactionDataList.stream().map(SavingsAccountTransactionData::getEquityBalance).reduce(BigDecimal.ZERO,BigDecimal::add);
-
         EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries);
+
 
         EquityGrowthDividends equityGrowthDividendsFlushed = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
 
         for(SavingsAccountTransactionData savingsAccountTransactionData : savingsAccountTransactionDataList){
 
             BigDecimal equityBalance = savingsAccountTransactionData.getEquityBalance();
+            Long savingsAccountId = savingsAccountTransactionData.getSavingsAccountId();
 
             boolean isZero = ComparatorUtility.isBigDecimalZero(equityBalance);
             if(isZero){
                 continue;
             }
 
-            Long savingsAccountId = savingsAccountTransactionData.getSavingsAccountId();
-
             Optional.ofNullable(savingsAccountId).ifPresent(e->{
 
                 SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e);
+                MonetaryCurrency monetaryCurrency = savingsAccount.getCurrency();
+                Money money = Money.of(monetaryCurrency ,equityBalance);
 
                 String clientName = savingsAccount.getClient().getDisplayName();
-                Double percentage = EquityGrowthHelper.percentage(equityBalance.doubleValue() ,totalEquity.doubleValue());
+                Double percentage = EquityGrowthHelper.percentage(money.getAmount().doubleValue() ,totalEquity.doubleValue());
 
-                EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,equityBalance ,percentage ,"Equity Migration" ,clientName);
+                EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,money.getAmount() ,percentage ,"Equity Migration" ,clientName);
                 equityGrowthOnSavingsAccount.setEquityGrowthDividends(equityGrowthDividends);
                 equityGrowthOnSavingsAccountRepository.save(equityGrowthOnSavingsAccount);
 

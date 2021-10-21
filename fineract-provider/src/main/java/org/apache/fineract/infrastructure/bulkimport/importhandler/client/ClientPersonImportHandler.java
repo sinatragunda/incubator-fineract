@@ -210,6 +210,8 @@ public class ClientPersonImportHandler implements ImportHandler {
 
                 System.err.println("---------------payload for client create is -------------"+payload);
 
+                System.err.println("-------------payload is ------------"+payload);
+
                 final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                         .createClient() //
                         .withJson(payload) //
