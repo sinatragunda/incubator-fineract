@@ -93,8 +93,11 @@ public class LoanImportHandler implements ImportHandler {
                     Optional.ofNullable(loanAccountData).ifPresent(e->{
                         System.err.println("--------------loan not null son ---------");
                         loans.add(loanAccountData);
+
                         approvalDates.add(readLoanApproval(row,locale,dateFormat));
+                        System.err.println("-------------------handing disbursal dates ------------");
                         disbursalDates.add(readDisbursalData(row,locale,dateFormat));
+                        System.err.println("-----------------------done with dibursal dates -------------");
                         loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
                     });
                 }
@@ -250,6 +253,13 @@ public class LoanImportHandler implements ImportHandler {
         Integer graceOnInterestCharged =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_INTEREST_CHARGED_COL, row);
         LocalDate interestChargedFromDate =  ImportHandlerUtils.readAsDate(LoanConstants.INTEREST_CHARGED_FROM_COL, row);
         LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
+
+
+        // here we need to circumvent this ,if first repayment is today then make it null
+
+        
+
+
         String loanType=null;
         EnumOptionData loanTypeEnumOption=null;
         if ( ImportHandlerUtils.readAsString(LoanConstants.LOAN_TYPE_COL, row)!=null) {

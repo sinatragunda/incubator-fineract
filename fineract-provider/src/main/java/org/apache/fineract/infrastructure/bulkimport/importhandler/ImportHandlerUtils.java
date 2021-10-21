@@ -224,7 +224,10 @@ public class ImportHandlerUtils {
         } else if (c.getCellType()==Cell.CELL_TYPE_NUMERIC) {
             return row.getCell(colIndex).getNumericCellValue();
         }else {
-            return Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            String value = row.getCell(colIndex).getStringCellValue();
+            String strippedVal = value.replace(",","");
+            System.err.println("----------------new stripped val is ---------"+strippedVal);
+            return Double.parseDouble(strippedVal);
         }
     }
 
