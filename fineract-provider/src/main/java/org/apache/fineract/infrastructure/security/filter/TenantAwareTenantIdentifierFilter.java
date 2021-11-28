@@ -126,7 +126,7 @@ public class TenantAwareTenantIdentifierFilter extends GenericFilterBean {
 
                 ThreadLocalContextUtil.setTenant(tenant);
 
-                System.err.println("----------------------------when do we reach this other filter beean ?");
+                //System.err.println("----------------------------when do we reach this other filter beean ?");
 
                 String authToken = request.getHeader("Authorization");
 

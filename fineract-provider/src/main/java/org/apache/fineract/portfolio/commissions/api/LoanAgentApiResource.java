@@ -109,8 +109,7 @@ public class LoanAgentApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
-
-        System.err.println("------------------do we get back here again in template ? ,what for ?----------------");
+        //System.err.println("------------------do we get back here again in template ? ,what for ?----------------");
 
         //final ChargeData charge = this.readPlatformService.retrieveNewChargeDetails();
 

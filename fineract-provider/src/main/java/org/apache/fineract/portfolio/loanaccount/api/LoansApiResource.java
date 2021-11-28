@@ -401,6 +401,7 @@ public class LoansApiResource {
     public String retrieveLoan(@PathParam("loanId") final Long loanId,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
             @Context final UriInfo uriInfo) {
+
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
         LoanAccountData loanBasicDetails = this.loanReadPlatformService.retrieveOne(loanId);
@@ -434,6 +435,7 @@ public class LoansApiResource {
             if(calendarData != null)
             	loanBasicDetails = LoanAccountData.withLoanCalendarData(loanBasicDetails, calendarData);
         }
+
         Collection<InterestRatePeriodData> interestRatesPeriods = this.loanReadPlatformService.retrieveLoanInterestRatePeriodData(loanBasicDetails);
         Collection<LoanTransactionData> loanRepayments = null;
         LoanScheduleData repaymentSchedule = null;
@@ -532,12 +534,10 @@ public class LoansApiResource {
                     notes = null;
                 }
             }
-
             if (associationParameters.contains("linkedAccount")) {
                 mandatoryResponseParameters.add("linkedAccount");
                 linkedAccount = this.accountAssociationsReadPlatformService.retriveLoanLinkedAssociation(loanId);
             }
-
         }
 
         Collection<LoanProductData> productOptions = null;
@@ -621,7 +621,6 @@ public class LoansApiResource {
 
 
         }
-
         Collection<ChargeData> overdueCharges = this.chargeReadPlatformService.retrieveLoanProductCharges(loanBasicDetails.loanProductId(),
                 ChargeTimeType.OVERDUE_INSTALLMENT);
 

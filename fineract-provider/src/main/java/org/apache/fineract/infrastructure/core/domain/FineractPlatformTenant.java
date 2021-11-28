@@ -18,6 +18,11 @@
  */
 package org.apache.fineract.infrastructure.core.domain;
 
+import org.apache.fineract.infrastructure.userinstancing.utility.UserSessionInstance;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class FineractPlatformTenant {
 
     private final Long id;
@@ -26,6 +31,11 @@ public class FineractPlatformTenant {
     private final String timezoneId;
     private final FineractPlatformTenantConnection connection;
 
+    /**
+     * Added 28/11/2022 at 0237
+     */
+    private final Map<Long , UserSessionInstance> userSessionInstanceMap;
+
     public FineractPlatformTenant(final Long id, final String tenantIdentifier, final String name,
             final String timezoneId, final FineractPlatformTenantConnection connection) {
         this.id = id;
@@ -33,6 +43,11 @@ public class FineractPlatformTenant {
         this.name = name;
         this.timezoneId = timezoneId;
         this.connection = connection;
+        this.userSessionInstanceMap = new HashMap<>();
+    }
+
+    public Map<Long, UserSessionInstance> getUserSessionInstanceMap() {
+        return userSessionInstanceMap;
     }
 
     public Long getId() {

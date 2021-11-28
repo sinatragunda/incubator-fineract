@@ -54,6 +54,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * A customised version of spring security's {@link BasicAuthenticationFilter}.
@@ -152,14 +153,12 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                     } else {
                         this.cacheWritePlatformService.switchToCache(CacheType.NO_CACHE);
                     }
-                    passwordResetRequest(pathInfo,response);
                     TenantAwareBasicAuthenticationFilter.firstRequestProcessed = true;
                 }
             }
             super.doFilter(req, res, chain);
         } catch (final InvalidTenantIdentiferException e) {
             // deal with exception at low level
-
             SecurityContextHolder.getContext().setAuthentication(null);
             response.addHeader("WWW-Authenticate", "Basic realm=\"" + "Fineract Platform API" + "\"");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -176,7 +175,6 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
     		throws IOException {
     	super.onSuccessfulAuthentication(request, response, authResult);
 
-    	/// what is happening here man ?
     	AppUser user = (AppUser) authResult.getPrincipal();
 
         if (notificationReadPlatformService.hasUnreadNotifications(user.getId())) {
@@ -184,63 +182,30 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
         } else {
             response.addHeader("X-Notification-Refresh", "false");
         }
-		
-		String pathURL = request.getRequestURI();
-
-		boolean isSelfServiceRequest[] = {false};
-
-        Optional.ofNullable(pathURL).ifPresent(e->{
-            isSelfServiceRequest[0] = (pathURL != null && pathURL.contains("/self/"));
-            if(!isSelfServiceRequest[0]){
-                // check again if its not selfservic request
-                isSelfServiceRequest[0] = pathURL.contains("selfservice");
-            }
-        });
-
-
-		// logic here a bit complex to comprehend with all the logical and ors
-		boolean notAllowed = ((isSelfServiceRequest[0] && !user.isSelfServiceUser())
-				||(!isSelfServiceRequest[0]));
-
-
-		// Added 19/12/2021
-		// handle all request regarding any of the financial services ,if its disabled then stop transaction or residerent it
-        // No way to add interceptor other than this thats why
-        // Should it return anything ,if product is disabled just throw an error from there
-        // substitute this command for later
-        // ProductHelper.handleRequest(request ,response);
-		
-		if(notAllowed){
-	            // we removing this step so that we can implement our self service item
-            boolean isPasswordRequest = passwordResetRequest(pathURL ,response);
-
-            // easy to bypass isSelfServiceRequest here to just proceed
-            if(isPasswordRequest){
-                return ;
-            }
-            /// we had blocked this there other day
-            /// toxic logic that needs reworking here
-		    ///throw new BadCredentialsException("User not authorised to use the requested resource.");
-		}
+        /**
+         * Modified by Sinatra Gunda at 21/11/2022 at 0751
+         * Some functionality has been deleted here but no idea what its intention was
+         */
     }
 
 
-    public static boolean passwordResetRequest(String url ,HttpServletResponse response){
+    /**
+     * Added 21/11/2022 at 0749
+     * Logic for resetting passwords .Request should bypass authentication and post request nonetheless
+     * onUnsuccessfulAuthentication
+     */
+    @Override
+    protected void onUnsuccessfulAuthentication(HttpServletRequest request,
+                                                HttpServletResponse response, AuthenticationException authenticationException)
+            throws IOException {
 
-        boolean isPasswordRequest = url.contains("resetpassword");
+        String pathURL = request.getRequestURI();
 
-        if(isPasswordRequest){
-            try{
-                System.err.println("------------------redirect this shit ");
-                response.sendRedirect("/authenticate/resetpassword");
-                // we dont have any user object so trying to find a quick rich way to get clever
-                response.setStatus(503);
+        System.err.println("-------------url is ---------------"+pathURL);
 
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        return isPasswordRequest;
+        boolean isResetPassword = (pathURL != null && pathURL.contains("/resetpassword"));
+
+        System.err.println("-------------------is reset password request hee son ?----------"+isResetPassword);
     }
+
 }

@@ -1097,7 +1097,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         
         final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
 
-        System.err.println("------------transaction amount is -----------"+transactionAmount);
+        //System.err.println("------------transaction amount is -----------"+transactionAmount);
         
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
@@ -1166,13 +1166,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
          */ 
         BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
 
-        System.err.println("--------------initial amount is ------------"+transactionAmount);
+        //System.err.println("--------------initial amount is ------------"+transactionAmount);
 
         boolean gate = !deductOnAccountBalance && applyWithdrawFee;
 
-        System.err.println("----------------------deduct on charges ---------"+deductOnAccountBalance);
+        //System.err.println("----------------------deduct on charges ---------"+deductOnAccountBalance);
 
-        System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
+        //System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
 
          /**
           * Gate of !deductOnAccountBalance and applyWithdrawFee
@@ -1182,7 +1182,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
             transactionAmount = transactionAmount.subtract(totalCharges);
 
-            System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
+            //System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
         } 
 
         return transactionAmount;
@@ -1212,18 +1212,18 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     private BigDecimal payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user ,boolean withholdPayingCharges) {
 
-        System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
+        //System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
 
-        System.err.println("------------------why there arent any charges in this "+this.charges.size());
+        //System.err.println("------------------why there arent any charges in this "+this.charges.size());
 
         BigDecimal totalCharges = BigDecimal.ZERO ;
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
             
-            System.err.println("---------product apply charges ----------------");
+            //System.err.println("---------product apply charges ----------------");
             
             if (charge.isWithdrawalFee() && charge.isActive()) {
-                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
+              //  System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
 
                 BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
 
@@ -1234,7 +1234,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
-        System.err.println("----------------------total charges amount is -----"+totalCharges);
+        //System.err.println("----------------------total charges amount is -----"+totalCharges);
 
         return totalCharges;
     }
