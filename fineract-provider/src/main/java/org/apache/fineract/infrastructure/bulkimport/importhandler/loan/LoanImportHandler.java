@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSe
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.EnumOptionDataValueSerializer;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.*;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
@@ -89,19 +90,24 @@ public class LoanImportHandler implements ImportHandler {
                 row = loanSheet.getRow(rowIndex);
                 if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)){
 
-                    LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
-                    Optional.ofNullable(loanAccountData).ifPresent(e->{
-                        System.err.println("--------------loan not null son ---------");
-                        loans.add(loanAccountData);
-
-                        approvalDates.add(readLoanApproval(row,locale,dateFormat));
-                        System.err.println("-------------------handing disbursal dates ------------");
-                        disbursalDates.add(readDisbursalData(row,locale,dateFormat));
-                        System.err.println("-----------------------done with dibursal dates -------------");
-                        loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
-                    });
+                    System.err.println("------------------row index is --------"+rowIndex);
+                    try{
+                        LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
+                        System.err.println("-------------------after row read------------");
+                        Optional.ofNullable(loanAccountData).ifPresent(e->{
+                            loans.add(loanAccountData);
+                            approvalDates.add(readLoanApproval(row,locale,dateFormat));
+                            disbursalDates.add(readDisbursalData(row,locale,dateFormat));
+                            loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
+                        });
+                    }
+                    catch (NullPointerException n){
+                        n.printStackTrace();
+                    }
                 }
         }
+
+        System.err.println("--------------------done reading loans-------------");
 
     }
 
@@ -110,6 +116,11 @@ public class LoanImportHandler implements ImportHandler {
         if (ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row)!=null)
             repaymentAmount = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row));
         LocalDate lastRepaymentDate = ImportHandlerUtils.readAsDate(LoanConstants.LAST_REPAYMENT_DATE_COL, row);
+
+        if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
+            lastRepaymentDate = DateUtils.getLocalDateOfTenant();
+        }
+
         String repaymentType = ImportHandlerUtils.readAsString(LoanConstants.REPAYMENT_TYPE_COL, row);
         Long repaymentTypeId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), repaymentType);
         if (repaymentAmount!=null&&lastRepaymentDate!=null&&repaymentType!=null&&repaymentTypeId!=null)
@@ -141,6 +152,7 @@ public class LoanImportHandler implements ImportHandler {
     private LoanAccountData readLoan(Row row,String locale,String dateFormat) {
 
         // Added 04/10/2021
+        System.err.println("------------------we might be reading null values-----------");
         String clientExternalId = ImportHandlerUtils.readAsString(LoanConstants.CLIENT_EXTERNAL_ID ,row);
 
         String externalId =  ImportHandlerUtils.readAsString(LoanConstants.EXTERNAL_ID_COL, row);
@@ -150,8 +162,6 @@ public class LoanImportHandler implements ImportHandler {
         String loanOfficerName =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_OFFICER_NAME_COL, row);
         Long loanOfficerId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME), loanOfficerName);
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
-
-        System.err.println("-----------------read fund name here but why it keeps having error");
 
         String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
         
@@ -179,12 +189,12 @@ public class LoanImportHandler implements ImportHandler {
             else if (repaidEveryFrequency.equalsIgnoreCase("Months")) repaidEveryFrequencyId = "2";
             repaidEveryFrequencyEnums = new EnumOptionData(null, null, repaidEveryFrequencyId);
         }
+
         Integer loanTerm =  ImportHandlerUtils.readAsInt(LoanConstants.LOAN_TERM_COL, row);
+
         String loanTermFrequency =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_TERM_FREQUENCY_COL, row);
         EnumOptionData loanTermFrequencyEnum = null;
         if (loanTermFrequency != null) {
-
-            System.err.println("-------------------loan term frequency enum not null ");
             String loanTermFrequencyId = "";
             if (loanTermFrequency.equalsIgnoreCase("Days"))
                 loanTermFrequencyId = "0";
@@ -255,10 +265,20 @@ public class LoanImportHandler implements ImportHandler {
         LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
 
 
+        System.err.println("-------------------------interest charged from date ? ---------------"+interestChargedFromDate);
+
+        //LocalDate approvedDate = ImportHandlerUtils.readAsDate(LoanConstants.APPROVED_DATE_COL, row);
+
+
+
+
+
         // here we need to circumvent this ,if first repayment is today then make it null
+        firstRepaymentOnDate = null ;
 
-        
-
+        // this is a hack to remove loans having interest charged from today ,but instead make it charge at day of disbursement
+        interestChargedFromDate = null ;
+        // use day of approved as this value ,because its creating lots of errors now we got it
 
         String loanType=null;
         EnumOptionData loanTypeEnumOption=null;
@@ -313,9 +333,7 @@ public class LoanImportHandler implements ImportHandler {
 
                 int cmp = clientId.compareTo(0L);
                 if(cmp <= 0){
-                    System.err.println("-------------------client id is null get using external Id now of "+clientExternalId);
                     clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
-
                     cmp = clientId.compareTo(0L);
 
                     if(cmp <= 0){

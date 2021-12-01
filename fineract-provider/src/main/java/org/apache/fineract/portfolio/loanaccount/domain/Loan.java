@@ -2238,11 +2238,23 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
             final LocalDate submittalDate = new LocalDate(this.submittedOnDate);
             if (approvedOn.isBefore(submittalDate)) {
+
+                System.err.println("--------------------------approval date is -----------"+approvedOn);
+
                 final String errorMessage = "The date on which a loan is approved cannot be before its submittal date: "
                         + submittalDate.toString();
-                throw new InvalidLoanStateTransitionException("approval", "cannot.be.before.submittal.date", errorMessage,
-                        getApprovedOnDate(), submittalDate);
+
+
+                System.err.println("----------------------------adopt another date for hack-------------------");
+                
+                boolean shouldThrowDateError = expecteddisbursementDate.isBefore(submittalDate);
+                
+                if(shouldThrowDateError){           
+                    throw new InvalidLoanStateTransitionException("approval", "cannot.be.before.submittal.date", errorMessage,
+                            getApprovedOnDate(), submittalDate);
+                }
             }
+            
 
             if (expecteddisbursementDate != null) {
                 this.expectedDisbursementDate = expecteddisbursementDate.toDate();
