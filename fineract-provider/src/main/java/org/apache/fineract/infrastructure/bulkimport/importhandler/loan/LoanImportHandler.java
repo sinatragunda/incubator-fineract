@@ -88,27 +88,39 @@ public class LoanImportHandler implements ImportHandler {
 
     public void readExcelFile(final String locale, final String dateFormat) {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
+        
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
-            Row row;
-                row = loanSheet.getRow(rowIndex);
-                if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)){
+        
+        System.err.println("-----------------------------------work with entries -----------"+noOfEntries);
 
-                    LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
-                    Optional.ofNullable(loanAccountData).ifPresent(e->{
-                        loans.add(loanAccountData);
 
-                        approvalDates.add(readLoanApproval(row,locale,dateFormat));
-                        disbursalDates.add(readDisbursalData(row,locale,dateFormat));
+        try{    
+            for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
+                Row row;
+                    row = loanSheet.getRow(rowIndex);
+                    System.err.println("-------------------working with column index --------------"+rowIndex);
+                    if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)){
 
-                        LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
-                        Optional.ofNullable(loanTransactionData).ifPresent(e1->{
-                            loanRepayments.add(e1);
+                        LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
+                        Optional.ofNullable(loanAccountData).ifPresent(e->{
+                            loans.add(loanAccountData);
+
+                            approvalDates.add(readLoanApproval(row,locale,dateFormat));
+                            disbursalDates.add(readDisbursalData(row,locale,dateFormat));
+
+                            LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
+                            Optional.ofNullable(loanTransactionData).ifPresent(e1->{
+                                System.err.println("-----------------value here not empty ----------");
+                                loanRepayments.add(e1);
+                            });
                         });
-                        //loanRepayments.add(readLoanRepayment(row,locale,dateFormat));
-                    });
-                }
+                    }
+            }            
         }
+        catch(Exception n){
+            System.err.println("-----------------blank field error -----------"+n.getMessage());
+        }
+
 
     }
 
@@ -116,19 +128,30 @@ public class LoanImportHandler implements ImportHandler {
         BigDecimal repaymentAmount=null;
         if (ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row)!=null)
             repaymentAmount = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(LoanConstants.TOTAL_AMOUNT_REPAID_COL, row));
+        
         LocalDate lastRepaymentDate = ImportHandlerUtils.readAsDate(LoanConstants.LAST_REPAYMENT_DATE_COL, row);
         
         // if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
         if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
-            //System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
+            System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
             lastRepaymentDate = DateUtils.getLocalDateOfTenant();
         }
 
         String repaymentType = ImportHandlerUtils.readAsString(LoanConstants.REPAYMENT_TYPE_COL, row);
+
+        boolean isRepaymentTypePresent = Optional.of(repaymentType).isPresent();
+
+        if(!isRepaymentTypePresent){
+            System.err.println("------------repayment type not present make use of payment type");
+            repaymentType = ImportHandlerUtils.readAsString(LoanConstants.DISBURSED_PAYMENT_TYPE_COL ,row);
+        }
+
         Long repaymentTypeId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), repaymentType);
-        if (repaymentAmount!=null&&lastRepaymentDate!=null&&repaymentType!=null&&repaymentTypeId!=null)
+        
+        if(repaymentAmount!=null&&lastRepaymentDate!=null&&repaymentType!=null&&repaymentTypeId!=null)
             return  LoanTransactionData.importInstance(repaymentAmount, lastRepaymentDate, repaymentTypeId, row.getRowNum(),locale,dateFormat);
         else
+            System.err.println("------------------------------------loan repayment null------------------");
             return null;
     }
 
@@ -170,10 +193,11 @@ public class LoanImportHandler implements ImportHandler {
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
 
         String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
-        
+
         final Long[] fundId = {0L} ;
 
         Consumer<String> fundNameConsumer = (e)->{
+            System.err.println("----------------fund name is present son watch out ---------------------");
             fundId[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), fundName);
         };
 
@@ -266,8 +290,11 @@ public class LoanImportHandler implements ImportHandler {
         Integer graceOnPrincipalPayment =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_PRINCIPAL_PAYMENT_COL, row);
         Integer graceOnInterestPayment =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_INTEREST_PAYMENT_COL, row);
         Integer graceOnInterestCharged =  ImportHandlerUtils.readAsInt(LoanConstants.GRACE_ON_INTEREST_CHARGED_COL, row);
-        LocalDate interestChargedFromDate =  ImportHandlerUtils.readAsDate(LoanConstants.INTEREST_CHARGED_FROM_COL, row);
         
+        // modified 18/08/2021 interestChargedFrom should always default to null so that interest wont be charged on day of importing 
+
+        //LocalDate interestChargedFromDate =  ImportHandlerUtils.readAsDate(LoanConstants.INTEREST_CHARGED_FROM_COL, row);
+        LocalDate interestChargedFromDate = null ;
         // if first repayment date not around we should just use the one in scheduling not today date
         //LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
         
@@ -396,6 +423,7 @@ public class LoanImportHandler implements ImportHandler {
 
                 if (progressLevel <= 2 && disbursalDates.get(i)!=null) progressLevel = importDisbursalData(result, i,dateFormat);
 
+                System.err.println("-------------------------do we get error here -----------------");
                 if (loanRepayments.get(i) != null) progressLevel = importLoanRepayment(result, i,dateFormat);
 
                 successCount++;

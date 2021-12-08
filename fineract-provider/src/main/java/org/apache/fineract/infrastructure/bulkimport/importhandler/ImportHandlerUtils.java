@@ -47,6 +47,7 @@ import org.apache.fineract.wese.helper.TimeHelper;
 public class ImportHandlerUtils {
 
     public static Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
+        
         Integer noOfEntries = 0;
 
         // getLastRowNum and getPhysicalNumberOfRows showing false values
@@ -54,20 +55,31 @@ public class ImportHandlerUtils {
         while(sheet.getRow(noOfEntries+1) !=null){
             noOfEntries++;
         }
-//
-//        while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
-//            noOfEntries++;
-//        }
+
+        System.err.println("------------------cause for concern here since last column throws null --------------"+noOfEntries);
+
+        // while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
+        //    noOfEntries++;
+        // }
 
         return noOfEntries;
     }
 
-    public static boolean isNotImported(Row row, int statusColumn) {
-        if (readAsString(statusColumn,row)!=null) {
-            return !readAsString(statusColumn, row).equals(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
-        }else {
-            return true;
+    public static boolean isNotImported(Row row, int statusColumn){
+
+        boolean isPresent = Optional.ofNullable(row).isPresent();
+
+        System.err.println("----------------------value is present or not------------"+isPresent);
+
+        if(isPresent){            
+            if (readAsString(statusColumn,row)!=null) {
+                return !readAsString(statusColumn, row).equals(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
+            }else {
+                return true;
+            }            
         }
+        return false ;
+
     }
 
     public static Long readAsLong(int colIndex, Row row) {
@@ -223,7 +235,15 @@ public class ImportHandlerUtils {
         } else if (c.getCellType()==Cell.CELL_TYPE_NUMERIC) {
             return row.getCell(colIndex).getNumericCellValue();
         }else {
-            return Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            Double val = 0.0;
+            try{
+                val = Double.parseDouble(row.getCell(colIndex).getStringCellValue());
+            }
+            catch(NullPointerException n){
+                System.err.println("---------------value is "+row.getCell(colIndex).getStringCellValue());    
+                System.err.println("-------------format exception caught son -----------"+n.getMessage());
+            }
+            return val ;
         }
     }
 

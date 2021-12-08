@@ -281,7 +281,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             System.err.println("----------------proceed failed validation -------------------");
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-            
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
 
 
