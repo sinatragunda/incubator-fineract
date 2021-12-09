@@ -299,6 +299,8 @@ public class LoanImportHandler implements ImportHandler {
         //LocalDate firstRepaymentOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.FIRST_REPAYMENT_COL, row);
         
         LocalDate firstRepaymentOnDate = null ;
+
+        // here is an error again ,interest charged from should be null 
                 
         String loanType=null;
         EnumOptionData loanTypeEnumOption=null;
@@ -351,7 +353,6 @@ public class LoanImportHandler implements ImportHandler {
             if (loanType.equals("individual")) {
 
                 Long clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
-
 
                 // returns 0L if value of clientId is null ,so we must search using client external id
                 boolean cmp = ComparatorUtility.isLongZero(clientId);
