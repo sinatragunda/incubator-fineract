@@ -90,9 +90,6 @@ public class LoanImportHandler implements ImportHandler {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
-        
-        System.err.println("-----------------------------------work with entries -----------"+noOfEntries);
-
 
         try{    
             for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
@@ -110,7 +107,6 @@ public class LoanImportHandler implements ImportHandler {
 
                             LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
                             Optional.ofNullable(loanTransactionData).ifPresent(e1->{
-                                System.err.println("-----------------value here not empty ----------");
                                 loanRepayments.add(e1);
                             });
                         });
@@ -118,7 +114,6 @@ public class LoanImportHandler implements ImportHandler {
             }            
         }
         catch(Exception n){
-            System.err.println("-----------------blank field error -----------"+n.getMessage());
         }
 
 
@@ -133,7 +128,6 @@ public class LoanImportHandler implements ImportHandler {
         
         // if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
         if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
-            System.err.println("------------------adjust date to today ---------"+lastRepaymentDate);
             lastRepaymentDate = DateUtils.getLocalDateOfTenant();
         }
 
@@ -142,7 +136,6 @@ public class LoanImportHandler implements ImportHandler {
         boolean isRepaymentTypePresent = Optional.of(repaymentType).isPresent();
 
         if(!isRepaymentTypePresent){
-            System.err.println("------------repayment type not present make use of payment type");
             repaymentType = ImportHandlerUtils.readAsString(LoanConstants.DISBURSED_PAYMENT_TYPE_COL ,row);
         }
 
@@ -151,7 +144,6 @@ public class LoanImportHandler implements ImportHandler {
         if(repaymentAmount!=null&&lastRepaymentDate!=null&&repaymentType!=null&&repaymentTypeId!=null)
             return  LoanTransactionData.importInstance(repaymentAmount, lastRepaymentDate, repaymentTypeId, row.getRowNum(),locale,dateFormat);
         else
-            System.err.println("------------------------------------loan repayment null------------------");
             return null;
     }
 
@@ -424,7 +416,6 @@ public class LoanImportHandler implements ImportHandler {
 
                 if (progressLevel <= 2 && disbursalDates.get(i)!=null) progressLevel = importDisbursalData(result, i,dateFormat);
 
-                System.err.println("-------------------------do we get error here -----------------");
                 if (loanRepayments.get(i) != null) progressLevel = importLoanRepayment(result, i,dateFormat);
 
                 successCount++;

@@ -93,10 +93,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             boolean isSavingsAccountNumberPresent = Optional.ofNullable(e.getSavingsAccountId()).isPresent();
             return !isSavingsAccountNumberPresent;
         }).forEach(f ->{
-
             String clientExternalId = f.getClientExternalId();
             SavingsAccountData savingsAccountData = SavingsAccountToClientLinkingHelper.linkBlindlySavingsAccount(clientReadPlatformService ,savingsAccountReadPlatformService ,clientExternalId);
-
             Optional.ofNullable(savingsAccountData).ifPresent(acc->{
                 Long accountId = acc.id();
                 f.setSavingsAccountId(accountId);
@@ -111,20 +109,18 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     public void readExcelFile(String locale, String dateFormat) {
         Sheet savingsTransactionSheet = workbook.getSheet(TemplatePopulateImportConstants.SAVINGS_TRANSACTION_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(savingsTransactionSheet, TransactionConstants.AMOUNT_COL);
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
 
             Row row;
             row = savingsTransactionSheet.getRow(rowIndex);
-
             if(ImportHandlerUtils.isNotImported(row, TransactionConstants.STATUS_COL)) {
 
                 SavingsAccountTransactionData savingsAccountTransactionData = readSavingsTransaction(row, locale, dateFormat);
-
                 Optional.ofNullable(savingsAccountTransactionData).ifPresent(e->{
                     // does it have any equity transaction ?
                     savingsTransactions.add(e);
                 });
-
             }
         }
     }
@@ -142,7 +138,7 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             try {
                 savingsAccountIdL = Long.parseLong(savingsAccountIdCheck);
             } catch (NumberFormatException n) {
-                System.err.println("------------------number exception caught for ---------------" + savingsAccountIdCheck);
+
             }
         }
 
@@ -155,8 +151,18 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             amount = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(TransactionConstants.AMOUNT_COL, row));
 
         LocalDate transactionDate = ImportHandlerUtils.readAsDate(TransactionConstants.TRANSACTION_DATE_COL, row);
-        String paymentType = ImportHandlerUtils.readAsString(TransactionConstants.PAYMENT_TYPE_COL, row);
-        Long paymentTypeId = ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), paymentType);
+        
+        // this is not usually provided so we just need to default to 1 if its null 
+        // modified 09/12/2021 6.00am
+        String paymentType[] = {ImportHandlerUtils.readAsString(TransactionConstants.PAYMENT_TYPE_COL, row)};
+        Long paymentTypeIdEx[] = {1L};
+
+        Optional.ofNullable(paymentType[0]).ifPresent(e->{
+            paymentTypeIdEx[0] =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME), paymentType[0]);
+        });
+
+        Long paymentTypeId = paymentTypeIdEx[0];
+
         String accountNumber = ImportHandlerUtils.readAsString(TransactionConstants.ACCOUNT_NO_COL, row);
         String checkNumber = ImportHandlerUtils.readAsString(TransactionConstants.CHECK_NO_COL, row);
         String routingCode = ImportHandlerUtils.readAsString(TransactionConstants.ROUTING_CODE_COL, row);
@@ -167,6 +173,9 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
         // Added 08/10/2021
         Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);
+
+        //added 08/12/2021
+        String note = ImportHandlerUtils.readAsString(TransactionConstants.NOTE_COL ,row);
 
         SavingsAccountTransactionData savingsAccountTransactionData = SavingsAccountTransactionData.importInstance(amount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountIdL, savingsAccountTransactionEnumData, row.getRowNum(),locale,dateFormat);
@@ -179,6 +188,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             savingsAccountTransactionData.setEquityBalance(new BigDecimal(equityBalance));
         });
 
+        // Added 08/12/2021
+        addTransactionNote(savingsAccountTransactionData ,note);
         return savingsAccountTransactionData ;
 
     }
@@ -195,12 +206,13 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
         for (SavingsAccountTransactionData transaction : savingsTransactions) {
             try {
-                JsonObject savingsTransactionJsonob=gsonBuilder.create().toJsonTree(transaction).getAsJsonObject();
+                JsonObject savingsTransactionJsonob= gsonBuilder.create().toJsonTree(transaction).getAsJsonObject();
                 savingsTransactionJsonob.remove("transactionType");
                 savingsTransactionJsonob.remove("reversed");
                 savingsTransactionJsonob.remove("interestedPostedAsOn");
                 String payload= savingsTransactionJsonob.toString();
                 CommandWrapper commandRequest=null;
+
                 if (transaction.getTransactionType().getValue().equals("Withdrawal")) {
                     commandRequest = new CommandWrapperBuilder() //
                             .savingsAccountWithdrawal(transaction.getSavingsAccountId()) //
@@ -213,7 +225,6 @@ public class SavingsTransactionImportHandler implements ImportHandler {
                             .withJson(payload) //
                             .build();
                 }
-
 
                 final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
@@ -235,6 +246,16 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         savingsTransactionSheet.setColumnWidth(TransactionConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(TransactionConstants.STATUS_COL, savingsTransactionSheet.getRow(TransactionConstants.STATUS_COL), TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount,errorCount);
+    }
+
+
+    public void addTransactionNote(SavingsAccountTransactionData savingsAccountTransactionData ,String note){
+
+        boolean hasNote = Optional.ofNullable(note).isPresent();        
+        if(!hasNote){
+            note = "Migration Balance";
+        }
+        savingsAccountTransactionData.setNote(note);
     }
 
 }

@@ -6,6 +6,8 @@
 */
 package org.apache.fineract.infrastructure.bulkimport.importhandler.equitygrowth;
 
+import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
+import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
 import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
@@ -27,27 +29,28 @@ public class EquityGrowthImportHandler {
 
     public static void postOpeningBalance(EquityGrowthDividendsRepository equityGrowthDividendsRepository, EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository, List<SavingsAccountTransactionData> savingsAccountTransactionDataList ,SavingsAccountAssembler savingsAccountAssembler , Long savingsProductId){
 
-        int beneficiaries = savingsAccountTransactionDataList.size();
+        //int beneficiaries[] = savingsAccountTransactionDataList.size();
+        int beneficiaries[] = {0};
         Date startDate = TimeHelper.dateNow();
         Date endDate = TimeHelper.dateNow() ;
 
         // Long savingsProductId = savingsAccountTransactionDataList.get(0).getS
-
         // how do we get product id here now ,seems some tricky logic to do but hold on son
         // hard coding this value for now savingsproductid
 
         BigDecimal totalEquity  = savingsAccountTransactionDataList.stream().map(SavingsAccountTransactionData::getEquityBalance).reduce(BigDecimal.ZERO,BigDecimal::add);
 
-        EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries);
-
+        EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries[0]);
         EquityGrowthDividends equityGrowthDividendsFlushed = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
 
+        //reset beneficiaries so that null and double counted excel value dont show
+
         for(SavingsAccountTransactionData savingsAccountTransactionData : savingsAccountTransactionDataList){
+            BigDecimal equityBalance[] = {savingsAccountTransactionData.getEquityBalance()};
 
-            BigDecimal equityBalance = savingsAccountTransactionData.getEquityBalance();
-
-            boolean isZero = ComparatorUtility.isBigDecimalZero(equityBalance);
+            boolean isZero = ComparatorUtility.isBigDecimalZero(equityBalance[0]);
             if(isZero){
+                //this will cancel out zero beneficiaries from being recorded
                 continue;
             }
 
@@ -57,14 +60,26 @@ public class EquityGrowthImportHandler {
 
                 SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e);
 
-                String clientName = savingsAccount.getClient().getDisplayName();
-                Double percentage = EquityGrowthHelper.percentage(equityBalance.doubleValue() ,totalEquity.doubleValue());
+                // added to avoid too many trailing numbers after decimal place for example writing 15.1245678888 instead of just rounding to 15.12
+                MonetaryCurrency monetaryCurrency = savingsAccount.getCurrency();
+                Money money = Money.of(monetaryCurrency ,equityBalance[0]);
 
-                EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,equityBalance ,percentage ,"Equity Migration" ,clientName);
+                equityBalance[0] = money.getAmount();
+
+                String clientName = savingsAccount.getClient().getDisplayName();
+                Double percentage = EquityGrowthHelper.percentage(equityBalance[0].doubleValue() ,totalEquity.doubleValue());
+
+                EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,equityBalance[0] ,percentage ,"Equity Migration" ,clientName);
                 equityGrowthOnSavingsAccount.setEquityGrowthDividends(equityGrowthDividends);
                 equityGrowthOnSavingsAccountRepository.save(equityGrowthOnSavingsAccount);
-
+                ++beneficiaries[0] ;
             });
         }
+
+        // Added 09/12/2021
+        equityGrowthDividends.setBeneficiaries(beneficiaries[0]);
+        equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
+
     }
+
 }

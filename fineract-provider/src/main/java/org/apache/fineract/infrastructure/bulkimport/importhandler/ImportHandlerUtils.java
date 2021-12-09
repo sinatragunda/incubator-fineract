@@ -55,9 +55,6 @@ public class ImportHandlerUtils {
         while(sheet.getRow(noOfEntries+1) !=null){
             noOfEntries++;
         }
-
-        System.err.println("------------------cause for concern here since last column throws null --------------"+noOfEntries);
-
         // while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
         //    noOfEntries++;
         // }
@@ -68,9 +65,6 @@ public class ImportHandlerUtils {
     public static boolean isNotImported(Row row, int statusColumn){
 
         boolean isPresent = Optional.ofNullable(row).isPresent();
-
-        System.err.println("----------------------value is present or not------------"+isPresent);
-
         if(isPresent){            
             if (readAsString(statusColumn,row)!=null) {
                 return !readAsString(statusColumn, row).equals(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);

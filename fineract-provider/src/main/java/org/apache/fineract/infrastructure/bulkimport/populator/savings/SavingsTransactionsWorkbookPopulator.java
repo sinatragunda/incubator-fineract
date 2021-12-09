@@ -212,6 +212,10 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
         worksheet.setColumnWidth(TransactionConstants.RECEIPT_NO_COL, 3000);
         worksheet.setColumnWidth(TransactionConstants.ROUTING_CODE_COL, 3000);
         worksheet.setColumnWidth(TransactionConstants.BANK_NO_COL, 3000);
+
+        // Added 09/12/2021
+        worksheet.setColumnWidth(TransactionConstants.NOTE_COL, 3000);
+        
         worksheet.setColumnWidth(TransactionConstants.LOOKUP_CLIENT_NAME_COL, 5000);
         worksheet.setColumnWidth(TransactionConstants.LOOKUP_ACCOUNT_NO_COL, 3000);
         worksheet.setColumnWidth(TransactionConstants.LOOKUP_PRODUCT_COL, 3000);
@@ -243,6 +247,12 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
 
         // Added 08/10/2021
         writeString(TransactionConstants.EQUITY_BALANCE_ID_COL, rowHeader, "Equity Balance");
+
+
+
+        // Added 09/12/2021
+        writeString(TransactionConstants.NOTE_COL, rowHeader, "Transaction Note");
+
 
     }
 }

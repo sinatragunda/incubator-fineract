@@ -277,11 +277,7 @@ public class SavingsImportHandler implements ImportHandler {
 
                 if (progressLevel == 0) {
                     CommandProcessingResult result = importSavings(i,dateFormat);
-
-                    //System.err.println("---------------savings account import-----------");
-
                     savingsId = result.getSavingsId();;
-
                     progressLevel = 1;
                 } else
 

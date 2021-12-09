@@ -240,6 +240,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     public CommandProcessingResult deposit(final Long savingsId, final JsonCommand command) {
 
         this.context.authenticatedUser();   
+
+        System.err.println("---------------run to validate --------------initia command is --"+command.json());
+
         this.savingsAccountTransactionDataValidator.validate(command);
 
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId);

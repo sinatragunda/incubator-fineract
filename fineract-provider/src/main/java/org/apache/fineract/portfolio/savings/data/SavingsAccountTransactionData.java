@@ -52,7 +52,7 @@ public class SavingsAccountTransactionData {
     private final LocalDate submittedOnDate;
     private final boolean interestedPostedAsOn;
     private final String submittedByUsername;
-    private final String note ;
+    private String note ;
     
     // templates
     final Collection<PaymentTypeData> paymentTypeOptions;
@@ -77,10 +77,14 @@ public class SavingsAccountTransactionData {
     // Added 08/10/2021
     private BigDecimal equityBalance;
 
+
     public static SavingsAccountTransactionData importInstance(BigDecimal transactionAmount,LocalDate transactionDate,
             Long paymentTypeId,String accountNumber, String checkNumber, String routingCode,
             String receiptNumber, String bankNumber,Long savingsAccountId,
             SavingsAccountTransactionEnumData transactionType, Integer rowIndex,String locale,String dateFormat){
+
+        System.err.println("----------------imported paymentTypeId---------------------"+paymentTypeId);
+
         return new SavingsAccountTransactionData(transactionAmount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountId, transactionType, rowIndex,locale,dateFormat);
     }
@@ -263,5 +267,18 @@ public class SavingsAccountTransactionData {
     // Added 08/10/2021
     public BigDecimal getEquityBalance(){
         return this.equityBalance;
+    }
+
+    // Added 09/12/2021
+    public Long getPaymentTypeId(){
+        return this.paymentTypeId;
+    }
+
+    public void setNote(String note){
+        this.note = note ;
+    }
+
+    public String getNote(){
+        return this.note ;
     }
 }

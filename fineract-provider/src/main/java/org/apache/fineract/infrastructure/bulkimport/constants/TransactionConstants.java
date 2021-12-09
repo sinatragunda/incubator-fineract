@@ -47,4 +47,7 @@ public class TransactionConstants {
 
     // Added 08/10/2021
     public static final int EQUITY_BALANCE_ID_COL = 21;
+
+    // Added 09/12/2021
+    public static final int NOTE_COL = 22; 
 }
