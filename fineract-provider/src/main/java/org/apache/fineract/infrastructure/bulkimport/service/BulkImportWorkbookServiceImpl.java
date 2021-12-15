@@ -103,11 +103,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 final String fileType = tika.detect(tikaInputStream);
                 final String fileExtension = Files.getFileExtension(fileDetail.getFileName()).toLowerCase();
                 ImportFormatType format = ImportFormatType.of(fileExtension);
-//
-//                if (!fileType.contains("msoffice")) {
-//                    throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
-//                            "Uploaded file extension is not recognized.");
-//                }
 
                 if(fileType==null){
                     throw new GeneralPlatformDomainRuleException("error.msg.invalid.file.extension",
@@ -116,8 +111,6 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
 
 
                 Workbook workbook = null;
-
-                System.err.println("---------------what is our format here ------------"+format);
 
                 switch (format){
                     case XLSX:
@@ -201,7 +194,15 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                 else if(entity.trim().equalsIgnoreCase(GlobalEntityType.SHARE_ACCOUNTS_TRANSACTIONS.toString())){
                     entityType = GlobalEntityType.SHARE_ACCOUNTS_TRANSACTIONS;
                     primaryColumn = 0;
-                }else{
+                }
+
+                // added 15/12/2021
+                else if(entity.trim().equalsIgnoreCase(GlobalEntityType.SSB_PAYMENTS.toString())){
+                    entityType = GlobalEntityType.SSB_PAYMENTS;
+                    primaryColumn = 0;
+                }
+
+                else{
                     throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
                             "Unable to find requested resource");
                 }

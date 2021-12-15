@@ -53,9 +53,13 @@ public class TemplatePopulateImportConstants {
     public static final String ROLES_SHEET_NAME="Roles";
     public static final String USER_SHEET_NAME="Users";
 
+    // added 15/12/2021
+    public static final String SSB_PAYMENTS_SHEET_NAME = "Ssb Payments";
+
     public final static int ROWHEADER_INDEX=0;
     public final static short ROW_HEADER_HEIGHT =500;
     public final static int FIRST_COLUMN_INDEX=0;
+
 
     //Status column
     public final static String STATUS_CELL_IMPORTED="Imported";

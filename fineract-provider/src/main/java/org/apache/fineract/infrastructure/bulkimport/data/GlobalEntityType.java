@@ -62,7 +62,10 @@ public enum GlobalEntityType {
     CLIENT(36,"client"),
 
     // added 16/10/2021
-    SHARE_ACCOUNTS_TRANSACTIONS(33,"shareaccountstransactions");
+    SHARE_ACCOUNTS_TRANSACTIONS(33,"shareaccountstransactions"),
+
+    // added 15/12/2021
+    SSB_PAYMENTS(34 ,"ssbpayments");
     
 
     private final Integer value;

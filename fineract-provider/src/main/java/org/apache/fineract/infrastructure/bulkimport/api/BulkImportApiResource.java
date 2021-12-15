@@ -35,6 +35,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.data.ImportData;
 import org.apache.fineract.infrastructure.bulkimport.exceptions.ImportTypeNotFoundException;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
@@ -57,15 +58,19 @@ public class BulkImportApiResource {
     private final DefaultToApiJsonSerializer<ImportData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
+    // added 15/12/2021
+    private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
+
     @Autowired
     public BulkImportApiResource(final PlatformSecurityContext context,
                                  final BulkImportWorkbookService bulkImportWorkbookService,
                                  final DefaultToApiJsonSerializer<ImportData> toApiJsonSerializer,
-                                 final ApiRequestParameterHelper apiRequestParameterHelper) {
+                                 final ApiRequestParameterHelper apiRequestParameterHelper ,final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService) {
         this.context = context;
         this.bulkImportWorkbookService = bulkImportWorkbookService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.bulkImportWorkbookPopulatorService = bulkImportWorkbookPopulatorService ;
     }
 
 
@@ -74,6 +79,8 @@ public class BulkImportApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveImportDocuments(@Context final UriInfo uriInfo,
                                           @QueryParam("entityType") final String entityType) {
+
+        System.err.println("----------------------is this for template --------------?");
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
         Collection<ImportData> importData=new ArrayList<>();
@@ -98,7 +105,7 @@ public class BulkImportApiResource {
     @Path("getOutputTemplateLocation")
     public String retriveOutputTemplateLocation(@QueryParam("importDocumentId")final String importDocumentId ){
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
-        final DocumentData documentData =this.bulkImportWorkbookService.getOutputTemplateLocation(importDocumentId);
+        final DocumentData documentData = this.bulkImportWorkbookService.getOutputTemplateLocation(importDocumentId);
         return this.toApiJsonSerializer.serialize(documentData.fileLocation());
     }
 
@@ -107,8 +114,25 @@ public class BulkImportApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getOutputTemplate(@QueryParam("importDocumentId") final String importDocumentId) {
         return bulkImportWorkbookService.getOutputTemplate(importDocumentId);
+
     }
 
+
+    // Added 15/12/2021
+    @GET
+    @Path("downloadtemplate")
+    @Produces("application/vnd.ms-excel")
+    public Response downloadTemplate(@QueryParam("officeId")final Long officeId,
+                                       @QueryParam("staffId")final Long staffId,@QueryParam("entityType")final String entityType ,@QueryParam("dateFormat") final String dateFormat) {
+
+        System.err.println("-----------------download template now ---------------");
+
+        GlobalEntityType type = GlobalEntityType.fromCode(entityType);
+
+        System.err.println("---------------------template is "+type);
+
+        return bulkImportWorkbookPopulatorService.getTemplate(type.toString(),officeId, staffId,dateFormat);
+    }
 
 
 }

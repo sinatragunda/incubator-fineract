@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.bulkimport.populator.recurringdeposit.
 import org.apache.fineract.infrastructure.bulkimport.populator.savings.SavingsTransactionsWorkbookPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.savings.SavingsWorkbookPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.shareaccount.SharedAccountWorkBookPopulator;
+import org.apache.fineract.infrastructure.bulkimport.populator.ssbpayments.SsbPaymentsWorkBookPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.staff.StaffWorkbookPopulator;
 import org.apache.fineract.infrastructure.bulkimport.populator.users.UserWorkbookPopulator;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
@@ -200,7 +201,13 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
 				populator=populateFixedDepositTransactionsWorkbook(officeId);
 			}else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.USERS.toString())){
 				populator=populateUserWorkbook(officeId,staffId);
-			}else {
+			}
+
+			// Added 15/12/2021
+			else if (entityType.trim().equalsIgnoreCase(GlobalEntityType.SSB_PAYMENTS.toString())){
+				populator=populateSsbPaymentsWorkbook(officeId,staffId);
+			}
+			else {
 				throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
 						"Unable to find requested resource");
 			}
@@ -669,5 +676,21 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 		return new FixedDepositTransactionWorkbookPopulator(new OfficeSheetPopulator(offices), new ClientSheetPopulator(clients, offices),
 				new ExtrasSheetPopulator(funds, paymentTypes, currencies),savingsAccounts);
 	}
+
+
+	// Added 15/12/2021 
+
+	private WorkbookPopulator populateSsbPaymentsWorkbook(Long officeId, Long staffId) {
+		this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
+
+		// this to be put later on so that l dont confuse myself with too much technicalities
+		//this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.SSB_PAYMENTS);
+		
+		List<OfficeData> offices = fetchOffices(officeId);	
+		List<ClientData> clients = fetchClients(officeId);
+		
+		return new SsbPaymentsWorkBookPopulator(new ClientSheetPopulator(clients, offices));
+	}
+
 
 }
