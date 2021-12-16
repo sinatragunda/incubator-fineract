@@ -662,6 +662,7 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 	}
 
 	private WorkbookPopulator populateFixedDepositTransactionsWorkbook(Long officeId) {
+
 		this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.OFFICE_ENTITY_TYPE);
 		this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
 		this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.FUNDS_ENTITY_TYPE);
@@ -684,7 +685,7 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 		this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.CLIENT_ENTITY_TYPE);
 
 		// this to be put later on so that l dont confuse myself with too much technicalities
-		//this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.SSB_PAYMENTS);
+		// this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.SSB_PAYMENTS);
 		
 		List<OfficeData> offices = fetchOffices(officeId);	
 		List<ClientData> clients = fetchClients(officeId);
