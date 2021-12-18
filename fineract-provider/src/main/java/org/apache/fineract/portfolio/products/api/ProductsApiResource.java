@@ -41,8 +41,11 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.products.constants.ProductsApiConstants;
 import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.exception.ResourceNotFoundException;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
+import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -60,15 +63,19 @@ public class ProductsApiResource {
     private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
+    // Added 18/12/2021 ,testing if repository works in non service injectors
+    private final ProductWritePlatformService productWritePlatformService;
+
     @Autowired
     public ProductsApiResource(final ApplicationContext applicationContext, final ApiRequestParameterHelper apiRequestParameterHelper,
             final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer, final PlatformSecurityContext platformSecurityContext,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final ProductWritePlatformService productWritePlatformService) {
         this.applicationContext = applicationContext;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.platformSecurityContext = platformSecurityContext;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.productWritePlatformService = productWritePlatformService;
     }
 
     @GET
@@ -110,6 +117,9 @@ public class ProductsApiResource {
     public String retrieveAllProducts(@PathParam("type") final String productType, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
             @Context final UriInfo uriInfo) {
         try {
+
+            System.err.println("--------------------when is this called though ?");
+
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
             Page<ProductData> data = service.retrieveAllProducts(offset, limit);
@@ -154,5 +164,22 @@ public class ProductsApiResource {
                 .withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+
+    // Added 18/12/2021
+    // Enable-Disable loan products
+    @POST
+    @Path("{productId}/disable")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String disableEnableProduct(@PathParam("type") final String productType, @PathParam("productId") final Long productId) {
+        this.platformSecurityContext.authenticatedUser();
+
+        Product product = this.productWritePlatformService.disableEnableProduct(productType ,productId);
+
+        return null ;
+        //final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        //return this.toApiJsonSerializer.serialize(result);
     }
 }

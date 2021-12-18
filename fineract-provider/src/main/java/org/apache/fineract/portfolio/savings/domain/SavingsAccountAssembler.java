@@ -331,13 +331,7 @@ public class SavingsAccountAssembler {
             accountType = AccountType.JLG;
         }
         final SavingsProduct product = this.savingProductRepository.findOne(productId) ;
-
-        System.err.println("--------------------lets assemble product now for charges--------------");
-
         final Set<SavingsAccountCharge> charges = this.savingsAccountChargeAssembler.fromSavingsProduct(product);
-
-        System.err.println("-------------------charges function passed now with size -----------"+charges.size());
-        
         final SavingsAccount account = SavingsAccount.createNewApplicationForSubmittal(client, group, product, null, null, null,
                 accountType, appliedonDate, appliedBy, product.nominalAnnualInterestRate(), product.interestCompoundingPeriodType(),
                 product.interestPostingPeriodType(), product.interestCalculationType(), product.interestCalculationDaysInYearType(),
@@ -345,10 +339,9 @@ public class SavingsAccountAssembler {
                 product.isWithdrawalFeeApplicableForTransfer(), charges, product.isAllowOverdraft(), product.overdraftLimit(),
                 product.isMinRequiredBalanceEnforced(), product.minRequiredBalance(), product.nominalAnnualInterestRateOverdraft(),
                 product.minOverdraftForInterestCalculation(), product.withHoldTax());
+        
         account.setHelpers(this.savingsAccountTransactionSummaryWrapper, this.savingsHelper);
-
         account.validateNewApplicationState(DateUtils.getLocalDateOfTenant(), SAVINGS_ACCOUNT_RESOURCE_NAME);
-
         account.validateAccountValuesWithProduct();
 
         return account;

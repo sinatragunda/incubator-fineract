@@ -510,17 +510,11 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
     @Override
     public CommandProcessingResult createActiveApplication(final SavingsAccountDataDTO savingsAccountDataDTO) {
 
-        System.err.println("-------------------------------------createActiveApplication son --------------------"+savingsAccountDataDTO);
-
-        final CommandWrapper commandWrapper = new CommandWrapperBuilder().savingsAccountActivation(null).build();
-       
+        final CommandWrapper commandWrapper = new CommandWrapperBuilder().savingsAccountActivation(null).build();       
         boolean rollbackTransaction = this.commandProcessingService.validateCommand(commandWrapper, savingsAccountDataDTO.getAppliedBy());
-
         SavingsAccount account = null ;
         
         try{
-            System.err.println("-----------------error is in assemble from --------------");
-
             account = this.savingAccountAssembler.assembleFrom(savingsAccountDataDTO.getClient(),
                 savingsAccountDataDTO.getGroup(), savingsAccountDataDTO.getSavingsProduct(), savingsAccountDataDTO.getApplicationDate(),
                 savingsAccountDataDTO.getAppliedBy());
@@ -528,11 +522,6 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
         catch(NullPointerException n){
             //n.printStackTrace();
         }
-
-        System.err.println("---------------------------savings product is ---------------"+savingsAccountDataDTO.getSavingsProduct());
-
-        System.err.println("-----------------------whats this date thing ---------------"+savingsAccountDataDTO.getApplicationDate().toDate());
-
     
         account.approveAndActivateApplication(savingsAccountDataDTO.getApplicationDate().toDate(), savingsAccountDataDTO.getAppliedBy());
         

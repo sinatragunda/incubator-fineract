@@ -31,6 +31,9 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
+import org.apache.fineract.portfolio.products.helper.ProductHelper;
+import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
@@ -50,18 +53,24 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     private final SavingProductLookupMapper savingsProductLookupsRowMapper = new SavingProductLookupMapper();
     private final FineractEntityAccessUtil fineractEntityAccessUtil;
 
+    // Added 18/12/2021
+    private final ProductWritePlatformService productWritePlatformService;
+
     @Autowired
     public SavingsProductReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource,
-            final FineractEntityAccessUtil fineractEntityAccessUtil) {
+            final FineractEntityAccessUtil fineractEntityAccessUtil ,final ProductWritePlatformService productWritePlatformService) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
+        this.productWritePlatformService = productWritePlatformService;
     }
 
     @Override
     public Collection<SavingsProductData> retrieveAll() {
 
         this.context.authenticatedUser();
+
+        System.err.println("---------------------retrieve all ,lets create entries from this ");
 
         String sql = "select " + this.savingsProductRowMapper.schema() + "where sp.deposit_type_enum = ?";
 
@@ -73,7 +82,16 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             sql += " and sp.id in ( " + inClause + " ) ";
         }
 
-        return this.jdbcTemplate.query(sql, this.savingsProductRowMapper, new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+        Collection<SavingsProductData> savingsProductDataCollection = this.jdbcTemplate.query(sql, this.savingsProductRowMapper, new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+
+        // Added 18/12/2021 execute it here
+        savingsProductDataCollection.stream().forEach(e->{
+            System.err.println("--------------------------item id is -----------------------"+e.getId());
+            ProductHelper.createProduct(productWritePlatformService , PRODUCT_TYPE.SAVINGS ,e.getId());
+        });
+
+        return savingsProductDataCollection ;
+
     }
 
     @Override
