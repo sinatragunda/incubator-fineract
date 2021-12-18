@@ -50,6 +50,7 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.address.service.AddressWritePlatformService;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.data.ClientDataValidator;
 import org.apache.fineract.portfolio.client.domain.AccountNumberGenerator;
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -335,8 +336,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             // added 25/09/2021 Option to create self service user automatically .Random password and sending details to their email account 
             final Boolean isCreateSelfServiceUser = command.booleanObjectValueOfParameterNamed(ClientApiConstants.createSelfServiceUserParam);
-            
-            
+
             final Integer legalFormParamValue = command.integerValueOfParameterNamed(ClientApiConstants.legalFormIdParamName);
             boolean isEntity = false;
             Integer legalFormValue = null;
@@ -363,7 +363,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
 
 
-            // Added 25/09/202
+            // Added 25/09/2021
+            System.err.println("--------------create self service user now-------------"+isCreateSelfServiceUser);
             createSelfServiceUser(newClient ,isCreateSelfServiceUser);
 			
             this.clientRepository.save(newClient);
@@ -670,17 +671,27 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     }
 
     private CommandProcessingResult openSavingsAccount(final Client client, final DateTimeFormatter fmt) {
+
         CommandProcessingResult commandProcessingResult = CommandProcessingResult.empty();
+
         if (client.isActive() && client.savingsProductId() != null) {
+
             SavingsAccountDataDTO savingsAccountDataDTO = new SavingsAccountDataDTO(client, null, client.savingsProductId(),
                     client.getActivationLocalDate(), client.activatedBy(), fmt);
+
+            System.err.println("----------------savingsdto -----------------"+savingsAccountDataDTO);
+
             commandProcessingResult = this.savingsApplicationProcessWritePlatformService.createActiveApplication(savingsAccountDataDTO);
+
             if (commandProcessingResult.getSavingsId() != null) {
                 this.savingsRepositoryWrapper.findOneWithNotFoundDetection(commandProcessingResult.getSavingsId());
                 client.updateSavingsAccount(commandProcessingResult.getSavingsId());
                 client.updateSavingsProduct(null);
             }
         }
+
+        System.err.println("-----------------------we out of this function now------------------------");
+
         return commandProcessingResult;
     }
 
@@ -742,16 +753,21 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         return commandProcessingResult;
     }
 
-    // added 25/09/2021 
+    // added 25/09/2021
+    // modified 12/17/2021
     private void createSelfServiceUser(final Client client,final Boolean isCreateSelfServiceUser) {
-        
-        if(isCreateSelfServiceUser){
-            // still other steps can be removed here as well
-            if (client.isActive()){
-                selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
-            }
-        }
 
+        Optional.ofNullable(isCreateSelfServiceUser).ifPresent(e->{
+
+            System.err.println("--------------------value is present create account now -----------");
+
+            if(isCreateSelfServiceUser){
+                // still other steps can be removed here as well
+                if (client.isActive()){
+                    selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
+                }
+            }
+        });
     }
 
 
@@ -1102,5 +1118,17 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         Map<BUSINESS_ENTITY, Object> map = new HashMap<>(1);
         map.put(entityEvent, entity);
         return map;
+    }
+
+
+    // Added 16/12/2021
+    @Override
+    public CommandProcessingResult openSavingsAccountEx(Client client , DateTimeFormatter dt , Long savingsProductId){
+
+        System.err.println("-------------------------------create new account for client with product id ------------"+savingsProductId);
+        client.updateSavingsProduct(savingsProductId);
+        client.updateSavingsAccount(null);
+        return openSavingsAccount(client,dt);
+
     }
 }

@@ -66,4 +66,16 @@ public class SavingsAccountDataDTO {
     public DateTimeFormatter getFmt() {
         return this.fmt;
     }
+
+    @Override
+    public String toString() {
+        return "SavingsAccountDataDTO{" +
+                "client=" + client +
+                ", group=" + group +
+                ", savingsProductId=" + savingsProductId +
+                ", applicationDate=" + applicationDate +
+                ", appliedBy=" + appliedBy +
+                ", fmt=" + fmt +
+                '}';
+    }
 }

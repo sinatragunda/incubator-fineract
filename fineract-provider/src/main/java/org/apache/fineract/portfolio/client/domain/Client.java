@@ -54,6 +54,7 @@ import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerat
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
@@ -191,7 +192,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Temporal(TemporalType.DATE)
     private Date submittedOnDate;
 
-    @ManyToOne(optional = true, fetch=FetchType.LAZY)
+    @ManyToOne(optional = true, fetch=FetchType.EAGER)
     @JoinColumn(name = "submittedon_userid", nullable = true)
     private AppUser submittedBy;
 
@@ -199,11 +200,11 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Temporal(TemporalType.DATE)
     private Date updatedOnDate;
 
-    @ManyToOne(optional = true, fetch=FetchType.LAZY)
+    @ManyToOne(optional = true, fetch=FetchType.EAGER)
     @JoinColumn(name = "updated_by", nullable = true)
     private AppUser updatedBy;
 
-    @ManyToOne(optional = true, fetch=FetchType.LAZY)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "activatedon_userid", nullable = true)
     private AppUser activatedBy;
 
@@ -1099,5 +1100,58 @@ public final class Client extends AbstractPersistableCustom<Long> {
     // Added 27/09/2021
     public String getAccountNumber(){
         return this.accountNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "accountNumber='" + accountNumber + '\'' +
+                ", office=" + office +
+                ", transferToOffice=" + transferToOffice +
+                ", image=" + image +
+                ", status=" + status +
+                ", subStatus=" + subStatus +
+                ", activationDate=" + activationDate +
+                ", officeJoiningDate=" + officeJoiningDate +
+                ", firstname='" + firstname + '\'' +
+                ", middlename='" + middlename + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", mobileNo='" + mobileNo + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", isStaff=" + isStaff +
+                ", externalId='" + externalId + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", gender=" + gender +
+                ", staff=" + staff +
+                ", groups=" + groups +
+                ", accountNumberRequiresAutoGeneration=" + accountNumberRequiresAutoGeneration +
+                ", closureReason=" + closureReason +
+                ", closureDate=" + closureDate +
+                ", rejectionReason=" + rejectionReason +
+                ", rejectionDate=" + rejectionDate +
+                ", rejectedBy=" + rejectedBy +
+                ", withdrawalReason=" + withdrawalReason +
+                ", withdrawalDate=" + withdrawalDate +
+                ", withdrawnBy=" + withdrawnBy +
+                ", reactivateDate=" + reactivateDate +
+                ", reactivatedBy=" + reactivatedBy +
+                ", closedBy=" + closedBy +
+                ", submittedOnDate=" + submittedOnDate +
+                ", submittedBy=" + submittedBy +
+                ", updatedOnDate=" + updatedOnDate +
+                ", updatedBy=" + updatedBy +
+                ", activatedBy=" + activatedBy +
+                ", savingsProductId=" + savingsProductId +
+                ", savingsAccountId=" + savingsAccountId +
+                ", clientType=" + clientType +
+                ", clientClassification=" + clientClassification +
+                ", legalForm=" + legalForm +
+                ", reopenedDate=" + reopenedDate +
+                ", reopenedBy=" + reopenedBy +
+                ", shareAccountId=" + shareAccountId +
+                ", shareProductId=" + shareProductId +
+                '}';
     }
 }

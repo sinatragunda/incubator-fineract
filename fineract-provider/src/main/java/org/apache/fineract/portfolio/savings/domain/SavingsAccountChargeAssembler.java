@@ -30,11 +30,7 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.feeOnMon
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.idParamName;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -143,26 +139,41 @@ public class SavingsAccountChargeAssembler {
 
     public Set<SavingsAccountCharge> fromSavingsProduct(final SavingsProduct savingsProduct) {
 
-        final Set<SavingsAccountCharge> savingsAccountCharges = new HashSet<>();
-        Set<Charge> productCharges = savingsProduct.charges();
-        for (Charge charge : productCharges) {
-            ChargeTimeType chargeTime = null;
-            if (charge.getChargeTimeType() != null) {
-                chargeTime = ChargeTimeType.fromInt(charge.getChargeTimeType());
-            }
-            if (chargeTime != null && chargeTime.isOnSpecifiedDueDate()) {
-                continue;
-            }
+        System.err.println("------------------how do we get here ? savingsproduct not null ?------------------"+Optional.ofNullable(savingsProduct).isPresent());
 
-            ChargeCalculationType chargeCalculation = null;
-            if (charge.getChargeCalculation() != null) {
-                chargeCalculation = ChargeCalculationType.fromInt(charge.getChargeCalculation());
+        final Set<SavingsAccountCharge> savingsAccountCharges = new HashSet<>();
+        
+        boolean chargesPresent = Optional.ofNullable(savingsProduct.charges()).isPresent();
+
+        System.err.println("------------------------------are charges present son ? ----------------"+chargesPresent);
+
+        if(chargesPresent){
+
+            Set<Charge> productCharges = savingsProduct.charges();
+
+            System.err.println("----------------do we have produc charges is null ?,how come---------------"+productCharges.size());
+
+            for (Charge charge : productCharges) {
+                ChargeTimeType chargeTime = null;
+                if (charge.getChargeTimeType() != null) {
+                    chargeTime = ChargeTimeType.fromInt(charge.getChargeTimeType());
+                }
+                if (chargeTime != null && chargeTime.isOnSpecifiedDueDate()) {
+                    continue;
+                }
+
+                ChargeCalculationType chargeCalculation = null;
+                if (charge.getChargeCalculation() != null) {
+                    chargeCalculation = ChargeCalculationType.fromInt(charge.getChargeCalculation());
+                }
+                final boolean status = true;
+                final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(charge,
+                        charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(), charge.feeInterval());
+                savingsAccountCharges.add(savingsAccountCharge);
             }
-            final boolean status = true;
-            final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(charge,
-                    charge.getAmount(), chargeTime, chargeCalculation, null, status, charge.getFeeOnMonthDay(), charge.feeInterval());
-            savingsAccountCharges.add(savingsAccountCharge);
         }
+        System.err.println("--------------------return charges that are present-------------");
+        
         return savingsAccountCharges;
     }
 

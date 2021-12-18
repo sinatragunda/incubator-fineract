@@ -247,11 +247,11 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
         try {
             final String sql = "select " + this.savingAccountMapper.schema() + " where sa.product_id = ?";
-
             return this.jdbcTemplate.query(sql, this.savingAccountMapper, new Object[] { productId });
         } catch (final EmptyResultDataAccessException e) {
             throw new SavingsProductNotFoundException(productId);
         }
+
     }
 
     private static final class SavingsAccountMonthlyDepositMapper implements RowMapper<SavingsAccountMonthlyDeposit> {
@@ -1356,5 +1356,18 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         String smdSql = savingsAccountMonthlyDepositMapper.schema();
         List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = jdbcTemplateStatic.query(smdSql,savingsAccountMonthlyDepositMapper);
         return savingsAccountMonthlyDepositList;
+    }
+
+
+    // Added 16/12/2021
+    public List<SavingsAccountData> retrieveAllForClientUnderPortfolio(Long clientId ,Long savingsProductId){
+
+        try {
+            final String sql = "select " + this.savingAccountMapper.schema() + " where sa.product_id = ? and sa.client_id = ?";
+            return this.jdbcTemplate.query(sql, this.savingAccountMapper, new Object[] { clientId ,savingsProductId });
+        } catch (final EmptyResultDataAccessException e) {
+            throw new SavingsProductNotFoundException(savingsProductId);
+        }
+
     }
 }

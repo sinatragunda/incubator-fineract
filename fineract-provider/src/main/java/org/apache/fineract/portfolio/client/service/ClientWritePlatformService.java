@@ -21,6 +21,13 @@ package org.apache.fineract.portfolio.client.service;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 
+
+import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+
 public interface ClientWritePlatformService {
 
     CommandProcessingResult createClient(JsonCommand command);
@@ -49,5 +56,8 @@ public interface ClientWritePlatformService {
 	
 	CommandProcessingResult undoWithdrawal(Long entityId, JsonCommand command);
 
+
+	// Added 16/12/2021
+    CommandProcessingResult openSavingsAccountEx(Client client , DateTimeFormatter dateTimeFormatter ,Long savingsProductId);
 
 }

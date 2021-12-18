@@ -58,10 +58,14 @@ public interface SavingsAccountReadPlatformService {
     List<Long> retrieveSavingsIdsPendingDormant(LocalDate tenantLocalDate);
 
     List<Long> retrieveSavingsIdsPendingEscheat(LocalDate tenantLocalDate);
+
     boolean isAccountBelongsToClient(final Long clientId, final Long accountId, final DepositAccountType depositAccountType, final String currencyCode) ;
 
 
 
     // added 21/07/2021
     List<SavingsAccountData> retrieveAllForPortfolio(Long savingsProductId);
+
+    // Added 16/12/2021
+    List<SavingsAccountData> retrieveAllForClientUnderPortfolio(Long clientId ,Long savingsProductId);
 }

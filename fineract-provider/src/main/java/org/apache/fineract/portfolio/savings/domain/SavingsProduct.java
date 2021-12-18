@@ -693,7 +693,8 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
     }
 
     public Set<Charge> charges() {
-        return this.charges;
+        System.err.println("--------------now way to catch error from here ?");
+        return new HashSet<>(this.charges);
     }
 
     public InterestRateChart applicableChart(@SuppressWarnings("unused") final LocalDate target) {

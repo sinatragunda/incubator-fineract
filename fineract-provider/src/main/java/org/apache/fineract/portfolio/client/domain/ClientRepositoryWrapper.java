@@ -47,22 +47,25 @@ public class ClientRepositoryWrapper {
     }
 
     public Client findOneWithNotFoundDetection(final Long id) {
-       return this.findOneWithNotFoundDetection(id, false) ;
+        return this.findOneWithNotFoundDetection(id, false);
     }
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public Client findOneWithNotFoundDetection(final Long clientId, final boolean loadLazyCollections) {
         final Client client = this.repository.findOne(clientId);
-        if (client == null) { throw new ClientNotFoundException(clientId); }
-        if(loadLazyCollections) {
+        if (client == null) {
+            throw new ClientNotFoundException(clientId);
+        }
+        if (loadLazyCollections) {
             client.loadLazyCollections();
         }
         return client;
     }
-    
+
     public List<Client> findAll(final Collection<Long> clientIds) {
-        return this.repository.findAll(clientIds) ;   
+        return this.repository.findAll(clientIds);
     }
+
     public void save(final Client client) {
         this.repository.save(client);
     }
@@ -74,23 +77,35 @@ public class ClientRepositoryWrapper {
     public void delete(final Client client) {
         this.repository.delete(client);
     }
-    
+
     public void flush() {
         this.repository.flush();
     }
 
     public Client getActiveClientInUserScope(Long clientId) {
         final Client client = this.findOneWithNotFoundDetection(clientId);
-        if (client.isNotActive()) { throw new ClientNotActiveException(client.getId()); }
+        if (client.isNotActive()) {
+            throw new ClientNotActiveException(client.getId());
+        }
         this.context.validateAccessRights(client.getOffice().getHierarchy());
         return client;
     }
-    
-    public Client getClientByAccountNumber(String accountNumber){
+
+    public Client getClientByAccountNumber(String accountNumber) {
         Client client = this.repository.getClientByAccountNumber(accountNumber);
-        if(client==null){
-            throw  new ClientNotFoundException(accountNumber);
+        if (client == null) {
+            throw new ClientNotFoundException(accountNumber);
         }
         return client;
+    }
+
+    // Added 16/12/2021
+    public List<Client> findAll() {
+        return this.repository.findAll();
+    }
+
+    public List<Client> findAllByOfficeId(Long officeId) {
+        return this.repository.getClientsByOfficeId(officeId);
+
     }
 }

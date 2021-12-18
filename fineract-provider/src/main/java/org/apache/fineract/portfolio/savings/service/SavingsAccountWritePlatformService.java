@@ -24,6 +24,8 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.joda.time.LocalDate;
@@ -104,4 +106,8 @@ public interface SavingsAccountWritePlatformService {
     CommandProcessingResult unblockDebits(Long savingsId);
 
     CommandProcessingResult releaseAmount(Long savingsId, Long transactionId);
+
+
+    // Added 16/12/2021
+    CommandProcessingResult autoCreateBulkAccounts(SavingsAccountReadPlatformService savingsAccountReadPlatformService ,ClientWritePlatformService clientWritePlatformService, DateTimeFormatter dateTimeFormatter , Long savingsProductId , Long officeId);
 }

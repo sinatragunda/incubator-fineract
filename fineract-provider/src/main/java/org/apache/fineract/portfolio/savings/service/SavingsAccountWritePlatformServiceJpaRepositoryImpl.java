@@ -54,8 +54,12 @@ import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatfor
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
@@ -75,6 +79,7 @@ import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDataV
 import org.apache.fineract.portfolio.savings.domain.*;
 import org.apache.fineract.portfolio.savings.exception.*;
 import org.apache.fineract.portfolio.savings.exception.PostInterestAsOnDateException.PostInterestAsOnException_TYPE;
+import org.apache.fineract.portfolio.savings.helper.SavingsAccountHelper;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepositoryWrapper;
 import org.joda.time.LocalDate;
@@ -119,6 +124,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     private final StandingInstructionRepository standingInstructionRepository;
     private final BusinessEventNotifierService businessEventNotifierService;
 
+    // added 16/12/2021
+    //private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
+    //private final ClientWritePlatformService clientWritePlatformService;
+    //private final ClientReadPlatformService clientReadPlatformService ;
+    private final ClientRepositoryWrapper clientRepositoryWrapper;
+
+
     @Autowired
     public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final SavingsAccountRepositoryWrapper savingAccountRepositoryWrapper,
@@ -139,7 +151,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository,
-            final BusinessEventNotifierService businessEventNotifierService) {
+            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -165,6 +177,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         this.appuserRepository = appuserRepository;
         this.standingInstructionRepository = standingInstructionRepository;
         this.businessEventNotifierService = businessEventNotifierService;
+
+        // added 16/12/2021
+        //this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
+        //this.clientReadPlatformService = clientReadPlatformService ;
+        //this.clientWritePlatformService = clientWritePlatformService ;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
+
     }
 
     @Transactional
@@ -241,8 +260,6 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         this.context.authenticatedUser();   
 
-        System.err.println("---------------run to validate --------------initia command is --"+command.json());
-
         this.savingsAccountTransactionDataValidator.validate(command);
 
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId);
@@ -256,7 +273,6 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         boolean isZero = ComparatorUtility.isBigDecimalZero(transactionAmount);
 
         if(isZero){
-            System.err.println("--------------------------value equal to zero ----------");
             return null ;
         }
 
@@ -486,6 +502,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (account.isNotActive()) {
             throwValidationForActiveStatus(SavingsApiConstants.undoTransactionAction);
         }
+
         account.undoTransaction(transactionId);
 
         // undoing transaction is withdrawal then undo withdrawal fee
@@ -517,6 +534,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         account.activateAccountBasedOnBalance();
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+        
+        System.err.println("---------------------------do we come here -------------------538 ----"+savingsId);
+
         return new CommandProcessingResultBuilder() //
                 .withEntityId(savingsId) //
                 .withOfficeId(account.officeId()) //
@@ -1509,5 +1529,11 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
         return new CommandProcessingResultBuilder().withEntityId(savingsId).withOfficeId(account.officeId())
                 .withClientId(account.clientId()).withGroupId(account.groupId()).withSavingsId(savingsId).with(changes).build();
+    }
+
+    @Override
+    public CommandProcessingResult autoCreateBulkAccounts(final SavingsAccountReadPlatformService savingsAccountReadPlatformService, final ClientWritePlatformService clientWritePlatformService, final DateTimeFormatter dateTimeFormatter ,Long savingsProductId ,Long officeId){
+
+        return SavingsAccountHelper.openSavingsAccount(savingsAccountReadPlatformService,clientWritePlatformService ,clientRepositoryWrapper , dateTimeFormatter ,savingsProductId ,officeId) ;
     }
 }

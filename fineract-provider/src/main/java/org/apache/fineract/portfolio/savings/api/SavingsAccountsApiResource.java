@@ -21,6 +21,7 @@ package org.apache.fineract.portfolio.savings.api;
 import java.io.InputStream;
 import java.util.*;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -54,6 +55,7 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
@@ -64,10 +66,17 @@ import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+
+// Added 16/12/2021
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 
 @Path("/savingsaccounts")
 @Component
@@ -84,6 +93,10 @@ public class SavingsAccountsApiResource {
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
     private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ;
 
+    // Added 16/12/2021
+    private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
+    private final ClientWritePlatformService clientWritePlatformService;
+
     @Autowired
     public SavingsAccountsApiResource(final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
             final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer,
@@ -92,7 +105,7 @@ public class SavingsAccountsApiResource {
             final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
             final BulkImportWorkbookService bulkImportWorkbookService,
             final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService ,
-                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository) {
+                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final ClientWritePlatformService clientWritePlatformService) {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -102,6 +115,10 @@ public class SavingsAccountsApiResource {
         this.bulkImportWorkbookService=bulkImportWorkbookService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
         this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
+
+        // added 16/12/2021
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService ;
+        this.clientWritePlatformService = clientWritePlatformService;
     }
 
     @GET
@@ -386,5 +403,26 @@ public class SavingsAccountsApiResource {
         final Long importDocumentId = this. bulkImportWorkbookService.importWorkbook(GlobalEntityType.SAVINGS_TRANSACTIONS.toString(), uploadedInputStream,
                 fileDetail,locale,dateFormat);
         return this.toApiJsonSerializer.serialize(importDocumentId);
+    }
+
+    // Added 16/12/2021
+    // Auto create savings account for all clients ..Belonging to specific savings product
+
+    @POST
+    @Path("/autocreate")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String autoCreateBulkAccounts(@QueryParam("savingsProductId") Long savingsProductId,@QueryParam("officeId") Long officeId) {
+
+        DateTimeFormatter dateTimeFormatter = null ;
+
+        boolean hasFormat = Optional.ofNullable(dateTimeFormatter).isPresent();
+        if(!hasFormat){
+            System.err.println("------------------create new formatter-----------------");
+            dateTimeFormatter = DateTimeFormat.forPattern("dd MM yyyy");
+        }
+
+        CommandProcessingResult commandProcessingResult = savingsAccountWritePlatformService.autoCreateBulkAccounts(savingsAccountReadPlatformService , clientWritePlatformService ,dateTimeFormatter ,savingsProductId ,officeId);
+        return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }
 }
