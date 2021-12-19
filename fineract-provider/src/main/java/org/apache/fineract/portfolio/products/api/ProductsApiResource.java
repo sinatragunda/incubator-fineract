@@ -45,12 +45,15 @@ import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.exception.ResourceNotFoundException;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
+import org.apache.fineract.wese.helper.JsonHelper;
 import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Path("/products/{type}")
 @Component
@@ -174,12 +177,12 @@ public class ProductsApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String disableEnableProduct(@PathParam("type") final String productType, @PathParam("productId") final Long productId) {
-        this.platformSecurityContext.authenticatedUser();
 
+        this.platformSecurityContext.authenticatedUser();
         Product product = this.productWritePlatformService.disableEnableProduct(productType ,productId);
 
-        return null ;
-        //final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-        //return this.toApiJsonSerializer.serialize(result);
+        // Added 19/12/2021
+        String response = JsonHelper.serializeResponse(product);
+        return response ;
     }
 }

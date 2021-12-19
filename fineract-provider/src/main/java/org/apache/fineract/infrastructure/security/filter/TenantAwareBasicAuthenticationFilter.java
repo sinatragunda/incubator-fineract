@@ -197,6 +197,10 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 		boolean notAllowed = ((isSelfServiceRequest[0] && !user.isSelfServiceUser())
 				||(!isSelfServiceRequest[0]));
 
+
+		// Added 19/12/2021
+		// handle all request regarding any of the financial services ,if its disabled then stop transaction or residerent it
+
 		
 		if(notAllowed){
 

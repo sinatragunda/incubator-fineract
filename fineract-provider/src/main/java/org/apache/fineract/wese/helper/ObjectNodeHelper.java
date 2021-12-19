@@ -30,4 +30,19 @@ public class ObjectNodeHelper{
 	    return objectNode().put("status",status);
     }
 
+
+    // Added 19/12/2021
+    public static ObjectNode objectNodeFromString(String arg){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try{
+            return (ObjectNode) objectMapper.readTree(arg);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null ;
+    }
+
+
 }

@@ -6,6 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.Optional;
+
+
+// Added 19/12/2021
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 public class JsonHelper {
 
@@ -51,6 +57,20 @@ public class JsonHelper {
             e.printStackTrace();
         }
         return t ;
+    }
+
+    public static <T> String serializeResponse(T object){
+
+        ObjectNode objectNode[] = {ObjectNodeHelper.statusNode(false)};
+
+        Optional.ofNullable(object).ifPresent(e->{
+            String json = objectToJson(object);
+            objectNode[0] = ObjectNodeHelper.objectNodeFromString(json);
+            objectNode[0].put("status",true);
+        });
+
+        return objectNode[0].toString();
+
     }
 
 }
