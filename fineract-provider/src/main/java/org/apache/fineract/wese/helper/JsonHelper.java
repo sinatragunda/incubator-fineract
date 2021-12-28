@@ -59,9 +59,9 @@ public class JsonHelper {
         return t ;
     }
 
-    public static <T> String serializeResponse(T object){
+    public static <T> String serializeResponse(T object ,String message){
 
-        ObjectNode objectNode[] = {ObjectNodeHelper.statusNode(false)};
+        ObjectNode objectNode[] = {ObjectNodeHelper.statusNode(false).put("message",new String(message))};
 
         Optional.ofNullable(object).ifPresent(e->{
             String json = objectToJson(object);

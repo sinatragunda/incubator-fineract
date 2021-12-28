@@ -182,7 +182,21 @@ public class ProductsApiResource {
         Product product = this.productWritePlatformService.disableEnableProduct(productType ,productId);
 
         // Added 19/12/2021
-        String response = JsonHelper.serializeResponse(product);
+        String response = JsonHelper.serializeResponse(product ,"Failed to change active status");
+        return response ;
+    }
+
+    @GET
+    @Path("{productId}/error")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String errorProductDisabled(@PathParam("type") final String productType, @PathParam("productId") final Long productId) {
+
+        this.platformSecurityContext.authenticatedUser();
+
+        String message = "Product has been disabled hence not possible to transact";
+        // Added 19/12/2021
+        String response = JsonHelper.serializeResponse(null ,message);
         return response ;
     }
 }

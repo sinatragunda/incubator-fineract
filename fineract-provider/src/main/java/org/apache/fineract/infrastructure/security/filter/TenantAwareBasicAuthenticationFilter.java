@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentiferException;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
 import org.apache.fineract.notification.service.NotificationReadPlatformService;
+import org.apache.fineract.portfolio.products.helper.ProductHelper;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +201,9 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
 		// Added 19/12/2021
 		// handle all request regarding any of the financial services ,if its disabled then stop transaction or residerent it
-
+        // No way to add interceptor other than this thats why
+        // Should it return anything ,if product is disabled just throw an error from there
+        ProductHelper.handleRequest(request ,response);
 		
 		if(notAllowed){
 
