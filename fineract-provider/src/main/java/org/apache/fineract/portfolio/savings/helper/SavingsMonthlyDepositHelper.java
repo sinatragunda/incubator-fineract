@@ -10,6 +10,11 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDeposit;
 
+
+// Added 28/12/2021
+import org.joda.time.LocalDate;
+
+
 public class SavingsMonthlyDepositHelper{
 
 	//// monthly duration thing here 
@@ -37,10 +42,12 @@ public class SavingsMonthlyDepositHelper{
 		return amount ;
 	}
 
-	public static void handleDepositOrWithdraw(SavingsAccountMonthlyDepositRepository repository ,SavingsAccount savingsAccount ,BigDecimal amount ,boolean isDeposit){
+	public static void handleDepositOrWithdraw(SavingsAccountMonthlyDepositRepository repository ,SavingsAccount savingsAccount ,BigDecimal amount ,LocalDate transactionDate ,boolean isDeposit){
 
 		Long id = savingsAccount.getId();
-		Date startDate = TimeHelper.startDate();
+
+		// modified 28/12/2021
+		Date startDate = TimeHelper.startDate(transactionDate.getTime());
 
 		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
 		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);

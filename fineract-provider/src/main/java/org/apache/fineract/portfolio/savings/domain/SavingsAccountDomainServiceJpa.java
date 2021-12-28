@@ -133,7 +133,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         /// added 26/07/2021
         /// here we add new value to save this transaction to monthly withdrawals 
-        SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,false);
+        SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,false);
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, transactionBooleanValues.isAccountTransfer());
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
@@ -219,8 +219,10 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         /// added 20/07/2021
         /// here we add new value to save this transaction to monthly deposit
-        
-        SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,true);
+        /// modified 28/12/2021 error with start dates ,backdated transactions adding to current month transactions instead of creating own record
+        /// added transaction date field
+
+        SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,true);
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer);
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_DEPOSIT,

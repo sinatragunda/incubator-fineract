@@ -5,16 +5,22 @@ import java.time.Duration;
 import java.util.Date;
 import java.time.Instant ;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class TimeHelper{
 
-
-
 	// start date to mark the start of a month 
-	public static Date startDate(){
-		Date date = dateNow();
-		date.setDate(1); 
-		return date ;
+	public static Date startDate(Long transactionDateEpoch){
+		
+		Date date[] = {dateNow()};
+
+		// added 28/12/2021
+		Optional.ofNullable(transactionDateEpoch).ifPresent(e->{
+			date[0] = jodaLocalDateToJavaDate(transactionDateEpoch);
+		});
+
+		date[0].setDate(1); 
+		return date[0] ;
 	}
 
 
