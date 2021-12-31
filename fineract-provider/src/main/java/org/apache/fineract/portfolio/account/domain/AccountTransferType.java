@@ -27,7 +27,10 @@ public enum AccountTransferType {
     ACCOUNT_TRANSFER(1, "accountTransferType.account.transfer"), //
     LOAN_REPAYMENT(2, "accountTransferType.loan.repayment"), //
     CHARGE_PAYMENT(3, "accountTransferType.charge.payment"), //
-    INTEREST_TRANSFER(4, "accountTransferType.interest.transfer"); //
+    INTEREST_TRANSFER(4, "accountTransferType.interest.transfer"), //
+
+    // Added 28/12/2021
+    EQUITY_ACCOUNT(5 ,"accountTransferType.equity.transfer");
 
     private final Integer value;
     private final String code;
@@ -47,6 +50,9 @@ public enum AccountTransferType {
             break;
             case 4:
                 enumeration = AccountTransferType.INTEREST_TRANSFER;
+            break;
+            case 5:
+                enumeration = AccountTransferType.EQUITY_ACCOUNT
             break;
         }
         return enumeration;

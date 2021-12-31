@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.account.domain;
 
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,26 +83,31 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @OneToOne(mappedBy = "accountTransferDetails", cascade = CascadeType.ALL, optional = true, orphanRemoval = true, fetch = FetchType.EAGER)
     private AccountTransferStandingInstruction accountTransferStandingInstruction;
 
+    // Added 29/12/2021 ,make it possible for equity accounts to act as savings account and make transfers
+    @Column(name = "equity_transfer")
+    private Boolean isEquityTransfer;
+
+
     public static AccountTransferDetails savingsToSavingsTransfer(final Office fromOffice, final Client fromClient,
             final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
-            Integer transferType) {
+            Integer transferType ,Boolean isEquityTransfer) {
 
         return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccount, null, toOffice, toClient, toSavingsAccount, null,
-                transferType, null);
+                transferType, null ,isEquityTransfer);
     }
 
     public static AccountTransferDetails savingsToLoanTransfer(final Office fromOffice, final Client fromClient,
             final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final Loan toLoanAccount,
-            Integer transferType) {
+            Integer transferType ,Boolean isEquityTransfer) {
         return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccount, null, toOffice, toClient, null, toLoanAccount,
-                transferType, null);
+                transferType, null ,isEquityTransfer);
     }
 
     public static AccountTransferDetails LoanTosavingsTransfer(final Office fromOffice, final Client fromClient,
             final Loan fromLoanAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
-            Integer transferType) {
+            Integer transferType ,Boolean isEquityTransfer) {
         return new AccountTransferDetails(fromOffice, fromClient, null, fromLoanAccount, toOffice, toClient, toSavingsAccount, null,
-                transferType, null);
+                transferType, null ,isEquityTransfer);
     }
 
     protected AccountTransferDetails() {
@@ -111,7 +117,7 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     private AccountTransferDetails(final Office fromOffice, final Client fromClient, final SavingsAccount fromSavingsAccount,
             final Loan fromLoanAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
             final Loan toLoanAccount, final Integer transferType,
-            final AccountTransferStandingInstruction accountTransferStandingInstruction) {
+            final AccountTransferStandingInstruction accountTransferStandingInstruction ,Boolean isEquityTransfer) {
         this.fromOffice = fromOffice;
         this.fromClient = fromClient;
         this.fromSavingsAccount = fromSavingsAccount;
@@ -122,6 +128,7 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
         this.toLoanAccount = toLoanAccount;
         this.transferType = transferType;
         this.accountTransferStandingInstruction = accountTransferStandingInstruction;
+        this.isEquityTransfer = isEquityTransfer ;
     }
 
     public SavingsAccount toSavingsAccount() {
@@ -159,6 +166,14 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     public static AccountTransferDetails LoanToLoanTransfer(Office fromOffice, Client fromClient, Loan fromLoanAccount, Office toOffice, Client toClient,
             Loan toLoanAccount, Integer transferType) {
         return new AccountTransferDetails(fromOffice, fromClient, null, fromLoanAccount, toOffice, toClient, null, toLoanAccount,
-                transferType, null);
+                transferType, null,false);
+    }
+
+    public Boolean getEquityTransfer() {
+        return isEquityTransfer;
+    }
+
+    public void setEquityTransfer(Boolean equityTransfer) {
+        isEquityTransfer = equityTransfer;
     }
 }

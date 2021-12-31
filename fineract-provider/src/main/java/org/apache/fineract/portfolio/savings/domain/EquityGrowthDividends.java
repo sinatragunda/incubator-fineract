@@ -39,15 +39,22 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
     @Column(name="savings_product_id")
     private Long savingsProductId;
 
+    // Added 28/12/2021
+
+    @Column(name="office_id")
+    private Long officeId;
+
+
 
     public EquityGrowthDividends(){}
 
-    public EquityGrowthDividends(Long savingsProductId , Date startPeriod, Date endPeriod, BigDecimal amount, int beneficiaries) {
+    public EquityGrowthDividends(Long savingsProductId , Date startPeriod, Date endPeriod, BigDecimal amount, int beneficiaries ,Long officeId) {
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.amount = amount;
         this.beneficiaries = beneficiaries;
         this.savingsProductId = savingsProductId ;
+        this.officeId = officeId;
     }
 
 
@@ -89,5 +96,13 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
 
     public void setSavingsProductId(Long savingsProductId) {
         this.savingsProductId = savingsProductId;
+    }
+
+    public void setOfficeId(Long id){
+        this.officeId = officeId;
+    }
+
+    public Long getOfficeId(){
+        return this.officeId;
     }
 }

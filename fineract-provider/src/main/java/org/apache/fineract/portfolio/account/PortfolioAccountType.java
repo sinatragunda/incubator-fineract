@@ -25,7 +25,10 @@ public enum PortfolioAccountType {
 
     INVALID(0, "accountType.invalid"), //
     LOAN(1, "accountType.loan"), //
-    SAVINGS(2, "accountType.savings");
+    SAVINGS(2, "accountType.savings"),
+
+    //modified 31/12/2021
+    EQUITY(3 ,"accountType.equity");
 
     private final Integer value;
     private final String code;
@@ -57,16 +60,25 @@ public enum PortfolioAccountType {
     public static PortfolioAccountType fromInt(final Integer type) {
 
         PortfolioAccountType enumType = PortfolioAccountType.INVALID;
-        if (type != null) {
-            switch (type) {
-                case 1:
-                    enumType = LOAN;
-                break;
-                case 2:
-                    enumType = SAVINGS;
-                break;
+        
+        // Modified call 31/12/2021
+        for(PortfolioAccountType a : PortfolioAccountType.values()){
+            if(a.ordinal()==type){
+                enumType = a ;
             }
         }
+
+        // if (type != null) {
+        //     switch (type) {
+        //         case 1:
+        //             enumType = LOAN;
+        //         break;
+        //         case 2:
+        //             enumType = SAVINGS;
+        //         break;
+        //     }
+        // }
+
         return enumType;
     }
 
@@ -76,5 +88,10 @@ public enum PortfolioAccountType {
 
     public boolean isLoanAccount() {
         return this.value == Integer.valueOf(1);
+    }
+
+    // Added 31/12/2021
+    public boolean isEquityAccount(){
+        return this.value == Integer.valueOf(3);
     }
 }

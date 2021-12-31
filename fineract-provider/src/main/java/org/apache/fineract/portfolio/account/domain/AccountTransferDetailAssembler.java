@@ -36,6 +36,7 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
+import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +119,7 @@ public class AccountTransferDetailAssembler {
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
 
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient,
-                toSavingsAccount, transfertype);
+                toSavingsAccount, transfertype,false);
 
     }
 
@@ -142,7 +143,7 @@ public class AccountTransferDetailAssembler {
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
 
         return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
-                transfertype);
+                transfertype,false);
 
     }
 
@@ -165,7 +166,7 @@ public class AccountTransferDetailAssembler {
         final Integer transfertype = this.fromApiJsonHelper.extractIntegerNamed(transferTypeParamName, element, Locale.getDefault());
 
         return AccountTransferDetails.LoanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccount,
-                transfertype);
+                transfertype,false);
     }
 
     public AccountTransferDetails assembleSavingsToLoanTransfer(final SavingsAccount fromSavingsAccount, final Loan toLoanAccount,
@@ -176,7 +177,7 @@ public class AccountTransferDetailAssembler {
         final Client toClient = toLoanAccount.client();
 
         return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
-                transferType);
+                transferType,false);
 
     }
 
@@ -188,7 +189,7 @@ public class AccountTransferDetailAssembler {
         final Client toClient = toSavingsAccount.getClient();
 
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient,
-                toSavingsAccount, transferType);
+                toSavingsAccount, transferType,false);
     }
 
     public AccountTransferDetails assembleLoanToSavingsTransfer(final Loan fromLoanAccount, final SavingsAccount toSavingsAccount,
@@ -199,7 +200,7 @@ public class AccountTransferDetailAssembler {
         final Client toClient = toSavingsAccount.getClient();
 
         return AccountTransferDetails.LoanTosavingsTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toSavingsAccount,
-                transferType);
+                transferType,false);
     }
 
     public AccountTransferDetails assembleLoanToLoanTransfer(Loan fromLoanAccount, Loan toLoanAccount, Integer transferType) {
@@ -211,4 +212,58 @@ public class AccountTransferDetailAssembler {
         return AccountTransferDetails.LoanToLoanTransfer(fromOffice, fromClient, fromLoanAccount, toOffice, toClient, toLoanAccount,
                 transferType);
     }
+
+    // Added 28/12/2021
+    public AccountTransferDetails equityToLoanTransfer(EquityGrowthOnSavingsAccount fromEquityAccount, Loan toLoanAccount, Integer transferType) {
+        
+        Long officeId = fromEquityAccount.getEquityGrowthDividends().getOfficeId();
+        Long savingsAccountId = fromEquityAccount.getSavingsAccountId();
+        SavingsAccount fromSavingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+
+        final Office fromOffice = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        final Client fromClient = fromSavingsAccount.getClient();
+        final Office toOffice = toLoanAccount.getOffice();
+        final Client toClient = toLoanAccount.client();
+
+        return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
+                transferType, true);
+    }
+
+
+    // Added 28/12/2021
+    public AccountTransferDetails equityToSavingsTransfer(EquityGrowthOnSavingsAccount fromEquityAccount, SavingsAccount toSavingsAccount, Integer transferType) {
+
+        Long officeId = fromEquityAccount.getEquityGrowthDividends().getOfficeId();
+        Long savingsAccountId = fromEquityAccount.getSavingsAccountId();
+        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+
+        final Office fromOffice = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        final Client fromClient = savingsAccount.getClient();
+
+        final Office toOffice = toSavingsAccount.office();
+        final Client toClient = toSavingsAccount.getClient();
+
+        return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
+                transferType,true);
+    }
+
+
+    // Added 28/12/2021
+    public AccountTransferDetails equityToEquityTransfer(EquityGrowthOnSavingsAccount fromEquityAccount, SavingsAccount toSavingsAccount, Integer transferType) {
+
+        Long officeId = fromEquityAccount.getEquityGrowthDividends().getOfficeId();
+        Long savingsAccountId = fromEquityAccount.getSavingsAccountId();
+        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+
+        final Office fromOffice = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        final Client fromClient = savingsAccount.getClient();
+
+        final Office toOffice = toSavingsAccount.office();
+        final Client toClient = toSavingsAccount.getClient();
+
+        return AccountTransferDetails.equityToEquityTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
+                transferType);
+    }
+
+
 }
