@@ -135,6 +135,10 @@ public interface LoanApiConstants {
     public static final String autoSettlementAtDisbursementParamName = "autoSettlementAtDisbursement";
 
 
-    // adde 21/08/2021
+    // added 21/08/2021
     public static final String loanFactorAccountIdParam = "loanFactorAccountId";
+
+
+    // adde 02/01/2021
+    public static final String loanCommissionChargeParam = "loanCommissionChargeId";
 }

@@ -216,6 +216,8 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         if (StringUtils.isNotBlank(noteText)) {
             final Note note = Note.loanTransactionNote(loan, newRepaymentTransaction, noteText);
             this.noteRepository.save(note);
+
+
         }
 
         postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer, isLoanToLoanTransfer);

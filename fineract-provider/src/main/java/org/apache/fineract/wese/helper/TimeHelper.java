@@ -7,6 +7,10 @@ import java.time.Instant ;
 import java.time.LocalDate;
 import java.util.Optional;
 
+
+// Added 02/01/2022
+import org.joda.time.DateTime ;
+
 public class TimeHelper{
 
 	// start date to mark the start of a month 
@@ -68,6 +72,19 @@ public class TimeHelper{
 		org.joda.time.LocalDate now = org.joda.time.LocalDate.now();
 		return now ;
 	}
+
+	// Added 28/09/2021
+	public static org.joda.time.LocalDate javaDateToJodaLocalDate(Date date){
+
+		Long epoch  = date.getTime();
+		DateTime dateTime = new DateTime(epoch);
+		org.joda.time.LocalDate localDate = dateTime.toLocalDate();
+		return localDate ;
+	}
+
+
+
+
 
 
 }

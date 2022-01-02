@@ -53,5 +53,12 @@ public class ComparatorUtility {
         return false;
     }
 
+    // Added 02/01/2022
+    public static <T> boolean areObjectsEqual(Object value ,Object comparator){
+        return value.equals(comparator);
+    }
+
+
+
 
 }

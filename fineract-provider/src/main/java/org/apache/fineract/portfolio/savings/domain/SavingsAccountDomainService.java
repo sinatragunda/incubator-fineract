@@ -42,4 +42,9 @@ public interface SavingsAccountDomainService {
     void postJournalEntries(SavingsAccount savingsAccount, Set<Long> existingTransactionIds, Set<Long> existingReversedTransactionIds);
 
     SavingsAccountTransaction handleDividendPayout(SavingsAccount account, LocalDate transactionDate, BigDecimal transactionAmount);
+
+
+    // Added 02/01/2021
+    SavingsAccountTransaction handleDepositLiteEx(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+   
 }

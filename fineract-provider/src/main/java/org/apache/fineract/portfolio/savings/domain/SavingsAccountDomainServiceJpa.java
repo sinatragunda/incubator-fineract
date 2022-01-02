@@ -28,6 +28,8 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
+import org.apache.fineract.portfolio.note.domain.Note;
+import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
@@ -64,6 +66,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     private final BusinessEventNotifierService businessEventNotifierService;
     private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository;
     private final SavingsAccountAssembler savingsAccountAssembler ;
+    private final NoteRepository noteRepository ;
+
 
     @Autowired
     public SavingsAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository,
@@ -73,7 +77,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
             final BusinessEventNotifierService businessEventNotifierService ,
-            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler) {
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -84,6 +88,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.businessEventNotifierService = businessEventNotifierService;
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
         this.savingsAccountAssembler = savingsAccountAssembler ;
+        this.noteRepository = noteRepository;
     }
 
     @Transactional
@@ -163,11 +168,13 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     @Transactional
     @Override
     public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount){
+
         AppUser user = getAppUserIfPresent();
         Integer accountType = null;
         PaymentDetail paymentDetail = null ;
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
+
         SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
 
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
@@ -175,6 +182,35 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
         return handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);
+    }
+
+
+
+    // Added 02/01/2021 ,with notes .
+    @Transactional
+    @Override
+    public SavingsAccountTransaction handleDepositLiteEx(final SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
+
+        AppUser user = getAppUserIfPresent();
+        Integer accountType = null;
+        PaymentDetail paymentDetail = null ;
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
+
+        final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
+                paymentDetail, new Date(), user, accountType);
+
+
+        SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
+        SavingsAccountTransaction savingsAccountTransaction = handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);
+
+
+        Optional.ofNullable(noteText).ifPresent(e->{
+            final Note note = Note.savingsTransactionNote (savingsAccount, savingsAccountTransaction, noteText);
+            this.noteRepository.save(note);
+        });
+
+        return savingsAccountTransaction ;
     }
 
     private SavingsAccountTransaction handleDeposit(final SavingsAccount account, final DateTimeFormatter fmt,
@@ -211,6 +247,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             account.calculateInterestUsing(mc, today, isInterestTransfer, isSavingsInterestPostingAtCurrentPeriodEnd,
                     financialYearBeginningMonth, postInterestOnDate);
         }
+
+
 
         saveTransactionToGenerateTransactionId(deposit);
 
