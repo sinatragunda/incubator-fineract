@@ -144,6 +144,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             final AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleSavingsToSavingsTransfer(command,
                     fromSavingsAccount, toSavingsAccount, withdrawal, deposit);
+            
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
             transferDetailId = accountTransferDetails.getId();
 
@@ -276,10 +277,14 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     @Transactional
     public Long transferFunds(final AccountTransferDTO accountTransferDTO) {
 
+        System.err.println("----------------------when is this called though ?--------------------");
+
         Long transferTransactionId = null;
         final boolean isAccountTransfer = true;
         final boolean isRegularTransaction = accountTransferDTO.isRegularTransaction();
+        
         AccountTransferDetails accountTransferDetails = accountTransferDTO.getAccountTransferDetails();
+        
         if (isSavingsToLoanAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
             //
             SavingsAccount fromSavingsAccount = null;
