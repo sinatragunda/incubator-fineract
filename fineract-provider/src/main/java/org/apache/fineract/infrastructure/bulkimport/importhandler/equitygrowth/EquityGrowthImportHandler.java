@@ -40,7 +40,7 @@ public class EquityGrowthImportHandler {
 
         BigDecimal totalEquity  = savingsAccountTransactionDataList.stream().map(SavingsAccountTransactionData::getEquityBalance).reduce(BigDecimal.ZERO,BigDecimal::add);
 
-        EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries[0]);
+        EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries[0],null);
         EquityGrowthDividends equityGrowthDividendsFlushed = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
 
         //reset beneficiaries so that null and double counted excel value dont show

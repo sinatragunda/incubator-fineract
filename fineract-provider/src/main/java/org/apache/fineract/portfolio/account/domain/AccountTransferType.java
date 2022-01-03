@@ -52,7 +52,7 @@ public enum AccountTransferType {
                 enumeration = AccountTransferType.INTEREST_TRANSFER;
             break;
             case 5:
-                enumeration = AccountTransferType.EQUITY_ACCOUNT
+                enumeration = AccountTransferType.EQUITY_ACCOUNT;
             break;
         }
         return enumeration;

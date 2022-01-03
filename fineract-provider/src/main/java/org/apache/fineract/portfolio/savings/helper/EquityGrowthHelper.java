@@ -76,7 +76,7 @@ public class EquityGrowthHelper {
 
         /// calculate equity ,filter by period
         int beneficiaries = savingsAccountDataList.size();
-        equityGrowthDividends = new EquityGrowthDividends(savingsProductId, startDate ,endDate ,profit ,beneficiaries);
+        equityGrowthDividends = new EquityGrowthDividends(savingsProductId, startDate ,endDate ,profit ,beneficiaries,null);
 
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList = new ArrayList<>();
 

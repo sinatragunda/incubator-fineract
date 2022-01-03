@@ -29,7 +29,6 @@ import javax.persistence.Version;
 
 
 @Entity
-@Component
 @Table(name="m_loan_commission")
 public class LoanCommission extends AbstractPersistableCustom<Long> {
 
@@ -37,7 +36,7 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
     private Boolean isDeposited ;
 
     @ManyToOne
-    @JoinColumn(name = "loan_commission_id", nullable = true)
+    @JoinColumn(name = "loan_commission_charge_id", nullable = true)
     private LoanCommissionCharge loanCommissionCharge ;
 
     @ManyToOne
@@ -47,6 +46,8 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "loan_agent_id", nullable = true)
     private LoanAgent loanAgent ;
+
+    public LoanCommission(){}
 
 
     public LoanCommissionCharge getLoanCommissionCharge() {

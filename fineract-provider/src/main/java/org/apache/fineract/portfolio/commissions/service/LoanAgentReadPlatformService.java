@@ -15,5 +15,6 @@ import java.sql.SQLException;
 public interface LoanAgentReadPlatformService {
 
     public LoanAgentData retrieveOne(Long id);
+    LoanAgentData retrieveOneByClient(Long id);
 }
 

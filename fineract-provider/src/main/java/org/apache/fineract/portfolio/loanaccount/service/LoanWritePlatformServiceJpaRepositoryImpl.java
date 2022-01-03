@@ -526,7 +526,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 final LocalDate validFrom = new LocalDate();
 
                 AccountTransferDetails accountTransferDetails = AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient,
-                        linkedSavingsAccount, toOffice, toClient, loan, transferType);
+                        linkedSavingsAccount, toOffice, toClient, loan, transferType,false);
 
                 AccountTransferStandingInstruction accountTransferStandingInstruction = AccountTransferStandingInstruction.create(
                         accountTransferDetails, name, priority, instructionType, status, null, validFrom, null, recurrenceType, null, null,

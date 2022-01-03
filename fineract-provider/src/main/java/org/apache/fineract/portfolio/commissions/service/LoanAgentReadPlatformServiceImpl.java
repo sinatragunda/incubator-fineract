@@ -6,21 +6,35 @@
 */
 package org.apache.fineract.portfolio.commissions.service;
 
+import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.commissions.data.LoanAgentData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 
 @Service
 public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformService{
 
     private PlatformSecurityContext context ;
+    private JdbcTemplate jdbcTemplate ;
 
 
     @Autowired
+    public LoanAgentReadPlatformServiceImpl(final RoutingDataSource routingDataSource ,final PlatformSecurityContext context){
+        this.jdbcTemplate = new JdbcTemplate(routingDataSource);
+        this.context = context ;
+    }
 
 
     private static final class LoanAgentDataMapper implements RowMapper<LoanAgentData> {
@@ -43,7 +57,7 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
         }
     }
 
-
+    // always one unique agent per client
     @Override
     public LoanAgentData retrieveOne(Long id){
 
@@ -52,5 +66,17 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
         final String sql = "select " + loanAgentDataMapper.schema() + " where la.id=?";
         return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { id, id });
     }
+
+    // always one unique agent per client
+    @Override
+    public LoanAgentData retrieveOneByClient(Long clientId){
+
+        this.context.authenticatedUser();
+        final LoanAgentDataMapper loanAgentDataMapper = new LoanAgentDataMapper();
+        final String sql = "select " + loanAgentDataMapper.schema() + " where la.clientId=?";
+        return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { clientId, clientId });
+    }
+
+
 
 }

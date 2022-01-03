@@ -61,6 +61,7 @@
 										  org.apache.fineract.adhocquery.*,
 										  org.apache.fineract.infrastructure.campaigns.**
 										  org.mifosplatform.infrastructure.report.service,
+										  org.apache.fineract.portfolio.commissions.*,
 										  org.apache.fineract.portfolio.products.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
@@ -94,8 +95,9 @@
 <!-- 	<jpa:repositories base-package="org.apache.fineract.wese.repo"/>
  -->
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.campaigns.email.domain"/>
-	
-	
+	<jpa:repositories base-package="org.apache.fineract.portfolio.commissions.repo"/>
+
+
 	<import resource="infrastructure.xml" />
 
 	<import resource="securityContext.xml" />

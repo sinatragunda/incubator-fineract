@@ -1,10 +1,8 @@
 package org.apache.fineract.wese.helper ;
 
 
-import java.time.Duration;
+import java.time.*;
 import java.util.Date;
-import java.time.Instant ;
-import java.time.LocalDate;
 import java.util.Optional;
 
 
@@ -20,7 +18,7 @@ public class TimeHelper{
 
 		// added 28/12/2021
 		Optional.ofNullable(transactionDateEpoch).ifPresent(e->{
-			date[0] = jodaLocalDateToJavaDate(transactionDateEpoch);
+			date[0] = fromEpoch(transactionDateEpoch);
 		});
 
 		date[0].setDate(1); 
@@ -81,6 +79,26 @@ public class TimeHelper{
 		org.joda.time.LocalDate localDate = dateTime.toLocalDate();
 		return localDate ;
 	}
+
+	// Added 03/01/2022
+	public static Long jodaLocalDateToEpoch(org.joda.time.LocalDate localDate){
+
+		int year = localDate.getYear();
+		int month = localDate.getMonthOfYear();
+		int day = localDate.getDayOfMonth();
+
+		LocalDate javaLocalDate = LocalDate.of(year ,month ,day);
+		Instant instant = javaLocalDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+		Long epoch = instant.getEpochSecond();
+		return epoch;
+	}
+
+	// Added 03/01/2021
+	public static Date fromEpoch(Long epoch){
+		Instant instant = Instant.ofEpochSecond(epoch);
+		return Date.from(instant);
+	}
+
 
 
 

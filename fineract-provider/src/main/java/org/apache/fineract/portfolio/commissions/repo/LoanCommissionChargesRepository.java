@@ -14,4 +14,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface LoanCommissionChargesRepository extends JpaRepository<LoanCommissionCharge ,Long> ,JpaSpecificationExecutor<LoanCommissionCharge>{
 
+    public LoanCommissionCharge findOne(Long id);
+
 }

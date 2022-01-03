@@ -225,8 +225,10 @@ public class AccountTransferDetailAssembler {
         final Office toOffice = toLoanAccount.getOffice();
         final Client toClient = toLoanAccount.client();
 
-        return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
-                transferType, true);
+        return null ;
+
+        // return AccountTransferDetails.savingsToLoanTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient, toLoanAccount,
+        //         transferType, true);
     }
 
 
@@ -243,26 +245,29 @@ public class AccountTransferDetailAssembler {
         final Office toOffice = toSavingsAccount.office();
         final Client toClient = toSavingsAccount.getClient();
 
-        return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
-                transferType,true);
+        return null ;
+
+        // return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
+        //         transferType,true);
     }
 
 
     // Added 28/12/2021
     public AccountTransferDetails equityToEquityTransfer(EquityGrowthOnSavingsAccount fromEquityAccount, SavingsAccount toSavingsAccount, Integer transferType) {
 
-        Long officeId = fromEquityAccount.getEquityGrowthDividends().getOfficeId();
-        Long savingsAccountId = fromEquityAccount.getSavingsAccountId();
-        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+        // Long officeId = fromEquityAccount.getEquityGrowthDividends().getOfficeId();
+        // Long savingsAccountId = fromEquityAccount.getSavingsAccountId();
+        // SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
 
-        final Office fromOffice = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
-        final Client fromClient = savingsAccount.getClient();
+        // final Office fromOffice = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        // final Client fromClient = savingsAccount.getClient();
 
-        final Office toOffice = toSavingsAccount.office();
-        final Client toClient = toSavingsAccount.getClient();
+        // final Office toOffice = toSavingsAccount.office();
+        // final Client toClient = toSavingsAccount.getClient();
 
-        return AccountTransferDetails.equityToEquityTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
-                transferType);
+        // return AccountTransferDetails.equityToEquityTransfer(fromOffice, fromClient, fromEquityAccount, toOffice, toClient, toSavingsAccount,
+        //         transferType);
+        return null ;
     }
 
 

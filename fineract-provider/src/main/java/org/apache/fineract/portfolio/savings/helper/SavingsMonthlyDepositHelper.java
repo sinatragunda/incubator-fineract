@@ -46,9 +46,11 @@ public class SavingsMonthlyDepositHelper{
 
 		Long id = savingsAccount.getId();
 
-		// modified 28/12/2021
-		Date startDate = TimeHelper.startDate(transactionDate.getTime());
+		// modified 28/12/2021 and 02/01/2022
+		Long epoch = TimeHelper.jodaLocalDateToEpoch(transactionDate);
 
+		Date startDate = TimeHelper.startDate(epoch);
+		
 		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
 		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);
 
@@ -56,8 +58,8 @@ public class SavingsMonthlyDepositHelper{
 
 			Predicate<SavingsAccountMonthlyDeposit> filterByMonth = (e)->{
 				SavingsAccountMonthlyDeposit transaction = e ;
-				Date transactionDate = e.getStartDate();
-				boolean isSameMonth = TimeHelper.sameMonth(startDate ,transactionDate);
+				Date startTransactionDate = e.getStartDate();
+				boolean isSameMonth = TimeHelper.sameMonth(startDate ,startTransactionDate);
 				return isSameMonth ;
 			};
 

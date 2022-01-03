@@ -61,8 +61,7 @@ public class CommissionsHelper {
 
     public static boolean isChargeTime(LoanCommission loanCommission ,LOAN_COMMISSION_CHARGE_TIME chargeTime){
 
-        LOAN_COMMISSION_CHARGE_TIME loanCommissionChargeTime = loanCommission.getLoanCommissionCharge().;
-
+        LOAN_COMMISSION_CHARGE_TIME loanCommissionChargeTime = loanCommission.getLoanCommissionCharge().getLoanCommissionChargeTime();
         boolean equals = ComparatorUtility.areObjectsEqual(loanCommissionChargeTime ,chargeTime);
         return equals ;
 

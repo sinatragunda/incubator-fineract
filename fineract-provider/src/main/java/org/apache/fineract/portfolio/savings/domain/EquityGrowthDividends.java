@@ -40,10 +40,8 @@ public class EquityGrowthDividends extends AbstractPersistableCustom<Long>{
     private Long savingsProductId;
 
     // Added 28/12/2021
-
     @Column(name="office_id")
     private Long officeId;
-
 
 
     public EquityGrowthDividends(){}
