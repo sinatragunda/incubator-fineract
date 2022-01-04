@@ -37,7 +37,11 @@ public enum ChargeTimeType {
     SHARE_PURCHASE(14, "chargeTimeType.sharespurchase"), 
     SHARE_REDEEM(15, "chargeTimeType.sharesredeem"),
     
-    SAVINGS_NOACTIVITY_FEE(16,"chargeTimeType.savingsNoActivityFee");
+    SAVINGS_NOACTIVITY_FEE(16,"chargeTimeType.savingsNoActivityFee"),
+
+    // Added 04/01/2022
+    LOAN_APPLICATION(17 ,"Loan Application"),
+    LOAN_CLOSED(18 ,"Loan Closed");
 
     private final Integer value;
     private final String code;

@@ -3149,4 +3149,21 @@ public class CommandWrapperBuilder {
         this.href = "shareaccount/"+sharesRequestId+"?command=approveadditionalshares";
         return this;
     }
+
+
+    // Added 04/01/2022 ,this is a test to see how this works 
+    public CommandWrapperBuilder createLoanAgent(){
+        this.actionName = "CREATE";
+        this.entityName = "LOANAGENT";
+        this.href = "loanagent/template";
+        return this;
+    }
+
+    // implementing this for all our new data classes now since we now know how this works
+    public CommandWrapperBuilder createCommissionCharge(){
+        this.actionName = "CREATE";
+        this.entityName = "COMMISSIONCHARGE";
+        this.href = "commissioncharge/template";
+        return this;
+    }
 }

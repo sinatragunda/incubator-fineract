@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Set;
+
 public class ObjectNodeHelper{
 
 
@@ -42,6 +44,22 @@ public class ObjectNodeHelper{
             e.printStackTrace();
         }
         return null ;
+    }
+
+    // Added 04/01/2022
+    public static ObjectNode objectNodeFromMap(Map<String,Object> map){
+
+        ObjectNode objectNode = objectNode();
+
+        Set<String> keySet = map.keySet();
+
+        for(String key : keySet){
+            Object value = map.get(key);
+            String valueString = String.valueOf(value);
+            objectNode.put(key,valueString);
+        }
+
+        return objectNode ;
     }
 
 

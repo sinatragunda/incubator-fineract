@@ -95,6 +95,21 @@ public class ChargeEnumerations {
             	optionData = new EnumOptionData(ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getValue().longValue(), ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getCode(), 
             			"Saving No Activity Fee");
             break;
+
+            // Added 04/01/2022
+
+            case LOAN_APPLICATION :
+                optionData = new EnumOptionData(ChargeTimeType.LOAN_APPLICATION.getValue().longValue(), ChargeTimeType.LOAN_APPLICATION.getCode(), 
+                        "Loan Application");
+            break;
+
+
+            case LOAN_CLOSED:
+                optionData = new EnumOptionData(ChargeTimeType.LOAN_CLOSED.getValue().longValue(), ChargeTimeType.LOAN_CLOSED.getCode(), 
+                        "Loan Closed");
+            break;
+
+
             default:
                 optionData = new EnumOptionData(ChargeTimeType.INVALID.getValue().longValue(), ChargeTimeType.INVALID.getCode(), "Invalid");
             break;

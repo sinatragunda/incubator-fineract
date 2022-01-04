@@ -37,7 +37,7 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
 
     @ManyToOne
     @JoinColumn(name = "loan_commission_charge_id", nullable = true)
-    private LoanCommissionCharge loanCommissionCharge ;
+    private CommissionCharge commissionCharge;
 
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = true)
@@ -47,15 +47,18 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "loan_agent_id", nullable = true)
     private LoanAgent loanAgent ;
 
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
+
     public LoanCommission(){}
 
 
-    public LoanCommissionCharge getLoanCommissionCharge() {
-        return loanCommissionCharge;
+    public CommissionCharge getCommissionCharge() {
+        return commissionCharge;
     }
 
-    public void setLoanCommissionCharge(LoanCommissionCharge loanCommissionCharge) {
-        this.loanCommissionCharge = loanCommissionCharge;
+    public void setCommissionCharge(CommissionCharge commissionCharge) {
+        this.commissionCharge = commissionCharge;
     }
 
     public Loan getLoan() {

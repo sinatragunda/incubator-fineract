@@ -186,6 +186,7 @@ public class LoanProductsApiResource {
         }
 
         LoanProductData loanProduct = this.loanProductReadPlatformService.retrieveNewLoanProductDetails();
+
         loanProduct = handleTemplate(loanProduct);
 
         return this.toApiJsonSerializer.serialize(settings, loanProduct, this.LOAN_PRODUCT_DATA_PARAMETERS);

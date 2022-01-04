@@ -58,6 +58,11 @@ public class ComparatorUtility {
         return value.equals(comparator);
     }
 
+    // Added 04/01/2021
+    public static boolean compareStringsIgnoreCase(String left ,String right){
+        return left.equalsIgnoreCase(right);
+    }
+
 
 
 

@@ -12,6 +12,8 @@ import java.util.Optional;
 // Added 19/12/2021
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+// Added 04/01/2021
+import java.util.Map ;
 
 public class JsonHelper {
 
@@ -71,6 +73,12 @@ public class JsonHelper {
 
         return objectNode[0].toString();
 
+    }
+
+    // Added 04/01/2022 1:52am
+    public static String serializeMapToJson(Map<String,Object> map){
+        ObjectNode node = ObjectNodeHelper.objectNodeFromMap(map);
+        return node.toString();
     }
 
 }

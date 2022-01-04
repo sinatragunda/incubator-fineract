@@ -43,6 +43,11 @@ public class LoanAgent extends AbstractPersistableCustom<Long>{
 
     public LoanAgent(){}
 
+    public LoanAgent(Client client, SavingsAccount savingsAccount) {
+        this.client = client;
+        this.savingsAccount = savingsAccount;
+    }
+
     public Client getClient() {
         return client;
     }

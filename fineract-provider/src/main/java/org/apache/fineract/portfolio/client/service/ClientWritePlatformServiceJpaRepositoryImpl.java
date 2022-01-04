@@ -64,6 +64,7 @@ import org.apache.fineract.portfolio.client.exception.ClientHasNoStaffException;
 import org.apache.fineract.portfolio.client.exception.ClientMustBePendingToBeDeletedException;
 import org.apache.fineract.portfolio.client.exception.InvalidClientSavingProductException;
 import org.apache.fineract.portfolio.client.exception.InvalidClientStateTransitionException;
+import org.apache.fineract.portfolio.client.helper.ClientCreateHelper;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
@@ -352,6 +353,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             
             final Client newClient = Client.createNew(currentUser, clientOffice, clientParentGroup, staff, savingsProductId, gender,
                     clientType, clientClassification, legalFormValue, command ,shareProductId);
+
             this.clientRepository.save(newClient);
             
             boolean rollbackTransaction = false;
@@ -364,9 +366,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
 
             // Added 25/09/2021
-            System.err.println("--------------create self service user now-------------"+isCreateSelfServiceUser);
             createSelfServiceUser(newClient ,isCreateSelfServiceUser);
-			
+
+
             this.clientRepository.save(newClient);
             if (newClient.isActive()) {
                 this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
@@ -387,6 +389,10 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 openShareAccount(newClient ,result.getSavingsId(), fmt); 
                 this.clientRepository.save(newClient);
             }
+
+            /// We should refactor out a lot of other garbage there so that code becomes clean now its too much scatter and so unproffessional
+            /// Can agents be self service users ?
+            ClientCreateHelper.createLoanAgent(commandsSourceWritePlatformService , newClient);
             
             if(isEntity) {
                 extractAndCreateClientNonPerson(newClient, command);
@@ -395,10 +401,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if (isAddressEnabled) {
                 this.addressWritePlatformService.addNewClientAddress(newClient, command);
             }
-            
-            
-            if(command.arrayOfParameterNamed("familyMembers")!=null)
-            {
+
+            if(command.arrayOfParameterNamed("familyMembers")!=null) {
             	this.clientFamilyMembersWritePlatformService.addClientFamilyMember(newClient, command);
             }
 

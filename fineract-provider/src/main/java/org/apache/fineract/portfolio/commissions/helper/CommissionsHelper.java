@@ -6,20 +6,20 @@
 */
 package org.apache.fineract.portfolio.commissions.helper;
 
+import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
+import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.commissions.domain.LoanAgent;
 import org.apache.fineract.portfolio.commissions.domain.LoanCommission;
-import org.apache.fineract.portfolio.commissions.domain.LoanCommissionCharge;
+import org.apache.fineract.portfolio.commissions.domain.CommissionCharge;
 import org.apache.fineract.portfolio.commissions.enumerations.LOAN_COMMISSION_CHARGE_TIME;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.wese.enumerations.CHARGE_CALCULATION_CRITERIA;
 import org.apache.fineract.wese.helper.ComparatorUtility;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Optional;
 
 import org.apache.fineract.wese.helper.TimeHelper;
 import org.joda.time.LocalDate;
@@ -61,7 +61,7 @@ public class CommissionsHelper {
 
     public static boolean isChargeTime(LoanCommission loanCommission ,LOAN_COMMISSION_CHARGE_TIME chargeTime){
 
-        LOAN_COMMISSION_CHARGE_TIME loanCommissionChargeTime = loanCommission.getLoanCommissionCharge().getLoanCommissionChargeTime();
+        ChargeTimeType loanCommissionChargeTime = loanCommission.getCommissionCharge().getChargeTimeType();
         boolean equals = ComparatorUtility.areObjectsEqual(loanCommissionChargeTime ,chargeTime);
         return equals ;
 
@@ -69,30 +69,38 @@ public class CommissionsHelper {
 
     public static BigDecimal calculateCommission(LoanCommission loanCommission , Loan loan){
 
-        LoanCommissionCharge loanCommissionCharge = loanCommission.getLoanCommissionCharge();
+        CommissionCharge commissionCharge = loanCommission.getCommissionCharge();
 
         BigDecimal commissionAmount = BigDecimal.ZERO;
         BigDecimal principal = loan.getProposedPrincipal();
-        BigDecimal valuationAmount = loanCommissionCharge.getAmount();
+        BigDecimal interest = loan.getTotalInterest();
+        BigDecimal valuationAmount = commissionCharge.getAmount();
 
-        LOAN_COMMISSION_CHARGE_TIME loanCommissionChargeTime = loanCommissionCharge.getLoanCommissionChargeTime();
+        ChargeTimeType loanCommissionChargeTime = commissionCharge.getChargeTimeType();
+
 
         switch (loanCommissionChargeTime){
-            case LOAN_DISBURSEMENT:
+            case DISBURSEMENT:
                 principal = loan.getDisbursedAmount();
                 break;
-            case LOAN_CLOSE:
+            case LOAN_CLOSED:
                 principal = loan.getDisbursedAmount();
                 break;
         }
 
-        CHARGE_CALCULATION_CRITERIA chargeCalculationCriteria = loanCommissionCharge.getChargeCalculationCriteria();
+        ChargeCalculationType chargeCalculationCriteria = commissionCharge.getChargeCalculationType();
 
         switch (chargeCalculationCriteria){
-            case PERCENTAGE:
+            case PERCENT_OF_AMOUNT:
                 commissionAmount = principal.multiply(valuationAmount);
                 break;
-            case FIXED_AMOUNT:
+            case PERCENT_OF_INTEREST:
+                commissionAmount = interest.multiply(valuationAmount);
+                break;
+            case PERCENT_OF_AMOUNT_AND_INTEREST:
+                 commissionAmount = valuationAmount.multiply(interest.add(principal));
+                 break;
+            case FLAT:
                 commissionAmount = valuationAmount;
                 break;
 

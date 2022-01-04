@@ -60,6 +60,10 @@ public final class CommandProcessingResultJsonSerializer {
         if (!"null".equalsIgnoreCase(serializedResult)) {
             returnedResult = serializedResult;
         }
+
+        System.err.println("-------------------serialized string --------------"+serializedResult);
+
+
         return returnedResult;
     }
 }

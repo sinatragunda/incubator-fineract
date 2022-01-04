@@ -10,7 +10,7 @@ package org.apache.fineract.portfolio.commissions.domain;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.commissions.repo.LoanCommissionChargesRepository;
+import org.apache.fineract.portfolio.commissions.repo.CommissionChargesRepository;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 
 
@@ -28,24 +28,24 @@ import org.springframework.jdbc.core.RowMapper;
 public class LoanCommissionChargesAssembler {
 
 
-    private LoanCommissionChargesRepository loanCommissionChargesRepository ;
+    private CommissionChargesRepository commissionChargesRepository;
     private final FromJsonHelper fromApiJsonHelper;
     private final PlatformSecurityContext platformSecurityContext;
 
     @Autowired
-    public LoanCommissionChargesAssembler(final LoanCommissionChargesRepository loanCommissionChargesRepository ,final FromJsonHelper fromApiJsonHelper ,final PlatformSecurityContext platformSecurityContext){
-        this.loanCommissionChargesRepository = loanCommissionChargesRepository ;
+    public LoanCommissionChargesAssembler(final CommissionChargesRepository commissionChargesRepository, final FromJsonHelper fromApiJsonHelper , final PlatformSecurityContext platformSecurityContext){
+        this.commissionChargesRepository = commissionChargesRepository;
         this.fromApiJsonHelper = fromApiJsonHelper ;
         this.platformSecurityContext = platformSecurityContext ;
     }
 
-    public LoanCommissionCharge assembleFrom(Long id){
+    public CommissionCharge assembleFrom(Long id){
 
-        LoanCommissionCharge loanCommissionCharge = this.loanCommissionChargesRepository.findOne(id);
-        return loanCommissionCharge ;
+        CommissionCharge commissionCharge = this.commissionChargesRepository.findOne(id);
+        return commissionCharge;
     }
 
-    public LoanCommissionCharge assembleFrom(final JsonCommand jsonCommand){
+    public CommissionCharge assembleFrom(final JsonCommand jsonCommand){
 
         final JsonElement element = jsonCommand.parsedJson();
         final Long id = this.fromApiJsonHelper.extractLongNamed(LoanApiConstants.loanCommissionChargeParam, element);
