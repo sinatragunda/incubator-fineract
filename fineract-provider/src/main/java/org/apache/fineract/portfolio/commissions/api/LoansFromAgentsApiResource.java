@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
+import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -58,7 +59,7 @@ public class LoansFromAgentsApiResource {
     private final PlatformSecurityContext context;
     private final LoansFromAgentsReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<LoansFromAgentsData> toApiJsonSerializer;
-    private final DefaultToApiJsonSerializer<Loan> loansApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<LoanAccountData> loansApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final LoanAgentReadPlatformService loanAgentReadPlatformService ;
@@ -67,7 +68,7 @@ public class LoansFromAgentsApiResource {
     public LoansFromAgentsApiResource(final PlatformSecurityContext context, final LoansFromAgentsReadPlatformService readPlatformService,
                                 final DefaultToApiJsonSerializer<LoansFromAgentsData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
                                 final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final LoanAgentReadPlatformService loanAgentReadPlatformService ,
-                                final DefaultToApiJsonSerializer<Loan> loansApiJsonSerializer) {
+                                final DefaultToApiJsonSerializer<LoanAccountData> loansApiJsonSerializer) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -91,11 +92,10 @@ public class LoansFromAgentsApiResource {
 
         Long loanAgentId = loanAgentData.getId();
 
-        System.err.println("------------------------loan agent id is ------------------"+loanAgentId);
-
-        final List<Loan> loanList = readPlatformService.retrieveAllLoansForAgent(loanAgentId);
+        final List<LoanAccountData> loanList = readPlatformService.retrieveAllLoansForAgent(loanAgentId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
         return this.loansApiJsonSerializer.serialize(settings, loanList , LoanApiConstants.LOAN_DATA_PARAMETERS);
 
     }

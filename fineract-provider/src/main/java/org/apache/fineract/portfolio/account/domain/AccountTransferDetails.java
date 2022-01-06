@@ -84,7 +84,7 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     private AccountTransferStandingInstruction accountTransferStandingInstruction;
 
     // Added 29/12/2021 ,make it possible for equity accounts to act as savings account and make transfers
-    @Column(name = "equity_transfer")
+    @Column(name = "is_equity_transfer" ,nullable = true)
     private Boolean isEquityTransfer;
 
 

@@ -11,16 +11,11 @@ public class LoansFromAgentsData {
     private Long id ;
     private Long loanAgentId;
     private Long loanId ;
-    private Long loanCommissionChargeId ;
-    private Boolean isDeposited ;
 
-
-    public LoansFromAgentsData(Long id, Long loanAgentId, Long loanId, Long loanCommissionChargeId, Boolean isDeposited) {
+    public LoansFromAgentsData(Long id, Long loanAgentId, Long loanId) {
         this.id = id;
         this.loanAgentId = loanAgentId;
         this.loanId = loanId;
-        this.loanCommissionChargeId = loanCommissionChargeId;
-        this.isDeposited = isDeposited;
     }
 
     public Long getId() {
@@ -35,11 +30,4 @@ public class LoansFromAgentsData {
         return loanId;
     }
 
-    public Long getLoanCommissionChargeId() {
-        return loanCommissionChargeId;
-    }
-
-    public Boolean getDeposited() {
-        return isDeposited;
-    }
 }

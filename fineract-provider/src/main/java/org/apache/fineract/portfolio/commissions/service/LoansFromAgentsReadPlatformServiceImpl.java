@@ -16,8 +16,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -34,23 +36,23 @@ public class LoansFromAgentsReadPlatformServiceImpl implements LoansFromAgentsRe
     private PlatformSecurityContext context ;
     private JdbcTemplate jdbcTemplate ;
     private LoansFromAgentsDataMapper loansFromAgentsDataMapper = new LoansFromAgentsDataMapper();
-    private LoanRepository loanRepository ;
+    private LoanReadPlatformService loanReadPlatformService;
 
 
     @Autowired
-    public LoansFromAgentsReadPlatformServiceImpl(final RoutingDataSource routingDataSource , final PlatformSecurityContext context ,final LoanRepository loanRepository){
+    public LoansFromAgentsReadPlatformServiceImpl(final RoutingDataSource routingDataSource , final PlatformSecurityContext context ,final LoanReadPlatformService loanReadPlatformService){
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
         this.context = context ;
-        this.loanRepository = loanRepository ;
+        this.loanReadPlatformService = loanReadPlatformService ;
     }
 
 
     private static final class LoansFromAgentsDataMapper implements RowMapper<LoansFromAgentsData> {
 
         public String schema() {
-            return "lfa.id as id, "
+            return "lfa.id as id , "
                     + "lfa.loan_id as loanId ,"
-                    + "lfa.loan_agent_id as loanAgentId"
+                    + "lfa.loan_agent_id as loanAgentId "
                     + "from m_loans_from_agents lfa ";
         }
 
@@ -60,10 +62,8 @@ public class LoansFromAgentsReadPlatformServiceImpl implements LoansFromAgentsRe
             final Long id = rs.getLong("id");
             final Long loanId = rs.getLong("loanId");
             final Long loanAgentId = rs.getLong("loanAgentId");
-            final Long loanCommissionChargeId = rs.getLong("loanCommissionChargeId");
-            final Boolean isDeposited = rs.getBoolean("isDeposited");
 
-            return new LoansFromAgentsData(id, loanId ,loanAgentId ,loanCommissionChargeId,isDeposited);
+            return new LoansFromAgentsData(id,loanAgentId, loanId);
         }
     }
 
@@ -94,17 +94,19 @@ public class LoansFromAgentsReadPlatformServiceImpl implements LoansFromAgentsRe
 
     // use client id to get loan agent id or ?
     @Override
-    public List<Loan> retrieveAllLoansForAgent(Long agentId){
+    public List<LoanAccountData> retrieveAllLoansForAgent(Long agentId){
 
         this.context.authenticatedUser();
         final String sql = "select "+ loansFromAgentsDataMapper.schema()+"where lfa.loan_agent_id =? ";
         List<LoansFromAgentsData> loansFromAgentsData =  this.jdbcTemplate.query(sql, loansFromAgentsDataMapper ,new Object[] { agentId});
         // should we build these loans all or
-        List<Loan> loanList = new ArrayList<>();
+        List<LoanAccountData> loanList = new ArrayList<>();
+
         loansFromAgentsData.stream().forEach(e->{
             Long loanId = e.getLoanId();
-            Loan loan = loanRepository.findOne(loanId);
-            loanList.add(loan);
+            System.err.println("--------------------loan id is ---------------------"+loanId);
+            LoanAccountData loanAccountData = this.loanReadPlatformService.retrieveOne(loanId);
+            loanList.add(loanAccountData);
         });
 
         System.err.println("----------------loans list is ---------------"+loanList.size());
