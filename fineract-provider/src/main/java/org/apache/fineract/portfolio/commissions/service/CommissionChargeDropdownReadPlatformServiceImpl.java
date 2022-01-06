@@ -29,7 +29,9 @@ public class CommissionChargeDropdownReadPlatformServiceImpl implements Commissi
     @Override
     public List<EnumOptionData> retrieveCalculationTypes() {
 
-        return Arrays.asList(chargeCalculationType(ChargeCalculationType.FLAT),
+        return Arrays.asList(
+                chargeCalculationType(ChargeCalculationType.FLEXIBLE_AMOUNT),
+                chargeCalculationType(ChargeCalculationType.FLAT),
                 chargeCalculationType(ChargeCalculationType.PERCENT_OF_AMOUNT),
                 chargeCalculationType(ChargeCalculationType.PERCENT_OF_AMOUNT_AND_INTEREST),
                 chargeCalculationType(ChargeCalculationType.PERCENT_OF_INTEREST),

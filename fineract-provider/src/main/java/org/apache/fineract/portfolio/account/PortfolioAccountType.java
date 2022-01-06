@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.account;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public enum PortfolioAccountType {
 
@@ -59,14 +60,21 @@ public enum PortfolioAccountType {
 
     public static PortfolioAccountType fromInt(final Integer type) {
 
-        PortfolioAccountType enumType = PortfolioAccountType.INVALID;
+        PortfolioAccountType[] enumType = {PortfolioAccountType.INVALID};
         
         // Modified call 31/12/2021
-        for(PortfolioAccountType a : PortfolioAccountType.values()){
-            if(a.ordinal()==type){
-                enumType = a ;
-            }
-        }
+
+        Optional.ofNullable(type).ifPresent(e->{
+            for(PortfolioAccountType a : values()){
+                Integer ordinal = Integer.valueOf(a.ordinal());
+                boolean ex = ordinal.equals(type);
+                if(ex){
+                    enumType[0] = a ;
+                    break;
+                }
+            }    
+        });
+        
 
         // if (type != null) {
         //     switch (type) {
@@ -79,7 +87,7 @@ public enum PortfolioAccountType {
         //     }
         // }
 
-        return enumType;
+        return enumType[0];
     }
 
     public boolean isSavingsAccount() {

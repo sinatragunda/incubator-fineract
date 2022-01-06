@@ -65,6 +65,10 @@ import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.collateral.service.CollateralAssembler;
+import org.apache.fineract.portfolio.commissions.domain.LoansFromAgents;
+import org.apache.fineract.portfolio.commissions.helper.CommissionsHelper;
+import org.apache.fineract.portfolio.commissions.service.AttachedCommissionChargesWritePlatformService;
+import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsWritePlatformService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -169,7 +173,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     /// added 21/08/2021
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
 
-    // added 23/08/2021
+    // added 06/01/2021
+    private final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService;
+    private final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
@@ -193,7 +199,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
             final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService) {
+            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
+            final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ,final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -230,6 +237,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
+        this.loansFromAgentsWritePlatformService = loansFromAgentsWritePlatformService;
+        this.attachedCommissionChargesWritePlatformService = attachedCommissionChargesWritePlatformService;
 
     }
 
@@ -243,6 +252,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     public CommandProcessingResult submitApplication(final JsonCommand command) {
 
         try {
+
+            System.err.println("----------submit new application and test our little friend -------------");
 
             final AppUser currentUser = getAppUserIfPresent();
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
@@ -304,7 +315,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final Loan newLoanApplication = this.loanAssembler.assembleFrom(command, currentUser);
 
             /// added 25/05/2021
-            ///do the whole revolve loan thing here 
+            /// do the whole revolve loan thing here 
 
             final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
             if(revolvingAccountIds!=null){
@@ -316,8 +327,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     final Loan revolvingLoanAccount = this.loanAssembler.assembleFrom(id);
                     list.add(revolvingLoanAccount);
                 }
+
                 RevolvingLoanHelper.validateApplication(list ,newLoanApplication);   
-                
             }
 
             validateSubmittedOnDate(newLoanApplication);
@@ -384,7 +395,13 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 }
             }
 
+            // loan created at this point now
             this.loanRepositoryWrapper.save(newLoanApplication);
+
+            // we have a loan now lets create the loan commission link 
+            // should also have checker to check if loan is being submitted through a loan agent
+            CommissionsHelper.linkLoanToCommissions(newLoanApplication ,loansFromAgentsWritePlatformService ,attachedCommissionChargesWritePlatformService , fromJsonHelper ,command);
+
 
             if (loanProduct.isInterestRecalculationEnabled()) {
                 this.fromApiJsonDeserializer.validateLoanForInterestRecalculation(newLoanApplication);

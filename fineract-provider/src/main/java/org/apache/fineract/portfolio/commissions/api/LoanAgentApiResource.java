@@ -6,10 +6,7 @@
 */
 package org.apache.fineract.portfolio.commissions.api;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,14 +27,22 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.Page;
+import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
+import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.commissions.constants.LoanAgentApiConstants;
+import org.apache.fineract.portfolio.commissions.data.LoanAgentData;
+import org.apache.fineract.portfolio.commissions.domain.LoanAgent;
+import org.apache.fineract.portfolio.commissions.service.LoanAgentReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Path("/loanagent")
+@Path("/loanagents")
 @Component
 @Scope("singleton")
 public class LoanAgentApiResource {
@@ -47,14 +52,14 @@ public class LoanAgentApiResource {
     private final String resourceNameForPermissions = "LOAN_AGENT";
 
     private final PlatformSecurityContext context;
-    private final ChargeReadPlatformService readPlatformService;
-    private final DefaultToApiJsonSerializer<ChargeData> toApiJsonSerializer;
+    private final LoanAgentReadPlatformService readPlatformService;
+    private final DefaultToApiJsonSerializer<LoanAgentData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @Autowired
-    public LoanAgentApiResource(final PlatformSecurityContext context, final ChargeReadPlatformService readPlatformService,
-                              final DefaultToApiJsonSerializer<ChargeData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
+    public LoanAgentApiResource(final PlatformSecurityContext context, final LoanAgentReadPlatformService readPlatformService,
+                              final DefaultToApiJsonSerializer<LoanAgentData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
                               final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
         this.context = context;
         this.readPlatformService = readPlatformService;
@@ -63,18 +68,19 @@ public class LoanAgentApiResource {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
     }
 
-//    @GET
-//    @Consumes({ MediaType.APPLICATION_JSON })
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public String retrieveAllCharges(@Context final UriInfo uriInfo) {
-//
-//        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
-//
-//        final Collection<ChargeData> charges = this.readPlatformService.retrieveAllCharges();
-//
-//        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-//        return this.toApiJsonSerializer.serialize(settings, charges, this.CHARGES_DATA_PARAMETERS);
-//    }
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAll(@Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+
+        final List<LoanAgentData> loanAgentDataList = this.readPlatformService.retrieveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, loanAgentDataList , LoanAgentApiConstants.LOAN_AGENT_DATA_PARAMETERS);
+
+    }
 //
 //    @GET
 //    @Path("{chargeId}")
@@ -128,6 +134,7 @@ public class LoanAgentApiResource {
 
         return this.toApiJsonSerializer.serialize(result);
     }
+
 
 //    @PUT
 //    @Path("{chargeId}")

@@ -36,8 +36,6 @@ public class CommissionChargeWritePlatformServiceImpl implements CommissionCharg
     @Override
     public CommandProcessingResult create(JsonCommand jsonCommand) {
 
-        System.err.println("------------create something son and first check if the string is not blank else will throw some funky errors-------------------");
-
         Integer chargeAppliesToInt = jsonCommand.integerValueOfParameterNamed(CommissionChargeApiConstants.chargeAppliesToParam);
         Integer chargeTimeTypeInt = jsonCommand.integerValueOfParameterNamed(CommissionChargeApiConstants.chargeTimeTypeParam);
         Integer chargeCalculationTypeInt = jsonCommand.integerValueOfParameterNamed(CommissionChargeApiConstants.chargeCalculationTypeParam);
@@ -52,7 +50,6 @@ public class CommissionChargeWritePlatformServiceImpl implements CommissionCharg
         ChargeAppliesTo chargeAppliesTo = ChargeAppliesTo.fromInt(chargeAppliesToInt);
 
         CommissionCharge commissionCharge = new CommissionCharge(name ,currencyCode ,amount ,chargeTimeType ,chargeAppliesTo ,chargeCalculationType,isActive);
-
         this.commissionChargesRepository.save(commissionCharge);
 
         return new CommandProcessingResultBuilder() //

@@ -18,7 +18,33 @@
  */
 package org.apache.fineract.portfolio.loanaccount.api;
 
+import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public interface LoanApiConstants {
+    
+    // added 06/01/2021    
+    public static Set<String> LOAN_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "accountNo", "status", "externalId", "clientId",
+            "group", "loanProductId", "loanProductName", "loanProductDescription", "isLoanProductLinkedToFloatingRate", "fundId",
+            "fundName", "loanPurposeId", "loanPurposeName", "loanOfficerId", "loanOfficerName", "currency", "principal", "totalOverpaid",
+            "inArrearsTolerance", "termFrequency", "termPeriodFrequencyType", "numberOfRepayments", "repaymentEvery",
+            "interestRatePerPeriod", "annualInterestRate", "repaymentFrequencyType", "transactionProcessingStrategyId",
+            "transactionProcessingStrategyName", "interestRateFrequencyType", "amortizationType", "interestType",
+            "interestCalculationPeriodType", LoanProductConstants.allowPartialPeriodInterestCalcualtionParamName, "expectedFirstRepaymentOnDate",
+            "graceOnPrincipalPayment", "recurringMoratoriumOnPrincipalPeriods", "graceOnInterestPayment", "graceOnInterestCharged", "interestChargedFromDate", "timeline",
+            "totalFeeChargesAtDisbursement", "summary", "repaymentSchedule", "transactions", "charges", "collateral", "guarantors",
+            "meeting", "productOptions", "amortizationTypeOptions", "interestTypeOptions", "interestCalculationPeriodTypeOptions",
+            "repaymentFrequencyTypeOptions", "repaymentFrequencyNthDayTypeOptions", "repaymentFrequencyDaysOfWeekTypeOptions",
+            "termFrequencyTypeOptions", "interestRateFrequencyTypeOptions", "fundOptions", "repaymentStrategyOptions", "chargeOptions",
+            "loanOfficerOptions", "loanPurposeOptions", "loanCollateralOptions", "chargeTemplate", "calendarOptions",
+            "syncDisbursementWithMeeting", "loanCounter", "loanProductCounter", "notes", "accountLinkingOptions", "linkedAccount",
+            "interestRateDifferential", "isFloatingInterestRate", "interestRatesPeriods", LoanApiConstants.canUseForTopup,
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.topupAmount, LoanApiConstants.clientActiveLoanOptions,
+            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam));
+
 
     public static final String emiAmountParameterName = "fixedEmiAmount";
     public static final String maxOutstandingBalanceParameterName = "maxOutstandingLoanBalance";
@@ -139,6 +165,13 @@ public interface LoanApiConstants {
     public static final String loanFactorAccountIdParam = "loanFactorAccountId";
 
 
-    // adde 02/01/2021
+    // added 02/01/2021
     public static final String loanCommissionChargeParam = "loanCommissionChargeId";
+
+
+    // added 04/01/2021 ,loan agents etc
+    public static final String agentDataParam = "agentData";
+
+
+
 }

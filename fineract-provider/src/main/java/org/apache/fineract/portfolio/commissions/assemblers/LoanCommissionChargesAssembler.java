@@ -4,12 +4,13 @@
     At 10:08 PM on 1/2/2022
 
 */
-package org.apache.fineract.portfolio.commissions.domain;
+package org.apache.fineract.portfolio.commissions.assemblers;
 
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.commissions.domain.CommissionCharge;
 import org.apache.fineract.portfolio.commissions.repo.CommissionChargesRepository;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 

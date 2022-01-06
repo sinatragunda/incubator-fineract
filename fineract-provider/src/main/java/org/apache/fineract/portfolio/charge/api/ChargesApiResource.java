@@ -117,10 +117,8 @@ public class ChargesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveNewChargeDetails(@Context final UriInfo uriInfo) {
 
-        System.err.println("---------------------does it come back on template ? ,what for ?");
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
-
         final ChargeData charge = this.readPlatformService.retrieveNewChargeDetails();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -133,10 +131,7 @@ public class ChargesApiResource {
     public String createCharge(final String apiRequestBodyAsJson) {
 
 
-        System.err.println("---------------------create charge -----------------------");
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createCharge().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);

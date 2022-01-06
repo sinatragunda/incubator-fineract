@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -28,6 +29,8 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
 
     private PlatformSecurityContext context ;
     private JdbcTemplate jdbcTemplate ;
+    private SavingsAccountReadPlatformService savingsAccountReadPlatformService ;
+    private ClientReadPlatformService clientReadPlatformService ;
 
 
     @Autowired
@@ -42,8 +45,11 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
         public String schema() {
             return "la.id as id, "
                     + "la.client_id as clientId ,"
+                    + "mc.account_no as clientAccountNo ,"
+                    + "mc.display_name as displayName ,"
                     + "la.savings_account_id as savingsAccountId "
-                    + "from m_loan_agent la ";
+                    + "from m_loan_agent la join "
+                    + "m_client mc on mc.id = la.client_id";
         }
 
         @Override
@@ -52,8 +58,10 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
             final Long id = rs.getLong("id");
             final Long clientId = rs.getLong("clientId");
             final Long savingsAccountId = rs.getLong("savingsAccountId");
+            final String displayName = rs.getString("displayName");
+            final String clientAccountNo = rs.getString("clientAccountNo");
 
-            return new LoanAgentData(id, clientId ,savingsAccountId);
+            return LoanAgentData.instance(id, clientId ,savingsAccountId ,clientAccountNo, displayName);
         }
     }
 
@@ -64,7 +72,7 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
         this.context.authenticatedUser();
         final LoanAgentDataMapper loanAgentDataMapper = new LoanAgentDataMapper();
         final String sql = "select " + loanAgentDataMapper.schema() + " where la.id=?";
-        return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { id, id });
+        return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { id});
     }
 
     // always one unique agent per client
@@ -73,9 +81,20 @@ public class LoanAgentReadPlatformServiceImpl implements LoanAgentReadPlatformSe
 
         this.context.authenticatedUser();
         final LoanAgentDataMapper loanAgentDataMapper = new LoanAgentDataMapper();
-        final String sql = "select " + loanAgentDataMapper.schema() + " where la.clientId=?";
-        return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { clientId, clientId });
+        final String sql = "select " + loanAgentDataMapper.schema() + " where la.client_id=?";
+        return this.jdbcTemplate.queryForObject(sql, loanAgentDataMapper, new Object[] { clientId });
     }
+
+    @Override
+    public List<LoanAgentData> retrieveAll(){
+
+        this.context.authenticatedUser();
+        final LoanAgentDataMapper loanAgentDataMapper = new LoanAgentDataMapper();
+        final String sql = "select " + loanAgentDataMapper.schema();
+        return this.jdbcTemplate.query(sql, loanAgentDataMapper);
+
+    }
+
 
 
 

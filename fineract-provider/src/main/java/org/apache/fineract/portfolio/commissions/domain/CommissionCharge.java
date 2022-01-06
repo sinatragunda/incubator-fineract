@@ -41,10 +41,8 @@ public class CommissionCharge extends AbstractPersistableCustom<Long>{
     @Column(name="name" ,nullable=false)
     private String name ;
 
-
     @Column(name="currency_code" ,nullable=false)
     private String currencyCode ;
-
 
     @Column(name="amount" ,nullable=false)
     private BigDecimal amount ;

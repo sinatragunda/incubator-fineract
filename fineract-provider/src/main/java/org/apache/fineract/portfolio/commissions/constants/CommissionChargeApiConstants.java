@@ -26,7 +26,7 @@ public class CommissionChargeApiConstants {
     public static String chargeCalculationTypeParam	= "chargeCalculationType";
     public static String amountParam = "amount";
     public static String nameParam	= "name";
-    public static String chargeTimeTypeParam	 = "chargeTimeType";
+    public static String chargeTimeTypeParam = "chargeTimeType";
     public static String isActiveParam = "active";
 
 }

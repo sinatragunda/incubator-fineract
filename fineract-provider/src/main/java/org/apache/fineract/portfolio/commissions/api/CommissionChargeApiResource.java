@@ -27,12 +27,17 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.commissions.constants.CommissionChargeApiConstants;
 import org.apache.fineract.portfolio.commissions.data.CommissionChargeData;
+import org.apache.fineract.portfolio.commissions.domain.CommissionCharge;
 import org.apache.fineract.portfolio.commissions.service.CommissionChargesReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.List;
 
 @Path("/commissioncharges")
 @Component
@@ -68,7 +73,6 @@ public class CommissionChargeApiResource {
 
         System.err.println("------------------template for commmissions----------------");
 
-        //final ChargeData charge = this.readPlatformService.retrieveNewChargeDetails();
         final CommissionChargeData commissionChargeData = this.readPlatformService.retrieveNewCommissionChargeTemplate();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -90,6 +94,39 @@ public class CommissionChargeApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAllCharges(@Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(CommissionChargeApiConstants.resourceNameForPermissions);
+
+        final List<CommissionChargeData> charges = this.readPlatformService.retrieveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, charges, CommissionChargeApiConstants.COMMISSION_CHARGE_DATA_PARAMETERS);
+    }
+
+    @GET
+    @Path("{chargeId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveCharge(@PathParam("chargeId") final Long chargeId, @Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(CommissionChargeApiConstants.resourceNameForPermissions);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        CommissionChargeData commissionChargeData = this.readPlatformService.retrieveOne(chargeId);
+        if (settings.isTemplate()) {
+            final CommissionChargeData templateData = this.readPlatformService.retrieveNewCommissionChargeTemplate();
+            commissionChargeData = CommissionChargeData.withTemplate(commissionChargeData, templateData);
+        }
+
+        return this.toApiJsonSerializer.serialize(settings, commissionChargeData, CommissionChargeApiConstants.COMMISSION_CHARGE_DATA_PARAMETERS);
     }
 
 

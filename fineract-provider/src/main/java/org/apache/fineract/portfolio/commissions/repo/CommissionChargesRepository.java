@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
 public interface CommissionChargesRepository extends JpaRepository<CommissionCharge,Long> ,JpaSpecificationExecutor<CommissionCharge>{
-
-    public CommissionCharge findOne(Long id);
+    CommissionCharge findOne(Long id);
 
 }

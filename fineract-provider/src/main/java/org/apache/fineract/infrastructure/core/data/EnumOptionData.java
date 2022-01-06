@@ -25,9 +25,11 @@ package org.apache.fineract.infrastructure.core.data;
  */
 public class EnumOptionData {
 
-    private final Long id;
-    private final String code;
-    private final String value;
+    private Long id;
+    private String code;
+    private String value;
+
+    public EnumOptionData(){}
 
     public EnumOptionData(final Long id, final String code, final String value) {
         this.id = id;
@@ -46,6 +48,16 @@ public class EnumOptionData {
     public String getValue() {
         return this.value;
     }
-    
-    
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

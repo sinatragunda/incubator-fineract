@@ -33,7 +33,7 @@ import javax.persistence.Version;
 public class LoanAgent extends AbstractPersistableCustom<Long>{
 
     @Column(name ="client_id" ,nullable = false)
-    @ManyToOne
+    @OneToOne
     private Client client ;
 
     @Column(name ="savings_account_id" ,nullable = false)
@@ -42,6 +42,7 @@ public class LoanAgent extends AbstractPersistableCustom<Long>{
 
 
     public LoanAgent(){}
+
 
     public LoanAgent(Client client, SavingsAccount savingsAccount) {
         this.client = client;

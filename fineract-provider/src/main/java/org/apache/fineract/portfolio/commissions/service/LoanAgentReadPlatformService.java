@@ -11,10 +11,12 @@ import org.apache.fineract.portfolio.commissions.data.LoanAgentData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface LoanAgentReadPlatformService {
 
-    public LoanAgentData retrieveOne(Long id);
+    LoanAgentData retrieveOne(Long id);
     LoanAgentData retrieveOneByClient(Long id);
+    List<LoanAgentData> retrieveAll();
 }
 

@@ -103,7 +103,6 @@ public class ChargeEnumerations {
                         "Loan Application");
             break;
 
-
             case LOAN_CLOSED:
                 optionData = new EnumOptionData(ChargeTimeType.LOAN_CLOSED.getValue().longValue(), ChargeTimeType.LOAN_CLOSED.getCode(), 
                         "Loan Closed");
@@ -172,6 +171,11 @@ public class ChargeEnumerations {
             	optionData = new EnumOptionData(ChargeCalculationType.PERCENT_OF_DISBURSEMENT_AMOUNT.getValue().longValue(),
             	        ChargeCalculationType.PERCENT_OF_DISBURSEMENT_AMOUNT.getCode(), "% Disbursement Amount");
             break;
+            case FLEXIBLE_AMOUNT:
+                optionData = new EnumOptionData(ChargeCalculationType.FLEXIBLE_AMOUNT.getValue().longValue(),
+                        ChargeCalculationType.FLEXIBLE_AMOUNT.getCode(), "To Be Determined");
+            break;
+            
             default:
                 optionData = new EnumOptionData(ChargeCalculationType.INVALID.getValue().longValue(),
                         ChargeCalculationType.INVALID.getCode(), "Invalid");

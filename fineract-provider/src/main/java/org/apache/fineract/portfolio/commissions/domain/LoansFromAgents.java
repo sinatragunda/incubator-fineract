@@ -29,15 +29,8 @@ import javax.persistence.Version;
 
 
 @Entity
-@Table(name="m_loan_commission")
-public class LoanCommission extends AbstractPersistableCustom<Long> {
-
-    @Column(name="is_deposited")
-    private Boolean isDeposited ;
-
-    @ManyToOne
-    @JoinColumn(name = "loan_commission_charge_id", nullable = true)
-    private CommissionCharge commissionCharge;
+@Table(name="m_loans_from_agents")
+public class LoansFromAgents extends AbstractPersistableCustom<Long> {
 
     @ManyToOne
     @JoinColumn(name = "loan_id", nullable = true)
@@ -47,18 +40,19 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "loan_agent_id", nullable = true)
     private LoanAgent loanAgent ;
 
-    @Column(name = "currency_code", length = 3)
-    private String currencyCode;
+    public LoansFromAgents(){}
 
-    public LoanCommission(){}
-
-
-    public CommissionCharge getCommissionCharge() {
-        return commissionCharge;
+    protected LoansFromAgents(Long id){
+        setId(id);
     }
 
-    public void setCommissionCharge(CommissionCharge commissionCharge) {
-        this.commissionCharge = commissionCharge;
+    public LoansFromAgents(Loan loan ,LoanAgent loanAgent){
+        this.loanAgent = loanAgent ;
+        this.loan = loan ;
+    }
+
+    public static LoansFromAgents fromId(Long id){
+        return new LoansFromAgents(id);
     }
 
     public Loan getLoan() {
@@ -77,11 +71,4 @@ public class LoanCommission extends AbstractPersistableCustom<Long> {
         this.loanAgent = loanAgent;
     }
 
-    public Boolean getDeposited() {
-        return isDeposited;
-    }
-
-    public void setDeposited(Boolean deposited) {
-        isDeposited = deposited;
-    }
 }

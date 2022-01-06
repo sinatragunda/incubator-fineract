@@ -3166,4 +3166,13 @@ public class CommandWrapperBuilder {
         this.href = "commissioncharge/template";
         return this;
     }
+
+
+    // Added 06/01/2022 
+    public CommandWrapperBuilder createLoansFromAgents(){
+        this.actionName = "CREATE";
+        this.entityName = "LOANSFROMAGENTS";
+        this.href = "loansfromagents/template";
+        return this;
+    }
 }

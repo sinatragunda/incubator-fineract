@@ -137,6 +137,12 @@ public enum ChargeTimeType {
                 case 16:
                 	chargeTimeType = SAVINGS_NOACTIVITY_FEE;
                 break;
+                case 17:
+                    chargeTimeType = LOAN_APPLICATION;
+                    break;
+                case 18:
+                    chargeTimeType = LOAN_CLOSED;
+                    break;
                 default:
                     chargeTimeType = INVALID;
                 break;
