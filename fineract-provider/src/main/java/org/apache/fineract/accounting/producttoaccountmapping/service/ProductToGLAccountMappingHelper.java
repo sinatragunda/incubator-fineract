@@ -86,14 +86,20 @@ public class ProductToGLAccountMappingHelper {
     public void mergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
             final int accountTypeId, final String accountTypeName, final Map<String, Object> changes,
             final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
+        
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
+
+        System.err.println("----------------------exception thrown here son------------------"+accountTypeName+"---------and account id is -------"+accountId);
 
         // get the existing product
         if (accountId != null) {
             final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId,
                     portfolioProductType.getValue(), accountTypeId);
-            if (accountMapping == null) { throw new ProductToGLAccountMappingNotFoundException(portfolioProductType, productId,
-                    accountTypeName); }
+            if (accountMapping == null) { 
+                System.err.println("---------------------accounting mapping null -----------------------"+accountTypeName);
+                throw new ProductToGLAccountMappingNotFoundException(portfolioProductType, productId,
+                    accountTypeName); 
+            }
             if (accountMapping.getGlAccount().getId() != accountId) {
                 final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                 changes.put(paramName, accountId);

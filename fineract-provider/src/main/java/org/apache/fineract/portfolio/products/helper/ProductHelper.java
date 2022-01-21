@@ -33,9 +33,6 @@ public class ProductHelper {
         String type[] = {"savings","loans","shares"};
 
         String path = request.getRequestURI();
-
-        System.err.println("-----------------------path is ----------------"+path);
-
         PRODUCT_TYPE productType = null ;
         // usually contains only one of the three not all
         for(String pathSegment : type){
@@ -47,8 +44,6 @@ public class ProductHelper {
         }
 
         // how do we get id of item now ?
-
-        System.err.println("------------------handle request filter");
     }
 
 }

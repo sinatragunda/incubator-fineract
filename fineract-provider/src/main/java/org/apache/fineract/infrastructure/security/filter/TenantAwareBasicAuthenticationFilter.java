@@ -207,15 +207,13 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 		
 		if(notAllowed){
 
-		    System.err.println("--------------------user not authorized for this shit man -------------"+pathURL);
-			 // we removing this step so that we can implement our self service item
+		     // we removing this step so that we can implement our self service item
             boolean isPasswordRequest = passwordResetRequest(pathURL ,response);
 
             // easy to bypass isSelfServiceRequest here to just proceed
             if(isPasswordRequest){
                 return ;
             }
-
             /// we had blocked this there other day
             // toxic logic that needs reworking here
 		    //throw new BadCredentialsException("User not authorised to use the requested resource.");

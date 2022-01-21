@@ -94,8 +94,12 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
 
     public void mergeLoanToLiabilityAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
             final int accountTypeId, final String accountTypeName, final Map<String, Object> changes) {
+
+        System.err.println("-----------------------map liability account --------------------------"+paramName);
         mergeProductToAccountMappingChanges(element, paramName, productId, accountTypeId, accountTypeName, changes,
                 GLAccountType.LIABILITY, PortfolioProductType.LOAN);
+
+        System.err.println("--------------------done merging-------------");
     }
 
     /*** Abstractions for payments channel related to loan products ***/
@@ -155,6 +159,11 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
         final Long receivablePenaltyAccountId = this.fromApiJsonHelper.extractLongNamed(
                 LOAN_PRODUCT_ACCOUNTING_PARAMS.PENALTIES_RECEIVABLE.getValue(), element);
 
+        // added 21/01/2022
+        final Long interestInSuspenseAccountId = this.fromApiJsonHelper.extractLongNamed(
+                LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(), element);
+
+
         switch (accountingRuleType) {
             case NONE:
             break;
@@ -166,12 +175,12 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
             case ACCRUAL_PERIODIC:
                 populateChangesForAccrualBasedAccounting(changes, fundAccountId, loanPortfolioAccountId, incomeFromInterestId,
                         incomeFromFeeId, incomeFromPenaltyId, writeOffAccountId, overPaymentAccountId, transfersInSuspenseAccountId,
-                        incomeFromRecoveryAccountId, receivableInterestAccountId, receivableFeeAccountId, receivablePenaltyAccountId);
+                        incomeFromRecoveryAccountId, receivableInterestAccountId, receivableFeeAccountId, receivablePenaltyAccountId ,interestInSuspenseAccountId);
             break;
             case ACCRUAL_UPFRONT:
                 populateChangesForAccrualBasedAccounting(changes, fundAccountId, loanPortfolioAccountId, incomeFromInterestId,
                         incomeFromFeeId, incomeFromPenaltyId, writeOffAccountId, overPaymentAccountId, transfersInSuspenseAccountId,
-                        incomeFromRecoveryAccountId, receivableInterestAccountId, receivableFeeAccountId, receivablePenaltyAccountId);
+                        incomeFromRecoveryAccountId, receivableInterestAccountId, receivableFeeAccountId, receivablePenaltyAccountId ,interestInSuspenseAccountId);
             break;
         }
 
@@ -182,11 +191,12 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
             final Long loanPortfolioAccountId, final Long incomeFromInterestId, final Long incomeFromFeeId, final Long incomeFromPenaltyId,
             final Long writeOffAccountId, final Long overPaymentAccountId, final Long transfersInSuspenseAccountId,
             final Long incomeFromRecoveryAccountId, final Long receivableInterestAccountId, final Long receivableFeeAccountId,
-            final Long receivablePenaltyAccountId) {
+            final Long receivablePenaltyAccountId ,final Long interestInSuspenseAccountId) {
 
         changes.put(LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_RECEIVABLE.getValue(), receivableInterestAccountId);
         changes.put(LOAN_PRODUCT_ACCOUNTING_PARAMS.FEES_RECEIVABLE.getValue(), receivableFeeAccountId);
         changes.put(LOAN_PRODUCT_ACCOUNTING_PARAMS.PENALTIES_RECEIVABLE.getValue(), receivablePenaltyAccountId);
+        changes.put(LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue() ,interestInSuspenseAccountId);
 
         populateChangesForCashBasedAccounting(changes, fundAccountId, loanPortfolioAccountId, incomeFromInterestId, incomeFromFeeId,
                 incomeFromPenaltyId, writeOffAccountId, overPaymentAccountId, transfersInSuspenseAccountId, incomeFromRecoveryAccountId);
@@ -220,6 +230,9 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
      */
     public void handleChangesToLoanProductToGLAccountMappings(final Long loanProductId, final Map<String, Object> changes,
             final JsonElement element, final AccountingRuleType accountingRuleType) {
+
+        System.err.println("----------------accountingrule type -------------------"+accountingRuleType);
+        
         switch (accountingRuleType) {
             case NONE:
             break;
@@ -295,8 +308,15 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
                 // liabilities
                 mergeLoanToLiabilityAccountMappingChanges(element, LOAN_PRODUCT_ACCOUNTING_PARAMS.OVERPAYMENT.getValue(), loanProductId,
                         CASH_ACCOUNTS_FOR_LOAN.OVERPAYMENT.getValue(), CASH_ACCOUNTS_FOR_LOAN.OVERPAYMENT.toString(), changes);
+                
+                // added 21/01/2022             
+                mergeLoanToLiabilityAccountMappingChanges(element, LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(), loanProductId,
+                        ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.toString(), changes);
+            
             break;
         }
+
+        System.err.println("----------------does it get out of here ?---------------------");
     }
 
     public void deleteLoanProductToGLAccountMapping(final Long loanProductId) {

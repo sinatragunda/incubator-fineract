@@ -47,13 +47,23 @@ public class LoanAccrualPlatformServiceImpl implements LoanAccrualPlatformServic
     @Override
     @CronTarget(jobName = JobName.ADD_ACCRUAL_ENTRIES)
     public void addAccrualAccounting() throws JobExecutionException {
+
+        System.err.println("----------------do we run accruals here ? ---------------");    
+
         Collection<LoanScheduleAccrualData> loanScheduleAccrualDatas = this.loanReadPlatformService.retriveScheduleAccrualData();
+
+        System.err.println("----------------------all scheduled loans are ------------------------"+loanScheduleAccrualDatas.size());
+        
+        
         StringBuilder sb = new StringBuilder();
         Map<Long, Collection<LoanScheduleAccrualData>> loanDataMap = new HashMap<>();
+
         for (final LoanScheduleAccrualData accrualData : loanScheduleAccrualDatas) {
             if (loanDataMap.containsKey(accrualData.getLoanId())) {
+                System.err.println("----------------------put id into map ----------------"+accrualData.getLoanId());
                 loanDataMap.get(accrualData.getLoanId()).add(accrualData);
             } else {
+                System.err.println("-----------------else part put id into map ----------------"+accrualData.getLoanId());
                 Collection<LoanScheduleAccrualData> accrualDatas = new ArrayList<>();
                 accrualDatas.add(accrualData);
                 loanDataMap.put(accrualData.getLoanId(), accrualDatas);
@@ -62,6 +72,7 @@ public class LoanAccrualPlatformServiceImpl implements LoanAccrualPlatformServic
 
         for (Map.Entry<Long, Collection<LoanScheduleAccrualData>> mapEntry : loanDataMap.entrySet()) {
             try {
+                System.err.println("--------------------------addAccrualAccounting map ----------------");
                 this.loanAccrualWritePlatformService.addAccrualAccounting(mapEntry.getKey(), mapEntry.getValue());
             } catch (Exception e) {
                 Throwable realCause = e;

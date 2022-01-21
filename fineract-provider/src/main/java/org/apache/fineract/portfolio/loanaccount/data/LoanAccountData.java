@@ -1934,4 +1934,9 @@ public class LoanAccountData {
     public Long getId() {
         return id;
     }
+
+    // added 21/01/2022
+    public boolean isNpa(){
+        return this.isNPA;
+    }
 }

@@ -1179,7 +1179,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
         }
 
         // 21/08/2020
-
         if (command.isChangeInIntegerParameterNamed(LoanProductConstants.loanFactorSourceAccountTypeParam,
                 this.loanFactorSourceAccountType.ordinal())) {
             final Integer newValue = command.integerValueOfParameterNamed(LoanProductConstants.loanFactorSourceAccountTypeParam);

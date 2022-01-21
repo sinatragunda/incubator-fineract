@@ -2,30 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b67edfa2-cc53-4f72-b77b-b5eeef9f87c0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/CommissionsHelperService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/AttachedCommissionChargesReadPlatformService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/AttachedCommissionChargesReadPlatformServiceImpl.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/glaccount/data/GLAccountData.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/glaccount/data/GLAccountData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/chartofaccounts/ChartOfAccountsImportHandler.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/chartofaccounts/ChartOfAccountsImportHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/CodeValueDataIdSerializer.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/helper/CodeValueDataIdSerializer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/ChargeTimeType.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/ChargeTimeType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeEnumerations.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeEnumerations.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/LoansFromAgentsApiResource.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/LoansFromAgentsApiResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/constants/CommissionChargeApiConstants.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/constants/CommissionChargeApiConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/data/AttachedCommissionChargesData.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/data/AttachedCommissionChargesData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/domain/AttachedCommissionCharges.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/domain/AttachedCommissionCharges.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/AttachedCommissionChargesHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/AttachedCommissionChargesHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/CommissionsHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/CommissionsHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/AttachedCommissionChargesWritePlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/AttachedCommissionChargesWritePlatformServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/CommissionChargeDropdownReadPlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/CommissionChargeDropdownReadPlatformServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/serialization/LoanApplicationCommandFromApiJsonHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/serialization/LoanApplicationCommandFromApiJsonHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformServiceJpaRepositoryImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformServiceJpaRepositoryImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/api/SelfClientsApiResource.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/api/SelfClientsApiResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/service/AppuserClientMapperReadService.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/service/AppuserClientMapperReadService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/service/AppuserClientMapperReadServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/service/AppuserClientMapperReadServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/common/AccountingConstants.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/common/AccountingConstants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/LoanProductToGLAccountMappingHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/LoanProductToGLAccountMappingHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingReadPlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingReadPlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingWritePlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingWritePlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/security/filter/TenantAwareBasicAuthenticationFilter.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/security/filter/TenantAwareBasicAuthenticationFilter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/data/LoanAccountData.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/data/LoanAccountData.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualPlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualPlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualWritePlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualWritePlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanReadPlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanReadPlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/domain/LoanProduct.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/domain/LoanProduct.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/enumerations/LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/enumerations/LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/serialization/LoanProductDataValidator.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/serialization/LoanProductDataValidator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/helper/ProductHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/helper/ProductHelper.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -63,109 +54,113 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="LoansFromAgentsApiResource.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/LoansFromAgentsApiResource.java">
+      <file leaf-file-name="LoanProductDataValidator.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/serialization/LoanProductDataValidator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1309">
-              <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ChartOfAccountsImportHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/chartofaccounts/ChartOfAccountsImportHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="884">
-              <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-              <folding>
-                <marker date="1642109166578" expanded="true" signature="6725:7908" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClientPersonImportHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/client/ClientPersonImportHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1020">
-              <caret line="99" column="13" lean-forward="false" selection-start-line="99" selection-start-column="13" selection-end-line="99" selection-end-column="13" />
+            <state relative-caret-position="390">
+              <caret line="212" column="7" lean-forward="false" selection-start-line="212" selection-start-column="7" selection-end-line="212" selection-end-column="7" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GLAccountData.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/glaccount/data/GLAccountData.java">
+      <file leaf-file-name="ProductToGLAccountMappingReadPlatformServiceImpl.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingReadPlatformServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3723">
-              <caret line="255" column="32" lean-forward="false" selection-start-line="255" selection-start-column="32" selection-end-line="255" selection-end-column="32" />
+            <state relative-caret-position="518">
+              <caret line="381" column="1" lean-forward="false" selection-start-line="381" selection-start-column="1" selection-end-line="381" selection-end-column="1" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SelfClientsApiResource.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/api/SelfClientsApiResource.java">
+      <file leaf-file-name="V314__updating_r_enum_table.sql" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/resources/sql/migrations/core_db/V314__updating_r_enum_table.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="382">
-              <caret line="232" column="13" lean-forward="false" selection-start-line="232" selection-start-column="13" selection-end-line="232" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LoanAccrualPlatformServiceImpl.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualPlatformServiceImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="47" column="5" lean-forward="false" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
+            <state relative-caret-position="289">
+              <caret line="56" column="147" lean-forward="false" selection-start-line="56" selection-start-column="147" selection-end-line="56" selection-end-column="147" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClientEntityImportHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/client/ClientEntityImportHandler.java">
+      <file leaf-file-name="AccountingProcessorHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/journalentry/service/AccountingProcessorHelper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2618">
-              <caret line="193" column="0" lean-forward="false" selection-start-line="193" selection-start-column="0" selection-end-line="196" selection-end-column="0" />
+            <state relative-caret-position="-3664">
+              <caret line="20" column="19" lean-forward="false" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LoanAgentApiResource.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/LoanAgentApiResource.java">
+      <file leaf-file-name="LoanProduct.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/domain/LoanProduct.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="714">
-              <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommissionsApiConstants.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/constants/CommissionsApiConstants.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="8" column="13" lean-forward="false" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+            <state relative-caret-position="123">
+              <caret line="1182" column="21" lean-forward="false" selection-start-line="1182" selection-start-column="21" selection-end-line="1182" selection-end-column="21" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CommissionChargeApiConstants.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/constants/CommissionChargeApiConstants.java">
+      <file leaf-file-name="LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/enumerations/LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="442">
+              <caret line="31" column="11" lean-forward="false" selection-start-line="31" selection-start-column="11" selection-end-line="31" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProductToGLAccountMappingHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingHelper.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
-              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <caret line="95" column="91" lean-forward="false" selection-start-line="95" selection-start-column="91" selection-end-line="95" selection-end-column="125" />
+              <folding>
+                <marker date="1642760298225" expanded="true" signature="6537:7751" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="7756:8012" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="8240:9381" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="9387:9652" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="9912:11219" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="11225:11326" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="11576:16711" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="16286:16384" ph="//..." />
+                <marker date="1642760298225" expanded="true" signature="16717:16818" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="17048:21598" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="21153:21251" ph="//..." />
+                <marker date="1642760298225" expanded="true" signature="21604:21664" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="21874:22464" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="22470:22530" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="22735:24081" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="22845:22948" ph="//..." />
+                <marker date="1642760298225" expanded="true" signature="24153:24378" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="24384:24645" ph="/**...*/" />
+                <marker date="1642760298225" expanded="true" signature="24776:25267" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="25406:26068" ph="{...}" />
+                <marker date="1642760298225" expanded="true" signature="26193:26587" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProductToGLAccountMappingRepository.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/domain/ProductToGLAccountMappingRepository.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="191">
+              <caret line="37" column="30" lean-forward="false" selection-start-line="37" selection-start-column="30" selection-end-line="37" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProductHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/helper/ProductHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="164">
+              <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -184,18 +179,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>retrieveAll</find>
-      <find>handleDepositOrWithdraw</find>
-      <find>handleDepositLi</find>
-      <find>note</find>
-      <find>closed</find>
-      <find>date</find>
-      <find>client</find>
-      <find>currency</find>
-      <find>jodaLocalDateToJavaDate</find>
-      <find>context.xml</find>
-      <find>repo</find>
-      <find>retrieveNewCh</find>
       <find>charges_data</find>
       <find>charges</find>
       <find>boolean</find>
@@ -214,6 +197,18 @@
       <find>gsonBuilder.registerTypeAdapter</find>
       <find>self/clients</find>
       <find>cron</find>
+      <find>npa</find>
+      <find>overpaymentLiabilityAccount</find>
+      <find>overpayment</find>
+      <find>OVERPAYMENT</find>
+      <find>INCOME_FROM_PENALTIES</find>
+      <find>interest_in_suspense</find>
+      <find>ProductToGLAccountMappingNotFoundException</find>
+      <find>findCoreProductToFinAccountMapping</find>
+      <find>handle req</find>
+      <find>interest_recei</find>
+      <find>LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt</find>
+      <find>interestInSuspenseAccount</find>
     </findStrings>
     <dirStrings>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache</dir>
@@ -224,8 +219,9 @@
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\loanaccount</dir>
-      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org</dir>
+      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\loanproduct</dir>
+      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract</dir>
       <dir>D:\Documents\Coding\incubator-fineract</dir>
     </dirStrings>
   </component>
@@ -443,14 +439,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/api/ChargesApiResource.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/CommissionChargeApiResource.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/api/ClientsApiResource.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/CommissionChargesReadPlatformServiceImpl.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoanAgentReadPlatformService.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/constants/LoanAgentApiConstants.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/domain/CommissionCharge.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/api/LoanAgentApiResource.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoansApiResource.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/LoanAgentDataBridgeHelper.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/domain/LoanCommissionChargesAssembler.java" />
@@ -494,6 +482,14 @@
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/chartofaccounts/ChartOfAccountsImportHandler.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/glaccount/data/GLAccountData.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/api/SelfClientsApiResource.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualPlatformServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualWritePlatformServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/common/AccountingConstants.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingReadPlatformServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/helper/ProductHelper.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/domain/LoanProduct.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/enumerations/LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/serialization/LoanProductDataValidator.java" />
       </list>
     </option>
   </component>
@@ -533,7 +529,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -606,82 +602,6 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="bulkimport" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="bulkimport" type="462c0819:PsiDirectoryNode" />
-              <item name="importhandler" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="bulkimport" type="462c0819:PsiDirectoryNode" />
-              <item name="importhandler" type="462c0819:PsiDirectoryNode" />
-              <item name="chartofaccounts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="bulkimport" type="462c0819:PsiDirectoryNode" />
-              <item name="importhandler" type="462c0819:PsiDirectoryNode" />
-              <item name="client" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
-              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="org" type="462c0819:PsiDirectoryNode" />
-              <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
               <item name="portfolio" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -693,9 +613,47 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
               <item name="portfolio" type="462c0819:PsiDirectoryNode" />
-              <item name="excel" type="462c0819:PsiDirectoryNode" />
+              <item name="loanproduct" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
+              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="fineract" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="loanproduct" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
+              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="fineract" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="loanproduct" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
+              <item name="incubator-fineract" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="fineract-provider" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="fineract" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="loanproduct" type="462c0819:PsiDirectoryNode" />
+              <item name="domain" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -734,7 +692,7 @@
       </pane>
       <pane id="PackagesPane" />
       <pane id="Scope" />
-      <pane id="AndroidView" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -939,14 +897,16 @@
       <workItem from="1642154757414" duration="175000" />
       <workItem from="1642484781490" duration="2757000" />
       <workItem from="1642671692766" duration="1876000" />
+      <workItem from="1642739296548" duration="14148000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="636543000" />
+    <option name="totallyTimeSpent" value="650691000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="736" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -967,7 +927,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32850242" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.07639939" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.056732222" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -1041,97 +1001,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/handler/CreateLoanAgentCommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="18" column="13" lean-forward="false" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/handler/CreateLoansFromAgentsCommandHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="18" column="37" lean-forward="false" selection-start-line="18" selection-start-column="37" selection-end-line="18" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/assemblers/LoanCommissionChargesAssembler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="35" column="14" lean-forward="false" selection-start-line="35" selection-start-column="14" selection-end-line="35" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/serialization/CalculateLoanScheduleQueryFromApiJsonHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="72" column="293" lean-forward="false" selection-start-line="72" selection-start-column="293" selection-end-line="72" selection-end-column="293" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/PaginationParameters.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/EnumOptionData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="29" column="25" lean-forward="false" selection-start-line="29" selection-start-column="25" selection-end-line="29" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/PortfolioAccountType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoanApiConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="35" column="61" lean-forward="false" selection-start-line="35" selection-start-column="61" selection-end-line="35" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoanAgentReadPlatformService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="19" column="38" lean-forward="false" selection-start-line="19" selection-start-column="38" selection-end-line="19" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoanAgentWritePlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoansFromAgentsWritePlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="58" column="25" lean-forward="false" selection-start-line="58" selection-start-column="25" selection-end-line="58" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoanAgentReadPlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="77" column="41" lean-forward="false" selection-start-line="77" selection-start-column="41" selection-end-line="77" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/service/LoansFromAgentsReadPlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="99" column="68" lean-forward="false" selection-start-line="99" selection-start-column="68" selection-end-line="99" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/data/CommissionChargeData.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1570">
@@ -1325,7 +1194,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="18" column="163" lean-forward="false" selection-start-line="18" selection-start-column="163" selection-end-line="18" selection-end-column="163" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1350,7 +1218,7 @@
         <state relative-caret-position="714">
           <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1360,7 +1228,7 @@
         <state relative-caret-position="1309">
           <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1401,18 +1269,144 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/self/client/api/SelfClientsApiResource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
+        <state relative-caret-position="3196">
           <caret line="232" column="13" lean-forward="false" selection-start-line="232" selection-start-column="13" selection-end-line="232" selection-end-column="13" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualPlatformServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="77" column="40" lean-forward="false" selection-start-line="77" selection-start-column="40" selection-end-line="77" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/common/AccountingConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="51" column="16" lean-forward="false" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanAccrualWritePlatformServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="416">
+          <caret line="116" column="0" lean-forward="false" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/api/LoanProductsApiResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="248" column="9" lean-forward="false" selection-start-line="248" selection-start-column="9" selection-end-line="248" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingReadPlatformServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="518">
+          <caret line="381" column="1" lean-forward="false" selection-start-line="381" selection-start-column="1" selection-end-line="381" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/resources/sql/migrations/core_db/V314__updating_r_enum_table.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="56" column="147" lean-forward="false" selection-start-line="56" selection-start-column="147" selection-end-line="56" selection-end-column="147" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/helper/ProductHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/domain/ProductToGLAccountMappingRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
-          <caret line="47" column="5" lean-forward="false" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
+          <caret line="37" column="30" lean-forward="false" selection-start-line="37" selection-start-column="30" selection-end-line="37" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/producttoaccountmapping/service/ProductToGLAccountMappingHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="95" column="91" lean-forward="false" selection-start-line="95" selection-start-column="91" selection-end-line="95" selection-end-column="125" />
+          <folding>
+            <marker date="1642760298225" expanded="true" signature="6537:7751" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="7756:8012" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="8240:9381" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="9387:9652" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="9912:11219" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="11225:11326" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="11576:16711" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="16286:16384" ph="//..." />
+            <marker date="1642760298225" expanded="true" signature="16717:16818" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="17048:21598" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="21153:21251" ph="//..." />
+            <marker date="1642760298225" expanded="true" signature="21604:21664" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="21874:22464" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="22470:22530" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="22735:24081" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="22845:22948" ph="//..." />
+            <marker date="1642760298225" expanded="true" signature="24153:24378" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="24384:24645" ph="/**...*/" />
+            <marker date="1642760298225" expanded="true" signature="24776:25267" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="25406:26068" ph="{...}" />
+            <marker date="1642760298225" expanded="true" signature="26193:26587" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/journalentry/service/AccountingProcessorHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3664">
+          <caret line="20" column="19" lean-forward="false" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/classes/main/sql/migrations/sample_data/load_sample_data.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3668">
+          <caret line="6015" column="46" lean-forward="false" selection-start-line="6015" selection-start-column="46" selection-end-line="6015" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/domain/LoanProduct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="1182" column="21" lean-forward="false" selection-start-line="1182" selection-start-column="21" selection-end-line="1182" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/enumerations/LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="31" column="11" lean-forward="false" selection-start-line="31" selection-start-column="11" selection-end-line="31" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanproduct/serialization/LoanProductDataValidator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="212" column="7" lean-forward="false" selection-start-line="212" selection-start-column="7" selection-end-line="212" selection-end-column="7" />
           <folding />
         </state>
       </provider>

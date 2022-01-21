@@ -181,6 +181,9 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
                 } else if ((glAccountForLoan.equals(ACCRUAL_ACCOUNTS_FOR_LOAN.INCOME_FROM_RECOVERY))) {
                     accountMappingDetails.put(LOAN_PRODUCT_ACCOUNTING_DATA_PARAMS.INCOME_FROM_RECOVERY.getValue(), gLAccountData);
                 }
+                else if ((glAccountForLoan.equals(ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE))) {
+                    accountMappingDetails.put(LOAN_PRODUCT_ACCOUNTING_DATA_PARAMS.INTEREST_IN_SUSPENSE.getValue(), gLAccountData);
+                }
             }
 
         }

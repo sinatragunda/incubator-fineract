@@ -68,6 +68,7 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
     @Override
     @Transactional
     public void createLoanProductToGLAccountMapping(final Long loanProductId, final JsonCommand command) {
+        
         final JsonElement element = this.fromApiJsonHelper.parse(command.json());
         final Integer accountingRuleTypeId = this.fromApiJsonHelper.extractIntegerNamed("accountingRule", element, Locale.getDefault());
         final AccountingRuleType accountingRuleType = AccountingRuleType.fromInt(accountingRuleTypeId);
@@ -162,6 +163,12 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
                         LOAN_PRODUCT_ACCOUNTING_PARAMS.OVERPAYMENT.getValue(), loanProductId,
                         ACCRUAL_ACCOUNTS_FOR_LOAN.OVERPAYMENT.getValue());
 
+                // added 21/01/2022
+                this.loanProductToGLAccountMappingHelper.saveLoanToLiabilityAccountMapping(element,
+                        LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(), loanProductId,
+                        ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.getValue());
+
+        
                 // advanced accounting mappings
                 this.loanProductToGLAccountMappingHelper.savePaymentChannelToFundSourceMappings(command, element, loanProductId, null);
                 this.loanProductToGLAccountMappingHelper.saveChargesToIncomeAccountMappings(command, element, loanProductId, null);
@@ -297,6 +304,7 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
          ***/
         Map<String, Object> changes = new HashMap<>();
         final JsonElement element = this.fromApiJsonHelper.parse(command.json());
+        
         final AccountingRuleType accountingRuleType = AccountingRuleType.fromInt(accountingRuleTypeId);
 
         /***
@@ -311,8 +319,12 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
                     accountingRuleType);
         }/*** else examine and update individual changes ***/
         else {
+                System.err.println("------------------handle changes to product mapping ----------------");
             this.loanProductToGLAccountMappingHelper.handleChangesToLoanProductToGLAccountMappings(loanProductId, changes, element,
                     accountingRuleType);
+
+            System.err.println("-----------------------------update payment channe---------------");
+            
             this.loanProductToGLAccountMappingHelper.updatePaymentChannelToFundSourceMappings(command, element, loanProductId, changes);
             this.loanProductToGLAccountMappingHelper.updateChargesToIncomeAccountMappings(command, element, loanProductId, changes);
         }

@@ -1643,6 +1643,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     @Override
     public Collection<LoanScheduleAccrualData> retriveScheduleAccrualData() {
 
+        System.err.println("--------------------non perfomiring assets are totally excluded at first now -----------------------");
+
         LoanScheduleAccrualMapper mapper = new LoanScheduleAccrualMapper();
         Date organisationStartDate = this.configurationDomainService.retrieveOrganisationStartDate();
         final StringBuilder sqlBuilder = new StringBuilder(400);
@@ -1653,7 +1655,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                 .append(" and (((ls.fee_charges_amount <> if(ls.accrual_fee_charges_derived is null,0, ls.accrual_fee_charges_derived))")
                 .append(" or ( ls.penalty_charges_amount <> if(ls.accrual_penalty_charges_derived is null,0,ls.accrual_penalty_charges_derived))")
                 .append(" or ( ls.interest_amount <> if(ls.accrual_interest_derived is null,0,ls.accrual_interest_derived)))")
-                .append(" and loan.loan_status_id=:active and mpl.accounting_type=:type and loan.is_npa=0 and ls.duedate <= CURDATE()) ");
+                .append(" and loan.loan_status_id=:active and mpl.accounting_type=:type and ls.duedate <= CURDATE()) ");
+                //.append(" and loan.loan_status_id=:active and mpl.accounting_type=:type and loan.is_npa=0 and ls.duedate <= CURDATE()) ");
         if(organisationStartDate != null){
             sqlBuilder.append(" and ls.duedate > :organisationstartdate ");
         }
@@ -1662,6 +1665,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         paramMap.put("active", LoanStatus.ACTIVE.getValue());
         paramMap.put("type", AccountingRuleType.ACCRUAL_PERIODIC.getValue());
         paramMap.put("organisationstartdate", formatter.print(new LocalDate(organisationStartDate)));
+
+        System.err.println("-------------------organisation date -----------------"+formatter.print(new LocalDate(organisationStartDate)));
         
         return this.namedParameterJdbcTemplate.query(sqlBuilder.toString(), paramMap, mapper);       
     }

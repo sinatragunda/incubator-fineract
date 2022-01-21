@@ -113,7 +113,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam ,LoanProductConstants.loanFactorSourceAccountTypeParam ,LoanProductConstants.isCrossLinkParam));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam ,LoanProductConstants.loanFactorSourceAccountTypeParam ,LoanProductConstants.isCrossLinkParam ,LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue()));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,
@@ -203,11 +203,14 @@ public final class LoanProductDataValidator {
 
 
         // added 21/08/2021
-        final Integer loanFactorSourceAccountTypeInt = this.fromApiJsonHelper.extractIntegerNamed("loanFactorSourceAccountType", element, Locale.getDefault());
-        baseDataValidator.reset().parameter("loanFactorSourceAccountType").value(loanFactorSourceAccountTypeInt).ignoreIfNull().integerZeroOrGreater();
 
-        final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(loanFactorSourceAccountTypeInt);
+        if(this.fromApiJsonHelper.parameterExists(LoanProductConstants.loanFactorSourceAccountTypeParam ,element)){
 
+            final Integer loanFactorSourceAccountTypeInt = this.fromApiJsonHelper.extractIntegerNamed("loanFactorSourceAccountType", element, Locale.getDefault());
+            baseDataValidator.reset().parameter("loanFactorSourceAccountType").value(loanFactorSourceAccountTypeInt).ignoreIfNull().integerZeroOrGreater();
+            //final LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = LOAN_FACTOR_SOURCE_ACCOUNT_TYPE.fromInt(loanFactorSourceAccountTypeInt);
+            //System.err.println("-----------------------create done nothing thrown");
+        }
 
         // added 21/08/2021
         boolean isCrossLink = false;
@@ -663,6 +666,14 @@ public final class LoanProductDataValidator {
                     LOAN_PRODUCT_ACCOUNTING_PARAMS.OVERPAYMENT.getValue(), element);
             baseDataValidator.reset().parameter(LOAN_PRODUCT_ACCOUNTING_PARAMS.OVERPAYMENT.getValue()).value(overpaymentAccountId)
                     .notNull().integerGreaterThanZero();
+
+
+            // added 21/01/2022
+            final Long interestSuspenseAccountId = this.fromApiJsonHelper.extractLongNamed(
+                    LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(), element);
+            baseDataValidator.reset().parameter(LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue()).value(interestSuspenseAccountId)
+                    .notNull().integerGreaterThanZero();
+
 
             validatePaymentChannelFundSourceMappings(baseDataValidator, element);
             validateChargeToIncomeAccountMappings(baseDataValidator, element);
@@ -1548,6 +1559,14 @@ public final class LoanProductDataValidator {
                 element);
         baseDataValidator.reset().parameter(LOAN_PRODUCT_ACCOUNTING_PARAMS.OVERPAYMENT.getValue()).value(overpaymentAccountId)
                 .ignoreIfNull().integerGreaterThanZero();
+
+
+        // added 21/01/2022
+        final Long interestInSuspense = this.fromApiJsonHelper.extractLongNamed(LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(),
+                element);
+        baseDataValidator.reset().parameter(LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue()).value(interestInSuspense)
+                .ignoreIfNull().integerGreaterThanZero();
+
 
         final Long receivableInterestAccountId = this.fromApiJsonHelper.extractLongNamed(
                 LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_RECEIVABLE.getValue(), element);

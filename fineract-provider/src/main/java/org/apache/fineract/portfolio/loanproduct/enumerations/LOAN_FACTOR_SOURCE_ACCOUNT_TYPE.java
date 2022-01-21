@@ -6,6 +6,8 @@
 */
 package org.apache.fineract.portfolio.loanproduct.enumerations;
 
+import java.util.Optional;
+
 public enum  LOAN_FACTOR_SOURCE_ACCOUNT_TYPE {
 
     SAVINGS("Savings Account"),
@@ -16,13 +18,18 @@ public enum  LOAN_FACTOR_SOURCE_ACCOUNT_TYPE {
 
     LOAN_FACTOR_SOURCE_ACCOUNT_TYPE(String code){}
 
-
     public static LOAN_FACTOR_SOURCE_ACCOUNT_TYPE fromInt(Integer arg){
-        for(LOAN_FACTOR_SOURCE_ACCOUNT_TYPE a : values()){
-            if(a.ordinal()==arg){
-                return a ;
+
+        LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType[] = {NONE};
+
+        Optional.ofNullable(arg).ifPresent(e->{
+            for(LOAN_FACTOR_SOURCE_ACCOUNT_TYPE a : values()){
+                if(a.ordinal()==arg){
+                    loanFactorSourceAccountType[0] = a ;
+                    break;
+                }
             }
-        }
-        return NONE ;
+        });
+        return loanFactorSourceAccountType[0] ;
     }
 }

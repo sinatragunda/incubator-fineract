@@ -19,13 +19,7 @@
 package org.apache.fineract.portfolio.loanaccount.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -36,11 +30,8 @@ import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.MoneyHelper;
-import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanInstallmentChargeData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanScheduleAccrualData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
-import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionEnumData;
+import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.loanaccount.data.*;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
@@ -56,7 +47,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service 
 public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlatformService {
 
     private final LoanReadPlatformService loanReadPlatformService;
@@ -87,11 +78,49 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
     @Transactional
     public void addAccrualAccounting(final Long loanId, final Collection<LoanScheduleAccrualData> loanScheduleAccrualDatas)
             throws Exception {
+        
         Collection<LoanChargeData> chargeData = this.loanChargeReadPlatformService.retrieveLoanChargesForAccural(loanId);
         Collection<LoanSchedulePeriodData> loanWaiverScheduleData = new ArrayList<>(1);
         Collection<LoanTransactionData> loanWaiverTansactionData = new ArrayList<>(1);
 
+        boolean isTest = loanId.equals(119L);
+
+        System.err.println("-----------------------loan id is -----------------------"+loanId);
+
+        if(isTest){        
+            System.err.println("------------------------------loan id for testing is ,we should get loan data then check if its npa then we put data into suspendend interest account  -----------------"+loanId);
+        }
+
+        LoanAccountData loanAccountData = this.loanReadPlatformService.retrieveOne(loanId);
+
+
+        //System.err.println("------------------------------due date is ------------------------------"+loanAccountData);
+
+        //loanAccountData
+        //loanAccountData.isNpa();
+        boolean isNpa = loanAccountData.isNpa();
+
+        System.err.println("---------------isnap ? -----------------------------"+isNpa);
+
+        if(isNpa){
+
+            nonPerfomingLoanAccrual(loanScheduleAccrualDatas ,chargeData ,loanWaiverScheduleData ,loanWaiverTansactionData);
+            return;
+        }
+
+        // npa loans should take a different route so that it can get to another route for suspended interest l think
+        perfomingLoanAccrual(loanScheduleAccrualDatas ,chargeData ,loanWaiverScheduleData ,loanWaiverTansactionData);
+
+        // npa loans would then start to post to suspended interest accounts
+
+    }
+
+
+    // added 21/01/2022 .Added this so we could have a delegate method to handle npa accounting accural
+    private void perfomingLoanAccrual(Collection<LoanScheduleAccrualData> loanScheduleAccrualDatas , Collection<LoanChargeData> chargeData , Collection<LoanSchedulePeriodData> loanWaiverScheduleData, Collection<LoanTransactionData> loanWaiverTansactionData) throws Exception{
+
         for (final LoanScheduleAccrualData accrualData : loanScheduleAccrualDatas) {
+
             if (accrualData.getWaivedInterestIncome() != null && loanWaiverScheduleData.isEmpty()) {
                 loanWaiverScheduleData = this.loanReadPlatformService.fetchWaiverInterestRepaymentData(accrualData.getLoanId());
                 loanWaiverTansactionData = this.loanReadPlatformService.retrieveWaiverLoanTransactions(accrualData.getLoanId());
@@ -101,6 +130,20 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
             addAccrualAccounting(accrualData);
         }
     }
+
+    private void nonPerfomingLoanAccrual(Collection<LoanScheduleAccrualData> loanScheduleAccrualDatas , Collection<LoanChargeData> chargeData , Collection<LoanSchedulePeriodData> loanWaiverScheduleData, Collection<LoanTransactionData> loanWaiverTansactionData) throws Exception{
+
+        for (final LoanScheduleAccrualData accrualData : loanScheduleAccrualDatas) {
+            if (accrualData.getWaivedInterestIncome() != null && loanWaiverScheduleData.isEmpty()) {
+                loanWaiverScheduleData = this.loanReadPlatformService.fetchWaiverInterestRepaymentData(accrualData.getLoanId());
+                loanWaiverTansactionData = this.loanReadPlatformService.retrieveWaiverLoanTransactions(accrualData.getLoanId());
+            }
+            //updateCharges(chargeData, accrualData, accrualData.getFromDateAsLocaldate(), accrualData.getDueDateAsLocaldate());
+            //updateInterestIncome(accrualData, loanWaiverTansactionData, loanWaiverScheduleData, accrualData.getDueDateAsLocaldate());
+            //addAccrualAccounting(accrualData);
+        }
+    }
+
 
     @Override
     @Transactional
@@ -216,6 +259,8 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
 
     @Transactional
     public void addAccrualAccounting(LoanScheduleAccrualData scheduleAccrualData) throws Exception {
+
+        System.err.println("--------------------add acrrual accounting ---------------");
 
         BigDecimal amount = BigDecimal.ZERO;
         BigDecimal interestportion = null;
