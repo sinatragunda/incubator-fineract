@@ -40,7 +40,7 @@ public enum ChargeTimeType {
     SAVINGS_NOACTIVITY_FEE(16,"chargeTimeType.savingsNoActivityFee"),
 
     // Added 04/01/2022
-    LOAN_APPLICATION(17 ,"Loan Application"),
+    LOAN_APPROVED(17 ,"Loan Approved"),
     LOAN_CLOSED(18 ,"Loan Closed");
 
     private final Integer value;
@@ -138,7 +138,7 @@ public enum ChargeTimeType {
                 	chargeTimeType = SAVINGS_NOACTIVITY_FEE;
                 break;
                 case 17:
-                    chargeTimeType = LOAN_APPLICATION;
+                    chargeTimeType = LOAN_APPROVED ;
                     break;
                 case 18:
                     chargeTimeType = LOAN_CLOSED;

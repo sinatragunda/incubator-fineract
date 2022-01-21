@@ -21,5 +21,7 @@ package org.apache.fineract.portfolio.self.client.service;
 public interface AppuserClientMapperReadService {
 
 	public Boolean isClientMappedToUser(Long clientId, Long appUserId);
+    public Long mappedUserClientId(Long appUserId);
+
 
 }

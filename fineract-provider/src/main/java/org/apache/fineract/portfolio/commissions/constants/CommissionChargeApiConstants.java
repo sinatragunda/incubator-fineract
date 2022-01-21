@@ -16,7 +16,7 @@ public class CommissionChargeApiConstants {
     public final static String resourceNameForPermissions = "COMMISSION_CHARGE";
 
 
-    public final static Set<String> COMMISSION_CHARGE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "amount", "currency", "active",
+    public final static Set<String> COMMISSION_CHARGE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "amount", "currency", "active","isDeposited",
             "chargeAppliesTo", "chargeTimeType", "chargeCalculationType", "chargeCalculationTypeOptions", "chargeAppliesToOptions",
             "chargeTimeTypeOptions", "currencyOptions"));
 

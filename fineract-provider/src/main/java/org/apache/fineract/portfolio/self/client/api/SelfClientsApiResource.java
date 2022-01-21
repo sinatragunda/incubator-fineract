@@ -40,9 +40,12 @@ import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.self.client.data.SelfClientDataValidator;
 import org.apache.fineract.portfolio.self.client.service.AppuserClientMapperReadService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.wese.helper.JsonHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Path("/self/clients")
 @Component
@@ -211,6 +214,32 @@ public class SelfClientsApiResource {
 		return this.clientTransactionsApiResource.retrieveClientTransaction(
 				clientId, transactionId, uriInfo);
 	}
+
+	@GET
+	@Path("/map/{userId}")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	//@ApiOperation(value = "Retrieve a Client", httpMethod = "GET", notes = "Retrieves a Client\n\n" + "Example Requests:\n" + "\n" + "self/clients/1\n" + "\n" + "self/clients/1?fields=id,displayName,officeName")
+	//@ApiResponses({@ApiResponse(code = 200, message = "OK", response = SelfClientsApiResourceSwagger.GetSelfClientsClientIdResponse.class)})
+	public String retrieveMappedClient(@PathParam("userId") final Long userId,
+									   @Context final UriInfo uriInfo) {
+
+		//this.dataValidator.validateRetrieveOne(uriInfo);
+		Long clientId = this.appUserClientMapperReadService.mappedUserClientId(userId);
+
+		String response[] = {JsonHelper.put("status" ,false).toString()};
+
+		Optional.ofNullable(clientId).ifPresent(e->{
+			System.err.println("----------------------------------return data client id --------------"+clientId);
+			response[0] = JsonHelper.put("status" ,true).put("clientId" ,clientId).toString();
+		});
+
+		return response[0];
+
+
+	}
+
+
 
 	private void validateAppuserClientsMapping(final Long clientId) {
 		AppUser user = this.context.authenticatedUser();

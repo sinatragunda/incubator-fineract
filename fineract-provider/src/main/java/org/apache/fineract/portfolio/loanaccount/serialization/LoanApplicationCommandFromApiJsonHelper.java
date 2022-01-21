@@ -434,16 +434,12 @@ public final class LoanApplicationCommandFromApiJsonHelper {
 
             final String apiJson = agentDataJsonObject.toString();
 
-            System.err.println("--------------request api string is ----------------"+apiJson);
-
             final LoanAgentDataBridge loanAgentDataBridge = LoanAgentDataBridge.fromJson(apiJson);
             final Boolean isValidEntry = AttachedCommissionChargesHelper.isValidEntry(loanAgentDataBridge);
 
             System.err.println("------------------is it a valid entry son , ?---------------"+isValidEntry);;
             
             int boolInt = isValidEntry ? 1 : 0 ;
-
-            System.err.println("-----------------------boool int is --------------------"+boolInt);
 
             /// this is a hack since have no idea how these work
             baseDataValidator.reset().parameter(loanAgentParamName).value(boolInt).notNull()
@@ -557,9 +553,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         validateLoanMultiDisbursementdate(element, baseDataValidator, expectedDisbursementDate, principal);
         validatePartialPeriodSupport(interestCalculationPeriodType, baseDataValidator, element, loanProduct);
         
-
-        //System.err.println("------------------------------error values ----------------"+dataValidationErrors.size());
-
         if (!dataValidationErrors.isEmpty()) { 
 
             //System.err.println("------------throwing error at this stage-----------");

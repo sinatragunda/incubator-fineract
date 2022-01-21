@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 // Added 04/01/2021
 import java.util.Map ;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class JsonHelper {
 
     public static String objectToJson(Object object){
@@ -80,5 +83,23 @@ public class JsonHelper {
         ObjectNode node = ObjectNodeHelper.objectNodeFromMap(map);
         return node.toString();
     }
+
+
+   public static JSONObject put(String key ,Object data){
+
+       JSONObject json = new JSONObject() ;
+       try{
+
+           json.put(key ,data);
+       
+       }
+
+       catch (JSONException j){
+           System.err.println(Constants.separator+" json exception here ");
+           j.printStackTrace();
+       }
+       return json ;
+   }
+
 
 }

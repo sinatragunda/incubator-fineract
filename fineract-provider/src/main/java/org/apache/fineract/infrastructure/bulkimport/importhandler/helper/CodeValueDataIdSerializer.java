@@ -29,6 +29,12 @@ import java.lang.reflect.Type;
 public class CodeValueDataIdSerializer implements JsonSerializer<CodeValueData> {
     @Override
     public JsonElement serialize(CodeValueData src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(src.getId());
+        JsonElement jsonElement = null ;
+        try{
+            jsonElement = new JsonPrimitive(src.getId());
+        }
+        catch(NullPointerException n){
+        }
+        return jsonElement;
     }
 }

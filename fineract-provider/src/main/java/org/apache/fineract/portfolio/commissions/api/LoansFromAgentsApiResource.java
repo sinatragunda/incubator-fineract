@@ -15,10 +15,13 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.commissions.constants.CommissionChargeApiConstants;
 import org.apache.fineract.portfolio.commissions.constants.LoanAgentApiConstants;
+import org.apache.fineract.portfolio.commissions.data.AttachedCommissionChargesData;
 import org.apache.fineract.portfolio.commissions.data.LoanAgentData;
 import org.apache.fineract.portfolio.commissions.data.LoansFromAgentsData;
 import org.apache.fineract.portfolio.commissions.domain.LoansFromAgents;
+import org.apache.fineract.portfolio.commissions.service.AttachedCommissionChargesReadPlatformService;
 import org.apache.fineract.portfolio.commissions.service.LoanAgentReadPlatformService;
 
 import java.util.Arrays;
@@ -38,6 +41,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+
+import javax.ws.rs.QueryParam;
+
 
 import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
@@ -63,12 +69,14 @@ public class LoansFromAgentsApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final LoanAgentReadPlatformService loanAgentReadPlatformService ;
+    private final AttachedCommissionChargesReadPlatformService attachedCommissionChargesReadPlatformService;
+    private final DefaultToApiJsonSerializer<AttachedCommissionChargesData> attachedCommissionChargesDataDefaultToApiJsonSerializer;
 
     @Autowired
     public LoansFromAgentsApiResource(final PlatformSecurityContext context, final LoansFromAgentsReadPlatformService readPlatformService,
                                 final DefaultToApiJsonSerializer<LoansFromAgentsData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
                                 final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final LoanAgentReadPlatformService loanAgentReadPlatformService ,
-                                final DefaultToApiJsonSerializer<LoanAccountData> loansApiJsonSerializer) {
+                                final DefaultToApiJsonSerializer<LoanAccountData> loansApiJsonSerializer ,final AttachedCommissionChargesReadPlatformService attachedCommissionChargesReadPlatformService ,final  DefaultToApiJsonSerializer<AttachedCommissionChargesData> attachedCommissionChargesDataDefaultToApiJsonSerializer) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -76,6 +84,8 @@ public class LoansFromAgentsApiResource {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.loanAgentReadPlatformService = loanAgentReadPlatformService ;
         this.loansApiJsonSerializer = loansApiJsonSerializer ;
+        this.attachedCommissionChargesReadPlatformService = attachedCommissionChargesReadPlatformService ;
+        this.attachedCommissionChargesDataDefaultToApiJsonSerializer = attachedCommissionChargesDataDefaultToApiJsonSerializer ;
     }
 
     // should all just be client oriented ?
@@ -86,17 +96,32 @@ public class LoansFromAgentsApiResource {
     public String retrieveOne(@PathParam("clientId") final Long clientId ,@Context final UriInfo uriInfo) {
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
-
         // lets deal with client id since its the one that comes from client portal ,later will add functionality depending on what we have
         LoanAgentData loanAgentData = this.loanAgentReadPlatformService.retrieveOneByClient(clientId);
 
         Long loanAgentId = loanAgentData.getId();
 
         final List<LoanAccountData> loanList = readPlatformService.retrieveAllLoansForAgent(loanAgentId);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         return this.loansApiJsonSerializer.serialize(settings, loanList , LoanApiConstants.LOAN_DATA_PARAMETERS);
+
+    }
+
+    //  retrieve commission data for single loan
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveLoanCharges(@QueryParam("loanId") final Long loanId ,@Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        // lets deal with client id since its the one that comes from client portal ,later will add functionality depending on what we have
+
+        List<AttachedCommissionChargesData> attachedCommissionChargesDataList = attachedCommissionChargesReadPlatformService.retrieveAllByLoan(loanId);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        return this.attachedCommissionChargesDataDefaultToApiJsonSerializer.serialize(settings, attachedCommissionChargesDataList , CommissionChargeApiConstants.COMMISSION_CHARGE_DATA_PARAMETERS);
 
     }
 

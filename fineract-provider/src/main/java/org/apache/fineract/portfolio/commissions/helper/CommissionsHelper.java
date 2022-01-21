@@ -6,30 +6,23 @@
 */
 package org.apache.fineract.portfolio.commissions.helper;
 
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.charge.domain.ChargeCalculationType;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.commissions.constants.CommissionsApiConstants;
+import org.apache.fineract.portfolio.commissions.data.AttachedCommissionChargesData;
 import org.apache.fineract.portfolio.commissions.data.LoanAgentDataBridge;
-import org.apache.fineract.portfolio.commissions.domain.LoanAgent;
 import org.apache.fineract.portfolio.commissions.domain.LoansFromAgents;
 import org.apache.fineract.portfolio.commissions.domain.CommissionCharge;
-import org.apache.fineract.portfolio.commissions.enumerations.LOAN_COMMISSION_CHARGE_TIME;
 import org.apache.fineract.portfolio.commissions.service.AttachedCommissionChargesWritePlatformService;
 import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsWritePlatformService;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 import org.apache.fineract.wese.helper.ComparatorUtility;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.apache.fineract.wese.helper.JsonHelper;
@@ -39,37 +32,13 @@ import org.joda.time.LocalDate;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.Map ;
 
 public class CommissionsHelper {
 
 
-    // charge time type comes from loan event class to tell at what time it is now
-    // not sure where this will fit now
-    // will be called from loan event classes ,when one is fired up then make sure one of these is executed
-    public static void deductAgentCommissionCharges(LoansFromAgents loansFromAgents,ChargeTimeType chargeTimeType , CommissionCharge commissionCharge, SavingsAccountDomainService savingsAccountDomainService){
-
-        /// if not same time prolly skip here
-        boolean isChargeTime = isChargeTime(loansFromAgents,commissionCharge , chargeTimeType);
-
-        Loan loan = loansFromAgents.getLoan();
-
-
-        if(isChargeTime){
-
-            /// this is charge time now do the honors
-            System.err.println("-------------------------------loan commission charge time then deposit to savings account");
-            BigDecimal commissionAmount = calculateCommission(loansFromAgents,commissionCharge);
-            LoanAgent loanAgent = loansFromAgents.getLoanAgent();
-            SavingsAccount savingsAccount = loanAgent.getSavingsAccount();
-            LocalDate transactionDate = getTransactionDate(loan ,chargeTimeType);
-
-            // some transaction getter date function here
-            savingsAccountDomainService.handleDepositLiteEx(savingsAccount ,transactionDate ,commissionAmount ,"Loan Agent Commission");
-
-            /// update loan commission to mark it as deposited here
-
-        }
+    // this now seems more professional all many classes autowired in
+    public static void depositCommissionCharges(CommissionsHelperService commissionsHelperService ,Loan loan ,ChargeTimeType chargeTimeType){
+        commissionsHelperService.depositAgentCommissionCharges(loan ,chargeTimeType);
     }
 
 
@@ -108,24 +77,14 @@ public class CommissionsHelper {
 
             JsonCommand loansFromAgentsJsonCommand  = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
 
-            // or we can use another nice class here that just gives us command processing without first converting to json command
-
-            //final CommandWrapper commandRequest = new CommandWrapperBuilder().createLoansFromAgents().withJson(payload).build();
-
-            //final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
-
-
             CommandProcessingResult loansFromAgentsCommandResult = loansFromAgentsWritePlatformService.create(loansFromAgentsJsonCommand);
 
             Long loansFromAgentsId = loansFromAgentsCommandResult.resourceId();
 
             System.err.println("------------------loansfromagents id is now ---------------------"+loansFromAgentsId);
-
             LoansFromAgents loansFromAgents = LoansFromAgents.fromId(loansFromAgentsId);
 
             loansFromAgents.setLoan(loanApplication);
-
             loanAgentDataBridge.setLoansFromAgents(loansFromAgents);
 
             CommandProcessingResult commandProcessingResult = attachedCommissionChargesWritePlatformService.create(loanAgentDataBridge);
@@ -138,15 +97,42 @@ public class CommissionsHelper {
 
     }
 
-    public static boolean isChargeTime(LoansFromAgents loansFromAgents,CommissionCharge commissionCharge , ChargeTimeType chargeTime){
+    public static boolean isChargeTime(AttachedCommissionChargesData attachedCommissionChargesData , ChargeTimeType chargeTime){
 
-        ChargeTimeType loanCommissionChargeTime = commissionCharge.getChargeTimeType();
+        ChargeTimeType loanCommissionChargeTime = attachedCommissionChargesData.getChargeTimeType();
         boolean equals = ComparatorUtility.areObjectsEqual(loanCommissionChargeTime ,chargeTime);
         return equals ;
 
     }
 
-    public static BigDecimal calculateCommission(LoansFromAgents loansFromAgents, CommissionCharge commissionCharge){
+
+    public static BigDecimal getAmount(Loan loan ,ChargeTimeType  loanCommissionChargeTime ,ChargeTimeType currentChargeTimeType){
+
+        BigDecimal principal = BigDecimal.ZERO ;
+        /// lets say d = 2
+        // current stage a = 1
+//
+//        if(currentChargeTimeType.ordinal() < loanCommissionChargeTime.ordinal()){
+//            System.err.println("-----------we dont have this charge ----------------");
+//            return principal ;
+//        }
+
+        switch (loanCommissionChargeTime){
+            case DISBURSEMENT:
+                principal = loan.getProposedPrincipal();
+                break;
+            case LOAN_CLOSED:
+                principal = loan.getProposedPrincipal();
+                break;
+            case LOAN_APPROVED:
+                principal = loan.getProposedPrincipal();
+                break;
+
+        }
+        return principal ;
+    }
+
+    public static BigDecimal calculateCommission(LoansFromAgents loansFromAgents, CommissionCharge commissionCharge ,ChargeTimeType currentChargeTimeType){
 
         System.err.println("---------------------loan could have been null ,but is loansfromagents present  ? -------------------"+Optional.ofNullable(loansFromAgents).isPresent());
 
@@ -157,24 +143,14 @@ public class CommissionsHelper {
 
         System.err.println("----------------------------we crush here now ------------------");
 
-        BigDecimal commissionAmount = BigDecimal.ZERO;
-        BigDecimal principal = loan.getProposedPrincipal();
-        BigDecimal interest = loan.getTotalInterest();
-        BigDecimal valuationAmount = commissionCharge.getAmount();
 
         ChargeTimeType loanCommissionChargeTime = commissionCharge.getChargeTimeType();
 
-        switch (loanCommissionChargeTime){
-            case DISBURSEMENT:
-                principal = loan.getDisbursedAmount();
-                break;
-            case LOAN_CLOSED:
-                principal = loan.getDisbursedAmount();
-                break;
-            case LOAN_APPLICATION:
-                principal = loan.getProposedPrincipal();
-                break;
-        }
+        BigDecimal commissionAmount = BigDecimal.ZERO;
+        BigDecimal principal = getAmount(loan ,loanCommissionChargeTime ,currentChargeTimeType);
+        BigDecimal interest = loan.getTotalInterest();
+        BigDecimal valuationAmount = commissionCharge.getAmount();
+
 
         ChargeCalculationType chargeCalculationCriteria = commissionCharge.getChargeCalculationType();
         BigDecimal percentageValuation = valuationAmount.divide(BigDecimal.valueOf(100));
@@ -210,7 +186,7 @@ public class CommissionsHelper {
                 Date date = loan.getClosedOnDate();
                 transactionDate = TimeHelper.javaDateToJodaLocalDate(date);
                 break;
-            case LOAN_APPLICATION:
+            case LOAN_APPROVED:
                 transactionDate = loan.getSubmittedOnDate();
                 break;
             case DISBURSEMENT:

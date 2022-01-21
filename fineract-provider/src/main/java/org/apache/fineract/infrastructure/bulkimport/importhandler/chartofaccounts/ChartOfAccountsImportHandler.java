@@ -36,12 +36,16 @@ import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.exception.*;
+import org.apache.fineract.wese.helper.JsonHelper;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ChartOfAccountsImportHandler implements ImportHandler {
     private  List<GLAccountData> glAccounts;
@@ -66,22 +70,30 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
     public void readExcelFile() {
 
         Sheet chartOfAccountsSheet=workbook.getSheet(TemplatePopulateImportConstants.CHART_OF_ACCOUNTS_SHEET_NAME);
+
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(chartOfAccountsSheet,TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
             Row row;
                 row=chartOfAccountsSheet.getRow(rowIndex);
                 if (ImportHandlerUtils.isNotImported(row, ChartOfAcountsConstants.STATUS_COL)){
-                    glAccounts.add(readGlAccounts(row));
+                    GLAccountData glAccountData = readGlAccounts(row);
+                    Optional.ofNullable(glAccountData).ifPresent(e->{
+                        glAccounts.add(e);
+                    });
                 }
         }
     }
 
     private GLAccountData readGlAccounts(Row row) {
+
         String accountType=ImportHandlerUtils.readAsString(ChartOfAcountsConstants.ACCOUNT_TYPE_COL,row);
         EnumOptionData accountTypeEnum=GLAccountType.fromString(accountType);
         String accountName=ImportHandlerUtils.readAsString(ChartOfAcountsConstants.ACCOUNT_NAME_COL,row);
+
         String usage=ImportHandlerUtils.readAsString(ChartOfAcountsConstants.ACCOUNT_USAGE_COL,row);
+
         Long usageId=null;
+
         EnumOptionData usageEnum=null;
         if (usage!=null&& usage.equals(GLAccountUsage.DETAIL.toString())){
             usageId=1L;
@@ -91,6 +103,7 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
             usageEnum=new EnumOptionData(usageId,null,null);
         }
         Boolean manualEntriesAllowed=ImportHandlerUtils.readAsBoolean(ChartOfAcountsConstants.MANUAL_ENTRIES_ALLOWED_COL,row);
+
         Long parentId=null;
         if (ImportHandlerUtils.readAsString(ChartOfAcountsConstants.PARENT_ID_COL,row)!=null) {
             parentId = Long.parseLong(ImportHandlerUtils.readAsString(ChartOfAcountsConstants.PARENT_ID_COL,row));
@@ -99,44 +112,70 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
         Long tagId=null;
         if(ImportHandlerUtils.readAsString(ChartOfAcountsConstants.TAG_ID_COL,row)!=null)
             tagId=Long.parseLong(ImportHandlerUtils.readAsString(ChartOfAcountsConstants.TAG_ID_COL,row));
-        CodeValueData tagIdCodeValueData=new CodeValueData(tagId);
+
+        CodeValueData tagIdCodeValueData = new CodeValueData(tagId);
+
         String description=ImportHandlerUtils.readAsString(ChartOfAcountsConstants.DESCRIPTION_COL,row);
         return GLAccountData.importInstance(accountName,parentId,glCode,manualEntriesAllowed,accountTypeEnum,
                 usageEnum,description,tagIdCodeValueData,row.getRowNum());
     }
 
     public Count importEntity() {
+        
         Sheet chartOfAccountsSheet=workbook.getSheet(TemplatePopulateImportConstants.CHART_OF_ACCOUNTS_SHEET_NAME);
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(EnumOptionData.class, new EnumOptionDataIdSerializer());
         gsonBuilder.registerTypeAdapter(CodeValueData.class, new CodeValueDataIdSerializer());
-        int successCount = 0;
+        int successCount[] = {0};
         int errorCount = 0;
         String errorMessage = "";
         for (GLAccountData glAccount: glAccounts) {
             try {
-                String payload=gsonBuilder.create().toJson(glAccount);
-                final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                        .createGLAccount() //
-                        .withJson(payload) //
-                        .build(); //
-                final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
-                successCount++;
-                Cell statusCell = chartOfAccountsSheet.getRow(glAccount.getRowIndex()).createCell(ChartOfAcountsConstants.STATUS_COL);
-                statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
-                statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
+
+                Optional.ofNullable(glAccount).ifPresent(e->{
+
+                    System.err.println("-------------gl account data to string ---------------"+glAccount);
+
+                    String payload = gsonBuilder.create().toJson(glAccount);
+
+                    System.err.println("---------------------payload is -------------------"+payload);
+
+
+                    final CommandWrapper commandRequest = new CommandWrapperBuilder() //
+                            .createGLAccount() //
+                            .withJson(payload) //
+                            .build(); //
+                    final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+                    System.err.println("---------------result id is ---------------------"+result.resourceId());
+
+                    successCount[0]++;
+
+                    System.err.println("-------------------count is ----------------"+successCount[0]);
+                    Cell statusCell = chartOfAccountsSheet.getRow(glAccount.getRowIndex()).createCell(ChartOfAcountsConstants.STATUS_COL);
+                    statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
+                    statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
+                });
+                
+            
             }catch (RuntimeException ex){
                 errorCount++;
                 ex.printStackTrace();
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);
+
+                System.err.println("----------------------------------error message some shit is null here -----------------"+errorMessage);
+
                 ImportHandlerUtils.writeErrorMessage(chartOfAccountsSheet,glAccount.getRowIndex(),errorMessage,ChartOfAcountsConstants.STATUS_COL);
             }
         }
+
+        System.err.println("------------------success count is ------------------"+successCount[0]);
+
         chartOfAccountsSheet.setColumnWidth(ChartOfAcountsConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(ChartOfAcountsConstants.STATUS_COL, chartOfAccountsSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.STATUS_COLUMN_HEADER);
-        return Count.instance(successCount,errorCount);
+        return Count.instance(successCount[0],errorCount);
     }
 
 

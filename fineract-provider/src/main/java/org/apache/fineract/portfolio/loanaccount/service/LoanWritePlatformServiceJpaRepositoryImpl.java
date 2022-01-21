@@ -68,6 +68,7 @@ import org.apache.fineract.portfolio.calendar.exception.CalendarParameterUpdateN
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
 import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.*;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeDeletedException.LOAN_CHARGE_CANNOT_BE_DELETED_REASON;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBePayedException.LOAN_CHARGE_CANNOT_BE_PAYED_REASON;
@@ -79,6 +80,8 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
+import org.apache.fineract.portfolio.commissions.helper.CommissionsHelper;
+import org.apache.fineract.portfolio.commissions.helper.CommissionsHelperService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -208,6 +211,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     
 
+    // added 07/01/2022
+    private final CommissionsHelperService commissionsHelperService ;
     
 
     @Autowired
@@ -244,7 +249,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final SavingsAccountAssembler savingsAccountAssembler ,
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,
             final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer ,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final CommissionsHelperService commissionsHelperService
     ) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
@@ -291,6 +296,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+
+
+        // added 07/01/2022
+        this.commissionsHelperService = commissionsHelperService ;
     
     }
 
@@ -301,8 +310,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
     @Transactional
     @Override
-    public CommandProcessingResult disburseLoan(final Long loanId, final JsonCommand command, Boolean isAccountTransfer) {
-    
+    public CommandProcessingResult disburseLoan(final Long loanId, final JsonCommand command, Boolean isAccountTransfer){
+
         final AppUser currentUser = getAppUserIfPresent();
 
         this.loanEventApiJsonValidator.validateDisbursement(command.json(), isAccountTransfer);
@@ -425,6 +434,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 changedTransactionDetail = loan.disburse(currentUser, command, changes, scheduleGeneratorDTO, null);
             }
         }
+
         if (!changes.isEmpty()) {
             saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
 
@@ -445,6 +455,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             createStandingInstruction(loan);
 
             postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds);
+
+            // added 07/01/2022 ,apply commission charging here .Since we have dibursed amount here why not use it ?
+            System.err.println("---------------------disbursement time commission charge -------------------");
+            CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan , ChargeTimeType.DISBURSEMENT);
 
         }
 
@@ -1227,7 +1241,11 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         // disable all active standing instructions linked to the loan
         this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
-        
+
+
+        // added 09/01/2022
+        CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan ,ChargeTimeType.LOAN_CLOSED);
+
         CommandProcessingResult result = null;
         if (possibleClosingTransaction != null) {
 

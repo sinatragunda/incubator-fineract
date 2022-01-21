@@ -98,9 +98,9 @@ public class ChargeEnumerations {
 
             // Added 04/01/2022
 
-            case LOAN_APPLICATION :
-                optionData = new EnumOptionData(ChargeTimeType.LOAN_APPLICATION.getValue().longValue(), ChargeTimeType.LOAN_APPLICATION.getCode(), 
-                        "Loan Application");
+            case LOAN_APPROVED :
+                optionData = new EnumOptionData(ChargeTimeType.LOAN_APPROVED.getValue().longValue(), ChargeTimeType.LOAN_APPROVED.getCode(), 
+                        "Loan Approved");
             break;
 
             case LOAN_CLOSED:

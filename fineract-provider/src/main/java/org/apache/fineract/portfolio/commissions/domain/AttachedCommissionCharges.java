@@ -45,7 +45,6 @@ public class AttachedCommissionCharges extends AbstractPersistableCustom<Long>{
     @Column(name="is_deposited")
     private Boolean deposited ;
 
-
     @Column(name="amount")
     private BigDecimal amount ;
 
@@ -60,7 +59,35 @@ public class AttachedCommissionCharges extends AbstractPersistableCustom<Long>{
         this.amount = amount;
     }
 
+    public LoansFromAgents getLoanFromAgent() {
+        return loanFromAgent;
+    }
 
+    public void setLoanFromAgent(LoansFromAgents loanFromAgent) {
+        this.loanFromAgent = loanFromAgent;
+    }
 
+    public CommissionCharge getCommissionCharge() {
+        return commissionCharge;
+    }
 
+    public void setCommissionCharge(CommissionCharge commissionCharge) {
+        this.commissionCharge = commissionCharge;
+    }
+
+    public Boolean getDeposited() {
+        return deposited;
+    }
+
+    public void setDeposited(Boolean deposited) {
+        this.deposited = deposited;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 }

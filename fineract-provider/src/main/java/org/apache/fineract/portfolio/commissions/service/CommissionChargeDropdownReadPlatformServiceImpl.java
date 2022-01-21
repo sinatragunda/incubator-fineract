@@ -47,7 +47,7 @@ public class CommissionChargeDropdownReadPlatformServiceImpl implements Commissi
 
     @Override
     public List<EnumOptionData> retrieveCollectionTimeTypes() {
-        return Arrays.asList(chargeTimeType(ChargeTimeType.LOAN_APPLICATION),
+        return Arrays.asList(chargeTimeType(ChargeTimeType.LOAN_APPROVED),
                 chargeTimeType(ChargeTimeType.DISBURSEMENT),
                 chargeTimeType(ChargeTimeType.LOAN_CLOSED));
 

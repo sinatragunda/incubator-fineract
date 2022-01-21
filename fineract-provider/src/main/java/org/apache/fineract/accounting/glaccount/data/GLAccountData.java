@@ -244,5 +244,34 @@ public class GLAccountData {
         return null;
     }
 
-
+    @Override
+    public String toString() {
+        return "GLAccountData{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", parentId=" + parentId +
+                ", glCode='" + glCode + '\'' +
+                ", disabled=" + disabled +
+                ", manualEntriesAllowed=" + manualEntriesAllowed +
+                ", type=" + type +
+                ", usage=" + usage.getId() +
+                ", description='" + description + '\'' +
+                ", nameDecorated='" + nameDecorated + '\'' +
+                ", tagId=" + tagId.getId() +
+                ", organizationRunningBalance=" + organizationRunningBalance +
+                ", accountTypeOptions=" + accountTypeOptions +
+                ", usageOptions=" + usageOptions +
+                ", assetHeaderAccountOptions=" + assetHeaderAccountOptions +
+                ", liabilityHeaderAccountOptions=" + liabilityHeaderAccountOptions +
+                ", equityHeaderAccountOptions=" + equityHeaderAccountOptions +
+                ", incomeHeaderAccountOptions=" + incomeHeaderAccountOptions +
+                ", expenseHeaderAccountOptions=" + expenseHeaderAccountOptions +
+                ", allowedAssetsTagOptions=" + allowedAssetsTagOptions +
+                ", allowedLiabilitiesTagOptions=" + allowedLiabilitiesTagOptions +
+                ", allowedEquityTagOptions=" + allowedEquityTagOptions +
+                ", allowedIncomeTagOptions=" + allowedIncomeTagOptions +
+                ", allowedExpensesTagOptions=" + allowedExpensesTagOptions +
+                ", rowIndex=" + rowIndex +
+                '}';
+    }
 }

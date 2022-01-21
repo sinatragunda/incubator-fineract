@@ -40,7 +40,7 @@ public class AttachedCommissionChargesWritePlatformServiceImpl implements Attach
     @Override
     public CommandProcessingResult create(LoansFromAgents loansFromAgents , CommissionCharge commissionCharge){
 
-        BigDecimal amount = CommissionsHelper.calculateCommission(loansFromAgents ,commissionCharge);
+        BigDecimal amount = CommissionsHelper.calculateCommission(loansFromAgents ,commissionCharge ,null);
 
 
         System.err.println("---------------------commission amount is --------------------"+amount.doubleValue());

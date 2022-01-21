@@ -59,6 +59,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.exception.CalendarNotFoundException;
 import org.apache.fineract.portfolio.calendar.service.CalendarReadPlatformService;
 import org.apache.fineract.portfolio.charge.domain.Charge;
+import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.client.domain.AccountNumberGenerator;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
@@ -67,6 +68,7 @@ import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.collateral.service.CollateralAssembler;
 import org.apache.fineract.portfolio.commissions.domain.LoansFromAgents;
 import org.apache.fineract.portfolio.commissions.helper.CommissionsHelper;
+import org.apache.fineract.portfolio.commissions.helper.CommissionsHelperService;
 import org.apache.fineract.portfolio.commissions.service.AttachedCommissionChargesWritePlatformService;
 import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsWritePlatformService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
@@ -176,31 +178,32 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     // added 06/01/2021
     private final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService;
     private final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ;
+    private final CommissionsHelperService commissionsHelperService ;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
-            final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
-            final LoanApplicationCommandFromApiJsonHelper fromApiJsonDeserializer,
-            final LoanProductDataValidator loanProductCommandFromApiJsonDeserializer, final AprCalculator aprCalculator,
-            final LoanAssembler loanAssembler, final LoanChargeAssembler loanChargeAssembler,
-            final CollateralAssembler loanCollateralAssembler, final LoanRepositoryWrapper loanRepositoryWrapper,
-            final NoteRepository noteRepository,
-            final LoanScheduleCalculationPlatformService calculationPlatformService, final ClientRepositoryWrapper clientRepository,
-            final LoanProductRepository loanProductRepository, final AccountNumberGenerator accountNumberGenerator,
-            final LoanSummaryWrapper loanSummaryWrapper, final GroupRepositoryWrapper groupRepository,
-            final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
-            final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository,
-            final SavingsAccountAssembler savingsAccountAssembler, final AccountAssociationsRepository accountAssociationsRepository,
-            final LoanRepaymentScheduleInstallmentRepository repaymentScheduleInstallmentRepository,
-            final LoanReadPlatformService loanReadPlatformService,
-            final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
-            final BusinessEventNotifierService businessEventNotifierService, final ConfigurationDomainService configurationDomainService,
-            final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService, 
-            final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
-            final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
-            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService ,final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-            final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ,final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService) {
+                                                                final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
+                                                                final LoanApplicationCommandFromApiJsonHelper fromApiJsonDeserializer,
+                                                                final LoanProductDataValidator loanProductCommandFromApiJsonDeserializer, final AprCalculator aprCalculator,
+                                                                final LoanAssembler loanAssembler, final LoanChargeAssembler loanChargeAssembler,
+                                                                final CollateralAssembler loanCollateralAssembler, final LoanRepositoryWrapper loanRepositoryWrapper,
+                                                                final NoteRepository noteRepository,
+                                                                final LoanScheduleCalculationPlatformService calculationPlatformService, final ClientRepositoryWrapper clientRepository,
+                                                                final LoanProductRepository loanProductRepository, final AccountNumberGenerator accountNumberGenerator,
+                                                                final LoanSummaryWrapper loanSummaryWrapper, final GroupRepositoryWrapper groupRepository,
+                                                                final LoanRepaymentScheduleTransactionProcessorFactory loanRepaymentScheduleTransactionProcessorFactory,
+                                                                final CalendarRepository calendarRepository, final CalendarInstanceRepository calendarInstanceRepository,
+                                                                final SavingsAccountAssembler savingsAccountAssembler, final AccountAssociationsRepository accountAssociationsRepository,
+                                                                final LoanRepaymentScheduleInstallmentRepository repaymentScheduleInstallmentRepository,
+                                                                final LoanReadPlatformService loanReadPlatformService,
+                                                                final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
+                                                                final BusinessEventNotifierService businessEventNotifierService, final ConfigurationDomainService configurationDomainService,
+                                                                final LoanScheduleAssembler loanScheduleAssembler, final LoanUtilService loanUtilService,
+                                                                final CalendarReadPlatformService calendarReadPlatformService, final GlobalConfigurationRepositoryWrapper globalConfigurationRepository,
+                                                                final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
+                                                                final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
+                                                                final AccountDetailsReadPlatformService accountDetailsReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
+                                                                final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService , final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService , final CommissionsHelperService commissionsHelperService) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -239,6 +242,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.loansFromAgentsWritePlatformService = loansFromAgentsWritePlatformService;
         this.attachedCommissionChargesWritePlatformService = attachedCommissionChargesWritePlatformService;
+        this.commissionsHelperService = commissionsHelperService;
 
     }
 
@@ -401,6 +405,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // we have a loan now lets create the loan commission link 
             // should also have checker to check if loan is being submitted through a loan agent
             CommissionsHelper.linkLoanToCommissions(newLoanApplication ,loansFromAgentsWritePlatformService ,attachedCommissionChargesWritePlatformService , fromJsonHelper ,command);
+
+
+            // at this stage chargetime is loan application
+            //CommissionsHelper.depositCommissionCharges(commissionsHelperService ,newLoanApplication ,ChargeTimeType.LOAN_APPLICATION);
 
 
             if (loanProduct.isInterestRecalculationEnabled()) {
@@ -1153,6 +1161,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         final AppUser currentUser = getAppUserIfPresent();
         LocalDate expectedDisbursementDate = null;
 
+        System.err.println("-------------------loan approval here son ---------------");
+
         this.loanApplicationTransitionApiJsonValidator.validateApproval(command.json());
 
         final Loan loan = retrieveLoanBy(loanId);
@@ -1231,6 +1241,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
 
             saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
+
+            CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan ,ChargeTimeType.LOAN_APPROVED);
 
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {

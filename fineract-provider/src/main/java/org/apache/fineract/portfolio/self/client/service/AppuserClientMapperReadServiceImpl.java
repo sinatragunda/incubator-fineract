@@ -43,4 +43,15 @@ public class AppuserClientMapperReadServiceImpl implements
 						new Object[] { clientId, appUserId }, Boolean.class);
 	}
 
+	@Override
+	public Long mappedUserClientId(Long appUserId) {
+		
+		return this.jdbcTemplate
+				.queryForObject(
+						"select client_id from m_selfservice_user_client_mapping where appuser_id = ?",
+						new Object[] {appUserId }, Long.class);
+	}
+
+
+
 }
