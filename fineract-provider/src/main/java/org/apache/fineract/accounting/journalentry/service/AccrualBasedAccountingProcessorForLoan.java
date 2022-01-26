@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.fineract.accounting.closure.domain.GLClosure;
+import org.apache.fineract.accounting.common.AccountingConstants;
 import org.apache.fineract.accounting.common.AccountingConstants.ACCRUAL_ACCOUNTS_FOR_LOAN;
 import org.apache.fineract.accounting.common.AccountingConstants.CASH_ACCOUNTS_FOR_LOAN;
 import org.apache.fineract.accounting.common.AccountingConstants.FINANCIAL_ACTIVITY;
@@ -35,6 +36,9 @@ import org.apache.fineract.accounting.journalentry.data.ChargePaymentDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanDTO;
 import org.apache.fineract.accounting.journalentry.data.LoanTransactionDTO;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepository;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,19 +46,27 @@ import org.springframework.stereotype.Component;
 public class AccrualBasedAccountingProcessorForLoan implements AccountingProcessorForLoan {
 
     private final AccountingProcessorHelper helper;
+    private final LoanRepositoryWrapper loanRepositoryWrapper ;
 
     @Autowired
-    public AccrualBasedAccountingProcessorForLoan(final AccountingProcessorHelper accountingProcessorHelper) {
+    public AccrualBasedAccountingProcessorForLoan(final AccountingProcessorHelper accountingProcessorHelper ,final LoanRepositoryWrapper loanRepositoryWrapper) {
         this.helper = accountingProcessorHelper;
+        this.loanRepositoryWrapper = loanRepositoryWrapper ;
     }
 
     @Override
     public void createJournalEntriesForLoan(final LoanDTO loanDTO) {
+
+        System.err.println("-----------------createJournalEntriesForLoan ------------using dto object ");
+
         final GLClosure latestGLClosure = this.helper.getLatestClosureByBranch(loanDTO.getOfficeId());
         final Office office = this.helper.getOfficeById(loanDTO.getOfficeId());
         for (final LoanTransactionDTO loanTransactionDTO : loanDTO.getNewLoanTransactions()) {
             final Date transactionDate = loanTransactionDTO.getTransactionDate();
             this.helper.checkForBranchClosures(latestGLClosure, transactionDate);
+
+
+            //System.err.println("-----------transaction type ----------"+loanTransactionDTO.getTransactionType().getValue());
 
             /** Handle Disbursements **/
             if (loanTransactionDTO.getTransactionType().isDisbursement()) {
@@ -63,6 +75,7 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
 
             /*** Handle Accruals ***/
             if (loanTransactionDTO.getTransactionType().isAccrual()) {
+                System.err.println("------------------------------create journal for accrual ------------");
                 createJournalEntriesForAccruals(loanDTO, loanTransactionDTO, office);
             }
 
@@ -367,6 +380,9 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
         final Long loanId = loanDTO.getLoanId();
         final String currencyCode = loanDTO.getCurrencyCode();
 
+
+        System.err.println("--------------get if loan is in npa or -------------");
+
         // transaction properties
         final String transactionId = loanTransactionDTO.getTransactionId();
         final Date transactionDate = loanTransactionDTO.getTransactionDate();
@@ -376,26 +392,78 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
         final boolean isReversed = loanTransactionDTO.isReversed();
         final Long paymentTypeId = loanTransactionDTO.getPaymentTypeId();
 
+
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
+
+        boolean isNpa = loan.isNpa();
+
+        System.err.println("-------------is npa transaction ? -------------"+isNpa+" ------------and due date is "+loan.getMaturityDate());
+
+        System.err.println("------------------transaction amount ,where does the other go if its an npa transaction --------------"+interestAmount.doubleValue());
+
+        // l usually hate using if else statements but no option here
+        if(isNpa){
+            System.err.println("---------------------create journal for non perfoming loan son ----------------------"+loanId);
+            createJournalEntriesForNonPerfomingLoans(loanTransactionDTO ,office ,loanProductId ,loanId ,currencyCode ,transactionId ,transactionDate ,interestAmount ,feesAmount ,penaltiesAmount ,isReversed ,paymentTypeId);
+            return ;
+        }
+        System.err.println("------------------------------create journal for perfoming loan ----------------"+loanId);
+        createJournalEntriesForPerfomingLoans(loanTransactionDTO, office, loanProductId, loanId, currencyCode, transactionId, transactionDate, interestAmount, feesAmount, penaltiesAmount, isReversed, paymentTypeId);
+
+    }
+
+    private void createJournalEntriesForPerfomingLoans(LoanTransactionDTO loanTransactionDTO, Office office, Long loanProductId, Long loanId, String currencyCode, String transactionId, Date transactionDate, BigDecimal interestAmount, BigDecimal feesAmount, BigDecimal penaltiesAmount, boolean isReversed, Long paymentTypeId) {
+
         // create journal entries for recognizing interest (or reversal)
-        if (interestAmount != null && !(interestAmount.compareTo(BigDecimal.ZERO) == 0)) {
+        if (interestAmount != null && !(interestAmount.compareTo(BigDecimal.ZERO) == 0)){
             this.helper.createAccrualBasedJournalEntriesAndReversalsForLoan(office, currencyCode,
                     ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_RECEIVABLE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_ON_LOANS.getValue(),
                     loanProductId, paymentTypeId, loanId, transactionId, transactionDate, interestAmount, isReversed);
+
         }
         // create journal entries for the fees application (or reversal)
-        if (feesAmount != null && !(feesAmount.compareTo(BigDecimal.ZERO) == 0)) {
+        if (feesAmount != null && !(feesAmount.compareTo(BigDecimal.ZERO) == 0)){
             this.helper.createAccrualBasedJournalEntriesAndReversalsForLoanCharges(office, currencyCode,
                     ACCRUAL_ACCOUNTS_FOR_LOAN.FEES_RECEIVABLE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INCOME_FROM_FEES.getValue(),
                     loanProductId, loanId, transactionId, transactionDate, feesAmount, isReversed, loanTransactionDTO.getFeePayments());
         }
         // create journal entries for the penalties application (or reversal)
-        if (penaltiesAmount != null && !(penaltiesAmount.compareTo(BigDecimal.ZERO) == 0)) {
-
+        if (penaltiesAmount != null && !(penaltiesAmount.compareTo(BigDecimal.ZERO) == 0)){
             this.helper.createAccrualBasedJournalEntriesAndReversalsForLoanCharges(office, currencyCode,
                     ACCRUAL_ACCOUNTS_FOR_LOAN.PENALTIES_RECEIVABLE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INCOME_FROM_PENALTIES.getValue(),
                     loanProductId, loanId, transactionId, transactionDate, penaltiesAmount, isReversed,
                     loanTransactionDTO.getPenaltyPayments());
         }
+    }
+
+    /// added 24/01/2022 ,for interest in suspense accounts .Not sure where the other leg go 
+
+    private void createJournalEntriesForNonPerfomingLoans(LoanTransactionDTO loanTransactionDTO, Office office, Long loanProductId, Long loanId, String currencyCode, String transactionId, Date transactionDate, BigDecimal interestAmount, BigDecimal feesAmount, BigDecimal penaltiesAmount, boolean isReversed, Long paymentTypeId) {
+
+        /// create journal entries for recognizing interest (or reversal)
+
+        System.err.println("----------------where is error here son ? -----------nullpointer");
+        if (interestAmount != null && !(interestAmount.compareTo(BigDecimal.ZERO) == 0)) {
+            System.err.println("-----------------------what is null -----------------?");
+            this.helper.createAccrualBasedJournalEntriesAndReversalsForLoan(office, currencyCode,
+                    ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_RECEIVABLE.getValue(),
+                    loanProductId, paymentTypeId, loanId, transactionId, transactionDate, interestAmount, isReversed);
+
+       }
+//        // create journal entries for the fees application (or reversal)
+//        if (feesAmount != null && !(feesAmount.compareTo(BigDecimal.ZERO) == 0)) {
+//            this.helper.createAccrualBasedJournalEntriesAndReversalsForLoanCharges(office, currencyCode,
+//                    ACCRUAL_ACCOUNTS_FOR_LOAN.FEES_RECEIVABLE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INCOME_FROM_FEES.getValue(),
+//                    loanProductId, loanId, transactionId, transactionDate, feesAmount, isReversed, loanTransactionDTO.getFeePayments());
+//        }
+//        // create journal entries for the penalties application (or reversal)
+//        if (penaltiesAmount != null && !(penaltiesAmount.compareTo(BigDecimal.ZERO) == 0)) {
+//
+//            this.helper.createAccrualBasedJournalEntriesAndReversalsForLoanCharges(office, currencyCode,
+//                    ACCRUAL_ACCOUNTS_FOR_LOAN.PENALTIES_RECEIVABLE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INCOME_FROM_PENALTIES.getValue(),
+//                    loanProductId, loanId, transactionId, transactionDate, penaltiesAmount, isReversed,
+//                    loanTransactionDTO.getPenaltyPayments());
+//        }
     }
 
     private void createJournalEntriesForRefund(final LoanDTO loanDTO, final LoanTransactionDTO loanTransactionDTO, final Office office) {

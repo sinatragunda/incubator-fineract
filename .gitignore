@@ -6,3 +6,4 @@
 .gradle
 build
 incubator-fineract.iml
+/bin/

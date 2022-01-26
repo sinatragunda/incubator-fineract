@@ -392,6 +392,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             /// We should refactor out a lot of other garbage there so that code becomes clean now its too much scatter and so unproffessional
             /// Can agents be self service users ?
+            /// modified error exist here when no client type is specified
             ClientCreateHelper.createLoanAgent(commandsSourceWritePlatformService , newClient);
             
             if(isEntity) {
@@ -683,19 +684,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             SavingsAccountDataDTO savingsAccountDataDTO = new SavingsAccountDataDTO(client, null, client.savingsProductId(),
                     client.getActivationLocalDate(), client.activatedBy(), fmt);
 
-            System.err.println("----------------savingsdto -----------------"+savingsAccountDataDTO);
-
             commandProcessingResult = this.savingsApplicationProcessWritePlatformService.createActiveApplication(savingsAccountDataDTO);
-
             if (commandProcessingResult.getSavingsId() != null) {
                 this.savingsRepositoryWrapper.findOneWithNotFoundDetection(commandProcessingResult.getSavingsId());
                 client.updateSavingsAccount(commandProcessingResult.getSavingsId());
                 client.updateSavingsProduct(null);
             }
         }
-
-        System.err.println("-----------------------we out of this function now------------------------");
-
         return commandProcessingResult;
     }
 
@@ -762,8 +757,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     private void createSelfServiceUser(final Client client,final Boolean isCreateSelfServiceUser) {
 
         Optional.ofNullable(isCreateSelfServiceUser).ifPresent(e->{
-
-            System.err.println("--------------------value is present create account now -----------");
 
             if(isCreateSelfServiceUser){
                 // still other steps can be removed here as well
@@ -1129,7 +1122,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Override
     public CommandProcessingResult openSavingsAccountEx(Client client , DateTimeFormatter dt , Long savingsProductId){
 
-        System.err.println("-------------------------------create new account for client with product id ------------"+savingsProductId);
         client.updateSavingsProduct(savingsProductId);
         client.updateSavingsAccount(null);
         return openSavingsAccount(client,dt);

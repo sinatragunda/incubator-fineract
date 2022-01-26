@@ -18,33 +18,34 @@ import org.apache.fineract.wese.helper.JsonHelper;
 
 import java.util.HashMap;
 import java.util.Map ;
+import java.util.Optional;
 
 public class ClientCreateHelper {
 
     private static String AGENT = "AGENT";
 
+
+    // modified 26/01/2022 to add optional nullable cause clientType wont be defined in other instances and would throw null pointer exception
     public static void createLoanAgent(PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService , Client client){
 
-        CodeValue clientType = client.clientType();
+        Optional.ofNullable(client.clientType()).ifPresent(e->{
 
-        String label  = clientType.label();
-        boolean isLoanAgent = ComparatorUtility.compareStringsIgnoreCase(label ,AGENT);
+            CodeValue clientType = e;
+            String label  = clientType.label();
 
-        if(!isLoanAgent){
-            return ;
-        }
+            boolean isLoanAgent = ComparatorUtility.compareStringsIgnoreCase(label ,AGENT);
 
-        Long clientId  = client.getId();
-        Map<String,Object> map = new HashMap<>();
-        map.put("clientId",clientId);
+            if(!isLoanAgent){
+                Long clientId  = client.getId();
+                Map<String,Object> map = new HashMap<>();
+                map.put("clientId",clientId);
 
-        String jsonRequest = JsonHelper.serializeMapToJson(map);
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createLoanAgent().withJson(jsonRequest).build();
-
-        final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
-
-        Long id = result.resourceId();
-
+                String jsonRequest = JsonHelper.serializeMapToJson(map);
+                final CommandWrapper commandRequest = new CommandWrapperBuilder().createLoanAgent().withJson(jsonRequest).build();
+                final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+                Long id = result.resourceId();
+            }
+        });
         /// now lets create some cool super stuff
     }
 }

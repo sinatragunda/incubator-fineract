@@ -302,6 +302,9 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
          * Variable tracks all accounting mapping properties that have been
          * updated
          ***/
+
+        System.err.println("-----------------update loan product ------------------------");
+
         Map<String, Object> changes = new HashMap<>();
         final JsonElement element = this.fromApiJsonHelper.parse(command.json());
         
@@ -323,7 +326,7 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
             this.loanProductToGLAccountMappingHelper.handleChangesToLoanProductToGLAccountMappings(loanProductId, changes, element,
                     accountingRuleType);
 
-            System.err.println("-----------------------------update payment channe---------------");
+            System.err.println("-----------------------------update payment channel---------------");
             
             this.loanProductToGLAccountMappingHelper.updatePaymentChannelToFundSourceMappings(command, element, loanProductId, changes);
             this.loanProductToGLAccountMappingHelper.updateChargesToIncomeAccountMappings(command, element, loanProductId, changes);

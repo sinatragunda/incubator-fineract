@@ -221,9 +221,6 @@ public final class LoanProductDataValidator {
         }
 
 
-
-
-
         if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.minimumDaysBetweenDisbursalAndFirstRepayment, element)) {
             final Long minimumDaysBetweenDisbursalAndFirstRepayment = this.fromApiJsonHelper.extractLongNamed(
                     LoanProductConstants.minimumDaysBetweenDisbursalAndFirstRepayment, element);
@@ -1251,6 +1248,12 @@ public final class LoanProductDataValidator {
         if (this.fromApiJsonHelper.parameterExists("saccoLoanLock", element)) {
             final Integer saccoLoanLock = this.fromApiJsonHelper.extractIntegerNamed("saccoLoanLock", element, Locale.getDefault());
             baseDataValidator.reset().parameter("saccoLoanLock").value(saccoLoanLock).ignoreIfNull();
+        }
+
+        // added 26/01/2022
+        if (this.fromApiJsonHelper.parameterExists(LoanProductConstants.loanFactorSourceAccountTypeParam, element)) {
+            final Integer loanFactorSourceAccount = this.fromApiJsonHelper.extractIntegerNamed(LoanProductConstants.loanFactorSourceAccountTypeParam, element, Locale.getDefault());
+            baseDataValidator.reset().parameter(LoanProductConstants.loanFactorSourceAccountTypeParam).value(loanFactorSourceAccount).ignoreIfNull().integerZeroOrGreater();
         }
 
 

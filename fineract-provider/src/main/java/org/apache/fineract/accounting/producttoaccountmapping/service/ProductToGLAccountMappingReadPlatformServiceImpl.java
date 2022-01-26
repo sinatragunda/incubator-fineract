@@ -314,7 +314,9 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
 
         final List<Map<String, Object>> chargeToFundSourceMappingsList = this.jdbcTemplate.query(sql, rm, new Object[] {
                 portfolioProductType.getValue(), loanProductId });
+
         List<ChargeToGLAccountMapper> chargeToGLAccountMappers = null;
+
         for (final Map<String, Object> chargeToIncomeAccountMap : chargeToFundSourceMappingsList) {
             if (chargeToGLAccountMappers == null) {
                 chargeToGLAccountMappers = new ArrayList<>();
@@ -339,6 +341,7 @@ public class ProductToGLAccountMappingReadPlatformServiceImpl implements Product
         final Map<String, Object> accountMappingDetails = new LinkedHashMap<>(8);
 
         final ProductToGLAccountMappingMapper rm = new ProductToGLAccountMappingMapper();
+
         final String sql = "select " + rm.schema() + " and product_id = ? and payment_type is null and mapping.charge_id is null ";
 
         final List<Map<String, Object>> listOfProductToGLAccountMaps = this.jdbcTemplate.query(sql, rm, new Object[] {

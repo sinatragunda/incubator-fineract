@@ -361,15 +361,25 @@ public class AccountingProcessorHelper {
             final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long loanProductId,
             final Long paymentTypeId, final Long loanId, final String transactionId, final Date transactionDate, final BigDecimal amount,
             final Boolean isReversal) {
+        System.err.println("---------------------error coming in this function -----------");
         int accountTypeToDebitId = accountTypeToBeDebited;
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
+
+        System.err.println("----------------account id "+accountTypeToCreditId+"--------------------debit --------"+accountTypeToDebitId);
+
+
         if (isReversal) {
             accountTypeToDebitId = accountTypeToBeCredited;
             accountTypeToCreditId = accountTypeToBeDebited;
         }
+
+        System.err.println("----------------error still not thrown here ----------------");
+        
         createJournalEntriesForLoan(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, loanProductId, paymentTypeId,
                 loanId, transactionId, transactionDate, amount);
+
+        System.err.println("-------------------we out of accounting processor for this function--------------");
     }
 
     /**
@@ -544,10 +554,29 @@ public class AccountingProcessorHelper {
     private void createJournalEntriesForLoan(final Office office, final String currencyCode, final int accountTypeToDebitId,
             final int accountTypeToCreditId, final Long loanProductId, final Long paymentTypeId, final Long loanId,
             final String transactionId, final Date transactionDate, final BigDecimal amount) {
-        final GLAccount debitAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToDebitId, paymentTypeId);
-        final GLAccount creditAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToCreditId, paymentTypeId);
+
+        System.err.println("-----------------------create journal entries for loan class --------------");
+
+        GLAccount debitAccount = null ;
+        GLAccount creditAccount = null ;
+        
+        try{
+            System.err.println("---------------------------find debit account son ------------------"+accountTypeToDebitId);
+            debitAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToDebitId, paymentTypeId);
+            System.err.println("--------------one of these is null since object might not have these accounts mapped -----------");
+            creditAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToCreditId, paymentTypeId);
+        }
+        catch(Exception n){
+            System.err.println("----------------null pointer throwed ,move to next loan---------------"+n.getMessage());
+            return ;
+        }
+
+        System.err.println("------------------------linked accounts now gotten ----------------"+debitAccount.getName()+"--------------------and credit account -----------"+creditAccount.getName());
+        
         createDebitJournalEntryForLoan(office, currencyCode, debitAccount, loanId, transactionId, transactionDate, amount);
         createCreditJournalEntryForLoan(office, currencyCode, creditAccount, loanId, transactionId, transactionDate, amount);
+        
+        System.err.println("------------------process another loan accrual --------------------");
     }
 
     private void createJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToDebitId,
@@ -889,6 +918,9 @@ public class AccountingProcessorHelper {
 
     private void createDebitJournalEntryForLoan(final Office office, final String currencyCode, final GLAccount account, final Long loanId,
             final String transactionId, final Date transactionDate, final BigDecimal amount) {
+        
+        System.err.println("------------------createdebit------------------"+transactionId);
+
         final boolean manualEntry = false;
         LoanTransaction loanTransaction = null;
         SavingsAccountTransaction savingsAccountTransaction = null;
@@ -899,8 +931,13 @@ public class AccountingProcessorHelper {
         if (StringUtils.isNumeric(transactionId)) {
             long id = Long.parseLong(transactionId);
             loanTransaction = this.loanTransactionRepository.findOne(id);
+
+            System.err.println("---------------------loantransaction object with identifier-----------");
             modifiedTransactionId = LOAN_TRANSACTION_IDENTIFIER + transactionId;
         }
+
+        System.err.println("-----------------------create journalentry object -----------------");
+
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
                 manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null,
                 loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
@@ -1081,6 +1118,9 @@ public class AccountingProcessorHelper {
     }
 
     public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId, final Long paymentTypeId) {
+
+        System.err.println("------------------------now what is this account ----------------");
+
         GLAccount glAccount = null;
         if (isOrganizationAccount(accountMappingTypeId)) {
             FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository

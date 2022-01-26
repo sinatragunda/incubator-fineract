@@ -139,19 +139,12 @@ public class SavingsAccountChargeAssembler {
 
     public Set<SavingsAccountCharge> fromSavingsProduct(final SavingsProduct savingsProduct) {
 
-        System.err.println("------------------how do we get here ? savingsproduct not null ?------------------"+Optional.ofNullable(savingsProduct).isPresent());
-
         final Set<SavingsAccountCharge> savingsAccountCharges = new HashSet<>();
-        
         boolean chargesPresent = Optional.ofNullable(savingsProduct.charges()).isPresent();
-
-        System.err.println("------------------------------are charges present son ? ----------------"+chargesPresent);
 
         if(chargesPresent){
 
             Set<Charge> productCharges = savingsProduct.charges();
-
-            System.err.println("----------------do we have produc charges is null ?,how come---------------"+productCharges.size());
 
             for (Charge charge : productCharges) {
                 ChargeTimeType chargeTime = null;
@@ -172,8 +165,6 @@ public class SavingsAccountChargeAssembler {
                 savingsAccountCharges.add(savingsAccountCharge);
             }
         }
-        System.err.println("--------------------return charges that are present-------------");
-        
         return savingsAccountCharges;
     }
 
