@@ -380,9 +380,6 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
         final Long loanId = loanDTO.getLoanId();
         final String currencyCode = loanDTO.getCurrencyCode();
 
-
-        System.err.println("--------------get if loan is in npa or -------------");
-
         // transaction properties
         final String transactionId = loanTransactionDTO.getTransactionId();
         final Date transactionDate = loanTransactionDTO.getTransactionDate();
@@ -397,17 +394,13 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
 
         boolean isNpa = loan.isNpa();
 
-        System.err.println("-------------is npa transaction ? -------------"+isNpa+" ------------and due date is "+loan.getMaturityDate());
-
-        System.err.println("------------------transaction amount ,where does the other go if its an npa transaction --------------"+interestAmount.doubleValue());
-
         // l usually hate using if else statements but no option here
         if(isNpa){
             System.err.println("---------------------create journal for non perfoming loan son ----------------------"+loanId);
             createJournalEntriesForNonPerfomingLoans(loanTransactionDTO ,office ,loanProductId ,loanId ,currencyCode ,transactionId ,transactionDate ,interestAmount ,feesAmount ,penaltiesAmount ,isReversed ,paymentTypeId);
             return ;
         }
-        System.err.println("------------------------------create journal for perfoming loan ----------------"+loanId);
+
         createJournalEntriesForPerfomingLoans(loanTransactionDTO, office, loanProductId, loanId, currencyCode, transactionId, transactionDate, interestAmount, feesAmount, penaltiesAmount, isReversed, paymentTypeId);
 
     }
@@ -441,10 +434,8 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
     private void createJournalEntriesForNonPerfomingLoans(LoanTransactionDTO loanTransactionDTO, Office office, Long loanProductId, Long loanId, String currencyCode, String transactionId, Date transactionDate, BigDecimal interestAmount, BigDecimal feesAmount, BigDecimal penaltiesAmount, boolean isReversed, Long paymentTypeId) {
 
         /// create journal entries for recognizing interest (or reversal)
-
-        System.err.println("----------------where is error here son ? -----------nullpointer");
         if (interestAmount != null && !(interestAmount.compareTo(BigDecimal.ZERO) == 0)) {
-            System.err.println("-----------------------what is null -----------------?");
+            System.err.println("-----------------------create non perfoming loan journal entryy ------------");
             this.helper.createAccrualBasedJournalEntriesAndReversalsForLoan(office, currencyCode,
                     ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_RECEIVABLE.getValue(),
                     loanProductId, paymentTypeId, loanId, transactionId, transactionDate, interestAmount, isReversed);

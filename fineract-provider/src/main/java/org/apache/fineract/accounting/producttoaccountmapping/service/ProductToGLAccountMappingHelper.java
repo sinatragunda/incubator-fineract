@@ -19,6 +19,8 @@
 package org.apache.fineract.accounting.producttoaccountmapping.service;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.apache.fineract.accounting.common.AccountingConstants.CASH_ACCOUNTS_FOR_LOAN;
 import org.apache.fineract.accounting.common.AccountingConstants.LOAN_PRODUCT_ACCOUNTING_PARAMS;
@@ -78,13 +80,19 @@ public class ProductToGLAccountMappingHelper {
         this.accountMappingRepository.save(accountMapping);
     }
 
+
+    // modified to support lambdas 26/01/2022 at 1940
     public void mergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
             final int accountTypeId, final String accountTypeName, final Map<String, Object> changes,
             final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
         
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
 
-        System.err.println("----------------------exception thrown here son------------------"+accountTypeName+"---------and account id is -------"+accountId+"-------expected account name "+expectedAccountType.name());
+        Boolean proceedFlag[] = {true};
+
+        Predicate proceed  = (e)->{
+            return proceedFlag[0];
+        };
 
         // get the existing product
         if (accountId != null) {
@@ -94,26 +102,28 @@ public class ProductToGLAccountMappingHelper {
 
             Optional.ofNullable(accountMapping).ifPresent(e->{
                 accountingMappingRepoSave(paramName, changes, expectedAccountType, accountId, accountMapping);
+                proceedFlag[0] = false ;
             });
 
             /// added 26/01/2022
             /// check if its interest in suspense so that we create new account link instead of changing it
             final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
-            //changes.put(paramName, accountId);
 
-            Optional.ofNullable(glAccount).ifPresent(e->{
-                ProductToGLAccountMapping newAccountMapping  = new ProductToGLAccountMapping(glAccount, productId,
-                        portfolioProductType.getValue(), accountTypeId) ;
+            Optional.ofNullable(glAccount).filter(proceed).ifPresent(e->{
+                ProductToGLAccountMapping newAccountMapping  = new ProductToGLAccountMapping(glAccount, productId,portfolioProductType.getValue(), accountTypeId) ;
                 this.accountMappingRepository.save(newAccountMapping);
+                proceedFlag[0]= false;
             });
 
-
             // change from accountMapping==null to glAccount .We hope it finds that new gl account and create it for that product
-            if (glAccount == null) {
-                System.err.println("---------------------accounting mapping null -----------------------"+accountTypeName);
+            Optional.ofNullable(proceedFlag).filter(proceed).ifPresent(e->{
+
                 throw new ProductToGLAccountMappingNotFoundException(portfolioProductType, productId,
-                    accountTypeName); 
-            }
+                        accountTypeName);
+
+            });
+
+        
         }
     }
 
@@ -130,21 +140,18 @@ public class ProductToGLAccountMappingHelper {
     public void createOrmergeProductToAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
             final int accountTypeId, final Map<String, Object> changes,
             final GLAccountType expectedAccountType, final PortfolioProductType portfolioProductType) {
+
         final Long accountId = this.fromApiJsonHelper.extractLongNamed(paramName, element);
-
-
-        System.err.println("-------------------------------------------create of merge -----------------");
 
         // get the existing product
         if (accountId != null) {
 
-            System.err.println("------------------product id is "+productId+"------------------"+accountTypeId+"--------------account type------"+portfolioProductType.getValue());
 
             final ProductToGLAccountMapping accountMapping = this.accountMappingRepository.findCoreProductToFinAccountMapping(productId,
                     portfolioProductType.getValue(), accountTypeId);
+
             if(accountMapping == null) {
 
-                System.err.println("----------------------------account mapping null create more -------------------");
                 final GLAccount glAccount = getAccountByIdAndType(paramName, expectedAccountType, accountId);
                 changes.put(paramName, accountId);
                 ProductToGLAccountMapping newAccountMapping  = new ProductToGLAccountMapping(glAccount, productId,
@@ -455,8 +462,6 @@ public class ProductToGLAccountMappingHelper {
      * @return
      */
     public GLAccount getAccountByIdAndType(final String paramName, final GLAccountType expectedAccountType, final Long accountId) {
-
-        System.err.println("-----------------gl account id is --------------"+accountId);
 
         final GLAccount glAccount = this.accountRepositoryWrapper.findOneWithNotFoundDetection(accountId);
 

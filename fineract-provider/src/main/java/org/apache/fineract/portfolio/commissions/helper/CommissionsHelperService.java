@@ -63,21 +63,15 @@ public class CommissionsHelperService {
                 // for each charge lets now deposit
 
             Long attachedCommissionChargeId = attachedCommissionChargesData.getId();
-
-            System.err.println("----------------------------chargetime now and recalculate commissions ------------"+attachedCommissionChargesData.getAmount().doubleValue());
-
             BigDecimal commissionAmount =     attachedCommissionChargesData.getAmount();
-
-            System.err.println("-------------new recalculated value is -----------------"+commissionAmount.doubleValue());
 
             boolean isDeposited = attachedCommissionChargesData.isDeposited();
 
             if(isDeposited) {
                 return;
             }
-            // from loan agent data we can get savings account id
-            System.err.println("----------------------charge time activated now ----------"+isDeposited);
 
+            // from loan agent data we can get savings account id
             // now we have loandagent data ,lets get the savingsaccount
             Long savingsAccountId = attachedCommissionChargesData.getSavingsAccountId();
             SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
@@ -95,7 +89,6 @@ public class CommissionsHelperService {
         });
 
         // get loan id now lets get loan agent id
-        System.err.println("-------------------we have returned no charge time ?");
 
     }
 

@@ -95,11 +95,9 @@ public class LoanProductToGLAccountMappingHelper extends ProductToGLAccountMappi
     public void mergeLoanToLiabilityAccountMappingChanges(final JsonElement element, final String paramName, final Long productId,
             final int accountTypeId, final String accountTypeName, final Map<String, Object> changes) {
 
-        System.err.println("-----------------------map liability account --------------------------"+paramName);
         mergeProductToAccountMappingChanges(element, paramName, productId, accountTypeId, accountTypeName, changes,
                 GLAccountType.LIABILITY, PortfolioProductType.LOAN);
-
-        System.err.println("--------------------done merging-------------");
+;
     }
 
     /*** Abstractions for payments channel related to loan products ***/

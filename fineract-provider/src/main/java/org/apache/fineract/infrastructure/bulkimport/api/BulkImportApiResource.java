@@ -80,7 +80,6 @@ public class BulkImportApiResource {
     public String retrieveImportDocuments(@Context final UriInfo uriInfo,
                                           @QueryParam("entityType") final String entityType) {
 
-        System.err.println("----------------------is this for template --------------?");
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
         Collection<ImportData> importData=new ArrayList<>();
@@ -125,12 +124,7 @@ public class BulkImportApiResource {
     public Response downloadTemplate(@QueryParam("officeId")final Long officeId,
                                        @QueryParam("staffId")final Long staffId,@QueryParam("entityType")final String entityType ,@QueryParam("dateFormat") final String dateFormat) {
 
-        System.err.println("-----------------download template now ---------------");
-
         GlobalEntityType type = GlobalEntityType.fromCode(entityType);
-
-        System.err.println("---------------------template is "+type);
-
         return bulkImportWorkbookPopulatorService.getTemplate(type.toString(),officeId, staffId,dateFormat);
     }
 

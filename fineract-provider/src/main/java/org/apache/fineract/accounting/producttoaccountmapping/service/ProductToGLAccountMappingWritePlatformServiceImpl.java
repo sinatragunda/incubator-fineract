@@ -303,8 +303,6 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
          * updated
          ***/
 
-        System.err.println("-----------------update loan product ------------------------");
-
         Map<String, Object> changes = new HashMap<>();
         final JsonElement element = this.fromApiJsonHelper.parse(command.json());
         
@@ -322,12 +320,7 @@ public class ProductToGLAccountMappingWritePlatformServiceImpl implements Produc
                     accountingRuleType);
         }/*** else examine and update individual changes ***/
         else {
-                System.err.println("------------------handle changes to product mapping ----------------");
-            this.loanProductToGLAccountMappingHelper.handleChangesToLoanProductToGLAccountMappings(loanProductId, changes, element,
-                    accountingRuleType);
-
-            System.err.println("-----------------------------update payment channel---------------");
-            
+            this.loanProductToGLAccountMappingHelper.handleChangesToLoanProductToGLAccountMappings(loanProductId, changes, element,accountingRuleType);
             this.loanProductToGLAccountMappingHelper.updatePaymentChannelToFundSourceMappings(command, element, loanProductId, changes);
             this.loanProductToGLAccountMappingHelper.updateChargesToIncomeAccountMappings(command, element, loanProductId, changes);
         }

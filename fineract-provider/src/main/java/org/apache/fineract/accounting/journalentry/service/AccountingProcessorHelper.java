@@ -361,20 +361,18 @@ public class AccountingProcessorHelper {
             final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long loanProductId,
             final Long paymentTypeId, final Long loanId, final String transactionId, final Date transactionDate, final BigDecimal amount,
             final Boolean isReversal) {
-        System.err.println("---------------------error coming in this function -----------");
+        
         int accountTypeToDebitId = accountTypeToBeDebited;
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
 
-        System.err.println("----------------account id "+accountTypeToCreditId+"--------------------debit --------"+accountTypeToDebitId);
+        System.err.println("----------------credit account id "+accountTypeToCreditId+"--------------------debit --------"+accountTypeToDebitId);
 
 
         if (isReversal) {
             accountTypeToDebitId = accountTypeToBeCredited;
             accountTypeToCreditId = accountTypeToBeDebited;
         }
-
-        System.err.println("----------------error still not thrown here ----------------");
         
         createJournalEntriesForLoan(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, loanProductId, paymentTypeId,
                 loanId, transactionId, transactionDate, amount);
@@ -561,9 +559,7 @@ public class AccountingProcessorHelper {
         GLAccount creditAccount = null ;
         
         try{
-            System.err.println("---------------------------find debit account son ------------------"+accountTypeToDebitId);
             debitAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToDebitId, paymentTypeId);
-            System.err.println("--------------one of these is null since object might not have these accounts mapped -----------");
             creditAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToCreditId, paymentTypeId);
         }
         catch(Exception n){
@@ -1118,8 +1114,6 @@ public class AccountingProcessorHelper {
     }
 
     public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId, final Long paymentTypeId) {
-
-        System.err.println("------------------------now what is this account ----------------");
 
         GLAccount glAccount = null;
         if (isOrganizationAccount(accountMappingTypeId)) {

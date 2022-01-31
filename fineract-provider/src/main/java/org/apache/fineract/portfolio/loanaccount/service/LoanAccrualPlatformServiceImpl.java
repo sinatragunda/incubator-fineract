@@ -48,13 +48,10 @@ public class LoanAccrualPlatformServiceImpl implements LoanAccrualPlatformServic
     @CronTarget(jobName = JobName.ADD_ACCRUAL_ENTRIES)
     public void addAccrualAccounting() throws JobExecutionException {
 
-        System.err.println("----------------do we run accruals here ? ---------------");    
-
         Collection<LoanScheduleAccrualData> loanScheduleAccrualDatas = this.loanReadPlatformService.retriveScheduleAccrualData();
 
         System.err.println("----------------------all scheduled loans are ------------------------"+loanScheduleAccrualDatas.size());
-        
-        
+
         StringBuilder sb = new StringBuilder();
         Map<Long, Collection<LoanScheduleAccrualData>> loanDataMap = new HashMap<>();
 
