@@ -39,6 +39,8 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,15 +55,19 @@ public class AccountTransferDetailAssembler {
     private final FromJsonHelper fromApiJsonHelper;
     private final LoanAssembler loanAccountAssembler;
 
+    // added 31/01/2022
+    private final ShareAccountAssembler shareAccountAssembler ;
+
     @Autowired
     public AccountTransferDetailAssembler(final ClientRepositoryWrapper clientRepository, final OfficeRepositoryWrapper officeRepositoryWrapper,
             final SavingsAccountAssembler savingsAccountAssembler, final FromJsonHelper fromApiJsonHelper,
-            final LoanAssembler loanAccountAssembler) {
+            final LoanAssembler loanAccountAssembler ,final ShareAccountAssembler shareAccountAssembler) {
         this.clientRepository = clientRepository;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
         this.savingsAccountAssembler = savingsAccountAssembler;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.loanAccountAssembler = loanAccountAssembler;
+        this.shareAccountAssembler = shareAccountAssembler ;
     }
 
     public AccountTransferDetails assembleSavingsToSavingsTransfer(final JsonCommand command) {
@@ -73,6 +79,20 @@ public class AccountTransferDetailAssembler {
         final SavingsAccount toSavingsAccount = this.savingsAccountAssembler.assembleFrom(toSavingsId);
 
         return assembleSavingsToSavingsTransfer(command, fromSavingsAccount, toSavingsAccount);
+
+    }
+
+
+    // added 31/01/2022
+    public AccountTransferDetails assembleSavingsToSharesTransfer(final JsonCommand command) {
+
+        final Long fromSavingsId = command.longValueOfParameterNamed(fromAccountIdParamName);
+        final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsId);
+
+        final Long toShareAccountId = command.longValueOfParameterNamed(toAccountIdParamName);
+        final ShareAccount toShareAccount = this.shareAccountAssembler.assembleFrom(toShareAccountId);
+
+        return assembleSavingsToShareTransfer(fromSavingsAccount, toShareAccount ,1);
 
     }
 
@@ -190,6 +210,21 @@ public class AccountTransferDetailAssembler {
 
         return AccountTransferDetails.savingsToSavingsTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient,
                 toSavingsAccount, transferType,false);
+    }
+
+    // added 31/01/2022
+
+    public AccountTransferDetails assembleSavingsToShareTransfer(final SavingsAccount fromSavingsAccount,
+            final ShareAccount toShareAccount, Integer transferType) {
+
+        final Office fromOffice = fromSavingsAccount.office();
+        final Client fromClient = fromSavingsAccount.getClient();
+        final Long officeId = toShareAccount.getOfficeId();
+        final Office toOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
+        final Client toClient = toShareAccount.getClient();
+
+        return AccountTransferDetails.savingsToShareTransfer(fromOffice, fromClient, fromSavingsAccount, toOffice, toClient,
+                toShareAccount, transferType);
     }
 
     public AccountTransferDetails assembleLoanToSavingsTransfer(final Loan fromLoanAccount, final SavingsAccount toSavingsAccount,

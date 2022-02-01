@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Table(name = "m_share_account")
 public class ShareAccount extends AbstractPersistableCustom<Long> {
 
-
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
     private Client client;
@@ -162,6 +161,10 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
 
     @Transient
     protected boolean accountNumberRequiresAutoGeneration = false;
+
+
+    @Transient
+    protected ShareAccountTransactionWrapper shareAccountTransactionWrapper ;
 
     protected ShareAccount() {
 
@@ -593,5 +596,11 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     
     public Integer status() {
         return this.status ;
+    }
+
+
+    public void setHelpers(ShareAccountTransactionWrapper shareAccountTransactionWrapper){
+        shareAccountTransactionWrapper.setShareAccount(this);
+        this.shareAccountTransactionWrapper = shareAccountTransactionWrapper ;
     }
 }

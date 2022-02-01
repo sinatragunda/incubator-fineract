@@ -26,6 +26,7 @@ import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -56,6 +57,10 @@ public class AccountTransferDTO {
     private final SavingsAccount fromSavingsAccount;
     private final Boolean isRegularTransaction;
     private final Boolean isExceptionForBalanceCheck;
+
+
+    //added 31/01/2022
+    private final ShareAccount toShareAccount ;
 
     public AccountTransferDTO(final LocalDate transactionDate, final BigDecimal transactionAmount,
             final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType, final Long fromAccountId,
@@ -89,6 +94,8 @@ public class AccountTransferDTO {
         this.fromSavingsAccount = fromSavingsAccount;
         this.isRegularTransaction = isRegularTransaction;
         this.isExceptionForBalanceCheck = isExceptionForBalanceCheck;
+
+        this.toShareAccount = null ;
     }
 
     public AccountTransferDTO(final LocalDate transactionDate, final BigDecimal transactionAmount,
@@ -121,6 +128,41 @@ public class AccountTransferDTO {
         this.fromSavingsAccount = null;
         this.isRegularTransaction = null;
         this.isExceptionForBalanceCheck = null;
+        this.toShareAccount = null ;
+    }
+
+
+    public AccountTransferDTO(final LocalDate transactionDate, final BigDecimal transactionAmount,
+            final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType, final Long fromAccountId,
+            final Long toAccountId, final String description, final Locale locale, final DateTimeFormatter fmt,
+            final Integer fromTransferType, final Integer toTransferType, final String txnExternalId,
+            final SavingsAccount fromSavingsAccount, final ShareAccount toShareAccount) {
+        this.transactionDate = transactionDate;
+        this.transactionAmount = transactionAmount;
+        this.fromAccountType = fromAccountType;
+        this.toAccountType = toAccountType;
+        this.fromAccountId = fromAccountId;
+        this.toAccountId = toAccountId;
+        this.description = description;
+        this.locale = locale;
+        this.fmt = fmt;
+        this.paymentDetail = null;
+        this.fromTransferType = fromTransferType;
+        this.toTransferType = toTransferType;
+        this.chargeId = null;
+        this.loanInstallmentNumber = null;
+        this.transferType = null;
+        this.accountTransferDetails = null;
+        this.noteText = null;
+        this.txnExternalId = txnExternalId;
+        this.fromLoan = null;
+        this.toLoan = null;
+        this.loan = null;
+        this.toSavingsAccount = null;
+        this.fromSavingsAccount = fromSavingsAccount;
+        this.isRegularTransaction = null;
+        this.isExceptionForBalanceCheck = true;
+        this.toShareAccount = toShareAccount ;
     }
 
     public LocalDate getTransactionDate() {
@@ -221,6 +263,10 @@ public class AccountTransferDTO {
 
     public Boolean isExceptionForBalanceCheck() {
         return this.isExceptionForBalanceCheck;
+    }
+
+    public ShareAccount toShareAccount(){
+        return this.toShareAccount ;
     }
 
 }

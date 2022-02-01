@@ -51,6 +51,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.exception.InvalidPaidInAdvanceAmountException;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
@@ -58,6 +59,10 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountAssembler;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDomainService;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -79,6 +84,10 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     private final AccountTransferDetailRepository accountTransferDetailRepository;
     private final LoanReadPlatformService loanReadPlatformService;
 
+    // added 31/01/2022
+    private final ShareAccountAssembler shareAccountAssembler ;
+    private final ShareAccountDomainService shareAccountDomainService ;
+
     @Autowired
     public AccountTransfersWritePlatformServiceImpl(final AccountTransfersDataValidator accountTransfersDataValidator,
             final AccountTransferAssembler accountTransferAssembler, final AccountTransferRepository accountTransferRepository,
@@ -86,7 +95,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final LoanAssembler loanAssembler, final LoanAccountDomainService loanAccountDomainService,
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService,
             final AccountTransferDetailRepository accountTransferDetailRepository,
-            final LoanReadPlatformService loanReadPlatformService) {
+            final LoanReadPlatformService loanReadPlatformService ,final ShareAccountAssembler shareAccountAssembler ,final ShareAccountDomainService shareAccountDomainService) {
         this.accountTransfersDataValidator = accountTransfersDataValidator;
         this.accountTransferAssembler = accountTransferAssembler;
         this.accountTransferRepository = accountTransferRepository;
@@ -97,14 +106,19 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
         this.accountTransferDetailRepository = accountTransferDetailRepository;
         this.loanReadPlatformService = loanReadPlatformService;
+        this.shareAccountAssembler = shareAccountAssembler ;
+        this.shareAccountDomainService = shareAccountDomainService ;
     }
 
     @Transactional
     @Override
     public CommandProcessingResult create(final JsonCommand command) {
+
         boolean isRegularTransaction = true;
 
         this.accountTransfersDataValidator.validate(command);
+
+        System.err.println("---------------data validated now --------------");
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
@@ -118,6 +132,12 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final Integer toAccountTypeId = command.integerValueSansLocaleOfParameterNamed(toAccountTypeParamName);
         final PortfolioAccountType toAccountType = PortfolioAccountType.fromInt(toAccountTypeId);
 
+        String fmtNew = transactionDate.toString("dd MMMM yyyy");
+
+        System.err.println("--------------------------new formatted date is ----------"+fmtNew);
+
+        final String note = command.stringValueOfParameterNamed("transferDescription");
+
         final PaymentDetail paymentDetail = null;
         Long fromSavingsAccountId = null;
         Long transferDetailId = null;
@@ -125,6 +145,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         boolean isAccountTransfer = true;
         Long fromLoanAccountId = null;
         boolean isWithdrawBalance = false;
+
+
+        System.err.println("--------------------transfer funds from json command now --------------------");
 
         if (isSavingsToSavingsAccountTransfer(fromAccountType, toAccountType)) {
 
@@ -194,7 +217,36 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
             transferDetailId = accountTransferDetails.getId();
 
-        } else {
+        }
+        // added 31/01/2022
+        else if(isSavingsToShareAccountTransfer(fromAccountType, toAccountType)) {
+
+            System.err.println("----------------savings to share transfer son ---------------");
+
+            fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
+            final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);
+
+            final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
+                    isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
+
+            final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
+                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
+
+            Note savingsNote = Note.savingsTransactionNote(fromSavingsAccount ,withdrawal ,note);
+
+            final Long toShareAccountId = command.longValueOfParameterNamed(toAccountIdParamName);
+            final ShareAccount toShareAccount = this.shareAccountAssembler.assembleFrom(toShareAccountId);
+
+
+
+            final ShareAccountTransaction shareAccountTransaction = this.shareAccountDomainService.purchaseShares(toShareAccount, new CommandProcessingResultBuilder(),
+                    transactionDate, transactionAmount, paymentDetail,savingsNote ,null , isAccountTransfer);
+
+            final AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleSavingsToShareTransfer(command,
+                    fromSavingsAccount, withdrawal , toShareAccount,shareAccountTransaction);
+
+            this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
+            transferDetailId = accountTransferDetails.getId();
 
         }
 
@@ -277,7 +329,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     @Transactional
     public Long transferFunds(final AccountTransferDTO accountTransferDTO) {
 
-        System.err.println("----------------------when is this called though ?--------------------");
+        System.err.println("----------------------time to transfer funds ?--------------------");
 
         Long transferTransactionId = null;
         final boolean isAccountTransfer = true;
@@ -339,7 +391,61 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     toLoanAccount, withdrawal, loanTransaction);
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
             transferTransactionId = accountTransferDetails.getId();
-        } else if (isSavingsToSavingsAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
+        }
+
+        // added 31/01/2022
+        else if (isSavingsToShareAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
+            //
+            SavingsAccount fromSavingsAccount = null;
+            ShareAccount toShareAccount = null;
+            
+            if (accountTransferDetails == null) {
+                if (accountTransferDTO.getFromSavingsAccount() == null) {
+                    fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(accountTransferDTO.getFromAccountId());
+                } else {
+                    fromSavingsAccount = accountTransferDTO.getFromSavingsAccount();
+                    this.savingsAccountAssembler.setHelpers(fromSavingsAccount);
+                }
+                if (accountTransferDTO.toShareAccount() == null) {
+                    toShareAccount = this.shareAccountAssembler.assembleFrom(accountTransferDTO.getToAccountId());
+                } else {
+                    toShareAccount = accountTransferDTO.toShareAccount();
+                    //this.shareAccountAssembler.setHelpers(toShareAccount);
+                }
+
+            } else {
+                fromSavingsAccount = accountTransferDetails.fromSavingsAccount();
+                this.savingsAccountAssembler.setHelpers(fromSavingsAccount);
+                //toShareAccount = accountTransferDetails.
+                //this.loanAccountAssembler.setHelpers(toLoanAccount);
+            }
+
+            final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
+                    isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), AccountTransferType.fromInt(
+                            accountTransferDTO.getTransferType()).isInterestTransfer(), accountTransferDTO.isExceptionForBalanceCheck());
+
+            final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount,
+                    accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
+                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues);
+
+            ShareAccountTransaction shareAccountTransaction = null;
+
+            // share accounts are never charge payments so will just go ahead with buying new shares 
+
+            Note savingsNote = Note.savingsTransactionNote(fromSavingsAccount ,withdrawal ,accountTransferDTO.getNoteText());
+            
+            shareAccountTransaction = this.shareAccountDomainService.purchaseShares(toShareAccount, new CommandProcessingResultBuilder(),
+                    accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
+                    accountTransferDTO.getPaymentDetail(),savingsNote ,accountTransferDTO.getTxnExternalId(), true);
+        
+
+            accountTransferDetails = this.accountTransferAssembler.assembleSavingsToSharesTransfer(accountTransferDTO, fromSavingsAccount,
+                    toShareAccount, withdrawal, shareAccountTransaction);
+
+            this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
+            transferTransactionId = accountTransferDetails.getId();
+        
+        }else if (isSavingsToSavingsAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
 
             SavingsAccount fromSavingsAccount = null;
             SavingsAccount toSavingsAccount = null;
@@ -478,6 +584,11 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
     private boolean isSavingsToSavingsAccountTransfer(final PortfolioAccountType fromAccountType, final PortfolioAccountType toAccountType) {
         return fromAccountType.isSavingsAccount() && toAccountType.isSavingsAccount();
+    }
+
+    // added 31/01/2022
+    private boolean isSavingsToShareAccountTransfer(final PortfolioAccountType fromAccountType ,final PortfolioAccountType toAccountType){
+        return fromAccountType.isSavingsAccount() && toAccountType.isSharesAccount();
     }
     
     @Override

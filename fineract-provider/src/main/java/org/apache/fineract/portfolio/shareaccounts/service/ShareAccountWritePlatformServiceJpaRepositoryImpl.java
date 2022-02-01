@@ -19,13 +19,7 @@
 package org.apache.fineract.portfolio.shareaccounts.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
@@ -228,7 +222,13 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     @Override
     public CommandProcessingResult applyAddtionalShares(final Long accountId, JsonCommand jsonCommand) {
         try {
+
+            System.err.println("------------------------account id is ---------------"+accountId);
+
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
+
+            System.err.println("------------------------error must be here is it present ? --"+ Optional.ofNullable(account).isPresent());
+
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);
             ShareAccountTransaction transaction = null;
             if (!changes.isEmpty()) {

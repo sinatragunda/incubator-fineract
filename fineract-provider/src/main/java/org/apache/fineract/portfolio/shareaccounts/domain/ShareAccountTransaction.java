@@ -79,6 +79,10 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
 
     }
 
+    public ShareAccountTransaction(Long id){
+        setId(id);
+    }
+
     public void setShareAccount(final ShareAccount shareAccount) {
         this.shareAccount = shareAccount;
     }

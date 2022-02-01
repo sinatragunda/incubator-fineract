@@ -43,11 +43,14 @@ public class AccountTransferEnumerations {
                 case LOAN:
                     optionData = new EnumOptionData(PortfolioAccountType.LOAN.getValue().longValue(), PortfolioAccountType.LOAN.getCode(),
                             "Loan Account");
-                break;
+                    break;
                 case SAVINGS:
                     optionData = new EnumOptionData(PortfolioAccountType.SAVINGS.getValue().longValue(),
                             PortfolioAccountType.SAVINGS.getCode(), "Savings Account");
-                break;
+                    break;
+                case SHARES:
+                    optionData = new EnumOptionData(PortfolioAccountType.SHARES.getValue().longValue(),PortfolioAccountType.SHARES.getCode() ,"Shares Account");
+                    break;
             }
         }
 

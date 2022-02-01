@@ -101,9 +101,12 @@ public class AccountTransfersReadPlatformServiceImpl implements
 		final EnumOptionData savingsAccountType = AccountTransferEnumerations
 				.accountType(PortfolioAccountType.SAVINGS);
 
+		final EnumOptionData sharesAccountType = AccountTransferEnumerations.accountType(PortfolioAccountType.SHARES);
+
 		final Integer mostRelevantFromAccountType = fromAccountType;
 		final Collection<EnumOptionData> fromAccountTypeOptions = Arrays
-				.asList(savingsAccountType, loanAccountType);
+				.asList(savingsAccountType, loanAccountType ,sharesAccountType);
+
 		final Collection<EnumOptionData> toAccountTypeOptions;
 		if (mostRelevantFromAccountType != null
 				&& mostRelevantFromAccountType == 1) {
@@ -111,8 +114,9 @@ public class AccountTransfersReadPlatformServiceImpl implements
 			toAccountTypeOptions = Arrays.asList(savingsAccountType);
 		} else {
 			toAccountTypeOptions = Arrays.asList(loanAccountType,
-					savingsAccountType);
+					savingsAccountType ,sharesAccountType);
 		}
+
 		final Integer mostRelevantToAccountType = toAccountType;
 
 		final EnumOptionData fromAccountTypeData = AccountTransferEnumerations
@@ -140,12 +144,26 @@ public class AccountTransfersReadPlatformServiceImpl implements
 		Long mostRelevantToClientId = toClientId;
 
 		if (fromAccountId != null) {
-			Integer accountType;
-			if (mostRelevantFromAccountType == 1) {
-				accountType = PortfolioAccountType.LOAN.getValue();
-			} else {
-				accountType = PortfolioAccountType.SAVINGS.getValue();
+			Integer accountType = null;
+			// if (mostRelevantFromAccountType == 1) {
+			// 	accountType = PortfolioAccountType.LOAN.getValue();
+			// } else {
+			// 	accountType = PortfolioAccountType.SAVINGS.getValue();
+			// }
+			
+			// added 31/01/2022
+			switch(mostRelevantFromAccountType){
+				case 1 :
+					accountType = PortfolioAccountType.LOAN.getValue();
+					break;
+				case 2 :
+					accountType = PortfolioAccountType.SAVINGS.getValue();
+					break;
+				case 3 :
+					accountType = PortfolioAccountType.SHARES.getValue();
+					break;
 			}
+
 			fromAccount = this.portfolioAccountReadPlatformService.retrieveOne(
 					fromAccountId, accountType);
 

@@ -37,6 +37,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
 import org.apache.fineract.useradministration.domain.AppUser;
 
 @Entity
@@ -76,6 +77,10 @@ public class Note extends AbstractAuditableCustom<AppUser, Long> {
     @ManyToOne
     @JoinColumn(name = "share_account_id", nullable = true)
     private ShareAccount shareAccount;
+    
+    @ManyToOne
+    @JoinColumn(name = "share_account_transaction_id", nullable = true)
+    private ShareAccountTransaction shareAccountTransaction;
     
     
     public static Note clientNoteFromJson(final Client client, final JsonCommand command) {
@@ -182,6 +187,10 @@ public class Note extends AbstractAuditableCustom<AppUser, Long> {
 
     public boolean isNotAgainstClientWithIdOf(final Long clientId) {
         return !this.client.identifiedBy(clientId);
+    }
+
+    public void setShareAccountTransaction(ShareAccountTransaction shareAccountTransaction){
+        this.shareAccountTransaction = shareAccountTransaction ;
     }
 
 }

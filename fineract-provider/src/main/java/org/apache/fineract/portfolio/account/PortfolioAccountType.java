@@ -29,7 +29,10 @@ public enum PortfolioAccountType {
     SAVINGS(2, "accountType.savings"),
 
     //modified 31/12/2021
-    EQUITY(3 ,"accountType.equity");
+    EQUITY(3 ,"accountType.equity"),
+
+    //added 31/01/2022
+    SHARES(4 ,"accountType.shares");
 
     private final Integer value;
     private final String code;
@@ -101,5 +104,10 @@ public enum PortfolioAccountType {
     // Added 31/12/2021
     public boolean isEquityAccount(){
         return this.value == Integer.valueOf(3);
+    }
+
+    // Added 31/01/2022
+    public boolean isSharesAccount(){
+        return this.value == Integer.valueOf(4);
     }
 }

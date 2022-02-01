@@ -19,11 +19,7 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.closure.domain.GLClosure;
@@ -1077,21 +1073,30 @@ public class AccountingProcessorHelper {
     
     private void createDebitJournalEntryForShares(final Office office, final String currencyCode, final GLAccount account,
             final Long shareAccountId, final String transactionId, final Date transactionDate, final BigDecimal amount) {
+
         final boolean manualEntry = false;
         LoanTransaction loanTransaction = null;
         SavingsAccountTransaction savingsAccountTransaction = null;
         ClientTransaction clientTransaction = null;
         final PaymentDetail paymentDetail = null;
-        Long shareTransactionId = null;
-        String modifiedTransactionId = transactionId;
+        Long shareTransactionId[] = {null};
+        String modifiedTransactionId[] = {transactionId};
         if (StringUtils.isNumeric(transactionId)) {
-            shareTransactionId = Long.parseLong(transactionId);
-            modifiedTransactionId = SHARE_TRANSACTION_IDENTIFIER + transactionId;
+            shareTransactionId[0] = Long.parseLong(transactionId);
+            modifiedTransactionId[0] = SHARE_TRANSACTION_IDENTIFIER + transactionId;
         }
-        final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
+
+        System.err.println("-------------------gl account might be null can we rectify that now ? ------");
+        
+        Optional.ofNullable(account).ifPresent(e->{
+            
+            final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId[0],
                 manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.SHARES.getValue(), shareAccountId,
-                null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
-        this.glJournalEntryRepository.save(journalEntry);
+                null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId[0]);
+            this.glJournalEntryRepository.save(journalEntry);
+    
+        });
+
     }
 
     private void createCreditJournalEntryForShares(final Office office, final String currencyCode, final GLAccount account,
@@ -1107,10 +1112,17 @@ public class AccountingProcessorHelper {
             shareTransactionId = Long.parseLong(transactionId);
             modifiedTransactionId = SHARE_TRANSACTION_IDENTIFIER + transactionId;
         }
-        final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
-                manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.SHARES.getValue(),
-                shareAccountId, null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
-        this.glJournalEntryRepository.save(journalEntry);
+
+
+        System.err.println("-----------------check if gl account is null or not then verify error on credit --------");
+
+        //Optional.ofNullable(account).ifPresent(e->{
+            final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
+                    manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.SHARES.getValue(),
+                    shareAccountId, null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
+            this.glJournalEntryRepository.save(journalEntry);
+        //});
+
     }
 
     public GLAccount getLinkedGLAccountForLoanProduct(final Long loanProductId, final int accountMappingTypeId, final Long paymentTypeId) {
@@ -1207,6 +1219,8 @@ public class AccountingProcessorHelper {
              * same for both cash and accrual accounts
              ***/
             if (accountMappingTypeId == CASH_ACCOUNTS_FOR_SAVINGS.SAVINGS_REFERENCE.getValue()) {
+                
+                System.err.println("----------------payment for cash accounts -------------");
                 final ProductToGLAccountMapping paymentChannelSpecificAccountMapping = this.accountMappingRepository
                         .findByProductIdAndProductTypeAndFinancialAccountTypeAndPaymentTypeId(savingsProductId,
                                 PortfolioProductType.SAVING.getValue(), accountMappingTypeId, paymentTypeId);
@@ -1220,6 +1234,10 @@ public class AccountingProcessorHelper {
     }
 
     private GLAccount getLinkedGLAccountForShareProduct(final Long shareProductId, final int accountMappingTypeId, final Long paymentTypeId) {
+        
+
+        System.err.println("-------------should catch a bunch of null errors here -----------"+accountMappingTypeId);
+
         GLAccount glAccount = null;
         if (isOrganizationAccount(accountMappingTypeId)) {
             FinancialActivityAccount financialActivityAccount = this.financialActivityAccountRepository

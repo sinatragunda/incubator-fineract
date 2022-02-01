@@ -21,6 +21,7 @@ package org.apache.fineract.portfolio.account.domain;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -34,6 +35,7 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
 import org.joda.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
@@ -77,6 +79,12 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
     @Column(name = "description", length = 100)
     private String description;
 
+    // added 31/01/2022
+
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "to_share_account_transaction_id",nullable = true)
+    private ShareAccountTransaction toShareAccountTransaction;
+
     public static AccountTransferTransaction savingsToSavingsTransfer(final AccountTransferDetails accountTransferDetails,
             final SavingsAccountTransaction withdrawal, final SavingsAccountTransaction deposit, final LocalDate transactionDate,
             final Money transactionAmount, final String description) {
@@ -92,10 +100,19 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
                 transactionAmount, description);
     }
 
+    // added 31/01/2022
+    public static AccountTransferTransaction savingsToShareTransfer(final AccountTransferDetails accountTransferDetails,
+            final SavingsAccountTransaction withdrawal, final ShareAccountTransaction shareAccountTransaction, final LocalDate transactionDate,
+            final Money transactionAmount, final String description) {
+        return new AccountTransferTransaction(accountTransferDetails, withdrawal, null, shareAccountTransaction, transactionDate,
+                transactionAmount, description);
+    }
+
+
     public static AccountTransferTransaction LoanTosavingsTransfer(final AccountTransferDetails accountTransferDetails,
             final SavingsAccountTransaction deposit, final LoanTransaction loanRefundTransaction, final LocalDate transactionDate,
             final Money transactionAmount, final String description) {
-        return new AccountTransferTransaction(accountTransferDetails, null, deposit, null, loanRefundTransaction, transactionDate,
+        return new AccountTransferTransaction(accountTransferDetails, null, deposit , null, loanRefundTransaction, transactionDate,
                 transactionAmount, description);
     }
 
@@ -116,6 +133,39 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
         this.currency = transactionAmount.getCurrency();
         this.amount = transactionAmount.getAmountDefaultedToNullIfZero();
         this.description = description;
+        //this.toShareAccountTransaction = null ;
+    }
+
+
+    private AccountTransferTransaction(final AccountTransferDetails accountTransferDetails, final SavingsAccountTransaction withdrawal,
+                                       final SavingsAccountTransaction deposit,
+                                       final LoanTransaction loanRefundTransaction, final LocalDate transactionDate, final Money transactionAmount,
+                                       final String description) {
+        this.accountTransferDetails = accountTransferDetails;
+        this.fromLoanTransaction = loanRefundTransaction;
+        this.fromSavingsTransaction = withdrawal;
+        this.toSavingsTransaction = deposit;
+        this.toShareAccountTransaction = null;
+        this.date = transactionDate.toDate();
+        this.currency = transactionAmount.getCurrency();
+        this.amount = transactionAmount.getAmountDefaultedToNullIfZero();
+        this.description = description;
+    }
+
+
+    // added 31/01/2022
+    private AccountTransferTransaction(final AccountTransferDetails accountTransferDetails, final SavingsAccountTransaction withdrawal,
+            final SavingsAccountTransaction deposit, final ShareAccountTransaction shareAccountTransaction,final LocalDate transactionDate, final Money transactionAmount,
+            final String description) {
+        this.accountTransferDetails = accountTransferDetails;
+        this.fromLoanTransaction = null;
+        this.fromSavingsTransaction = withdrawal;
+        this.toSavingsTransaction = deposit;
+        this.toShareAccountTransaction = shareAccountTransaction;
+        this.date = transactionDate.toDate();
+        this.currency = transactionAmount.getCurrency();
+        this.amount = transactionAmount.getAmountDefaultedToNullIfZero();
+        this.description = description;
     }
 
     public LoanTransaction getFromLoanTransaction() {
@@ -132,6 +182,11 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
 
     public SavingsAccountTransaction getToSavingsTransaction() {
         return this.toSavingsTransaction;
+    }
+
+    // added 31/01/2022
+    public ShareAccountTransaction getToShareAccountTransaction(){
+        return this.toShareAccountTransaction ;
     }
 
     public void reverse() {

@@ -31,6 +31,8 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,6 +77,25 @@ public class AccountTransferAssembler {
 
         AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToLoanTransfer(accountTransferDetails,
                 withdrawal, loanRepaymentTransaction, transactionDate, transactionMonetaryAmount, description);
+        accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
+        return accountTransferDetails;
+    }
+
+    // added 31/01/2022
+    public AccountTransferDetails assembleSavingsToShareTransfer(final JsonCommand command, final SavingsAccount fromSavingsAccount,final SavingsAccountTransaction withdrawal, final ShareAccount shareAccount ,final ShareAccountTransaction shareAccountTransaction) {
+
+        final AccountTransferDetails accountTransferDetails = this.accountTransferDetailAssembler.assembleSavingsToShareTransfer(
+                fromSavingsAccount, shareAccount,1);
+
+        final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
+        final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
+        final Money transactionMonetaryAmount = Money.of(fromSavingsAccount.getCurrency(), transactionAmount);
+
+        final String description = command.stringValueOfParameterNamed(transferDescriptionParamName);
+
+        AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToShareTransfer(accountTransferDetails,
+                withdrawal, shareAccountTransaction, transactionDate, transactionMonetaryAmount, description);
+        
         accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
         return accountTransferDetails;
     }
@@ -126,6 +147,30 @@ public class AccountTransferAssembler {
         AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToSavingsTransfer(accountTransferDetails,
                 withdrawal, deposit, accountTransferDTO.getTransactionDate(), transactionMonetaryAmount,
                 accountTransferDTO.getDescription());
+        accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
+        return accountTransferDetails;
+    }
+
+
+
+    // added 31/01/2022
+    public AccountTransferDetails assembleSavingsToSharesTransfer(final AccountTransferDTO accountTransferDTO,
+                                                                   final SavingsAccount fromSavingsAccount, final ShareAccount toShareAccount, final SavingsAccountTransaction withdrawal,
+                                                                   final ShareAccountTransaction shareAccountTransaction) {
+
+        final Money transactionMonetaryAmount = Money.of(fromSavingsAccount.getCurrency(), accountTransferDTO.getTransactionAmount());
+
+        AccountTransferDetails accountTransferDetails = accountTransferDTO.getAccountTransferDetails();
+
+        if (accountTransferDetails == null) {
+            accountTransferDetails = this.accountTransferDetailAssembler.assembleSavingsToShareTransfer(fromSavingsAccount,
+                    toShareAccount, accountTransferDTO.getTransferType());
+        }
+
+        AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToShareTransfer(accountTransferDetails,
+                withdrawal, shareAccountTransaction, accountTransferDTO.getTransactionDate(), transactionMonetaryAmount,
+                accountTransferDTO.getDescription());
+
         accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
         return accountTransferDetails;
     }

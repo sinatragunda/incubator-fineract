@@ -38,7 +38,7 @@ public class BusinessEventNotificationConstants {
                 SAVINGS_WITHDRAWAL("savings_withdrawal"), SAVINGS_APPROVE("savings_approve"), SAVINGS_CREATE("savings_create"), CLIENTS_ACTIVATE("clients_activate"), SHARE_ACCOUNT_CREATE("share_account_create"),
                 CLIENTS_REJECT("clients_reject"), CLIENTS_CREATE("clients_create"),CENTERS_CREATE("centers_create"), GROUPS_CREATE("groups_create"),
                 SHARE_PRODUCT_DIVIDENDS_CREATE("share_product_dividends_create"),FIXED_DEPOSIT_ACCOUNT_CREATE("fixed_deposit_account_create"),
-                SHARE_ACCOUNT_APPROVE("share_account_approve"), RECURRING_DEPOSIT_ACCOUNT_CREATE("recurring_deposit_account_create");
+                SHARE_ACCOUNT_APPROVE("share_account_approve"), RECURRING_DEPOSIT_ACCOUNT_CREATE("recurring_deposit_account_create") ,SHARES_PURCHASE("shares_purchase");
 
         private final String value;
 
