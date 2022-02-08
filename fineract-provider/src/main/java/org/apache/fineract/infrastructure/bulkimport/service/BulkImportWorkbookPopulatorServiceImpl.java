@@ -59,6 +59,8 @@ import org.apache.fineract.organisation.staff.service.StaffReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
@@ -77,12 +79,14 @@ import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.*;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.service.DepositProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
 import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.service.RoleReadPlatformService;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +98,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkbookPopulatorService {
@@ -117,6 +123,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
   private final ChargeReadPlatformService chargeReadPlatformService;
   private final DepositProductReadPlatformService depositProductReadPlatformService;
   private final RoleReadPlatformService roleReadPlatformService;
+  private final ClientReadPlatformService clientReadPlatformServiceEx[] = {null};
+  private final ClientRepositoryWrapper clientRepositoryWrapper[] = {null};
   
   @Autowired
   public BulkImportWorkbookPopulatorServiceImpl(final PlatformSecurityContext context,
@@ -137,7 +145,7 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
 		  final ProductReadPlatformService productReadPlatformService,
 		  final ChargeReadPlatformService chargeReadPlatformService,
 		  final DepositProductReadPlatformService depositProductReadPlatformService,
-		  final RoleReadPlatformService roleReadPlatformService) {
+		  final RoleReadPlatformService roleReadPlatformService ,final ClientRepositoryWrapper clientRepositoryWrapper) {
     this.officeReadPlatformService = officeReadPlatformService;
     this.staffReadPlatformService = staffReadPlatformService;
     this.context = context;
@@ -157,6 +165,8 @@ public class BulkImportWorkbookPopulatorServiceImpl implements BulkImportWorkboo
     this.chargeReadPlatformService=chargeReadPlatformService;
     this.depositProductReadPlatformService=depositProductReadPlatformService;
     this.roleReadPlatformService=roleReadPlatformService;
+    this.clientReadPlatformServiceEx[0] = clientReadPlatformService;
+    this.clientRepositoryWrapper[0] = clientRepositoryWrapper ;
   }
 
 	@Override
@@ -686,12 +696,39 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 
 		// this to be put later on so that l dont confuse myself with too much technicalities
 		// this.context.authenticatedUser().validateHasReadPermission(TemplatePopulateImportConstants.SSB_PAYMENTS);
-		
+
 		List<OfficeData> offices = fetchOffices(officeId);	
 		List<ClientData> clients = fetchClients(officeId);
-		
-		return new SsbPaymentsWorkBookPopulator(new ClientSheetPopulator(clients, offices));
+
+		List<SavingsAccountData> savingsAccountDataList = fetchSavingsAccounts(officeId);
+
+		// we want clients who are some other type
+		OfficeSheetPopulator officeSheetPopulator = new OfficeSheetPopulator(offices);
+		ClientSheetPopulator clientSheetPopulator = new ClientSheetPopulator(clients ,offices);
+
+		SavingsAccountSheetPopulator savingsAccountSheetPopulator = new SavingsAccountSheetPopulator(savingsAccountDataList);
+		savingsAccountSheetPopulator.filterDDAFundsAccounts(ddaFundsPredicate);
+
+		return new SsbPaymentsWorkBookPopulator(officeSheetPopulator , clientSheetPopulator , savingsAccountSheetPopulator);
 	}
 
+
+	// added 07/02/2022
+
+	// added 07/02/2022 at 3:59am
+	private Predicate<SavingsAccountData> ddaFundsPredicate = (e)->{
+		Long clientId = e.getClientId();
+		// long routine here load all accounts and filter those whose client type != DDA FUND
+
+        ClientData clientData = this.clientReadPlatformServiceEx[0].retrieveOne(clientId);
+		boolean isType[] = {false};
+
+		Optional.ofNullable(clientData.getClientType()).ifPresent(clientType ->{
+            String name = clientType.getName();
+			isType[0] = ComparatorUtility.compareStringsIgnoreCase(name ,"DDAC");
+		});
+
+		return isType[0] ;
+	};
 
 }

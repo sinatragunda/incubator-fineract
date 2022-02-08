@@ -223,12 +223,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     public CommandProcessingResult applyAddtionalShares(final Long accountId, JsonCommand jsonCommand) {
         try {
 
-            System.err.println("------------------------account id is ---------------"+accountId);
-
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
-
-            System.err.println("------------------------error must be here is it present ? --"+ Optional.ofNullable(account).isPresent());
-
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);
             ShareAccountTransaction transaction = null;
             if (!changes.isEmpty()) {
@@ -396,9 +391,6 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     @SuppressWarnings("unchecked")
     @Override
     public CommandProcessingResult approveAdditionalShares(Long accountId, JsonCommand jsonCommand) {
-
-
-        System.err.println("---------------approve do we come here ? ----------------"+jsonCommand.json());
 
         try {
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);

@@ -28,6 +28,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.infrastructure.codes.domain.CodeValueRepository;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.organisation.office.data.OfficeData;
@@ -652,5 +653,9 @@ final public class ClientData implements Comparable<ClientData> {
     //added 25/09/2021
     public Boolean isCreateSelfServiceUser(){
         return this.createSelfServiceUser ;
+    }
+
+    public CodeValueData getClientType() {
+        return clientType;
     }
 }

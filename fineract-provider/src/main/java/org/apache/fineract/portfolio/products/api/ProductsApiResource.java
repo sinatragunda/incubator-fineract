@@ -121,8 +121,6 @@ public class ProductsApiResource {
             @Context final UriInfo uriInfo) {
         try {
 
-            System.err.println("--------------------when is this called though ?");
-
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
             Page<ProductData> data = service.retrieveAllProducts(offset, limit);

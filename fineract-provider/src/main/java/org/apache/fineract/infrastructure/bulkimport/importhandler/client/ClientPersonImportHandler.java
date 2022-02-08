@@ -28,6 +28,9 @@ import org.apache.fineract.infrastructure.bulkimport.data.Count;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.*;
 import org.apache.fineract.portfolio.address.data.AddressData;
@@ -70,20 +73,16 @@ public class ClientPersonImportHandler implements ImportHandler {
 
         Integer noOfEntries= ImportHandlerUtils.getNumberOfRows(clientSheet,0);
 
-        //System.err.println("---------------------number of entries to talk about here ----------------"+noOfEntries);
         for (int rowIndex=1;rowIndex<=noOfEntries;rowIndex++){
             Row row;
                 row=clientSheet.getRow(rowIndex);
 
                 if (ImportHandlerUtils.isNotImported(row, ClientPersonConstants.STATUS_COL)){
 
-                    //System.err.println("-----------------row index is -------------------"+rowIndex);
                     ClientData clientData = readClient(row ,locale ,dateFormat);
                     Optional.ofNullable(clientData).ifPresent(e->{
-                        //System.err.println("-------------------add clients here son ,skipping null shit ");
                         clients.add(e);
                     });
-                    //clients.add(readClient(row,locale,dateFormat));
                 }
         }
 
@@ -184,6 +183,9 @@ public class ClientPersonImportHandler implements ImportHandler {
         
         // added 25/09/2021
         Boolean createSelfService = ImportHandlerUtils.readAsBoolean(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL ,row);
+
+        // added 25/09/2021 include capability to put client type
+        //String clientType = ImportHandlerUtils.readAsString(ClientPersonConstants.CLIENT_TYPE_COL ,row);
 
         //System.err.println("------------------------is anything null son ----------------");
         boolean isAnyNull = ExceptionsHelper.isAnyNull(firstName ,lastName);

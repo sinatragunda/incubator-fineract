@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopulator {
+
     private OfficeSheetPopulator officeSheetPopulator;
     private ClientSheetPopulator clientSheetPopulator;
     private ExtrasSheetPopulator extrasSheetPopulator;
@@ -120,6 +121,7 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
 
     private void setNames(Sheet worksheet) {
         Workbook savingsTransactionWorkbook = worksheet.getWorkbook();
+
         List<String> officeNames = officeSheetPopulator.getOfficeNames();
 
         //Office Names
@@ -144,6 +146,7 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
         int startIndex = 1, endIndex = 1;
         String clientName = "";
         Long clientId = null;
+
         for(int i = 0; i < savingsAccounts.size(); i++){
             if(!clientName.equals(savingsAccounts.get(i).getClientName())) {
                 endIndex = i + 1;

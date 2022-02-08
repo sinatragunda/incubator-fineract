@@ -20,9 +20,16 @@ package org.apache.fineract.infrastructure.bulkimport.constants;
 
 public class SsbPaymentsConstants {
 
-    public static final int CLIENT_NAME_COL = 0;
-    public static final int LOAN_ACCOUNT_NO_COL = 1;
-    public static final int EMPLOYEE_ID_COL  =2 ;
-    public static final int DOCUMENT_ID_COL = 3;
-    public static final int AMOUNT_COL = 4;
+    public static final int CLIENT_NAME_COL = 0;//A
+    public static final int LOAN_ACCOUNT_NO_COL = 1;//B
+    public static final int EMPLOYEE_ID_COL  =2 ;//C
+    public static final int DOCUMENT_ID_COL = 3;//D
+    public static final int AMOUNT_COL = 4;//E
+    public static final int STAGING_COL = 5 ;//F
+
+    public static final int DDA_FUND_ACCOUNT_NAME_COL = 6 ;//G
+    public static final int DDA_FUND_ACCOUNT_ID_COL = 7;//H
+    public static final int CURRENCY_COL = 8;//I
+
+    public static final String DDA_FUND_SHEET_NAME = "DDA_Funds";
 }

@@ -146,9 +146,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         Long fromLoanAccountId = null;
         boolean isWithdrawBalance = false;
 
-
-        System.err.println("--------------------transfer funds from json command now --------------------");
-
         if (isSavingsToSavingsAccountTransfer(fromAccountType, toAccountType)) {
 
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
@@ -221,8 +218,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         // added 31/01/2022
         else if(isSavingsToShareAccountTransfer(fromAccountType, toAccountType)) {
 
-            System.err.println("----------------savings to share transfer son ---------------");
-
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
             final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);
 
@@ -246,7 +241,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     fromSavingsAccount, withdrawal , toShareAccount,shareAccountTransaction);
 
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
-            transferDetailId = accountTransferDetails.getId();
+            transferDetailId = shareAccountTransaction.getId();
+
+            // get some
 
         }
 
@@ -254,6 +251,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         if (fromAccountType.isSavingsAccount()) {
             builder.withSavingsId(fromSavingsAccountId);
+        }
+        if(toAccountType.isSharesAccount()){
+            builder.withTransactionId(transferDetailId.toString());
         }
         if (fromAccountType.isLoanAccount()) {
             builder.withLoanId(fromLoanAccountId);

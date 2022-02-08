@@ -29,6 +29,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.domain.Money;
+import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
@@ -80,15 +81,6 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         final Money repaymentAmount = Money.of(shareAccount.getCurrency(), transactionAmount);
         ShareAccountTransaction newShareAccountTransaction = null;
-        final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
-
-        /***
-         * TODO Vishwas Batch save is giving me a
-         * HibernateOptimisticLockingFailureException, looping and saving for
-         * the time being, not a major issue for now as this loop is entered
-         * only in edge cases (when a payment is made before the latest payment
-         * recorded against the loan)
-         ***/
 
         Map<String ,Object> jsonMap = new HashMap<>();
         ShareProduct shareProduct = shareAccount.getShareProduct();
@@ -103,7 +95,6 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         String payload = JsonHelper.serializeMapToJson(jsonMap);
 
-
         System.err.println("-------------------------------payload is -------------------"+payload);
 
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
@@ -112,42 +103,48 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         CommandProcessingResult commandProcessingResult = this.shareAccountWritePlatformService.applyAddtionalShares(shareAccountId ,jsonCommand);
 
-
-//        if (StringUtils.isNotBlank(noteText)) {
-//            //final Note note = Note.shareNote(shareAccount, noteText);
-//
-//            this.noteRepository.save(note);
-//
-//        }
-
+        
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SHARES_PURCHASE, constructEntityMap(BUSINESS_ENTITY.SHARE_ACCOUNT, newShareAccountTransaction));
 
         // disable all active standing orders linked to this loan if status changes to closed
         //disableStandingInstructionsLinkedToClosedLoan(loan);
 
-        builderResult.withEntityId(commandProcessingResult.commandId()) //
-                .withOfficeId(commandProcessingResult.getOfficeId()) //
-                .withClientId(commandProcessingResult.getClientId()) ;
 
-        Long id = commandProcessingResult.commandId();
-        Long res = commandProcessingResult.resourceId();
+        Long transactionId[] = {null} ;
 
         /// with command id can we get the transaction id ?
 
-        System.err.println("---------------------------what is share account transaction ------------------"+id+"----------------and resource id ---------------"+res);
+        Map<String ,Object> changes = commandProcessingResult.getChanges();
+
+        System.err.println("--------------------command changes -------------"+changes.size());
+
+        if(!changes.isEmpty()){
+            
+            Object val = changes.get(ShareAccountApiConstants.additionalshares_paramname);
+            String strVal = String.valueOf(val);
+            transactionId[0] = Long.parseLong(strVal);
+
+            System.err.println("---------------------------transaction id -------------------"+val);
+        }
+
+
+        builderResult.withEntityId(transactionId[0]) //
+                .withOfficeId(commandProcessingResult.getOfficeId()) //
+                .withClientId(commandProcessingResult.getClientId()) ;
+
+        System.err.println("---------------------------what is share account transaction ------------------------------"+transactionId[0]);
 
         ShareAccountTransaction shareAccountTransaction[] = {null} ;
 
-        Optional.ofNullable(res).ifPresent(e->{
+        Optional.ofNullable(transactionId).ifPresent(e->{
 
-            shareAccountTransaction[0] = new ShareAccountTransaction(res);
+            shareAccountTransaction[0] = new ShareAccountTransaction(transactionId[0]);
 
             Optional.ofNullable(note).ifPresent(n->{
                 note.setShareAccountTransaction(shareAccountTransaction[0]);
                 this.noteRepository.save(note);
             });
         });
-
 
         return shareAccountTransaction[0] ;
 

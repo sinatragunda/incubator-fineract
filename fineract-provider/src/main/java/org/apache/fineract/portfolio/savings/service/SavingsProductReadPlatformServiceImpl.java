@@ -70,8 +70,6 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
 
         this.context.authenticatedUser();
 
-        System.err.println("---------------------retrieve all ,lets create entries from this ");
-
         String sql = "select " + this.savingsProductRowMapper.schema() + "where sp.deposit_type_enum = ?";
 
         // Check if branch specific products are enabled. If yes, fetch only
@@ -86,7 +84,6 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
 
         // Added 18/12/2021 execute it here
         savingsProductDataCollection.stream().forEach(e->{
-            System.err.println("--------------------------item id is -----------------------"+e.getId());
             ProductHelper.createProduct(productWritePlatformService , PRODUCT_TYPE.SAVINGS ,e.getId());
         });
 

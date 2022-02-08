@@ -28,6 +28,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
 
@@ -38,6 +40,7 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
    private static final int SAVING_ACCOUNT_NO=1;
    private static final int CURRENCY_COL=2;
    private static final int CLIENT_NAME=3;
+   private static final int AMOUNT=4 ;
 
 
     public SavingsAccountSheetPopulator(List<SavingsAccountData> savingsAccountDataList) {
@@ -59,7 +62,7 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
             writeLong(SAVINGS_ACCOUNT_ID_COL,row,savings.id());
             writeString(SAVING_ACCOUNT_NO,row,savings.getAccountNo());
             writeString(CURRENCY_COL,row,savings.currency().code());
-            writeString(CLIENT_NAME,row,savings.getClientName());
+            writeString(CLIENT_NAME,row,savings.getClientName().replaceAll("[ ]","_"));
         }
     }
 
@@ -80,5 +83,18 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
         savingsSheet.setColumnWidth(CLIENT_NAME,TemplatePopulateImportConstants.SMALL_COL_SIZE);
         writeString(CLIENT_NAME,rowHeader,"Client Name");
 
+        savingsSheet.setColumnWidth(AMOUNT,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+        writeString(AMOUNT,rowHeader,"Amount (Only When DDA Funding)");
+
+    }
+
+    // added 07/02/2022 at 0400
+    public void filterDDAFundsAccounts(Predicate<SavingsAccountData> ddaFundsPredicate){
+        System.err.println("----------------------------savings account data size ----------------"+savingsAccountDataList.size());
+        this.savingsAccountDataList = savingsAccountDataList.stream().filter(ddaFundsPredicate).collect(Collectors.toList());
+    }
+
+    public List<SavingsAccountData> getSavingsAccountDataList(){
+        return this.savingsAccountDataList;
     }
 }

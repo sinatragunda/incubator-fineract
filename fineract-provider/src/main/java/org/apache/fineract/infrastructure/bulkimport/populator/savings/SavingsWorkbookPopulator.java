@@ -60,6 +60,7 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         productSheetPopulator.populate(workbook,dateFormat);
         setRules(savingsSheet,dateFormat);
         setDefaults(savingsSheet,dateFormat);
+
         setClientAndGroupDateLookupTable(savingsSheet, clientSheetPopulator.getClients(), groupSheetPopulator.getGroups(),
                 SavingsConstants.LOOKUP_CLIENT_NAME_COL, SavingsConstants.LOOKUP_ACTIVATION_DATE_COL,!TemplatePopulateImportConstants.CONTAINS_CLIENT_EXTERNAL_ID,dateFormat);
         setLayout(savingsSheet);
@@ -147,7 +148,6 @@ public class SavingsWorkbookPopulator extends AbstractWorkbookPopulator {
         writeString(SavingsConstants.CHARGE_ID_2,rowHeader,"Charge Id");
         writeString(SavingsConstants.CHARGE_AMOUNT_2, rowHeader, "Charged Amount");
         writeString(SavingsConstants.CHARGE_DUE_DATE_2, rowHeader, "Charged On Date");
-
 
 
 

@@ -7,6 +7,7 @@
 package org.apache.fineract.wese.helper;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class ComparatorUtility {
 
@@ -60,7 +61,16 @@ public class ComparatorUtility {
 
     // Added 04/01/2021
     public static boolean compareStringsIgnoreCase(String left ,String right){
-        return left.equalsIgnoreCase(right);
+        
+        boolean isPresent = Optional.ofNullable(left).isPresent() && Optional.ofNullable(right).isPresent();
+
+        if(isPresent){
+            return left.equalsIgnoreCase(right);
+        }
+        // here it will be false since isPresent wouldnt have compared
+        return false ;
+
+    
     }
 
 
