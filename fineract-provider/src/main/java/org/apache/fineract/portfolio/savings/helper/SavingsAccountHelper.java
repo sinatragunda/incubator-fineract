@@ -33,6 +33,7 @@ public class SavingsAccountHelper {
             Long clientId = client.getId();
 
             client.updateSavingsProduct(savingsProductId);
+            
             client.updateSavingsAccount(null);
 
             boolean isEmpty = savingsAccountReadPlatformService.retrieveAllForClientUnderPortfolio(clientId ,savingsProductId).isEmpty();
@@ -40,7 +41,6 @@ public class SavingsAccountHelper {
             if(isEmpty){
                 commandProcessingResult[0] = clientWritePlatformService.openSavingsAccountEx(client ,dateTimeFormatter,savingsProductId);
             }
-
         });
 
         return commandProcessingResult[0] ;

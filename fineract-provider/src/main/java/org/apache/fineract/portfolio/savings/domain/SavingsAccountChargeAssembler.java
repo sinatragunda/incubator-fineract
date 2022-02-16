@@ -140,6 +140,7 @@ public class SavingsAccountChargeAssembler {
     public Set<SavingsAccountCharge> fromSavingsProduct(final SavingsProduct savingsProduct) {
 
         final Set<SavingsAccountCharge> savingsAccountCharges = new HashSet<>();
+        
         boolean chargesPresent = Optional.ofNullable(savingsProduct.charges()).isPresent();
 
         if(chargesPresent){

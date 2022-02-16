@@ -37,13 +37,10 @@ public class ShareAccountRepositoryWrapper {
 	
 	public ShareAccount findOneWithNotFoundDetection(final Long accountId) {
 		
-		Long id = new Long(accountId);
-
-		System.err.println("--------------id for account ---------"+id);
-		
+		Long id = new Long(accountId);	
 		ShareAccount shareAccount = null ;
+		
 		try{
-
 			shareAccount = this.shareAccountRepository.findOne(id) ;
 			if(shareAccount == null) {
 				throw new ShareAccountNotFoundException(id) ;

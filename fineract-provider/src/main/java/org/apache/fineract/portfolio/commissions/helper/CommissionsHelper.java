@@ -58,14 +58,10 @@ public class CommissionsHelper {
 
             final String apiJson = agentDataJsonObject.toString();
 
-            System.err.println("---------------does it even show any data ?----------------------");
-
             final LoanAgentDataBridge loanAgentDataBridge = LoanAgentDataBridge.fromJson(apiJson);
 
             /// create loans from agents link and get agent data
             Long loanAgentId  = loanAgentDataBridge.getLoanAgentData().getId();
-
-            System.err.println("--------------------loan agent id is -----------------"+loanAgentId);
 
             Map<String ,Object> map = new HashMap<>();
             map.put(CommissionsApiConstants.loanFromAgentsIdParam ,loanAgentId);
@@ -73,15 +69,12 @@ public class CommissionsHelper {
 
             String payload = JsonHelper.serializeMapToJson(map);
 
-            System.err.println("-----------------------payload is ---------------"+payload);
-
             JsonCommand loansFromAgentsJsonCommand  = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
 
             CommandProcessingResult loansFromAgentsCommandResult = loansFromAgentsWritePlatformService.create(loansFromAgentsJsonCommand);
 
             Long loansFromAgentsId = loansFromAgentsCommandResult.resourceId();
 
-            System.err.println("------------------loansfromagents id is now ---------------------"+loansFromAgentsId);
             LoansFromAgents loansFromAgents = LoansFromAgents.fromId(loansFromAgentsId);
 
             loansFromAgents.setLoan(loanApplication);

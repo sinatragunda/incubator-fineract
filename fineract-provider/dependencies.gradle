@@ -91,6 +91,7 @@ dependencies {
                 [group: 'pentaho-library',name: 'libsparkline', version: '1.2.8'],
                 [group: 'pentaho-library',name: 'libxml', version: '1.2.8'],
 
+                // apache poi version org is 3.9 ,changing to 5.0 to check if concate is supported
                 [group: 'org.apache.poi',name: 'poi', version: '3.9'],
                 [group: 'org.apache.poi',name: 'poi-ooxml', version: '3.9'],
                 [group: 'org.apache.poi',name: 'poi-ooxml-schemas', version: '3.9'],

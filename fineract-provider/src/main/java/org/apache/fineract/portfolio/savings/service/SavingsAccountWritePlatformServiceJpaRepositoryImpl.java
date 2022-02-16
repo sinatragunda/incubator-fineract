@@ -534,8 +534,6 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         account.activateAccountBasedOnBalance();
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
-        
-        System.err.println("---------------------------do we come here -------------------538 ----"+savingsId);
 
         return new CommandProcessingResultBuilder() //
                 .withEntityId(savingsId) //
@@ -1535,5 +1533,6 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     public CommandProcessingResult autoCreateBulkAccounts(final SavingsAccountReadPlatformService savingsAccountReadPlatformService, final ClientWritePlatformService clientWritePlatformService, final DateTimeFormatter dateTimeFormatter ,Long savingsProductId ,Long officeId){
 
         return SavingsAccountHelper.openSavingsAccount(savingsAccountReadPlatformService,clientWritePlatformService ,clientRepositoryWrapper , dateTimeFormatter ,savingsProductId ,officeId) ;
+
     }
 }

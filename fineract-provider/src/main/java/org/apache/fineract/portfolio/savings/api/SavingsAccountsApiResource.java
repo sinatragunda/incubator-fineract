@@ -422,6 +422,8 @@ public class SavingsAccountsApiResource {
             dateTimeFormatter = DateTimeFormat.forPattern("dd MM yyyy");
         }
 
+        System.err.println("--------------------------auto create bulk account ------------------"+savingsProductId);
+
         CommandProcessingResult commandProcessingResult = savingsAccountWritePlatformService.autoCreateBulkAccounts(savingsAccountReadPlatformService , clientWritePlatformService ,dateTimeFormatter ,savingsProductId ,officeId);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }

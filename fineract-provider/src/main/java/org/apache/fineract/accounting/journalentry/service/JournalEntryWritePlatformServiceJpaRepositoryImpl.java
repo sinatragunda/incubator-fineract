@@ -490,22 +490,17 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     @Override
     public void createJournalEntriesForLoan(final Map<String, Object> accountingBridgeData) {
 
-        System.err.println("--------------------comes to this function over here ------------------");
-
         final boolean cashBasedAccountingEnabled = (Boolean) accountingBridgeData.get("cashBasedAccountingEnabled");
         final boolean upfrontAccrualBasedAccountingEnabled = (Boolean) accountingBridgeData.get("upfrontAccrualBasedAccountingEnabled");
         final boolean periodicAccrualBasedAccountingEnabled = (Boolean) accountingBridgeData.get("periodicAccrualBasedAccountingEnabled");
 
         if (cashBasedAccountingEnabled || upfrontAccrualBasedAccountingEnabled || periodicAccrualBasedAccountingEnabled) {
-            
-            System.err.println("-----------------create loan dto object ------------------");
 
             final LoanDTO loanDTO = this.helper.populateLoanDtoFromMap(accountingBridgeData, cashBasedAccountingEnabled,
                     upfrontAccrualBasedAccountingEnabled, periodicAccrualBasedAccountingEnabled);
             final AccountingProcessorForLoan accountingProcessorForLoan = this.accountingProcessorForLoanFactory
                     .determineProcessor(loanDTO);
 
-            System.err.println("-----------------------------accounting processor for loan with loan dto object -----------");
             accountingProcessorForLoan.createJournalEntriesForLoan(loanDTO);
         }
     }

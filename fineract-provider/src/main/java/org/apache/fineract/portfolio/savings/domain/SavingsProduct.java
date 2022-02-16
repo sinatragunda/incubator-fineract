@@ -52,12 +52,7 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withHold
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withdrawalFeeForTransfersParamName;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -704,8 +699,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
     }
 
     public Set<Charge> charges() {
-        System.err.println("--------------now way to catch error from here ?");
-        return new HashSet<>(this.charges);
+        return Optional.ofNullable(charges).orElse(new HashSet<>());
     }
 
     public InterestRateChart applicableChart(@SuppressWarnings("unused") final LocalDate target) {

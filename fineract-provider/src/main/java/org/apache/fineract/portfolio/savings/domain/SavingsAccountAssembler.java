@@ -331,7 +331,9 @@ public class SavingsAccountAssembler {
             accountType = AccountType.JLG;
         }
         final SavingsProduct product = this.savingProductRepository.findOne(productId) ;
+        
         final Set<SavingsAccountCharge> charges = this.savingsAccountChargeAssembler.fromSavingsProduct(product);
+        
         final SavingsAccount account = SavingsAccount.createNewApplicationForSubmittal(client, group, product, null, null, null,
                 accountType, appliedonDate, appliedBy, product.nominalAnnualInterestRate(), product.interestCompoundingPeriodType(),
                 product.interestPostingPeriodType(), product.interestCalculationType(), product.interestCalculationDaysInYearType(),

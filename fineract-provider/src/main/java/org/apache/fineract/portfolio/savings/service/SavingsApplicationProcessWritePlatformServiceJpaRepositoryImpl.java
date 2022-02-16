@@ -520,7 +520,9 @@ public class SavingsApplicationProcessWritePlatformServiceJpaRepositoryImpl impl
                 savingsAccountDataDTO.getAppliedBy());
         }
         catch(NullPointerException n){
-            //n.printStackTrace();
+            System.err.println("----------------where is error ------------"+n.getMessage());
+            n.printStackTrace();
+            return null ;
         }
     
         account.approveAndActivateApplication(savingsAccountDataDTO.getApplicationDate().toDate(), savingsAccountDataDTO.getAppliedBy());

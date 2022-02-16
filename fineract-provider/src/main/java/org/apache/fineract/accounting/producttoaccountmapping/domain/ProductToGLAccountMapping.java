@@ -90,8 +90,6 @@ public class ProductToGLAccountMapping extends AbstractPersistableCustom<Long> {
     }
 
     public GLAccount getGlAccount(){
-
-        System.err.println("-------------this would be throwing null---------------");
         return this.glAccount;
     }
 

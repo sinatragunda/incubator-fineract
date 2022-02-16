@@ -24,19 +24,12 @@ public class AttachedCommissionChargesHelper {
 
         boolean hasAgent = Optional.ofNullable(loanAgentData).isPresent();
 
-        System.err.println("----------has agent now is ----------------"+hasAgent);
-
         if(hasAgent){
-            System.err.println("-----------lets check if it has the id now ");
             hasAgent = Optional.ofNullable(loanAgentData.getId()).isPresent();
-            System.err.println("------------------has agent new val is ----------"+hasAgent);
         }
 
         boolean hasCommissionCharges = !commissionChargeDataList.isEmpty();
 
-        System.err.println("--------------------hasAgent ?-------------"+hasAgent+"=============and id is ----------"+loanAgentData.getId());
-
-        System.err.println("--------------------hasCommissionCharges ---------"+hasCommissionCharges);
 
         // only valid if it has agent and commission charges
         boolean validEntry = hasAgent && hasCommissionCharges;

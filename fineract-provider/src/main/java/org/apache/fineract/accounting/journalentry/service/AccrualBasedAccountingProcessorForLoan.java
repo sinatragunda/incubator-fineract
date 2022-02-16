@@ -57,8 +57,6 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
     @Override
     public void createJournalEntriesForLoan(final LoanDTO loanDTO) {
 
-        System.err.println("-----------------createJournalEntriesForLoan ------------using dto object ");
-
         final GLClosure latestGLClosure = this.helper.getLatestClosureByBranch(loanDTO.getOfficeId());
         final Office office = this.helper.getOfficeById(loanDTO.getOfficeId());
         for (final LoanTransactionDTO loanTransactionDTO : loanDTO.getNewLoanTransactions()) {
@@ -75,7 +73,6 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
 
             /*** Handle Accruals ***/
             if (loanTransactionDTO.getTransactionType().isAccrual()) {
-                System.err.println("------------------------------create journal for accrual ------------");
                 createJournalEntriesForAccruals(loanDTO, loanTransactionDTO, office);
             }
 

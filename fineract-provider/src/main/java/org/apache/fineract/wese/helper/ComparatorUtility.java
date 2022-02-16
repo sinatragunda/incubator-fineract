@@ -12,8 +12,15 @@ import java.util.Optional;
 public class ComparatorUtility {
 
     public static boolean compareLong(Long l ,Long r){
-        int cmp = l.compareTo(r);
-        return cmpToBoolean(cmp);
+        
+        boolean isPresent = Optional.ofNullable(l).isPresent() && Optional.ofNullable(r).isPresent();
+
+        if(isPresent){
+            int cmp = l.compareTo(r);
+            return cmpToBoolean(cmp);
+        }
+        return isPresent ;
+    
     }
 
 
