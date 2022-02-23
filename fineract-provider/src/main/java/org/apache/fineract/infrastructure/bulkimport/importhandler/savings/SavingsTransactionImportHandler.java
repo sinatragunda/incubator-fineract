@@ -84,6 +84,7 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     public Count process(Workbook workbook, String locale, String dateFormat) {
         this.workbook=workbook;
         this.savingsTransactions=new ArrayList<>();
+        
         readExcelFile(locale,dateFormat);
 
         // added new check if savings account is null then set this value only ,some its tedious to list all clients with account numbers and balances
@@ -107,13 +108,14 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     }
 
     public void readExcelFile(String locale, String dateFormat) {
+        
         Sheet savingsTransactionSheet = workbook.getSheet(TemplatePopulateImportConstants.SAVINGS_TRANSACTION_SHEET_NAME);
-        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(savingsTransactionSheet, TransactionConstants.AMOUNT_COL);
+        
+        Integer noOfEntries = ImportHandlerUtils.getNumberOfRowsWithErrorHandling(savingsTransactionSheet, TransactionConstants.AMOUNT_COL);
 
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
 
-            Row row;
-            row = savingsTransactionSheet.getRow(rowIndex);
+            Row row = savingsTransactionSheet.getRow(rowIndex);
             if(ImportHandlerUtils.isNotImported(row, TransactionConstants.STATUS_COL)) {
 
                 SavingsAccountTransactionData savingsAccountTransactionData = readSavingsTransaction(row, locale, dateFormat);
@@ -174,6 +176,8 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         // Added 08/10/2021
         Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);
 
+
+
         //added 08/12/2021
         String note = ImportHandlerUtils.readAsString(TransactionConstants.NOTE_COL ,row);
 
@@ -185,6 +189,7 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         });
 
         Optional.ofNullable(equityBalance).ifPresent(e->{
+            System.err.println("---equity balance is -------------"+equityBalance.doubleValue());
             savingsAccountTransactionData.setEquityBalance(new BigDecimal(equityBalance));
         });
 

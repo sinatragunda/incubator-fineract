@@ -83,8 +83,6 @@ public class SavingsAccountTransactionData {
             String receiptNumber, String bankNumber,Long savingsAccountId,
             SavingsAccountTransactionEnumData transactionType, Integer rowIndex,String locale,String dateFormat){
 
-        System.err.println("----------------imported paymentTypeId---------------------"+paymentTypeId);
-
         return new SavingsAccountTransactionData(transactionAmount, transactionDate, paymentTypeId, accountNumber,
                 checkNumber, routingCode, receiptNumber, bankNumber, savingsAccountId, transactionType, rowIndex,locale,dateFormat);
     }

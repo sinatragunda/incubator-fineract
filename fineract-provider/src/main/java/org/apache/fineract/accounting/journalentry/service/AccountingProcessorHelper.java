@@ -1219,8 +1219,6 @@ public class AccountingProcessorHelper {
              * same for both cash and accrual accounts
              ***/
             if (accountMappingTypeId == CASH_ACCOUNTS_FOR_SAVINGS.SAVINGS_REFERENCE.getValue()) {
-                
-                System.err.println("----------------payment for cash accounts -------------");
                 final ProductToGLAccountMapping paymentChannelSpecificAccountMapping = this.accountMappingRepository
                         .findByProductIdAndProductTypeAndFinancialAccountTypeAndPaymentTypeId(savingsProductId,
                                 PortfolioProductType.SAVING.getValue(), accountMappingTypeId, paymentTypeId);
@@ -1234,9 +1232,6 @@ public class AccountingProcessorHelper {
     }
 
     private GLAccount getLinkedGLAccountForShareProduct(final Long shareProductId, final int accountMappingTypeId, final Long paymentTypeId) {
-        
-
-        System.err.println("-------------should catch a bunch of null errors here -----------"+accountMappingTypeId);
 
         GLAccount glAccount = null;
         if (isOrganizationAccount(accountMappingTypeId)) {

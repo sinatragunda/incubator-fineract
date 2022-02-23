@@ -38,7 +38,14 @@ public class EquityGrowthImportHandler {
         // how do we get product id here now ,seems some tricky logic to do but hold on son
         // hard coding this value for now savingsproductid
 
-        BigDecimal totalEquity  = savingsAccountTransactionDataList.stream().map(SavingsAccountTransactionData::getEquityBalance).reduce(BigDecimal.ZERO,BigDecimal::add);
+        BigDecimal totalEquity = savingsAccountTransactionDataList.stream().map(SavingsAccountTransactionData::getEquityBalance).reduce(BigDecimal.ZERO,BigDecimal::add);
+//
+//        boolean isDepositable = MoneyHelper.depositable(totalEquity);
+//
+//        if(!isDepositable){
+//            // if this money is depositable then return
+//            return ;
+//        }
 
         EquityGrowthDividends equityGrowthDividends = new EquityGrowthDividends(savingsProductId ,startDate ,endDate ,totalEquity ,beneficiaries[0],null);
         EquityGrowthDividends equityGrowthDividendsFlushed = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
@@ -56,23 +63,10 @@ public class EquityGrowthImportHandler {
 
             Long savingsAccountId = savingsAccountTransactionData.getSavingsAccountId();
 
+            System.err.println("-----------------------savings account id is ------"+savingsAccountId);
+
             Optional.ofNullable(savingsAccountId).ifPresent(e->{
-
-                SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(e);
-
-                // added to avoid too many trailing numbers after decimal place for example writing 15.1245678888 instead of just rounding to 15.12
-                MonetaryCurrency monetaryCurrency = savingsAccount.getCurrency();
-                Money money = Money.of(monetaryCurrency ,equityBalance[0]);
-
-                equityBalance[0] = money.getAmount();
-
-                String clientName = savingsAccount.getClient().getDisplayName();
-                Double percentage = EquityGrowthHelper.percentage(equityBalance[0].doubleValue() ,totalEquity.doubleValue());
-
-                EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,equityBalance[0] ,percentage ,"Equity Migration" ,clientName);
-                equityGrowthOnSavingsAccount.setEquityGrowthDividends(equityGrowthDividends);
-                equityGrowthOnSavingsAccountRepository.save(equityGrowthOnSavingsAccount);
-                ++beneficiaries[0] ;
+                depositEquityFunds(equityGrowthOnSavingsAccountRepository, savingsAccountAssembler, beneficiaries, totalEquity, equityGrowthDividends, equityGrowthDividendsFlushed, equityBalance, savingsAccountId);
             });
         }
 
@@ -80,6 +74,32 @@ public class EquityGrowthImportHandler {
         equityGrowthDividends.setBeneficiaries(beneficiaries[0]);
         equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
 
+    }
+
+    private static void depositEquityFunds(EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository, SavingsAccountAssembler savingsAccountAssembler, int[] beneficiaries, BigDecimal totalEquity, EquityGrowthDividends equityGrowthDividends, EquityGrowthDividends equityGrowthDividendsFlushed, BigDecimal[] equityBalance, Long savingsAccountId) {
+
+        SavingsAccount savingsAccount = null ;
+        try{
+            savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+        }
+        catch (Exception n){
+            System.err.println("---------------exception thrown "+n.getMessage());
+            return;
+        }
+
+        // added to avoid too many trailing numbers after decimal place for example writing 15.1245678888 instead of just rounding to 15.12
+        MonetaryCurrency monetaryCurrency = savingsAccount.getCurrency();
+        Money money = Money.of(monetaryCurrency ,equityBalance[0]);
+
+        equityBalance[0] = money.getAmount();
+
+        String clientName = savingsAccount.getClient().getDisplayName();
+        Double percentage = EquityGrowthHelper.percentage(equityBalance[0].doubleValue() ,totalEquity.doubleValue());
+
+        EquityGrowthOnSavingsAccount equityGrowthOnSavingsAccount = new EquityGrowthOnSavingsAccount(equityGrowthDividendsFlushed ,savingsAccountId ,BigDecimal.ZERO ,equityBalance[0] ,percentage ,"Equity Migration" ,clientName);
+        equityGrowthOnSavingsAccount.setEquityGrowthDividends(equityGrowthDividends);
+        equityGrowthOnSavingsAccountRepository.save(equityGrowthOnSavingsAccount);
+        ++beneficiaries[0] ;
     }
 
 }

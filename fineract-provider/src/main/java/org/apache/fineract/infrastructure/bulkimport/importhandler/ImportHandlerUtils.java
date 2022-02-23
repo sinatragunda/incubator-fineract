@@ -55,11 +55,40 @@ public class ImportHandlerUtils {
         while(sheet.getRow(noOfEntries+1) !=null){
             noOfEntries++;
         }
-        // while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
-        //    noOfEntries++;
-        // }
 
         return noOfEntries;
+    }
+
+    // added 17/02/2022
+    public static Integer getNumberOfRowsEx(Sheet sheet, int primaryColumn) {
+        
+        Integer noOfEntries = 0;
+
+        while (sheet.getRow(noOfEntries+1) !=null && sheet.getRow(noOfEntries+1).getCell(primaryColumn) != null) {
+           noOfEntries++;
+        }
+        return noOfEntries;
+    }
+
+    // added 17/02/2022 
+    // added to counteract some excel raising error if used with getNumberofRows only 
+    public static int getNumberOfRowsWithErrorHandling(Sheet sheet ,int primaryColumn){
+
+        System.err.println("------------------why error not being caught ? -----------------");
+        
+        Integer noOfEntries = 0 ;
+        try{
+            noOfEntries = getNumberOfRows(sheet ,primaryColumn);
+            System.err.println("---------------------number of entries we got is -----------"+noOfEntries);
+        }
+
+        catch(NullPointerException n){
+            /// if we catch an exception here then use another method
+            noOfEntries = getNumberOfRowsEx(sheet ,primaryColumn);
+            System.err.println("----------------exception thrown here we got another error --------"+noOfEntries);
+        }
+        return noOfEntries ;
+
     }
 
     public static boolean isNotImported(Row row, int statusColumn){
@@ -233,12 +262,12 @@ public class ImportHandlerUtils {
             try{
                 val = Double.parseDouble(row.getCell(colIndex).getStringCellValue());
             }
-            catch(NullPointerException n){
-                System.err.println("---------------value is "+row.getCell(colIndex).getStringCellValue());    
-                System.err.println("-------------format exception caught son -----------"+n.getMessage());
+            catch(Exception n){  
+                System.err.println("-------------format exception caught son ,but null registered-----------"+n.getMessage());
             }
             return val ;
         }
+      
     }
 
     public static void writeString(int colIndex, Row row, String value) {
