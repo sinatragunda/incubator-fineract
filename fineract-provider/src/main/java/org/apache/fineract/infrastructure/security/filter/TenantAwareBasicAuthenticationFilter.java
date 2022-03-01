@@ -106,6 +106,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
         final StopWatch task = new StopWatch();
         task.start();
+
+        System.err.println("------------------------which filtering is this ? -----------------------");
       
         try {
 
@@ -125,6 +127,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                                 + "' or add the parameter 'tenantIdentifier' to query string of request URL."); }
 
                 String pathInfo = request.getRequestURI();
+
+                System.err.println("---------------------------which path info is this ------------------------"+pathInfo);
 
                 boolean isReportRequest = false;
                 if (pathInfo != null && pathInfo.contains("report")) {
@@ -203,9 +207,12 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 		// handle all request regarding any of the financial services ,if its disabled then stop transaction or residerent it
         // No way to add interceptor other than this thats why
         // Should it return anything ,if product is disabled just throw an error from there
-        ProductHelper.handleRequest(request ,response);
+        // substitute this command for later
+        //ProductHelper.handleRequest(request ,response);
 		
 		if(notAllowed){
+
+		    System.err.println("---------------that not allowed shit-------------------");
 
 		     // we removing this step so that we can implement our self service item
             boolean isPasswordRequest = passwordResetRequest(pathURL ,response);
@@ -215,8 +222,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                 return ;
             }
             /// we had blocked this there other day
-            // toxic logic that needs reworking here
-		    //throw new BadCredentialsException("User not authorised to use the requested resource.");
+            /// toxic logic that needs reworking here
+		    ///throw new BadCredentialsException("User not authorised to use the requested resource.");
 		}
     }
 
@@ -227,7 +234,9 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
         if(isPasswordRequest){
             try{
-                //response.sendRedirect("/login");
+                response.sendRedirect("/authenticate/resetpassword");
+                System.err.println("------------------reset password request son-------------");
+                // we dont have any user object so trying to find a quick rich way to get clever
             }
             catch (Exception e){
                 e.printStackTrace();

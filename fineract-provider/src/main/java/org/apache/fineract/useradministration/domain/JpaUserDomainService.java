@@ -31,6 +31,9 @@ public class JpaUserDomainService implements UserDomainService {
     private final PlatformPasswordEncoder applicationPasswordEncoder;
     private final PlatformEmailService emailService;
 
+    // added 01/03/2022
+    private String unencodedPassword = null ;
+
     @Autowired
     public JpaUserDomainService(final AppUserRepository userRepository, final PlatformPasswordEncoder applicationPasswordEncoder,
             final PlatformEmailService emailService) {
@@ -45,7 +48,7 @@ public class JpaUserDomainService implements UserDomainService {
 
         generateKeyUsedForPasswordSalting(appUser);
 
-        final String unencodedPassword = appUser.getPassword();
+        this.unencodedPassword = appUser.getPassword();
 
         final String encodePassword = this.applicationPasswordEncoder.encode(appUser);
         appUser.updatePassword(encodePassword);
@@ -60,5 +63,13 @@ public class JpaUserDomainService implements UserDomainService {
 
     private void generateKeyUsedForPasswordSalting(final AppUser appUser) {
         this.userRepository.save(appUser);
+    }
+
+
+
+    // added 01/03/2022
+    @Override
+    public String unencodedPassword(){
+        return this.unencodedPassword ;
     }
 }

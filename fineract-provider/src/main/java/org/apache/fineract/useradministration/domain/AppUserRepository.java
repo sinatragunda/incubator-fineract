@@ -28,4 +28,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long>, JpaSpec
 
     @Query("Select appUser from AppUser appUser where appUser.username = :username")
     AppUser findAppUserByName(@Param("username") String username);
+
+    // added 01/03/2022
+    @Query("Select appUser from AppUser appUser where appUser.email = :email")
+    AppUser findAppUserByEmail(@Param("email") String email);
+
+
 }

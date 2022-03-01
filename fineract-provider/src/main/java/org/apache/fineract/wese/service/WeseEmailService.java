@@ -42,6 +42,7 @@ import javax.mail.SendFailedException;
 import com.sun.mail.smtp.SMTPSendFailedException ;
 
 import java.net.UnknownHostException;
+import java.util.Optional;
 
 @Service
 public class WeseEmailService{
@@ -52,6 +53,13 @@ public class WeseEmailService{
 	public WeseEmailService(final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService){
 		this.externalServicesReadPlatformService = externalServicesReadPlatformService;
 	}
+
+
+    // added 01/03/2022
+    public SEND_MAIL_MESSAGE_STATUS send(EmailDetail emailDetail){
+        SEND_MAIL_MESSAGE_STATUS status = sendDefinedEmail(emailDetail,null);
+        return status ;
+    }
 
     public void send(String address, String subject, String body ,String contactName) {
 	    final EmailDetail emailDetail = new EmailDetail(subject, body, address, contactName);
@@ -129,7 +137,13 @@ public class WeseEmailService{
 
             email.setSubject(emailDetails.getSubject());
             email.setMsg(emailDetails.getBody());
-            email.attach(emailAttachment);
+
+            boolean hasAttachment = Optional.ofNullable(emailAttachment).isPresent();
+            
+            // modified 01/03/2022
+            if(hasAttachment){
+                email.attach(emailAttachment);
+            }
 
             if(emailDetails.getAddress()==null){
                 return SEND_MAIL_MESSAGE_STATUS.INVALID_ADDRESS ;

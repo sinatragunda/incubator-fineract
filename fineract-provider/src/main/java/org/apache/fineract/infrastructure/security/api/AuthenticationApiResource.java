@@ -28,15 +28,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.infrastructure.security.constants.ResetPasswordConstants;
 import org.apache.fineract.infrastructure.security.constants.TwoFactorConstants;
 import org.apache.fineract.infrastructure.security.data.AuthenticatedUserData;
+import org.apache.fineract.infrastructure.security.domain.ResetPasswordService;
+import org.apache.fineract.infrastructure.security.helper.ResetPasswordHelper;
 import org.apache.fineract.infrastructure.security.service.SpringSecurityPlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TwoFactorUtils;
 import org.apache.fineract.useradministration.data.RoleData;
-import org.apache.fineract.useradministration.domain.AppUser;
-import org.apache.fineract.useradministration.domain.Role;
+import org.apache.fineract.useradministration.domain.*;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
+import org.apache.fineract.wese.service.WeseEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -60,15 +66,42 @@ public class AuthenticationApiResource {
     private final SpringSecurityPlatformSecurityContext springSecurityPlatformSecurityContext;
     private final TwoFactorUtils twoFactorUtils;
 
+    // added 01/03/2022
+    private final ResetPasswordService resetPasswordService;
+    private final FromJsonHelper fromJsonHelper ;
+
     @Autowired
     public AuthenticationApiResource(
             @Qualifier("customAuthenticationProvider") final DaoAuthenticationProvider customAuthenticationProvider,
             final ToApiJsonSerializer<AuthenticatedUserData> apiJsonSerializerService,
-            final SpringSecurityPlatformSecurityContext springSecurityPlatformSecurityContext, TwoFactorUtils twoFactorUtils) {
+            final SpringSecurityPlatformSecurityContext springSecurityPlatformSecurityContext, TwoFactorUtils twoFactorUtils ,ResetPasswordService resetPasswordService ,FromJsonHelper fromJsonHelper) {
         this.customAuthenticationProvider = customAuthenticationProvider;
         this.apiJsonSerializerService = apiJsonSerializerService;
         this.springSecurityPlatformSecurityContext = springSecurityPlatformSecurityContext;
         this.twoFactorUtils = twoFactorUtils;
+
+        // added 01/03/2022
+        this.resetPasswordService = resetPasswordService;
+        this.fromJsonHelper = fromJsonHelper ;
+    }
+
+    // added 01/03/2022
+    @POST
+    @Path("/resetpassword")
+    public String resetPassword(String payload){
+
+        System.err.println("------------------reset password son with paylod -------------"+payload);
+
+        JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
+        String emailAddress = null ;
+
+        if(jsonCommand.hasParameter(ResetPasswordConstants.emailAddressParam)){
+            emailAddress = jsonCommand.stringValueOfParameterNamed(ResetPasswordConstants.emailAddressParam);
+        }
+
+        String response = resetPasswordService.resetPassword(emailAddress);
+        //String response = ResetPasswordHelper.resetPassword(weseEmailService ,userDomainService ,appUserRepositoryWrapper ,emailAddress);
+        return response;
     }
 
     @POST

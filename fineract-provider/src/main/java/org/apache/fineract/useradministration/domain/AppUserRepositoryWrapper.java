@@ -40,4 +40,9 @@ public class AppUserRepositoryWrapper {
         }
         return user ;
     }
+
+    public AppUser fetchByEmail(String emailAddress){
+        AppUser appUser = this.appUserRepository.findAppUserByEmail(emailAddress);
+        return appUser ;
+    }
 }

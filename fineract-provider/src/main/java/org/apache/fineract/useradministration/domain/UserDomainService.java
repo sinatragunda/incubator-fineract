@@ -21,4 +21,7 @@ package org.apache.fineract.useradministration.domain;
 public interface UserDomainService {
 
     void create(AppUser appUser, Boolean sendPasswordToEmail);
+
+    // added 01/03/2022
+    String unencodedPassword();
 }
