@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.fineract.ApiConfig;
 import org.apache.fineract.infrastructure.cache.domain.CacheType;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -107,8 +108,6 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
         final StopWatch task = new StopWatch();
         task.start();
 
-        System.err.println("------------------------which filtering is this ? -----------------------");
-      
         try {
 
             if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -134,9 +133,11 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                 if (pathInfo != null && pathInfo.contains("report")) {
                     isReportRequest = true;
                 }
+
                 final FineractPlatformTenant tenant = this.basicAuthTenantDetailsService.loadTenantById(tenantIdentifier, isReportRequest);
 
                 ThreadLocalContextUtil.setTenant(tenant);
+
                 String authToken = request.getHeader("Authorization");
 
                 if (authToken != null && authToken.startsWith("Basic ")) {
@@ -144,7 +145,13 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                 }
 
                 if (!firstRequestProcessed) {
+
+                    System.err.println("------------------first request processed ?-----------------");
+
                     final String baseUrl = request.getRequestURL().toString().replace(request.getPathInfo(), "/");
+
+                    System.err.println("----------------base url --------------"+baseUrl);
+
                     System.setProperty("baseUrl", baseUrl);
 
                     final boolean ehcacheEnabled = this.configurationDomainService.isEhcacheEnabled();
@@ -153,6 +160,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                     } else {
                         this.cacheWritePlatformService.switchToCache(CacheType.NO_CACHE);
                     }
+                    passwordResetRequest(pathInfo,response);
                     TenantAwareBasicAuthenticationFilter.firstRequestProcessed = true;
                 }
             }
@@ -208,7 +216,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
         // No way to add interceptor other than this thats why
         // Should it return anything ,if product is disabled just throw an error from there
         // substitute this command for later
-        //ProductHelper.handleRequest(request ,response);
+        // ProductHelper.handleRequest(request ,response);
 		
 		if(notAllowed){
 
@@ -234,9 +242,11 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
         if(isPasswordRequest){
             try{
+                System.err.println("------------------redirect this shit ");
                 response.sendRedirect("/authenticate/resetpassword");
-                System.err.println("------------------reset password request son-------------");
                 // we dont have any user object so trying to find a quick rich way to get clever
+                response.setStatus(503);
+
             }
             catch (Exception e){
                 e.printStackTrace();

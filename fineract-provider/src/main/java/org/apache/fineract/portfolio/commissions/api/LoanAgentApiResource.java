@@ -124,14 +124,8 @@ public class LoanAgentApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createLoanAgent(final String apiRequestBodyAsJson) {
 
-        System.err.println("------------------some authentication should be valid here ------------------");
-
-        System.err.println("--------------------create loan agent here now ---------------------"+apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createLoanAgent().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 

@@ -125,6 +125,9 @@ public class TenantAwareTenantIdentifierFilter extends GenericFilterBean {
                 final FineractPlatformTenant tenant = this.basicAuthTenantDetailsService.loadTenantById(tenantIdentifier, isReportRequest);
 
                 ThreadLocalContextUtil.setTenant(tenant);
+
+                System.err.println("----------------------------when do we reach this other filter beean ?");
+
                 String authToken = request.getHeader("Authorization");
 
                 if (authToken != null && authToken.startsWith("bearer ")) {

@@ -8,10 +8,20 @@ package org.apache.fineract.wese.enumerations;
 
 public enum SEND_MAIL_MESSAGE_STATUS {
 
-    SUCCESS,
-    INVALID_ADDRESS,
-    QOUTA_LIMIT,
-    BOUNCE_BACK,
-    ERROR,
-    NETWORK_FAILURE
+    SUCCESS("Success"),
+    INVALID_ADDRESS("Invalid Email Address"),
+    QOUTA_LIMIT("Quota Limit"),
+    BOUNCE_BACK("Bounced Back form Mail Server"),
+    ERROR("Error"),
+    NETWORK_FAILURE("Network Failure");
+
+    private String code ;
+
+    SEND_MAIL_MESSAGE_STATUS(String code){
+        this.code = code;
+    }
+
+    public String getCode(){
+        return this.code ;
+    }
 };
