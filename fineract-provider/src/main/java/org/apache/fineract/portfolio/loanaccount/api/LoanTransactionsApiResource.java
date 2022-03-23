@@ -172,6 +172,8 @@ public class LoanTransactionsApiResource {
 
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
+        //LoanTransaction loanTransaction = loanTransactionRepository.findOne()
+
         CommandProcessingResult result = null;
         if (is(commandParam, "repayment")) {
             final CommandWrapper commandRequest = builder.loanRepaymentTransaction(loanId).build();

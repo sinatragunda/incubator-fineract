@@ -3477,11 +3477,23 @@ public class Loan extends AbstractPersistableCustom<Long> {
         validateActivityNotBeforeClientOrGroupTransferDate(LoanEvent.LOAN_REPAYMENT_OR_WAIVER,
                 transactionForAdjustment.getTransactionDate());
 
-        if (transactionForAdjustment.isNotRepayment() && transactionForAdjustment.isNotWaiver()) {
-            final String errorMessage = "Only transactions of type repayment or waiver can be adjusted.";
-            throw new InvalidLoanTransactionTypeException("transaction", "adjustment.is.only.allowed.to.repayment.or.waiver.transaction",
-                    errorMessage);
-        }
+
+        System.err.println("-----------------jump transaction here reverse it son ------------------");
+//
+//        if (transactionForAdjustment.isNotRepayment() && transactionForAdjustment.isNotWaiver()) {
+//            final String errorMessage = "Only transactions of type repayment or waiver can be adjusted.";
+//            throw new InvalidLoanTransactionTypeException("transaction", "adjustment.is.only.allowed.to.repayment.or.waiver.transaction",
+//                    errorMessage);
+//        }
+
+        changedTransactionDetail = reverseLoanTransaction(newTransactionDetail, loanLifecycleStateMachine, transactionForAdjustment, scheduleGeneratorDTO, currentUser, changedTransactionDetail);
+
+        return changedTransactionDetail;
+    }
+
+    private ChangedTransactionDetail reverseLoanTransaction(LoanTransaction newTransactionDetail, LoanLifecycleStateMachine loanLifecycleStateMachine, LoanTransaction transactionForAdjustment, ScheduleGeneratorDTO scheduleGeneratorDTO, AppUser currentUser, ChangedTransactionDetail changedTransactionDetail) {
+
+        System.err.println("=---------------------------reversing loan transaction --------------");
 
         transactionForAdjustment.reverse();
         transactionForAdjustment.manuallyAdjustedOrReversed();
@@ -3500,7 +3512,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
             changedTransactionDetail = handleRepaymentOrRecoveryOrWaiverTransaction(newTransactionDetail, loanLifecycleStateMachine,
                     transactionForAdjustment, scheduleGeneratorDTO, currentUser);
         }
-
         return changedTransactionDetail;
     }
 

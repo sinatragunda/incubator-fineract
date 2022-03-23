@@ -26,10 +26,12 @@ public class SsbPaymentsConstants {
     public static final int DOCUMENT_ID_COL = 3;//D
     public static final int AMOUNT_COL = 4;//E
     public static final int STAGING_COL = 5 ;//F
+    public static final int STATUS_COL = 6 ;// G 
+    public static final int PORTFOLIO_TYPE_COL = 7 ;// H
 
-    public static final int DDA_FUND_ACCOUNT_NAME_COL = 6 ;//G
-    public static final int DDA_FUND_ACCOUNT_ID_COL = 7;//H
-    public static final int CURRENCY_COL = 8;//I
+    public static final int DDA_FUND_ACCOUNT_NAME_COL = 8 ;// I
+    public static final int DDA_FUND_ACCOUNT_ID_COL = 9;// J
+    public static final int CURRENCY_COL = 10;//K
 
     public static final String DDA_FUND_SHEET_NAME = "DDA_Funds";
 }

@@ -459,8 +459,14 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     @Override
     public void reverseTransfer(final LoanTransaction loanTransaction) {
+
+        System.err.println("-----------------reverse transfer here son -----------------");
         loanTransaction.reverse();
+
+        System.err.println("----------------save loan with data violation checks -----------------");
         saveLoanTransactionWithDataIntegrityViolationChecks(loanTransaction);
+
+        System.err.println("------------------done the checkign here son ------------------");
     }
 
     /*

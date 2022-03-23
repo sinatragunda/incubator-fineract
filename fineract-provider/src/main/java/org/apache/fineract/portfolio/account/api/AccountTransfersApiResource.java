@@ -97,9 +97,7 @@ public class AccountTransfersApiResource {
         System.err.println("----------------create funds transfer-------------");
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountTransfer().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 

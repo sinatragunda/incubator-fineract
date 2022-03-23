@@ -47,7 +47,11 @@ import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatform
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.CannotAcquireLockException;
@@ -65,6 +69,7 @@ public class SavingsAccountTransactionsApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final PaymentTypeReadPlatformService paymentTypeReadPlatformService;
+    private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
 
     @Autowired
     public SavingsAccountTransactionsApiResource(final PlatformSecurityContext context,
@@ -72,13 +77,15 @@ public class SavingsAccountTransactionsApiResource {
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-            PaymentTypeReadPlatformService paymentTypeReadPlatformService) {
+            PaymentTypeReadPlatformService paymentTypeReadPlatformService ,
+            SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
+        this.savingsAccountTransactionRepository = savingsAccountTransactionRepository ;
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -111,10 +118,21 @@ public class SavingsAccountTransactionsApiResource {
     @Path("{transactionId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveOne(@PathParam("savingsId") final Long savingsId, @PathParam("transactionId") final Long transactionId,
+    public String retrieveOne(@PathParam("savingsId") Long savingsId, @PathParam("transactionId") final Long transactionId,
             @Context final UriInfo uriInfo) {
 
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        
+        // if savingsId is null or 0 then lets look for its corresponding account 
+        boolean isSavingsIdSpecified = ComparatorUtility.areObjectsEqual(0L ,savingsId);
+
+        System.err.println("-------------------------------is savings account specified ----------"+isSavingsIdSpecified);
+
+        if(!isSavingsIdSpecified){
+            SavingsAccountTransaction savingsAccountTransaction = savingsAccountTransactionRepository.findOne(transactionId);
+            savingsId = savingsAccountTransaction.getSavingsAccount().getId();
+        }
+
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService.retrieveSavingsTransaction(savingsId,
                 transactionId, DepositAccountType.SAVINGS_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

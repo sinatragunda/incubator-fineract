@@ -127,8 +127,6 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
                 String pathInfo = request.getRequestURI();
 
-                System.err.println("---------------------------which path info is this ------------------------"+pathInfo);
-
                 boolean isReportRequest = false;
                 if (pathInfo != null && pathInfo.contains("report")) {
                     isReportRequest = true;
@@ -146,14 +144,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
                 if (!firstRequestProcessed) {
 
-                    System.err.println("------------------first request processed ?-----------------");
-
                     final String baseUrl = request.getRequestURL().toString().replace(request.getPathInfo(), "/");
-
-                    System.err.println("----------------base url --------------"+baseUrl);
-
                     System.setProperty("baseUrl", baseUrl);
-
                     final boolean ehcacheEnabled = this.configurationDomainService.isEhcacheEnabled();
                     if (ehcacheEnabled) {
                         this.cacheWritePlatformService.switchToCache(CacheType.SINGLE_NODE);
@@ -219,10 +211,7 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
         // ProductHelper.handleRequest(request ,response);
 		
 		if(notAllowed){
-
-		    System.err.println("---------------that not allowed shit-------------------");
-
-		     // we removing this step so that we can implement our self service item
+	            // we removing this step so that we can implement our self service item
             boolean isPasswordRequest = passwordResetRequest(pathURL ,response);
 
             // easy to bypass isSelfServiceRequest here to just proceed

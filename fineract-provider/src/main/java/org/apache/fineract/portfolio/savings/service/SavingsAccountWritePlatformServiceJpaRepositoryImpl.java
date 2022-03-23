@@ -486,15 +486,18 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 .findOneByIdAndSavingsAccountId(transactionId, savingsId);
         if (savingsAccountTransaction == null) { throw new SavingsAccountTransactionNotFoundException(savingsId, transactionId); }
 
-        if (!allowAccountTransferModification && this.accountTransfersReadPlatformService.isAccountTransfer(transactionId,
-                PortfolioAccountType.SAVINGS)) { throw new PlatformServiceUnavailableException(
-                        "error.msg.saving.account.transfer.transaction.update.not.allowed",
-                        "Savings account transaction:" + transactionId + " update not allowed as it involves in account transfer",
-                        transactionId); }
 
-        if (!account
-                .allowModify()) { throw new PlatformServiceUnavailableException("error.msg.saving.account.transaction.update.not.allowed",
-                        "Savings account transaction:" + transactionId + " update not allowed for this savings type", transactionId); }
+        System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
+        //
+//        if (!allowAccountTransferModification && this.accountTransfersReadPlatformService.isAccountTransfer(transactionId,
+//                PortfolioAccountType.SAVINGS)) { throw new PlatformServiceUnavailableException(
+//                        "error.msg.saving.account.transfer.transaction.update.not.allowed",
+//                        "Savings account transaction:" + transactionId + " update not allowed as it involves in account transfer",
+//                        transactionId); }
+//
+//        if (!account
+//                .allowModify()) { throw new PlatformServiceUnavailableException("error.msg.saving.account.transaction.update.not.allowed",
+//                        "Savings account transaction:" + transactionId + " update not allowed for this savings type", transactionId); }
 
         final LocalDate today = DateUtils.getLocalDateOfTenant();
         final MathContext mc = new MathContext(15, MoneyHelper.getRoundingMode());

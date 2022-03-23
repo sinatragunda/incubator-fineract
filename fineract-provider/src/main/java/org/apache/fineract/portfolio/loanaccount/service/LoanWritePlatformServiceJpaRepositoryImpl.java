@@ -901,11 +901,16 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         if (transactionToAdjust == null) { throw new LoanTransactionNotFoundException(transactionId); }
         this.businessEventNotifierService.notifyBusinessEventToBeExecuted(BUSINESS_EVENTS.LOAN_ADJUST_TRANSACTION,
                 constructEntityMap(BUSINESS_ENTITY.LOAN_ADJUSTED_TRANSACTION, transactionToAdjust));
-        if (this.accountTransfersReadPlatformService.isAccountTransfer(transactionId, PortfolioAccountType.LOAN)) { throw new PlatformServiceUnavailableException(
-                "error.msg.loan.transfer.transaction.update.not.allowed", "Loan transaction:" + transactionId
-                        + " update not allowed as it involves in account transfer", transactionId); }
-        if (loan.isClosedWrittenOff()) { throw new PlatformServiceUnavailableException("error.msg.loan.written.off.update.not.allowed",
-                "Loan transaction:" + transactionId + " update not allowed as loan status is written off", transactionId); }
+
+        System.err.println("---------------executing loan transfer from savings ----------------");
+
+        System.err.println("-------------------first stage is to let it go the other way ");
+
+//        if (this.accountTransfersReadPlatformService.isAccountTransfer(transactionId, PortfolioAccountType.LOAN)) { throw new PlatformServiceUnavailableException(
+//                "error.msg.loan.transfer.transaction.update.not.allowed", "Loan transaction:" + transactionId
+//                        + " update not allowed as it involves in account transfer", transactionId); }
+//        if (loan.isClosedWrittenOff()) { throw new PlatformServiceUnavailableException("error.msg.loan.written.off.update.not.allowed",
+//                "Loan transaction:" + transactionId + " update not allowed as loan status is written off", transactionId); }
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
