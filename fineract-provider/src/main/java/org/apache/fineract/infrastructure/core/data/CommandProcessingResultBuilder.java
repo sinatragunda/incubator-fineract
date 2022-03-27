@@ -40,10 +40,19 @@ public class CommandProcessingResultBuilder {
     private Long productId;
     private boolean rollbackTransaction = false;
 
+    // added 27/03/2022
+    private boolean status = false;
+
     public CommandProcessingResult build() {
         return CommandProcessingResult.fromDetails(this.commandId, this.officeId, this.groupId, this.clientId, this.loanId, this.savingsId,
                 this.resourceIdentifier, this.entityId, this.transactionId, this.changes, this.productId, this.rollbackTransaction,
-                this.subEntityId);
+                this.subEntityId ,this.status);
+    }
+
+
+    public CommandProcessingResultBuilder withStatus(final Boolean status) {
+        this.status = status;
+        return this;
     }
 
     public CommandProcessingResultBuilder withCommandId(final Long withCommandId) {

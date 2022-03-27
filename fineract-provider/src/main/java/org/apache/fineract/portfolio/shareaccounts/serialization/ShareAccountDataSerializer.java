@@ -47,11 +47,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountCharge;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountChargePaidBy;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountStatusType;
-import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
+import org.apache.fineract.portfolio.shareaccounts.domain.*;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProductRepositoryWrapper;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -101,6 +97,13 @@ public class ShareAccountDataSerializer {
                     .locale_paramname,
             ShareAccountApiConstants.requesteddate_paramname, ShareAccountApiConstants.requestedshares_paramname,
             ShareAccountApiConstants.purchasedprice_paramname, ShareAccountApiConstants.dateformat_paramname));
+
+
+    // added 27/03/2022
+
+    private static final Set<String> reverseShareAccountTransactionParameters = new HashSet<>(Arrays.asList(ShareAccountApiConstants
+                    .locale_paramname,
+            ShareAccountApiConstants.transactionDateParam, ShareAccountApiConstants.dateformat_paramname));
 
     
     @Autowired
@@ -639,6 +642,41 @@ public class ShareAccountDataSerializer {
         PeriodFrequencyType frequencyType = PeriodFrequencyType.INVALID;
         frequencyType = PeriodFrequencyType.fromInt(this.fromApiJsonHelper.extractIntegerWithLocaleNamed(paramName, element));
         return frequencyType;
+    }
+
+    // added 27/03/2022
+
+    public ReverseShareAccountTransaction validateForTransactionReversal(JsonCommand jsonCommand ,Long transactionId) {
+        
+        Map<String, Object> actualChanges = new HashMap<>();
+        if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
+        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+        this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, jsonCommand.json(),
+                reverseShareAccountTransactionParameters);
+        final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("sharesaccount");
+        JsonElement element = jsonCommand.parsedJson();
+
+        baseDataValidator.reset().value(transactionId).longGreaterThanZero().notNull();
+
+        LocalDate localTransactionDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.transactionDateParam, element);
+        baseDataValidator.reset().parameter(ShareAccountApiConstants.transactionDateParam).value(localTransactionDate).notNull();
+
+        Date transactionDate = localTransactionDate.toDate();
+        
+        System.err.println("----------------any exceptions here ----------------");
+        if (!dataValidationErrors.isEmpty()) { 
+
+            for(ApiParameterError e : dataValidationErrors){
+                System.err.println("-------------error is ---------"+e.getDeveloperMessage());
+            }            
+            throw new PlatformApiDataValidationException(dataValidationErrors);
+        }
+
+
+        ReverseShareAccountTransaction reverseShareAccountTransaction = new ReverseShareAccountTransaction(transactionId,transactionDate);
+        return reverseShareAccountTransaction ;
+  
     }
 
     public Map<String, Object> validateAndApplyAddtionalShares(JsonCommand jsonCommand, ShareAccount account) {

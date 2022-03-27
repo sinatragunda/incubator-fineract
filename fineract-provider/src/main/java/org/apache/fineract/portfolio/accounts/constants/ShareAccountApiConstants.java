@@ -96,6 +96,8 @@ public interface ShareAccountApiConstants {
 	public String additionalshares_paramname = "additionalshares" ;
 	
 	public String closeddate_paramname = "closedDate" ;
+
+	public static String transactionDateParam = "transactionDate";
 	
 	Set<String> supportedParameters = new HashSet<>(Arrays.asList(locale_paramname, dateformat_paramname, id_paramname,clientid_paramname, productid_paramname,
 	        submitteddate_paramname,approveddate_paramname, externalid_paramname, currency_paramname, digitsafterdecimal_paramname,

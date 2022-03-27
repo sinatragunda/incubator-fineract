@@ -18,5 +18,7 @@ public interface ShareAccountDomainService {
     ShareAccountTransaction purchaseShares(final ShareAccount shareAccount, final CommandProcessingResultBuilder builderResult,final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final Note note,
                                                   final String txnExternalId, boolean isAccountTransfer);
 
+    boolean reverseShareAccountTransaction(final ReverseShareAccountTransaction reverseShareAccountTransaction);
+
 }
 

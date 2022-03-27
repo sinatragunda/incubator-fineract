@@ -239,9 +239,14 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 }
             }
 
+            Long transactionId = transaction.getId();
+
             return new CommandProcessingResultBuilder() //
                     .withCommandId(jsonCommand.commandId()) //
-                    .withEntityId(accountId) //
+                    .withEntityId(accountId)
+
+                     // added 27/03/2022
+                    .withTransactionId(String.valueOf(transactionId)) //
                     .with(changes) //
                     .build();
         } catch (final DataIntegrityViolationException dve) {

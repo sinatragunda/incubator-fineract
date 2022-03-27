@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -35,6 +36,7 @@ import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.B
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.note.domain.ShareAccountTransactionRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
@@ -47,6 +49,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// added 27/03/2022
+import java.util.Date;
+
+
 @Service
 public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
@@ -56,16 +62,22 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
     private final BusinessEventNotifierService businessEventNotifierService;
     private final FromJsonHelper fromJsonHelper ;
     private final ShareAccountTransactionWrapper shareAccountTransactionWrapper ;
-    //private final Sh
+    
+
+    // added 27/03/2022
+    private final ShareAccountTransactionRepository shareAccountTransactionRepository ;
+    private final JournalEntryWritePlatformService journalEntryWritePlatformService ;
 
     @Autowired
-    public ShareAccountDomainServiceJpa(final NoteRepository noteRepository, final PlatformSecurityContext context, final BusinessEventNotifierService businessEventNotifierService,final ShareAccountWritePlatformService shareAccountWritePlatformService ,final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWrapper shareAccountTransactionWrapper) {
+    public ShareAccountDomainServiceJpa(final NoteRepository noteRepository, final PlatformSecurityContext context, final BusinessEventNotifierService businessEventNotifierService,final ShareAccountWritePlatformService shareAccountWritePlatformService ,final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWrapper shareAccountTransactionWrapper ,final ShareAccountTransactionRepository shareAccountTransactionRepository ,final JournalEntryWritePlatformService journalEntryWritePlatformService) {
         this.noteRepository = noteRepository;
         this.context = context;
         this.businessEventNotifierService = businessEventNotifierService;
         this.shareAccountWritePlatformService = shareAccountWritePlatformService ;
         this.fromJsonHelper = fromJsonHelper ;
         this.shareAccountTransactionWrapper = shareAccountTransactionWrapper ;
+        this.shareAccountTransactionRepository = shareAccountTransactionRepository ;
+        this.journalEntryWritePlatformService = journalEntryWritePlatformService ;
     }
 
     @Transactional
@@ -148,6 +160,31 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         return shareAccountTransaction[0] ;
 
+    }
+
+
+    public boolean reverseShareAccountTransaction(ReverseShareAccountTransaction reverseShareAccountTransaction){
+
+        Long shareAccountTransactionId = reverseShareAccountTransaction.getId();
+        Date transactionDate = reverseShareAccountTransaction.getTransactionDate();
+        ShareAccountTransaction shareAccountTransaction = shareAccountTransactionWrapper.findShareAccountTransaction(shareAccountTransactionRepository ,shareAccountTransactionId);
+        boolean isPresent = Optional.ofNullable(shareAccountTransaction).isPresent();
+        boolean status = true;
+
+        if(isPresent){
+            try{
+                List transactionIdsList = Arrays.asList(shareAccountTransactionId);
+                journalEntryWritePlatformService.revertShareAccountJournalEntries((ArrayList<Long>)transactionIdsList ,transactionDate);
+                /// if done then delete share account 
+                shareAccountTransactionRepository.delete(shareAccountTransaction);
+            }
+            catch(Exception e){
+                /// 
+                e.printStackTrace();
+                status = false ;
+            }
+        }
+        return status ;
     }
 
 

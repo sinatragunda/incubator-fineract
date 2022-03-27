@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
+import org.apache.fineract.portfolio.note.domain.ShareAccountTransactionRepository;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,6 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ShareAccountTransactionWrapper {
 
-
     private ShareAccount shareAccount ;
 
     public Integer calculateSharesPossibleForAmount(final ShareProduct shareProduct , final Money total) {
@@ -44,7 +44,6 @@ public final class ShareAccountTransactionWrapper {
         Optional.ofNullable(shareProduct).ifPresent(e->{
             BigDecimal amount = total.getAmount();
             BigDecimal unitPrice = shareProduct.getUnitPrice();
-
             BigDecimal sharePurchasable = amount.divide(unitPrice);
             shares[0] = sharePurchasable.intValue();
         
@@ -55,6 +54,20 @@ public final class ShareAccountTransactionWrapper {
     public void setShareAccount(ShareAccount shareaccount){
         this.shareAccount = shareAccount;
     }
+
+    public ShareAccountTransaction findShareAccountTransaction(ShareAccountTransactionRepository repo , Long transactionId){
+
+        ShareAccountTransaction shareAccountTransaction = null ;
+        try{
+            shareAccountTransaction = repo.findOne(transactionId);
+        }
+        catch(NullPointerException e){
+            /// some exception thrown if value not present
+        }
+        return shareAccountTransaction ;
+    }
+
+
 
 
 }
