@@ -135,6 +135,7 @@ public class LoanScheduleCalculationPlatformServiceImpl implements LoanScheduleC
         }
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
 
+        // how come no error is thrown here for not valid repayment frequency ? 
         return this.loanScheduleAssembler.assembleLoanScheduleFrom(query.parsedJson());
     }
 

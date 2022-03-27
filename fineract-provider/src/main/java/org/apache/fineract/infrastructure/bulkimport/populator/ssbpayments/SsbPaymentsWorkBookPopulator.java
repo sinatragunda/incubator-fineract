@@ -135,6 +135,8 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         ddaFundAccountsGroup.setNameName(SsbPaymentsConstants.DDA_FUND_SHEET_NAME);
         ddaFundAccountsGroup.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$D$2:$D$" + (savingsAccountsDataList.size() + 1));
 
+        System.err.println("--------------------------------------savings data list ----------------"+savingsAccountsDataList.size());
+
         for (int i = 0; i < savingsAccountsDataList.size() ;++i){
 
             String clientName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");

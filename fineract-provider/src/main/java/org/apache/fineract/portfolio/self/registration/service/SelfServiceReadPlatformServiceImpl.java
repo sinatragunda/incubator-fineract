@@ -36,6 +36,8 @@ public class SelfServiceReadPlatformServiceImpl implements SelfServiceReadPlatfo
     @Override
     public Long selfServiceUserLinkedClientId(Long userId) {
 
+        System.err.println("-----------------------app user id is son ------------"+userId);
+
         String sql = "select client_id from m_selfservice_user_client_mapping where appuser_id = ?";
         Object[] params = new Object[] { userId };
         Long clientId = this.jdbcTemplate.queryForObject(sql, params, Long.class);

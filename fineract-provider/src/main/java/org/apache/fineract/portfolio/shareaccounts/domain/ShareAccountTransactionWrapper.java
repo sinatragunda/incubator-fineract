@@ -49,9 +49,6 @@ public final class ShareAccountTransactionWrapper {
             shares[0] = sharePurchasable.intValue();
         
         });
-
-        System.err.println("------------------requested shares is --------------"+shares[0]);
-
         return shares[0];
     }
 
