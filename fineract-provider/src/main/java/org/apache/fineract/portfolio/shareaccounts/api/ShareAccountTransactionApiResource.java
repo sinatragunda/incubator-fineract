@@ -62,7 +62,7 @@ public class ShareAccountTransactionApiResource {
 
     private final ShareAccountTransactionWritePlatformService shareAccountTransactionWritePlatformService;
     private final FromJsonHelper fromJsonHelper ;
-    private final String resourceNameForPermissions = "REVERSE_SHAREACCOUNTTRANSACTION";
+    private final String resourceNameForPermissions = "REVERSETRANSACTION_SHARE";
 
     @Autowired
     public ShareAccountTransactionApiResource(final DefaultToApiJsonSerializer<ShareProductDividendPayOutData> toApiJsonSerializer,

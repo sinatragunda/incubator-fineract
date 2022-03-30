@@ -112,11 +112,7 @@ public class CommandProcessingResult implements Serializable {
     
     // added 27/03/2022    
     public CommandProcessingResult(final Boolean status) {
-        if (entityId != null) {
-            this.resourceIdentifier = entityId.toString();
-        } else {
-            this.resourceIdentifier = null;
-        }
+        this.resourceIdentifier =null ;
         this.resourceId = null;
         this.officeId = null;
         this.groupId = null;

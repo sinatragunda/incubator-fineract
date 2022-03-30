@@ -20,10 +20,11 @@
 // added 27/03/2022 
 // added to add feature to reverse share account transactions 
 
-package org.apache.fineract.portfolio.note.domain;
+package org.apache.fineract.portfolio.shareaccounts.repo;
 
 import java.util.List;
 
+import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

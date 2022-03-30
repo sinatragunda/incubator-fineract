@@ -24,7 +24,7 @@ import java.util.Optional;
 
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.note.domain.ShareAccountTransactionRepository;
+import org.apache.fineract.portfolio.shareaccounts.repo.ShareAccountTransactionRepository;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
 import org.springframework.stereotype.Component;
 

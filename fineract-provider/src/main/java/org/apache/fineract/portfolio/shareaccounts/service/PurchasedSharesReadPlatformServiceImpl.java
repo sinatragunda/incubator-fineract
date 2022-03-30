@@ -47,7 +47,7 @@ public class PurchasedSharesReadPlatformServiceImpl implements
 	public Collection<ShareAccountTransactionData> retrievePurchasedShares(
 			Long accountId) {
 		PurchasedSharesDataRowMapper mapper = new PurchasedSharesDataRowMapper() ;
-		final String sql = "select " + mapper.schema() + " where saps.account_id=? and saps.is_active = 1";
+		final String sql = "select " + mapper.schema() + " where saps.account_id=? and saps.is_active = 1 and saps.is_reversed = 0";
 		return this.jdbcTemplate.query(sql, mapper, new Object[] { accountId});
 	}
 
@@ -57,10 +57,11 @@ public class PurchasedSharesReadPlatformServiceImpl implements
 		
 		public PurchasedSharesDataRowMapper() {
 			StringBuffer buff = new StringBuffer()
-			.append("saps.id, saps.account_id, saps.transaction_date, saps.total_shares, saps.unit_price, ")
+			.append("saps.id, saps.account_id, saps.is_reversed , saps.transaction_date, saps.total_shares, saps.unit_price, ")
 			.append("saps.status_enum, saps.type_enum, saps.amount, saps.charge_amount as chargeamount, ")
 			.append("saps.amount_paid as amountPaid")
-			.append(" from m_share_account_transactions saps ");
+			// only transactions that havent been reversed
+			.append(" from m_share_account_transactions saps");
 			schema = buff.toString() ;
 		}
 		@Override
@@ -78,8 +79,11 @@ public class PurchasedSharesReadPlatformServiceImpl implements
 			final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "amount") ;
 			final BigDecimal chargeAmount = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "chargeamount") ;
 			final BigDecimal amountPaid = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "amountPaid") ;
+
+			// added 29/03/2022
+			final Boolean reversed = rs.getBoolean("is_reversed");
 			
-			return new ShareAccountTransactionData(id,accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid);
+			return new ShareAccountTransactionData(id,accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid,reversed);
 		}
 		
 		public String schema() {

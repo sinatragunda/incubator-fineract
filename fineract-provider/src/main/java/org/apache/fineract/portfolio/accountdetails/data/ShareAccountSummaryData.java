@@ -22,6 +22,8 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountApplicationTimelineData;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountStatusEnumData;
 
+import java.math.BigDecimal;
+
 @SuppressWarnings("unused")
 public class ShareAccountSummaryData {
 
@@ -37,13 +39,17 @@ public class ShareAccountSummaryData {
 	private final CurrencyData currency;
 	private final ShareAccountApplicationTimelineData timeline;
 
+	// added 28/03/2022 
+	private final BigDecimal unitPrice;
+	private final BigDecimal totalValueOfShares ;
+
 	public ShareAccountSummaryData(final Long id, final String accountNo,
 			final String externalId, final Long productId,
 			final String productName, final String shortProductName,
 			final ShareAccountStatusEnumData status,
 			final CurrencyData currency, final Long approvedShares,
 			final Long pendingForApprovalShares,
-			final ShareAccountApplicationTimelineData timeline) {
+			final ShareAccountApplicationTimelineData timeline ,final BigDecimal unitPrice) {
 		this.id = id;
 		this.accountNo = accountNo;
 		this.externalId = externalId;
@@ -63,6 +69,8 @@ public class ShareAccountSummaryData {
 		this.status = status;
 		this.currency = currency;
 		this.timeline = timeline;
+		this.unitPrice = unitPrice ;
+		this.totalValueOfShares = totalValueOfShares();
 	}
 
     
@@ -72,6 +80,13 @@ public class ShareAccountSummaryData {
 
     public Long getTotalApprovedShares(){
     	return this.totalApprovedShares;
+    }
+
+    private BigDecimal totalValueOfShares(){
+    	if(totalApprovedShares > 0){
+			return unitPrice.multiply(new BigDecimal(totalApprovedShares));
+		}
+		return BigDecimal.ONE;
     }
 
 }

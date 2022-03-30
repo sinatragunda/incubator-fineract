@@ -74,6 +74,11 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "shareAccountTransaction", orphanRemoval = true, fetch=FetchType.EAGER)
     private Set<ShareAccountChargePaidBy> shareAccountChargesPaid = new HashSet<>();
+
+    // added 29/03/2022
+    @Column(name = "is_reversed", nullable = false)
+    private boolean reverse = false ;
+    
     
     protected ShareAccountTransaction() {
 
@@ -98,7 +103,7 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
     }
 
     private ShareAccountTransaction(final Date transactionDate, final Long totalShares, final BigDecimal shareValue,
-            final Integer status, final Integer type, final BigDecimal amount, final BigDecimal chargeAmount, final BigDecimal amountPaid) {
+            final Integer status, final Integer type, final BigDecimal amount, final BigDecimal chargeAmount, final BigDecimal amountPaid ,final Boolean isReversed) {
         this.transactionDate = transactionDate;
         this.totalShares = totalShares;
         this.shareValue = shareValue;
@@ -107,6 +112,7 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
         this.amount = amount ;
         this.chargeAmount = chargeAmount ;
         this.amountPaid = amountPaid ;
+        this.reverse = isReversed;
     }
     
     public static ShareAccountTransaction createRedeemTransaction(final Date transactionDate, final Long totalShares, final BigDecimal shareValue) {
@@ -114,7 +120,7 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
         final Integer type = PurchasedSharesStatusType.REDEEMED.getValue() ;
         final BigDecimal amount = shareValue.multiply(BigDecimal.valueOf(totalShares)) ;
         BigDecimal amountPaid = new BigDecimal(amount.doubleValue()) ;
-        return new ShareAccountTransaction(transactionDate, totalShares, shareValue, status, type, amount, null, amountPaid) ; 
+        return new ShareAccountTransaction(transactionDate, totalShares, shareValue, status, type, amount, null, amountPaid,false) ;
     }
     
     public static ShareAccountTransaction createChargeTransaction(final Date transactionDate, final ShareAccountCharge charge) {
@@ -125,7 +131,8 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
        BigDecimal amount = charge.percentageOrAmount() ;
        BigDecimal chargeAmount = null ;
        BigDecimal amountPaid = null ;
-       return new ShareAccountTransaction(transactionDate, totalShares, unitPrice, status, type, amount, chargeAmount, amountPaid) ;
+       final Boolean isReversed = false ;
+       return new ShareAccountTransaction(transactionDate, totalShares, unitPrice, status, type, amount, chargeAmount, amountPaid ,isReversed) ;
     }
     
     public Date getPurchasedDate() {
@@ -251,5 +258,17 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
     
     public BigDecimal shareValue() {
         return this.shareValue ;
+    }
+
+    public boolean isReverse() {
+        return reverse;
+    }
+
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+    }
+
+    public ShareAccount getShareAccount() {
+        return shareAccount;
     }
 }

@@ -164,6 +164,10 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     		.append("sa.activated_date as activatedDate, avbu.username as activatedByUsername, ")
     		.append("avbu.firstname as activatedByFirstname, avbu.lastname as activatedByLastname, ")
     		.append("sa.closed_date as closedDate, cbu.username as closedByUsername, ")
+
+             // added 28/03/2022
+                    .append("p.unit_price as unitPrice, ")
+
     		.append("cbu.firstname as closedByFirstname, cbu.lastname as closedByLastname, ")
     		.append("sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, ")
     		.append("curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, ")
@@ -226,6 +230,9 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
             final String closedByFirstname = rs.getString("closedByFirstname");
             final String closedByLastname = rs.getString("closedByLastname");
 
+            // added 28/03/2022
+            final BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
+
             final ShareAccountApplicationTimelineData timeline = new ShareAccountApplicationTimelineData(submittedOnDate,
                     submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername,
                     rejectedByFirstname, rejectedByLastname, approvedOnDate, approvedByUsername, approvedByFirstname, approvedByLastname, activatedOnDate,
@@ -233,7 +240,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     closedByLastname);
 
             return new ShareAccountSummaryData(id, accountNo, externalId, productId, productName, shortProductName, status, currency,
-                    approvedShares, pendingShares, timeline);
+                    approvedShares, pendingShares, timeline ,unitPrice);
         }
     	
 		public String schema() {

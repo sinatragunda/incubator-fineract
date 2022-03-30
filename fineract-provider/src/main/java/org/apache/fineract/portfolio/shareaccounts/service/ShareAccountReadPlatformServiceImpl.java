@@ -283,6 +283,9 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
                     .append("sa.activated_date as activatedDate, avbu.username as activatedByUsername, ")
                     .append("avbu.firstname as activatedByFirstname, avbu.lastname as activatedByLastname, ")
                     .append("sa.closed_date as closedDate, cbu.username as closedByUsername, ")
+                     // added 28/03/2022
+                    .append("p.unit_price as unitPrice, ")
+                    // 
                     .append("cbu.firstname as closedByFirstname, cbu.lastname as closedByLastname, ")
                     .append("sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, ")
                     .append("curr.name as currencyName, curr.internationalized_name_code as currencyNameCode, ")
@@ -372,8 +375,13 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             }
 
             final String shortProductName = null;
+
+            // added 28/03/2022 
+            final BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
+
+
             final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
-                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline ,unitPrice);
             return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName,
                     productId, productName, status, timeline, currency, summary, charges, purchasedShares, lockinPeriodFrequency,
                     lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, allowdividendsforinactiveclients);
@@ -440,8 +448,10 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
                 }
             }
 
+            final  BigDecimal unitPrice = null ;
+
             final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
-                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
+                    shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline ,unitPrice);
 
             return new ShareAccountData(id, accountNo, externalId, clientId, clientName, productId, shortProductName, productId,
                     shortProductName, status, timeline, currency, summary, charges, purchasedSharesData, lockinPeriod, lockPeriodTypeEnum,
@@ -456,7 +466,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
 
         public PurchasedSharesDataRowMapper() {
             StringBuffer buff = new StringBuffer()
-                    .append("saps.id as purchasedId, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice, ")
+                    .append("saps.id as purchasedId,saps.is_reversed as isReversed, saps.account_id as accountId, saps.transaction_date as transactionDate, saps.total_shares as purchasedShares, saps.unit_price as unitPrice, ")
                     .append("saps.status_enum as purchaseStatus, saps.type_enum as purchaseType, saps.amount as amount, saps.charge_amount as chargeamount, ")
                     .append("saps.amount_paid as amountPaid ");
             
@@ -473,12 +483,13 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final Integer status = rs.getInt("purchaseStatus");
             final EnumOptionData statusEnum = SharesEnumerations.purchasedSharesEnum(status);
             final Integer type = rs.getInt("purchaseType");
+            final Boolean isReverse = rs.getBoolean("isReversed");
             final EnumOptionData typeEnum = SharesEnumerations.purchasedSharesEnum(type);
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amount");
             final BigDecimal chargeAmount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "chargeamount");
             final BigDecimal amountPaid = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs, "amountPaid");
             return new ShareAccountTransactionData(id, accountId, transactionDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount,
-                    chargeAmount, amountPaid);
+                    chargeAmount, amountPaid ,isReverse);
         }
 
         public String schema() {

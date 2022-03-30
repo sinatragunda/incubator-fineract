@@ -146,23 +146,37 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         Long fromLoanAccountId = null;
         boolean isWithdrawBalance = false;
         Long transactionId = null ;
-        Long commandId = null ;
+        Long subEntityId = null ;
+        Long shareAccountTransactionId = null ;
 
         if (isSavingsToSavingsAccountTransfer(fromAccountType, toAccountType)) {
+
+            System.err.println("--------------savings to savings transfer --------------");
 
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
             final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);
 
+            System.err.println("-----------------from savings account -------------"+fromSavingsAccount.getClient().getDisplayName());
+
+            System.err.println("---------------account balance is -------------"+fromSavingsAccount.getWithdrawableBalance());
+
             final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
                     isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
+
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
                     transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
+
+            System.err.println("-------------failed to perfom withdrawl of funds ------------------");
 
             final Long toSavingsId = command.longValueOfParameterNamed(toAccountIdParamName);
             final SavingsAccount toSavingsAccount = this.savingsAccountAssembler.assembleFrom(toSavingsId);
 
+            System.err.println("--------------------handle deposit now ---------------------");
+
             final SavingsAccountTransaction deposit = this.savingsAccountDomainService.handleDeposit(toSavingsAccount, fmt,
                     transactionDate, transactionAmount, paymentDetail, isAccountTransfer, isRegularTransaction);
+
+            System.err.println("-------------------------error thrown there ? ---------------------");
 
             transactionId = deposit.getId();
 
@@ -185,7 +199,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             // how do we set it now
 
             System.err.println("----------------------- savings transaction id is -----------------------"+withdrawal.getId());
-            commandId = withdrawal.getId();
+            subEntityId = withdrawal.getId();
 
             final Long toLoanAccountId = command.longValueOfParameterNamed(toAccountIdParamName);
             final Loan toLoanAccount = this.loanAccountAssembler.assembleFrom(toLoanAccountId);
@@ -196,7 +210,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final LoanTransaction loanRepaymentTransaction = this.loanAccountDomainService.makeRepayment(toLoanAccount,
                     new CommandProcessingResultBuilder(), transactionDate, transactionAmount, paymentDetail, null, null,
                     isRecoveryRepayment, isAccountTransfer, holidayDetailDto, isHolidayValidationDone);
-
 
 
             System.err.println("------------"+toLoanAccountId+"------------loan transaction id here is -----------"+loanRepaymentTransaction.getId());
@@ -238,6 +251,8 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         // added 31/01/2022
         else if(isSavingsToShareAccountTransfer(fromAccountType, toAccountType)) {
 
+            System.err.println("----------------------------transfer ----------------");
+
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
             final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);
 
@@ -252,8 +267,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final Long toShareAccountId = command.longValueOfParameterNamed(toAccountIdParamName);
             final ShareAccount toShareAccount = this.shareAccountAssembler.assembleFrom(toShareAccountId);
 
-
-
             final ShareAccountTransaction shareAccountTransaction = this.shareAccountDomainService.purchaseShares(toShareAccount, new CommandProcessingResultBuilder(),
                     transactionDate, transactionAmount, paymentDetail,savingsNote ,null , isAccountTransfer);
 
@@ -261,7 +274,17 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     fromSavingsAccount, withdrawal , toShareAccount,shareAccountTransaction);
 
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
-            transferDetailId = shareAccountTransaction.getId();
+
+            shareAccountTransactionId = shareAccountTransaction.getId();
+
+            System.err.println("------------share account id"+toShareAccountId+" +--------share transaction id is ---------------"+shareAccountTransactionId);
+
+            System.err.println("----------------------we need something else as well to identify these --------------");
+
+            // use this as savings transaction id 
+            subEntityId = withdrawal.getId();
+
+            System.err.println("------------savings account id ----"+fromSavingsAccountId+"--savings transaction id is -------------"+subEntityId);
 
             // get some
 
@@ -270,13 +293,21 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final CommandProcessingResultBuilder builder = new CommandProcessingResultBuilder().withEntityId(transferDetailId);
 
         if (fromAccountType.isSavingsAccount()) {
-            builder.withCommandId(commandId); // savings transaction id here ,will use it to reverse transactions ..
+            System.err.println("----------------------from account transaction set here as well ?---------------------");
+            //builder.withCommandId(commandId); // savings transaction id here ,will use it to reverse transactions ..
             builder.withSavingsId(fromSavingsAccountId);
             builder.withTransactionId(String.valueOf(transactionId));
+
+            // savings transaction id here instead of command id
+            builder.withSubEntityId(subEntityId);
         }
         if(toAccountType.isSharesAccount()){
-            builder.withTransactionId(transferDetailId.toString());
+            builder.withTransactionId(shareAccountTransactionId.toString());
+            //builder.withCommandId(commandId);
+            //builder.withResourceIdAsString(commandId.toString());
+            builder.withSubEntityId(subEntityId);
         }
+
         if(toAccountType.isLoanAccount()){
             ///
             System.err.println("-------------------------to loan account is savings account ---------------");

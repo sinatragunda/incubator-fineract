@@ -36,8 +36,8 @@ import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.B
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
-import org.apache.fineract.portfolio.note.domain.ShareAccountTransactionRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.shareaccounts.repo.ShareAccountTransactionRepository;
 import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountWritePlatformService;
 import org.apache.fineract.portfolio.shareproducts.domain.ShareProduct;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -45,6 +45,7 @@ import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.apache.fineract.wese.helper.JsonHelper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,8 +69,11 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
     private final ShareAccountTransactionRepository shareAccountTransactionRepository ;
     private final JournalEntryWritePlatformService journalEntryWritePlatformService ;
 
+    // added 29/03/2022
+    private final ShareAccountRepository shareAccountRepository ;
+
     @Autowired
-    public ShareAccountDomainServiceJpa(final NoteRepository noteRepository, final PlatformSecurityContext context, final BusinessEventNotifierService businessEventNotifierService,final ShareAccountWritePlatformService shareAccountWritePlatformService ,final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWrapper shareAccountTransactionWrapper ,final ShareAccountTransactionRepository shareAccountTransactionRepository ,final JournalEntryWritePlatformService journalEntryWritePlatformService) {
+    public ShareAccountDomainServiceJpa(final NoteRepository noteRepository, final PlatformSecurityContext context, final BusinessEventNotifierService businessEventNotifierService,final ShareAccountWritePlatformService shareAccountWritePlatformService ,final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWrapper shareAccountTransactionWrapper ,final ShareAccountTransactionRepository shareAccountTransactionRepository ,final JournalEntryWritePlatformService journalEntryWritePlatformService ,final ShareAccountRepository shareAccountRepository) {
         this.noteRepository = noteRepository;
         this.context = context;
         this.businessEventNotifierService = businessEventNotifierService;
@@ -78,6 +82,9 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
         this.shareAccountTransactionWrapper = shareAccountTransactionWrapper ;
         this.shareAccountTransactionRepository = shareAccountTransactionRepository ;
         this.journalEntryWritePlatformService = journalEntryWritePlatformService ;
+
+        // added 29/03/2022
+        this.shareAccountRepository = shareAccountRepository ;
     }
 
     @Transactional
@@ -115,12 +122,10 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         CommandProcessingResult commandProcessingResult = this.shareAccountWritePlatformService.applyAddtionalShares(shareAccountId ,jsonCommand);
 
-        
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SHARES_PURCHASE, constructEntityMap(BUSINESS_ENTITY.SHARE_ACCOUNT, newShareAccountTransaction));
 
         // disable all active standing orders linked to this loan if status changes to closed
         //disableStandingInstructionsLinkedToClosedLoan(loan);
-
 
         Long transactionId[] = {null} ;
 
@@ -162,7 +167,6 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
     }
 
-
     public boolean reverseShareAccountTransaction(ReverseShareAccountTransaction reverseShareAccountTransaction){
 
         Long shareAccountTransactionId = reverseShareAccountTransaction.getId();
@@ -174,9 +178,33 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
         if(isPresent){
             try{
                 List transactionIdsList = Arrays.asList(shareAccountTransactionId);
-                journalEntryWritePlatformService.revertShareAccountJournalEntries((ArrayList<Long>)transactionIdsList ,transactionDate);
+                ArrayList<Long> arrayList = new ArrayList(transactionIdsList); 
+                journalEntryWritePlatformService.revertShareAccountJournalEntries(arrayList ,transactionDate);
                 /// if done then delete share account 
-                shareAccountTransactionRepository.delete(shareAccountTransaction);
+                // so transaction fail here now ,instead of delete we should reverse ,set boolean to true ''
+
+                shareAccountTransaction.setReverse(true);
+
+                ///
+                Long reversedShares = shareAccountTransaction.getTotalShares();
+
+                System.err.println("----------------reversed shares in this transaction are -----------"+reversedShares);
+
+                ShareAccount shareAccount = shareAccountTransaction.getShareAccount();
+
+                Long totalShares = shareAccount.getTotalApprovedShares();
+
+                System.err.println("----------------total shares ----------"+totalShares);
+
+                Long balanceShares = totalShares - reversedShares ;
+
+                System.err.println("---------------------------total shares after reversal ------"+balanceShares);
+
+                shareAccountTransactionRepository.save(shareAccountTransaction);
+                shareAccount.setTotalSharesApproved(balanceShares);
+                shareAccountRepository.save(shareAccount);
+
+                System.err.println("----------------has share account beeen reversed to a new total of ---------------"+shareAccount.getTotalApprovedShares());
             }
             catch(Exception e){
                 /// 

@@ -109,9 +109,13 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final LocalDate postInterestOnDate = null;
         final Set<Long> existingReversedTransactionIds = new HashSet<>();
         updateExistingTransactionsDetails(account, existingTransactionIds, existingReversedTransactionIds);
+        
         Integer accountType = null;
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
+
+
+        System.err.println("----------------------account withdrawal there son -------------------");
 
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
 
@@ -130,11 +134,24 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             depositAccountOnHoldTransactions = this.depositAccountOnHoldTransactionRepository
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
-        account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
-                depositAccountOnHoldTransactions);
+        System.out.println("-----------------validate negative thing here --------------");
+
+        // added 28/03/2022
+        // added so that products that allow overdrawing can actually transfer money out of this account
+        SavingsProduct savingsProduct = account.savingsProduct();
+        boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
+
+        System.err.println("-------------------account overdraft ? "+isOverdraftAccount);
+
+        if(!isOverdraftAccount) {
+
+            System.err.println("--------------if you see this and you in overdraft ?-----------");
+            account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
+                    depositAccountOnHoldTransactions);
+
+        }
         saveTransactionToGenerateTransactionId(withdrawal);
         this.savingsAccountRepository.save(account);
-
 
         /// added 26/07/2021
         /// here we add new value to save this transaction to monthly withdrawals 

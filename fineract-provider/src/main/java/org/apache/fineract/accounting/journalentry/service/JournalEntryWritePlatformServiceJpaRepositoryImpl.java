@@ -552,6 +552,9 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
                 JournalEntry reversalJournalEntry;
                 String reversalComment = "Reversal entry for Journal Entry with id  :" + journalEntry.getId() + " and transaction Id "
                         + journalEntry.getTransactionId();
+
+                System.err.println("------------------------------reversal comment ----------------"+reversalComment);
+                        
                 if (journalEntry.isDebitEntry()) {
                     reversalJournalEntry = JournalEntry.createNew(journalEntry.getOffice(), journalEntry.getPaymentDetails(),
                             journalEntry.getGlAccount(), journalEntry.getCurrencyCode(), reversalTransactionId, Boolean.FALSE,

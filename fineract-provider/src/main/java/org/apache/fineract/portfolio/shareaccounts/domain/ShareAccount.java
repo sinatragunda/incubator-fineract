@@ -525,6 +525,12 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         }
     }
 
+    public void setTotalSharesApproved(Long sharesApproved){
+        Optional.ofNullable(sharesApproved).ifPresent(e->{
+            this.totalSharesApproved = e ;
+        });
+    }
+
     public Long getTotalApprovedShares() {
         return this.totalSharesApproved ;
     }
