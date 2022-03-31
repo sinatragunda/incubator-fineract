@@ -103,7 +103,10 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     public Collection<LoanAccountSummaryData> retrieveClientLoanAccountsByLoanOfficerId(final Long clientId, final Long loanOfficerId) {
         // Check if client exists
         this.clientReadPlatformService.retrieveOne(clientId);
-        final String loanWhereClause = " where l.client_id = ? and l.loan_officer_id = ?";
+        final String loanWhereClause = " where l.client_id = ? and l.loan_officer_id = ? GROUP BY l.id";
+
+
+        System.err.println("-----------------query string 3----------"+loanWhereClause);
         return retrieveLoanAccountDetails(loanWhereClause, new Object[] { clientId, loanOfficerId });
     }
 
@@ -116,13 +119,18 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     }
 
     @Override public Collection<LoanAccountSummaryData> retrieveClientActiveLoanAccountSummary(final Long clientId) {
-        final String loanWhereClause = " where l.client_id = ? and l.loan_status_id = 300 ";
+        final String loanWhereClause = " where l.client_id = ? and l.loan_status_id = 300 GROUP BY l.id";
+
+
+        System.err.println("-----------------query string 2----------"+loanWhereClause);
         return retrieveLoanAccountDetails(loanWhereClause, new Object[] { clientId });
     }
 
     private List<LoanAccountSummaryData> retrieveLoanAccountDetails(final String loanwhereClause, final Object[] inputs) {
         final LoanAccountSummaryDataMapper rm = new LoanAccountSummaryDataMapper();
-        final String sql = "select " + rm.loanAccountSummarySchema() + loanwhereClause;
+        final String sql = "select " + rm.loanAccountSummarySchema() + loanwhereClause+" GROUP BY l.id";
+
+        System.err.println("-----------------query string with ordering ----------"+sql);
         this.columnValidator.validateSqlInjection(rm.loanAccountSummarySchema(), loanwhereClause);
         return this.jdbcTemplate.query(sql, rm, inputs);
     }
@@ -392,11 +400,16 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     .append(" l.product_id as productId, lp.name as productName, lp.short_name as shortProductName,")
                     .append(" l.loan_status_id as statusId, l.loan_type_enum as loanType,")
                     
-                    .append("l.principal_disbursed_derived as originalLoan,")
-                    .append("l.total_outstanding_derived as loanBalance,")
-                    .append("l.total_repayment_derived as amountPaid,")
+                    .append(" l.principal_disbursed_derived as originalLoan,")
+                    .append(" l.total_outstanding_derived as loanBalance,")
+                    .append(" l.total_repayment_derived as amountPaid,")
                     
                     .append(" l.loan_product_counter as loanCycle,")
+
+                    // added 30/03/2022
+                    //.append(" sum(if(mlt.transaction_type_enum = 10 ,mlt.amount ,0)) as interestAccrued,")
+                    // version 2 of the query hope it works rather than the first one ,only returning one row .Sumin up all of them into one single transaction
+                    .append(" sum(ifnull(if(mlt.transaction_type_enum = 10 ,mlt.amount ,0),0)) AS interestAccrued ,")
 
                     .append(" l.submittedon_date as submittedOnDate,")
                     .append(" sbu.username as submittedByUsername, sbu.firstname as submittedByFirstname, sbu.lastname as submittedByLastname,")
@@ -418,7 +431,9 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     .append(" la.overdue_since_date_derived as overdueSinceDate,")
                     .append(" l.writtenoffon_date as writtenOffOnDate, l.expected_maturedon_date as expectedMaturityDate")
 
-                    .append(" from m_loan l ").append("LEFT JOIN m_product_loan AS lp ON lp.id = l.product_id")
+                    .append(" from m_loan l ")
+                    .append(" LEFT JOIN m_product_loan AS lp ON lp.id = l.product_id")
+                    .append(" left JOIN m_loan_transaction mlt ON mlt.loan_id = l.id")
                     .append(" left join m_appuser sbu on sbu.id = l.submittedon_userid")
                     .append(" left join m_appuser rbu on rbu.id = l.rejectedon_userid")
                     .append(" left join m_appuser wbu on wbu.id = l.withdrawnon_userid")
@@ -490,6 +505,9 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                 inArrears = false;
             }
 
+            // added 30/03/2022
+            final BigDecimal accruedInterest = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs ,"interestAccrued");
+
             final LoanApplicationTimelineData timeline = new LoanApplicationTimelineData(submittedOnDate, submittedByUsername,
                     submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname,
                     withdrawnOnDate, withdrawnByUsername, withdrawnByFirstname, withdrawnByLastname, approvedOnDate, approvedByUsername,
@@ -498,7 +516,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     expectedMaturityDate, writtenOffOnDate, closedByUsername, closedByFirstname, closedByLastname);
 
             return new LoanAccountSummaryData(id, accountNo, externalId, productId, loanProductName, shortLoanProductName, loanStatus, loanType, loanCycle,
-                    timeline, inArrears,originalLoan,loanBalance,amountPaid);
+                    timeline, inArrears,originalLoan,loanBalance,amountPaid ,accruedInterest);
         }
     }
 

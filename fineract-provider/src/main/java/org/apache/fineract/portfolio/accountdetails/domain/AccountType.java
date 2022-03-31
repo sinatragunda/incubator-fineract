@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.accountdetails.domain;
 
+import java.util.Optional;
+
 /**
  * Enum representation of account types .
  */
@@ -36,32 +38,47 @@ public enum AccountType {
         this.code = code;
     }
 
-    public static AccountType fromInt(final Integer accountTypeValue) {
+    public static AccountType fromInt(final Integer accountTypeValue){
 
-        AccountType enumeration = AccountType.INVALID;
-        switch (accountTypeValue) {
-            case 1:
-                enumeration = AccountType.INDIVIDUAL;
-            break;
-            case 2:
-                enumeration = AccountType.GROUP;
-            break;
-            case 3:
-                enumeration = AccountType.JLG;
-            break;
-        }
-        return enumeration;
+        AccountType enumeration[] = {AccountType.INVALID};
+        
+        Optional.ofNullable(accountTypeValue).ifPresent(e->{
+            for(AccountType type : values()){
+                if(type.ordinal()==accountTypeValue){
+                    enumeration[0] = type;
+                }
+            }
+        });
+
+        return enumeration[0];
+
+        // switch (accountTypeValue) {
+        //     case 1:
+        //         enumeration = AccountType.INDIVIDUAL;
+        //     break;
+        //     case 2:
+        //         enumeration = AccountType.GROUP;
+        //     break;
+        //     case 3:
+        //         enumeration = AccountType.JLG;
+        //     break;
+        // }
+        // return enumeration;
     }
 
     public static AccountType fromName(final String name) {
-        AccountType accountType = AccountType.INVALID;
-        for (final AccountType type : AccountType.values()) {
-            if (type.getName().equals(name)) {
-                accountType = type;
-                break;
+        
+        AccountType accountType[] = {AccountType.INVALID};
+        
+        Optional.ofNullable(name).ifPresent(e->{   
+            for (final AccountType type : AccountType.values()) {
+                if (type.getName().equals(name)) {
+                    accountType[0] = type;
+                    break;
+                }
             }
-        }
-        return accountType;
+        });
+        return accountType[0];
     }
 
     public Integer getValue() {

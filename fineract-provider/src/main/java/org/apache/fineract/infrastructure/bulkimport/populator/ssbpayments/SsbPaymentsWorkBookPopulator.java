@@ -26,6 +26,7 @@ import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
 
@@ -44,6 +47,7 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
     private ClientSheetPopulator clientSheetPopulator;
     private List<SavingsAccountData> savingsAccountsDataList ;
     private SavingsAccountSheetPopulator savingsAccountSheetPopulator ;
+    private List<String> accountNamesList;
 
 
     public SsbPaymentsWorkBookPopulator(OfficeSheetPopulator officeSheetPopulator,
@@ -129,6 +133,7 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
     private void setNames(Sheet worksheet) {
 
         Workbook ssbPaymentsWorkbook = worksheet.getWorkbook();
+        accountNamesList = new ArrayList<>();
 
         //savings accounts
         Name ddaFundAccountsGroup = ssbPaymentsWorkbook.createName();
@@ -141,6 +146,16 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
 
             String clientName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");
             Name accountIdName  = ssbPaymentsWorkbook.createName();
+
+            // if account name is duplicate then some errors are popping up as well so we need to mark them with numbers
+            int occurenceCount = occurenceCount(clientName);
+
+            if(occurenceCount > 0){
+                System.err.println("----------------------occurence count for "+clientName+" -----at "+occurenceCount);
+                clientName = String.format("%s_%d",clientName ,occurenceCount);
+            }
+
+            // if name has been inserted count its occurences
 
             accountIdName.setNameName("Fund_Account_Id_"+clientName);
             accountIdName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
@@ -178,5 +193,17 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         writeString(SsbPaymentsConstants.DDA_FUND_ACCOUNT_ID_COL,rowHeader,"Fund Account ID");
         writeString(SsbPaymentsConstants.CURRENCY_COL ,rowHeader ,"Currency");
 
+    }
+
+
+    private int occurenceCount(String name){
+
+        Predicate<String> isNamePredicate = (e)->{
+            return ComparatorUtility.compareStringsIgnoreCase(name ,e);
+        };
+
+        List<String> filteredList = accountNamesList.stream().filter(isNamePredicate).collect(Collectors.toList());
+        accountNamesList.add(name);
+        return filteredList.size();
     }
 }

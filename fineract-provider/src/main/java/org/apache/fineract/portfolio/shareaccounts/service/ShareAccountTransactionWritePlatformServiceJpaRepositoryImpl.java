@@ -76,17 +76,20 @@ public class ShareAccountTransactionWritePlatformServiceJpaRepositoryImpl implem
     @SuppressWarnings("unchecked")
     @Override
     public CommandProcessingResult updateShareAccountTransaction(Long transactionId,String command ,JsonCommand jsonCommand) {
-        
+
+        System.err.println("--------------------------------reverse some transactions son-------------");
         try {
             ReverseShareAccountTransaction transaction = accountDataSerializer.validateForTransactionReversal(jsonCommand ,transactionId);
             transaction.setId(transactionId);
             boolean status = shareAccountDomainService.reverseShareAccountTransaction(transaction);
-            return CommandProcessingResult.withStatus(status);
+            return CommandProcessingResult.commandOnlyResult(1L);
 
         } catch (DataIntegrityViolationException dve) {
+            System.err.println("-----------------integrity error ? ");
             handleDataIntegrityIssues(jsonCommand, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }catch (final PersistenceException dve) {
+            System.err.println("-------------------another integrity error -------------");
         	Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
         	handleDataIntegrityIssues(jsonCommand, throwable, dve);
         	return CommandProcessingResult.empty();

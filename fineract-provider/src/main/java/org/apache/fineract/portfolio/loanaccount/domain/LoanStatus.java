@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain;
 
+import java.util.Optional;
+
 /**
  * Enum representation of loan status states.
  */
@@ -41,43 +43,54 @@ public enum LoanStatus {
 
     public static LoanStatus fromInt(final Integer statusValue) {
 
-        LoanStatus enumeration = LoanStatus.INVALID;
-        switch (statusValue) {
-            case 100:
-                enumeration = LoanStatus.SUBMITTED_AND_PENDING_APPROVAL;
-            break;
-            case 200:
-                enumeration = LoanStatus.APPROVED;
-            break;
-            case 300:
-                enumeration = LoanStatus.ACTIVE;
-            break;
-            case 303:
-                enumeration = LoanStatus.TRANSFER_IN_PROGRESS;
-            break;
-            case 304:
-                enumeration = LoanStatus.TRANSFER_ON_HOLD;
-            break;
-            case 400:
-                enumeration = LoanStatus.WITHDRAWN_BY_CLIENT;
-            break;
-            case 500:
-                enumeration = LoanStatus.REJECTED;
-            break;
-            case 600:
-                enumeration = LoanStatus.CLOSED_OBLIGATIONS_MET;
-            break;
-            case 601:
-                enumeration = LoanStatus.CLOSED_WRITTEN_OFF;
-            break;
-            case 602:
-                enumeration = LoanStatus.CLOSED_RESCHEDULE_OUTSTANDING_AMOUNT;
-            break;
-            case 700:
-                enumeration = LoanStatus.OVERPAID;
-            break;
-        }
-        return enumeration;
+        LoanStatus enumeration[] = {LoanStatus.INVALID};
+
+        Optional.ofNullable(statusValue).ifPresent(e->{
+            for(LoanStatus status : values()){
+                if(status.ordinal()==statusValue){
+                    enumeration[0] = status;
+                }
+            }
+        });
+
+        return enumeration[0];
+
+        
+        // switch (statusValue) {
+        //     case 100:
+        //         enumeration = LoanStatus.SUBMITTED_AND_PENDING_APPROVAL;
+        //     break;
+        //     case 200:
+        //         enumeration = LoanStatus.APPROVED;
+        //     break;
+        //     case 300:
+        //         enumeration = LoanStatus.ACTIVE;
+        //     break;
+        //     case 303:
+        //         enumeration = LoanStatus.TRANSFER_IN_PROGRESS;
+        //     break;
+        //     case 304:
+        //         enumeration = LoanStatus.TRANSFER_ON_HOLD;
+        //     break;
+        //     case 400:
+        //         enumeration = LoanStatus.WITHDRAWN_BY_CLIENT;
+        //     break;
+        //     case 500:
+        //         enumeration = LoanStatus.REJECTED;
+        //     break;
+        //     case 600:
+        //         enumeration = LoanStatus.CLOSED_OBLIGATIONS_MET;
+        //     break;
+        //     case 601:
+        //         enumeration = LoanStatus.CLOSED_WRITTEN_OFF;
+        //     break;
+        //     case 602:
+        //         enumeration = LoanStatus.CLOSED_RESCHEDULE_OUTSTANDING_AMOUNT;
+        //     break;
+        //     case 700:
+        //         enumeration = LoanStatus.OVERPAID;
+        //     break;
+        // }
     }
 
     private LoanStatus(final Integer value, final String code) {

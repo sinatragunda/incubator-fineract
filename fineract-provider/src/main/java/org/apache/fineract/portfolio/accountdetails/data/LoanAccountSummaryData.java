@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.accountdetails.data;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanApplicationTimelineData;
@@ -44,10 +45,16 @@ public class LoanAccountSummaryData {
     private final BigDecimal originalLoan;
     private final BigDecimal loanBalance;
     private final BigDecimal amountPaid;
+
+    // added 30/03/2022
+    private final BigDecimal accruedInterest ;
+
+    // added 31/03/2022
+    private final BigDecimal loanBalanceWithAccruedInterest ;
     
     public LoanAccountSummaryData(final Long id, final String accountNo, final String externalId, final Long productId,
             final String loanProductName, final String shortLoanProductName, final LoanStatusEnumData loanStatus, final EnumOptionData loanType, final Integer loanCycle,
-            final LoanApplicationTimelineData timeline, final Boolean inArrears,final BigDecimal originalLoan,final BigDecimal loanBalance,final BigDecimal amountPaid) {
+            final LoanApplicationTimelineData timeline, final Boolean inArrears,final BigDecimal originalLoan,final BigDecimal loanBalance,final BigDecimal amountPaid ,final BigDecimal accruedInterest) {
         this.id = id;
         this.accountNo = accountNo;
         this.externalId = externalId;
@@ -62,6 +69,8 @@ public class LoanAccountSummaryData {
         this.loanBalance = loanBalance;
         this.originalLoan = originalLoan;
         this.amountPaid = amountPaid;
+        this.accruedInterest = accruedInterest ;
+        this.loanBalanceWithAccruedInterest = loanBalanceWithAccruedInterest();
     }
 
     public boolean isActive(){
@@ -76,4 +85,35 @@ public class LoanAccountSummaryData {
     public Long productId(){
         return this.productId;
     }
+
+    public BigDecimal loanBalanceWithAccruedInterest(){
+
+        System.err.println("--------------what is null here ? -----------");
+
+        Boolean isVal = Optional.ofNullable(originalLoan).isPresent();
+
+        BigDecimal balance = BigDecimal.ZERO ;
+
+        if(isVal){
+
+            Boolean isVal2 = Optional.ofNullable(accruedInterest).isPresent();
+            //BigDecimal balance = originalLoan.add(accruedInterest);
+            System.err.println("---------orginal loan is "+originalLoan);
+            if(isVal2){
+                balance = originalLoan.add(accruedInterest);
+            }
+
+            Boolean isVal3 = Optional.ofNullable(amountPaid).isPresent();
+
+            if(isVal3){
+                System.err.println("-----------------amount paid is "+accruedInterest);
+                balance = balance.subtract(amountPaid);
+            }
+
+            System.err.println("------------------------l take error throw now -----------?"+isVal+"---------------------val 2 rpesent "+isVal2);
+            //return balance.subtract(amountPaid);
+        }
+        return balance ;
+    }
+
 }

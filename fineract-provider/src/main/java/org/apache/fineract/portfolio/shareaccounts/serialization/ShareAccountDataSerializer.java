@@ -103,7 +103,7 @@ public class ShareAccountDataSerializer {
 
     private static final Set<String> reverseShareAccountTransactionParameters = new HashSet<>(Arrays.asList(ShareAccountApiConstants
                     .locale_paramname,
-            ShareAccountApiConstants.transactionDateParam, ShareAccountApiConstants.dateformat_paramname));
+            ShareAccountApiConstants.transactionDateParam, ShareAccountApiConstants.dateformat_paramname ,ShareAccountApiConstants.transactionAmountParam));
 
     
     @Autowired
@@ -658,6 +658,7 @@ public class ShareAccountDataSerializer {
         JsonElement element = jsonCommand.parsedJson();
 
         baseDataValidator.reset().value(transactionId).longGreaterThanZero().notNull();
+        //baseDataValidator.reset().value()
 
         LocalDate localTransactionDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.transactionDateParam, element);
         baseDataValidator.reset().parameter(ShareAccountApiConstants.transactionDateParam).value(localTransactionDate).notNull();

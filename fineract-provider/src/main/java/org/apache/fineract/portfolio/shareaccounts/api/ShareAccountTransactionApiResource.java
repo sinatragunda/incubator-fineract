@@ -79,8 +79,10 @@ public class ShareAccountTransactionApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String reverseTransaction(@PathParam("transactionId") final Long transactionId, @QueryParam("command") final String command,final String payload) {
-
+        System.err.println("-----------------------do we reach here son ? --------------------------");
         this.platformSecurityContext.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+
+        System.err.println("---------yeah got some fucked errors now --------------");
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
         CommandProcessingResult commandProcessingResult = shareAccountTransactionWritePlatformService.updateShareAccountTransaction(transactionId ,command ,jsonCommand);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
