@@ -99,8 +99,12 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     public CommandProcessingResult createShareAccount(JsonCommand jsonCommand) {
         try {
             ShareAccount account = this.accountDataSerializer.validateAndCreate(jsonCommand);
+            
             this.shareAccountRepository.save(account);
+            
             generateAccountNumber(account);
+
+
             journalEntryWritePlatformService.createJournalEntriesForShares(populateJournalEntries(account,
                     account.getPendingForApprovalSharePurchaseTransactions()));
 
@@ -112,9 +116,11 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                     .withEntityId(account.getId()) //
                     .build();
         } catch (final DataIntegrityViolationException dve) {
+            dve.printStackTrace();
             handleDataIntegrityIssues(jsonCommand, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }catch (final PersistenceException dve) {
+            dve.printStackTrace();
         	Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
         	handleDataIntegrityIssues(jsonCommand, throwable, dve);
         	return CommandProcessingResult.empty();
@@ -143,6 +149,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
         accountingBridgeData.put("currency", currencyData);
         final List<Map<String, Object>> newTransactionsMap = new ArrayList<>();
         accountingBridgeData.put("newTransactions", newTransactionsMap);
+
+        System.err.println("-------------------where do we fail with error");
 
         for (ShareAccountTransaction transaction : transactions) {
             final Map<String, Object> transactionDto = new HashMap<>();

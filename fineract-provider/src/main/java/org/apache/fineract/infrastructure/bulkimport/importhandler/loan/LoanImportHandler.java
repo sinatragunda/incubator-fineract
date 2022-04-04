@@ -84,6 +84,8 @@ public class LoanImportHandler implements ImportHandler {
         this.disbursalDates = new ArrayList<>();
         this.statuses=new ArrayList<>();
         readExcelFile(locale,dateFormat);
+
+        System.err.println("--------------------loans size is "+loans.size());
         return importEntity(dateFormat);
     }
 
@@ -94,12 +96,10 @@ public class LoanImportHandler implements ImportHandler {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
 
-
         try{    
-            for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
+            for(int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
 
-                    Row row;
-                    row = loanSheet.getRow(rowIndex);
+                    Row row = loanSheet.getRow(rowIndex);
                     System.err.println("-------------------working with column index --------------"+rowIndex);
 
                     if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
@@ -126,11 +126,13 @@ public class LoanImportHandler implements ImportHandler {
 
     private void addLoanToList(String locale, String dateFormat, Row row) {
 
+        System.err.println("----------------adding list to loan -----------");
+
         LoanAccountData loanAccountData = readLoan(row ,locale ,dateFormat);
 
         Optional.ofNullable(loanAccountData).ifPresent(e->{
-
             loans.add(loanAccountData);
+            System.err.println("--------------------add to approval dates");
             approvalDates.add(readLoanApproval(row,locale,dateFormat));
             disbursalDates.add(readDisbursalData(row,locale,dateFormat));
             LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
@@ -186,10 +188,14 @@ public class LoanImportHandler implements ImportHandler {
 
     private LoanApprovalData readLoanApproval(Row row,String locale,String dateFormat) {
         LocalDate approvedDate = ImportHandlerUtils.readAsDate(LoanConstants.APPROVED_DATE_COL, row);
-        if (approvedDate!=null)
-            return LoanApprovalData.importInstance(approvedDate, row.getRowNum(),locale,dateFormat);
-        else
-            return null;
+        LoanApprovalData loanApprovalData[] = {null} ;
+
+        Optional.ofNullable(approvedDate).ifPresent(e->{
+            System.err.println("-------------------------approval date for this loan not null---------------"+approvedDate);
+            loanApprovalData[0] = LoanApprovalData.importInstance(approvedDate, row.getRowNum(),locale,dateFormat);
+        });
+
+        return loanApprovalData[0];
     }
 
     private LoanAccountData readLoan(Row row,String locale,String dateFormat) {

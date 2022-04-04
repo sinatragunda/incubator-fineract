@@ -2158,6 +2158,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         final LoanStatus newStatusEnum = loanLifecycleStateMachine.transition(LoanEvent.LOAN_APPROVED, LoanStatus.fromInt(this.loanStatus));
 
+        System.err.println("--------loan status is ----------"+newStatusEnum);
         /*
          * FIXME: There is no need to check below condition, if
          * loanLifecycleStateMachine.transition is doing it's responsibility
@@ -4969,7 +4970,12 @@ public class Loan extends AbstractPersistableCustom<Long> {
             break;
         }
 
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) {
+            for(ApiParameterError a : dataValidationErrors){
+                System.err.println("---------------------error in loan application --------------"+a.getDeveloperMessage());
+            } 
+            throw new PlatformApiDataValidationException(dataValidationErrors); 
+        }
 
     }
 

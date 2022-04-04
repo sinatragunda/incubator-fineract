@@ -41,7 +41,9 @@ public enum LoanStatus {
     private final Integer value;
     private final String code;
 
-    public static LoanStatus fromInt(final Integer statusValue) {
+    public static LoanStatus fromInt(final Integer statusValue){
+
+        System.err.println("-------------------loan status value ---------------"+statusValue);
 
         LoanStatus enumeration[] = {LoanStatus.INVALID};
 

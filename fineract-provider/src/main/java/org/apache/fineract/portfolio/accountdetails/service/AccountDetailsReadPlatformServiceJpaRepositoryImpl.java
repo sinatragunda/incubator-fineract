@@ -103,10 +103,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     public Collection<LoanAccountSummaryData> retrieveClientLoanAccountsByLoanOfficerId(final Long clientId, final Long loanOfficerId) {
         // Check if client exists
         this.clientReadPlatformService.retrieveOne(clientId);
-        final String loanWhereClause = " where l.client_id = ? and l.loan_officer_id = ? GROUP BY l.id";
-
-
-        System.err.println("-----------------query string 3----------"+loanWhereClause);
+        final String loanWhereClause = " where l.client_id = ? and l.loan_officer_id = ? ";
         return retrieveLoanAccountDetails(loanWhereClause, new Object[] { clientId, loanOfficerId });
     }
 
@@ -119,10 +116,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     }
 
     @Override public Collection<LoanAccountSummaryData> retrieveClientActiveLoanAccountSummary(final Long clientId) {
-        final String loanWhereClause = " where l.client_id = ? and l.loan_status_id = 300 GROUP BY l.id";
-
-
-        System.err.println("-----------------query string 2----------"+loanWhereClause);
+        final String loanWhereClause = " where l.client_id = ? and l.loan_status_id =300 ";
         return retrieveLoanAccountDetails(loanWhereClause, new Object[] { clientId });
     }
 
@@ -130,7 +124,8 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
         final LoanAccountSummaryDataMapper rm = new LoanAccountSummaryDataMapper();
         final String sql = "select " + rm.loanAccountSummarySchema() + loanwhereClause+" GROUP BY l.id";
 
-        System.err.println("-----------------query string with ordering ----------"+sql);
+        System.err.println("--------------full sql is ------------"+sql);
+        
         this.columnValidator.validateSqlInjection(rm.loanAccountSummarySchema(), loanwhereClause);
         return this.jdbcTemplate.query(sql, rm, inputs);
     }
@@ -265,6 +260,9 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
             accountsSummary.append("sa.account_type_enum as accountType, ");
             accountsSummary.append("sa.account_balance_derived as accountBalance, ");
 
+            // added 31/03/2022
+            accountsSummary.append("sa.total_deposits_derived as cumulativeBalance, ");
+
             accountsSummary.append("sa.submittedon_date as submittedOnDate,");
             accountsSummary.append("sbu.username as submittedByUsername,");
             accountsSummary.append("sbu.firstname as submittedByFirstname, sbu.lastname as submittedByLastname,");
@@ -379,6 +377,9 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
             
             final LocalDate lastActiveTransactionDate = JdbcSupport.getLocalDate(rs, "lastActiveTransactionDate");
 
+            // added 31/03/2022
+            final BigDecimal cumulativeBalance = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs ,"cumulativeBalance"); 
+
             final SavingsAccountApplicationTimelineData timeline = new SavingsAccountApplicationTimelineData(submittedOnDate,
                     submittedByUsername, submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername,
                     rejectedByFirstname, rejectedByLastname, withdrawnOnDate, withdrawnByUsername, withdrawnByFirstname,
@@ -387,7 +388,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     closedByLastname);
 
             return new SavingsAccountSummaryData(id, accountNo, externalId, productId, productName, shortProductName, status, currency, accountBalance,
-                    accountTypeData, timeline, depositTypeData, subStatus, lastActiveTransactionDate);
+                    accountTypeData, timeline, depositTypeData, subStatus, lastActiveTransactionDate ,cumulativeBalance);
         }
     }
 

@@ -114,8 +114,6 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         String payload = JsonHelper.serializeMapToJson(jsonMap);
 
-        System.err.println("-------------------------------payload is -------------------"+payload);
-
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
 
         Long shareAccountId = shareAccount.getId();
@@ -133,23 +131,18 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         Map<String ,Object> changes = commandProcessingResult.getChanges();
 
-        System.err.println("--------------------command changes -------------"+changes.size());
-
         if(!changes.isEmpty()){
             
             Object val = changes.get(ShareAccountApiConstants.additionalshares_paramname);
             String strVal = String.valueOf(val);
             transactionId[0] = Long.parseLong(strVal);
 
-            System.err.println("---------------------------transaction id -------------------"+val);
         }
 
 
         builderResult.withEntityId(transactionId[0]) //
                 .withOfficeId(commandProcessingResult.getOfficeId()) //
                 .withClientId(commandProcessingResult.getClientId()) ;
-
-        System.err.println("---------------------------what is share account transaction ------------------------------"+transactionId[0]);
 
         ShareAccountTransaction shareAccountTransaction[] = {null} ;
 
@@ -188,23 +181,14 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
                 ///
                 Long reversedShares = shareAccountTransaction.getTotalShares();
 
-                System.err.println("----------------reversed shares in this transaction are -----------"+reversedShares);
-
                 ShareAccount shareAccount = shareAccountTransaction.getShareAccount();
 
                 Long totalShares = shareAccount.getTotalApprovedShares();
-
-                System.err.println("----------------total shares ----------"+totalShares);
-
                 Long balanceShares = totalShares - reversedShares ;
-
-                System.err.println("---------------------------total shares after reversal ------"+balanceShares);
-
                 shareAccountTransactionRepository.save(shareAccountTransaction);
                 shareAccount.setTotalSharesApproved(balanceShares);
                 shareAccountRepository.save(shareAccount);
 
-                System.err.println("----------------has share account beeen reversed to a new total of ---------------"+shareAccount.getTotalApprovedShares());
             }
             catch(Exception e){
                 /// 

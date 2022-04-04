@@ -76,7 +76,8 @@ public class ShareAccountTransaction extends AbstractPersistableCustom<Long> {
     private Set<ShareAccountChargePaidBy> shareAccountChargesPaid = new HashSet<>();
 
     // added 29/03/2022
-    @Column(name = "is_reversed", nullable = false)
+    // modified 03/04/2022 nullable set to true ..
+    @Column(name="is_reversed",nullable = true)
     private boolean reverse = false ;
     
     

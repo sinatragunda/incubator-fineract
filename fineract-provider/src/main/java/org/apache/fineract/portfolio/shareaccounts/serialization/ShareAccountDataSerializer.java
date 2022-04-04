@@ -665,7 +665,6 @@ public class ShareAccountDataSerializer {
 
         Date transactionDate = localTransactionDate.toDate();
         
-        System.err.println("----------------any exceptions here ----------------");
         if (!dataValidationErrors.isEmpty()) { 
 
             for(ApiParameterError e : dataValidationErrors){
@@ -707,8 +706,6 @@ public class ShareAccountDataSerializer {
         }
         boolean isTransactionBeforeExistingTransactions = false ;
         
-        System.err.println("----------------any exceptions here ----------------");
-
         Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions() ;
 
         boolean isPresent  = Optional.ofNullable(transactions).isPresent();
