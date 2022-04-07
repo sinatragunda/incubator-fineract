@@ -467,6 +467,10 @@ public class AccountingProcessorHelper {
             accountTypeToDebitId = accountTypeToBeCredited;
             accountTypeToCreditId = accountTypeToBeDebited;
         }
+
+        // could we check these if there are null for simplicity ? 
+        System.err.println("---------------------create entries ---------"+accountTypeToDebitId+"----------------credit ------"+accountTypeToCreditId);
+
         createJournalEntriesForSavings(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, savingsProductId, paymentTypeId,
                 loanId, transactionId, transactionDate, amount);
     }
@@ -675,14 +679,19 @@ public class AccountingProcessorHelper {
             final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId,
             final Date transactionDate, final BigDecimal amount) {
         final GLAccount debitAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);
-        createDebitJournalEntryForSavings(office, currencyCode, debitAccount, savingsId, transactionId, transactionDate, amount);
+        Optional.ofNullable(debitAccount).ifPresent(e->{
+            createDebitJournalEntryForSavings(office, currencyCode, debitAccount, savingsId, transactionId, transactionDate, amount);
+        });
     }
 
     private void createCreditJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToCreditId,
             final Long savingsProductId, final Long paymentTypeId, final Long savingsId, final String transactionId,
             final Date transactionDate, final BigDecimal amount) {
         final GLAccount creditAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToCreditId, paymentTypeId);
-        createCreditJournalEntryForSavings(office, currencyCode, creditAccount, savingsId, transactionId, transactionDate, amount);
+        
+        Optional.ofNullable(creditAccount).ifPresent(e->{
+            createCreditJournalEntryForSavings(office, currencyCode, creditAccount, savingsId, transactionId, transactionDate, amount);
+        });
     }
 
     public void createDebitJournalEntryOrReversalForLoan(final Office office, final String currencyCode, final int accountMappingTypeId,
@@ -855,7 +864,11 @@ public class AccountingProcessorHelper {
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
                 manualEntry, transactionDate, JournalEntryType.CREDIT, amount, null, PortfolioProductType.SAVING.getValue(), savingsId,
                 null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
-        this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        //this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        
+        Optional.ofNullable(account).ifPresent(e->{
+            this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        });
     }
 
     private void createCreditJournalEntryForLoan(final Office office, final String currencyCode, final GLAccount account,
@@ -933,6 +946,7 @@ public class AccountingProcessorHelper {
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
                 manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null,
                 loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
+        
         this.glJournalEntryRepository.saveAndFlush(journalEntry);
     }
 
@@ -953,7 +967,12 @@ public class AccountingProcessorHelper {
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
                 manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.SAVING.getValue(), savingsId,
                 null, loanTransaction, savingsAccountTransaction, clientTransaction, shareTransactionId);
-        this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        
+        Optional.ofNullable(account).ifPresent(e->{
+            this.glJournalEntryRepository.saveAndFlush(journalEntry);
+        });
+
+    
     }
 
     private void createDebitJournalEntryForClientPayments(final Office office, final String currencyCode, final GLAccount account,
@@ -1226,7 +1245,10 @@ public class AccountingProcessorHelper {
                     accountMapping = paymentChannelSpecificAccountMapping;
                 }
             }
-            glAccount = accountMapping.getGlAccount();
+            boolean hasGl = Optional.ofNullable(accountMapping).isPresent();
+            if(hasGl){
+                glAccount = accountMapping.getGlAccount();
+            }        
         }
         return glAccount;
     }
