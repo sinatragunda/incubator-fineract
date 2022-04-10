@@ -296,8 +296,11 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
                     GL_JOURNAL_ENTRY_INVALID_REASON.DEBIT_CREDIT_ACCOUNT_OR_AMOUNT_EMPTY, null, null, null); }
             debitsSum = debitsSum.add(debitEntryCommand.getAmount());
         }
-        if (creditsSum.compareTo(debitsSum) != 0) { throw new JournalEntryInvalidException(
-                GL_JOURNAL_ENTRY_INVALID_REASON.DEBIT_CREDIT_SUM_MISMATCH, null, null, null); }
+        if (creditsSum.compareTo(debitsSum) != 0) { 
+            
+            System.err.println("--------------------no debit entries ------------");
+            throw new JournalEntryInvalidException(GL_JOURNAL_ENTRY_INVALID_REASON.DEBIT_CREDIT_SUM_MISMATCH, null, null, null); 
+        }
     }
 
     private void validateGLAccountForTransaction(final GLAccount creditOrDebitAccountHead) {

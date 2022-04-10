@@ -41,8 +41,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 @Service
 public class JournalEntriesImportHandler implements ImportHandler {
     private Workbook workbook;
@@ -80,6 +84,15 @@ public class JournalEntriesImportHandler implements ImportHandler {
                 row = addJournalEntriesSheet.getRow(rowIndex);
 
                 currentTransactionId = ImportHandlerUtils.readAsString(JournalEntryConstants.TRANSACTION_ID_COL, row);
+
+                /// what if transaction id is null ? .....create seeded id manually
+                boolean isIdPresent = Optional.ofNullable(currentTransactionId).isPresent();
+
+                if(!isIdPresent){
+                    currentTransactionId = randomTransactionId();
+                    System.err.println("-------------random generated id is --------"+currentTransactionId
+                    );
+                }
 
                 if (currentTransactionId.equals(prevTransactionId)) {
                     if (journalEntry != null) {
@@ -220,6 +233,15 @@ public class JournalEntriesImportHandler implements ImportHandler {
         addJournalEntriesSheet.setColumnWidth(JournalEntryConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(JournalEntryConstants.STATUS_COL, addJournalEntriesSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX), TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount,errorCount);
+    }
+
+
+    private String randomTransactionId(){
+
+        Long seed = Instant.now().toEpochMilli();
+        Random ra = new Random(seed);
+        Long id = ra.nextLong();
+        return id.toString();
     }
 
 
