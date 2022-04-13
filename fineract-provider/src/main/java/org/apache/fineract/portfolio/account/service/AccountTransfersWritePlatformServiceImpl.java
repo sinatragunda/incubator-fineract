@@ -166,7 +166,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
                     transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
 
-            System.err.println("-------------failed to perfom withdrawl of funds ------------------");
+            System.err.println("-------------withdrawal id us  ------------------"+withdrawal.getId());
 
             final Long toSavingsId = command.longValueOfParameterNamed(toAccountIdParamName);
             final SavingsAccount toSavingsAccount = this.savingsAccountAssembler.assembleFrom(toSavingsId);
@@ -306,6 +306,11 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             //builder.withCommandId(commandId);
             //builder.withResourceIdAsString(commandId.toString());
             builder.withSubEntityId(subEntityId);
+        }
+
+        // added feature 14/04/2022
+        if(toAccountType.isSavingsAccount()){
+            System.err.println("---------------------set another id here son -----------------");
         }
 
         if(toAccountType.isLoanAccount()){
