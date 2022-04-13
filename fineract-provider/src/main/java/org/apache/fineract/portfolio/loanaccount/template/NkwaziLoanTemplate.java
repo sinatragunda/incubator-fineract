@@ -16,9 +16,7 @@ public class NkwaziLoanTemplate {
     private BigDecimal savingsAccountBalance ;
     private Boolean isSet = false ;
 
-    public NkwaziLoanTemplate(){
-
-    }
+    public NkwaziLoanTemplate(){}
 
     public NkwaziLoanTemplate(BigDecimal maxAllowable, BigDecimal balanceAllowable, Integer loanFactor, BigDecimal savingsAccountBalance) {
         this.maxAllowable = maxAllowable;

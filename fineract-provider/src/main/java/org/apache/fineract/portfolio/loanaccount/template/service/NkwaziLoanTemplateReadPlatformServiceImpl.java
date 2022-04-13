@@ -33,12 +33,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class NkwaziLoanTemplateReadPlatformServiceImpl implements NkwaziLoanTemplateReadPlatformService {
 
-    @Autowired
     private SavingsAccountReadPlatformService savingsAccountReadPlatformService ;
     private LoanReadPlatformService loanReadPlatformService ;
     private LoanProductReadPlatformService loanProductReadPlatformService ;
     private ClientReadPlatformService clientReadPlatformService ;
 
+    @Autowired
     public NkwaziLoanTemplateReadPlatformServiceImpl(SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanReadPlatformService loanReadPlatformService, LoanProductReadPlatformService loanProductReadPlatformService, ClientReadPlatformService clientReadPlatformService) {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.loanReadPlatformService = loanReadPlatformService;
@@ -69,8 +69,19 @@ public class NkwaziLoanTemplateReadPlatformServiceImpl implements NkwaziLoanTemp
     }
 
     private Boolean isLoanFactorPresent(Integer loanFactor){
+
+        System.err.println("-------------loan factor -------------"+loanFactor);
+
         int cmp = loanFactor.compareTo(0);
-        return ComparatorUtility.cmpToBoolean(cmp);
+
+        boolean isEqualTo0 = ComparatorUtility.cmpToBoolean(cmp);
+
+        /// return true since 0 is equal to loan factor
+        // if its equal to 0 then its not set so return !
+
+        System.err.println("======================is set ? ==========="+isEqualTo0);
+
+        return !isEqualTo0;
     }
 
     private BigDecimal totalLoansOutstanding(Long clientId){
@@ -86,6 +97,7 @@ public class NkwaziLoanTemplateReadPlatformServiceImpl implements NkwaziLoanTemp
 
         Collection<LoanAccountData> loanAccountDataCollections = loanReadPlatformService.retrieveAllForClient(clientId);
         BigDecimal loansOutstanding = loanAccountDataCollections.stream().filter(activeLoans).map(totalOutstanding).reduce(BigDecimal.ZERO ,BigDecimal::add);
+        System.err.println("--------------loans outstanding ----------------"+loansOutstanding);
         return loansOutstanding ;
     }
 
