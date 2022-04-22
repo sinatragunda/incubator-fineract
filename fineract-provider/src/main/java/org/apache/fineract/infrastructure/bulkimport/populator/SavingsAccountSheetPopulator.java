@@ -26,6 +26,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -50,9 +57,10 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
     @Override
     public void populate(Workbook workbook,String dateFormat) {
         Sheet savingsSheet=workbook.createSheet(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME);
+        setRules(savingsSheet);
         setLayout(savingsSheet);
         populateSavingsSheet(savingsSheet);
-        savingsSheet.protectSheet("");
+        //savingsSheet.protectSheet("");
     }
 
     private void populateSavingsSheet(Sheet savingsSheet) {
@@ -65,6 +73,19 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
             writeString(CLIENT_NAME,row,savings.getClientName().replaceAll("[ ]","_"));
         }
     }
+
+
+    private void setRules(Sheet worksheet){
+
+	    CellRangeAddressList amountRange = new  CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),AMOUNT,AMOUNT);
+        DataValidationHelper validationHelper = new HSSFDataValidationHelper((HSSFSheet)worksheet);
+        
+        DataValidationConstraint amountRangeConstraint = validationHelper.createDecimalConstraint(DataValidationConstraint.OperatorType.GREATER_THAN ,"0" ,null);
+        DataValidation amountValidation = validationHelper.createValidation(amountRangeConstraint, amountRange);
+        
+        worksheet.addValidationData(amountValidation);
+
+   }
 
 
     private void setLayout(Sheet savingsSheet) {
@@ -90,7 +111,6 @@ public class SavingsAccountSheetPopulator extends AbstractWorkbookPopulator {
 
     // added 07/02/2022 at 0400
     public void filterDDAFundsAccounts(Predicate<SavingsAccountData> ddaFundsPredicate){
-        System.err.println("----------------------------savings account data size ----------------"+savingsAccountDataList.size());
         this.savingsAccountDataList = savingsAccountDataList.stream().filter(ddaFundsPredicate).collect(Collectors.toList());
     }
 

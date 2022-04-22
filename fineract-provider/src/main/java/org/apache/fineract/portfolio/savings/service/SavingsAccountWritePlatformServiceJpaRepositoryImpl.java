@@ -80,6 +80,8 @@ import org.apache.fineract.portfolio.savings.domain.*;
 import org.apache.fineract.portfolio.savings.exception.*;
 import org.apache.fineract.portfolio.savings.exception.PostInterestAsOnDateException.PostInterestAsOnException_TYPE;
 import org.apache.fineract.portfolio.savings.helper.SavingsAccountHelper;
+import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
+import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserRepositoryWrapper;
 import org.joda.time.LocalDate;
@@ -130,6 +132,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     //private final ClientReadPlatformService clientReadPlatformService ;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
 
+    // added 18/04/2022
+    private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ;
+
 
     @Autowired
     public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -151,7 +156,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository,
-            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper) {
+            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -183,6 +188,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         //this.clientReadPlatformService = clientReadPlatformService ;
         //this.clientWritePlatformService = clientWritePlatformService ;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
+
+        // added 18/04/2022
+        this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
 
     }
 
@@ -507,6 +515,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
 
         account.undoTransaction(transactionId);
+
+        // maybe we should reverse our monthly deposit transaction here 
+        SavingsMonthlyDepositHelper.handleDepositOrWithdrawReversal(savingsAccountMonthlyDepositRepository ,account ,savingsAccountTransaction.getAmount(), today ,!savingsAccountTransaction.isWithdrawal());
 
         // undoing transaction is withdrawal then undo withdrawal fee
         // transaction if any

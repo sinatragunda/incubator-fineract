@@ -41,17 +41,21 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
 
 
     private OfficeSheetPopulator officeSheetPopulator;
-    private ClientSheetPopulator clientSheetPopulator;
+    private ClientSheetPopulatorEx clientSheetPopulator;
     private List<SavingsAccountData> savingsAccountsDataList ;
     private SavingsAccountSheetPopulator savingsAccountSheetPopulator ;
+    private List<ClientData> clientDataList ;
 
 
     public SsbPaymentsWorkBookPopulator(OfficeSheetPopulator officeSheetPopulator,
-                                                ClientSheetPopulator clientSheetPopulator,SavingsAccountSheetPopulator savingsAccountSheetPopulator) {
+                                                ClientSheetPopulatorEx clientSheetPopulator,SavingsAccountSheetPopulator savingsAccountSheetPopulator) {
         this.officeSheetPopulator = officeSheetPopulator;
         this.clientSheetPopulator = clientSheetPopulator;
         this.savingsAccountSheetPopulator = savingsAccountSheetPopulator ;
         this.savingsAccountsDataList = savingsAccountSheetPopulator.getSavingsAccountDataList();
+
+        // added 14/04/2022
+        this.clientDataList = clientSheetPopulator.getClients();
 
     }
 
@@ -67,25 +71,23 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         setDefaults(ssbPaymentsSheet);
         setLayout(ssbPaymentsSheet);
 
-
     }
 
 
     private void setDefaults(Sheet worksheet) {
 
-        //Workbook workbook = worksheet.getWorkbook();
-        //CellStyle dateCellStyle = workbook.createCellStyle();
-        //short df = workbook.createDataFormat().getFormat(dateFormat);
-        //dateCellStyle.setDataFormat(df);
-
         for(Integer rowNo = 1; rowNo < 1000; rowNo++) {
-            //Row row = worksheet.getRow(rowNo);
             Row row = worksheet.createRow(rowNo);
-            writeFormula(SsbPaymentsConstants.DDA_FUND_ACCOUNT_ID_COL, row, "IF(ISERROR(INDIRECT(CONCATENATE(\"Fund_Account_Id_\",$G" + (rowNo + 1)
-                    + "))),\"\",INDIRECT(CONCATENATE(\"Fund_Account_Id_\",$G" + (rowNo + 1) + ")))");
-            writeFormula(SsbPaymentsConstants.CURRENCY_COL, row, "IF(ISERROR(INDIRECT(CONCATENATE(\"Currency_\",$G" + (rowNo + 1)
-                    + "))),\"\",INDIRECT(CONCATENATE(\"Currency_\",$G" + (rowNo + 1) + ")))");
+            
+            writeFormula(SsbPaymentsConstants.CURRENCY_COL, row, "IF(ISERROR(INDIRECT(CONCATENATE(\"Currency_\",$I" + (rowNo + 1)
+                    + "))),\"\",INDIRECT(CONCATENATE(\"Currency_\",$I" + (rowNo + 1) + ")))");
 
+            writeFormula(SsbPaymentsConstants.DOCUMENT_ID_COL, row, "IF(ISERROR(INDIRECT(CONCATENATE(\"Client_Id_\",$A" + (rowNo + 1)
+                    + "))),\"\",INDIRECT(CONCATENATE(\"Client_Id_\",$A" + (rowNo + 1) + ")))");
+
+            writeFormula(SsbPaymentsConstants.DDA_FUND_ACCOUNT_ID_COL, row,
+                    "IF(ISERROR(INDIRECT(CONCATENATE(\"FUND_ACCOUNT_ID_\",$I" + (rowNo + 1)
+                            + "))),\"\",INDIRECT(CONCATENATE(\"FUND_ACCOUNT_ID_\",$I" + (rowNo + 1) + ")))");
         }
     }
 
@@ -101,26 +103,20 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         CellRangeAddressList ddaFundAccountNameRange = new  CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
                 SsbPaymentsConstants.DDA_FUND_ACCOUNT_NAME_COL, SsbPaymentsConstants.DDA_FUND_ACCOUNT_NAME_COL);
 
-//        CellRangeAddressList ddaFundAccountIdRange = new  CellRangeAddressList(1, SpreadsheetVersion.EXCEL97.getLastRowIndex(),
-//                SsbPaymentsConstants.DDA_FUND_ACCOUNT_ID_COL, SsbPaymentsConstants.DDA_FUND_ACCOUNT_ID_COL);
-
 
         DataValidationHelper validationHelper = new HSSFDataValidationHelper((HSSFSheet)worksheet);
 
         setNames(worksheet);
 
-        DataValidationConstraint amountRangeConstraint = validationHelper.createDecimalConstraint(DataValidationConstraint.OperatorType.GREATER_OR_EQUAL ,"1.0" ,null);
-        //DataValidationConstraint clientNameConstraint = validationHelper.createFormulaListConstraint("INDIRECT(CONCATENATE(\"Client_\",$A1))");
+        DataValidationConstraint amountRangeConstraint = validationHelper.createDecimalConstraint(DataValidationConstraint.OperatorType.GREATER_THAN ,"0" ,null);
+        DataValidationConstraint clientNameConstraint = validationHelper.createFormulaListConstraint(TemplatePopulateImportConstants.CLIENT_SHEET_NAME);
         DataValidationConstraint ddaFundAccountNameConstraint = validationHelper.createFormulaListConstraint(SsbPaymentsConstants.DDA_FUND_SHEET_NAME);
-        //DataValidationConstraint ddaFundAccountIdConstraint = validationHelper.createIntegerConstraint(DataValidationConstraint.OperatorType.GREATER_THAN ,"0" ,null);
 
-        //DataValidation clientValidation = validationHelper.createValidation(clientNameConstraint, clientNameRange);
+        DataValidation clientValidation = validationHelper.createValidation(clientNameConstraint, clientNameRange);
         DataValidation amountValidation = validationHelper.createValidation(amountRangeConstraint, amountRange);
         DataValidation ddaFundAccountNameValidation = validationHelper.createValidation(ddaFundAccountNameConstraint ,ddaFundAccountNameRange);
-        //DataValidation ddaFundAccountIdValidation = validationHelper.createValidation(ddaFundAccountIdConstraint ,ddaFundAccountIdRange);
 
-        //worksheet.addValidationData(clientValidation);
-        //worksheet.addValidationData(ddaFundAccountIdValidation);
+        worksheet.addValidationData(clientValidation);
         worksheet.addValidationData(ddaFundAccountNameValidation);
         worksheet.addValidationData(amountValidation);
 
@@ -135,19 +131,42 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         ddaFundAccountsGroup.setNameName(SsbPaymentsConstants.DDA_FUND_SHEET_NAME);
         ddaFundAccountsGroup.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$D$2:$D$" + (savingsAccountsDataList.size() + 1));
 
-        System.err.println("--------------------------------------savings data list ----------------"+savingsAccountsDataList.size());
-
         for (int i = 0; i < savingsAccountsDataList.size() ;++i){
 
-            String clientName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");
-            Name accountIdName  = ssbPaymentsWorkbook.createName();
+            String accountName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");
+            Name accountNameName  = ssbPaymentsWorkbook.createName();
 
-            accountIdName.setNameName("Fund_Account_Id_"+clientName);
-            accountIdName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
+            accountNameName.setNameName("Fund_Account_Name_"+accountName);
+            accountNameName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
 
             Name currencyName = ssbPaymentsWorkbook.createName();
-            currencyName.setNameName("Currency_"+clientName);
+            currencyName.setNameName("Currency_"+accountName);
             currencyName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$C$" + (i + 2));
+
+
+            Name fundAccountIdName = ssbPaymentsWorkbook.createName();
+            fundAccountIdName.setNameName("Fund_Account_Id_"+accountName);
+            fundAccountIdName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
+        }
+
+
+        // client accounts
+        Name clientNameGroup = ssbPaymentsWorkbook.createName();
+        clientNameGroup.setNameName("Clients");
+        clientNameGroup.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$A$2:$A$" + (clientDataList.size() + 1));
+
+        for (int i = 0; i < clientDataList.size() ;++i){
+
+            String clientName = clientDataList.get(i).displayName().replaceAll("[ ]" ,"_");
+            Name clientNameName  = ssbPaymentsWorkbook.createName();
+
+            clientNameName.setNameName("Client_Name"+clientName);
+            clientNameName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$A$" + (i + 2));
+
+            Name accountIdName = ssbPaymentsWorkbook.createName();
+            accountIdName.setNameName("Client_Id_"+ clientName);
+            accountIdName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$B$" + (i + 2));
+
         }
     }
 
@@ -171,7 +190,7 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         writeString(SsbPaymentsConstants.CLIENT_NAME_COL,rowHeader,"Client Name");
         writeString(SsbPaymentsConstants.LOAN_ACCOUNT_NO_COL,rowHeader,"Loan Account Number");
         writeString(SsbPaymentsConstants.EMPLOYEE_ID_COL,rowHeader,"Employee Id ");
-        writeString(SsbPaymentsConstants.DOCUMENT_ID_COL,rowHeader,"Document Id or Client ID *");
+        writeString(SsbPaymentsConstants.DOCUMENT_ID_COL,rowHeader,"Client Id");
         writeString(SsbPaymentsConstants.AMOUNT_COL,rowHeader,"Amount *");
         writeString(SsbPaymentsConstants.STAGING_COL,rowHeader,"Staging");
         writeString(SsbPaymentsConstants.DDA_FUND_ACCOUNT_NAME_COL,rowHeader,"Fund Account Name");

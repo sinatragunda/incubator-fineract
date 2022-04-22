@@ -1178,19 +1178,19 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
             // enforceMinRequiredBalance
-            System.err.println("----------------------what happens if we just allow this withdrawal ? SavingsAccount.1161-------------------");
-//            if (transaction.canProcessBalanceCheck()) {
-//                if (runningBalance.minus(minRequiredBalance).isLessThanZero()) {
-//                    final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-//                    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-//                            .resource(depositAccountType().resourceName() + transactionAction);
-//                    if (!this.allowOverdraft) {
-//                        baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("results.in.balance.going.negative");
-//                    }
-//                    if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
-//                }
-//
-//            }
+            System.err.println("----------------------bring back this mean balance violation rule thing -------------------");
+           if (transaction.canProcessBalanceCheck()) {
+               if (runningBalance.minus(minRequiredBalance).isLessThanZero()) {
+                   final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+                   final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
+                           .resource(depositAccountType().resourceName() + transactionAction);
+                   if (!this.allowOverdraft) {
+                       baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("results.in.balance.going.negative");
+                   }
+                   if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+               }
+
+           }
 
             lastSavingsDate = transaction.transactionLocalDate();
 

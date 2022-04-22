@@ -704,7 +704,7 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 
 		// we want clients who are some other type
 		OfficeSheetPopulator officeSheetPopulator = new OfficeSheetPopulator(offices);
-		ClientSheetPopulator clientSheetPopulator = new ClientSheetPopulator(clients ,offices);
+		ClientSheetPopulatorEx clientSheetPopulator = new ClientSheetPopulatorEx(clients ,offices);
 
 		SavingsAccountSheetPopulator savingsAccountSheetPopulator = new SavingsAccountSheetPopulator(savingsAccountDataList);
 		savingsAccountSheetPopulator.filterDDAFundsAccounts(ddaFundsPredicate);

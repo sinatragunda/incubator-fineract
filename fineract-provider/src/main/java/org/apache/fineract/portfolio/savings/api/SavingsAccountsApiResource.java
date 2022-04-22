@@ -427,4 +427,25 @@ public class SavingsAccountsApiResource {
         CommandProcessingResult commandProcessingResult = savingsAccountWritePlatformService.autoCreateBulkAccounts(savingsAccountReadPlatformService , clientWritePlatformService ,dateTimeFormatter ,savingsProductId ,officeId);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }
+
+
+    // added 19/04/2022 retrieve all for client 
+
+    @GET
+    @Path("/clientaccounts/{clientId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAllForClient(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+
+        //final Collection<SavingsAccountData> savingsAccountsData = this.savingsAccountReadPlatformService.retrieveAllForLookup(clientId);
+
+        final Collection<SavingsAccountData> savingsAccountsData = this.savingsAccountReadPlatformService.retrieveAllForLookup(clientId);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, savingsAccountsData,
+                SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
+
+    }
 }

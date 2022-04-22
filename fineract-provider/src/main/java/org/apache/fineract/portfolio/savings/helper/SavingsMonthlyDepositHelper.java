@@ -5,6 +5,8 @@ import java.util.List ;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import java.util.function.Predicate;
+
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.fineract.wese.helper.TimeHelper ;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
@@ -86,5 +88,48 @@ public class SavingsMonthlyDepositHelper{
 		// create new value here
 		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount ,isDeposit);
 		repository.save(savingsAccountMonthlyDeposit);
+	}
+
+	// added 18/04/2022
+	public static void handleDepositOrWithdrawReversal(SavingsAccountMonthlyDepositRepository repository ,SavingsAccount savingsAccount ,BigDecimal amount ,LocalDate transactionDate ,boolean isDeposit){
+
+		Long id = savingsAccount.getId();
+
+		// modified 28/12/2021 and 02/01/2022
+		Long epoch = TimeHelper.jodaLocalDateToEpoch(transactionDate);
+
+		Date startDate = TimeHelper.startDate(epoch);
+		
+		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
+		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);
+
+		if(!savingsAccountMonthlyDepositList.isEmpty()){
+
+			Predicate<SavingsAccountMonthlyDeposit> filterByMonth = (e)->{
+				SavingsAccountMonthlyDeposit transaction = e ;
+				Date startTransactionDate = e.getStartDate();
+				boolean isSameMonth = TimeHelper.sameMonth(startDate ,startTransactionDate);
+				return isSameMonth ;
+			};
+
+			List<SavingsAccountMonthlyDeposit> newList = savingsAccountMonthlyDepositList.stream().filter(filterByMonth).collect(Collectors.toList());
+			
+			if(!newList.isEmpty()){
+				savingsAccountMonthlyDeposit = newList.get(0);
+				BigDecimal amountUpdate = BigDecimal.ZERO;
+				if(!isDeposit){
+					/// 5000 -=1000
+					amountUpdate = savingsAccountMonthlyDeposit.getWithdraw().subtract(amount).abs();
+					savingsAccountMonthlyDeposit.setWithdraw(amountUpdate);
+				}
+				else{
+					amountUpdate = savingsAccountMonthlyDeposit.getDeposit().subtract(amount).abs();
+					savingsAccountMonthlyDeposit.setDeposit(amountUpdate);
+				}
+
+				repository.save(savingsAccountMonthlyDeposit);
+				return ;
+			}
+		}
 	}	
 }

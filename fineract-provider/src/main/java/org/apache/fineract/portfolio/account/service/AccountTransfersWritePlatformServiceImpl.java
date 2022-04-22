@@ -168,6 +168,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             System.err.println("-------------withdrawal id us  ------------------"+withdrawal.getId());
 
+
             final Long toSavingsId = command.longValueOfParameterNamed(toAccountIdParamName);
             final SavingsAccount toSavingsAccount = this.savingsAccountAssembler.assembleFrom(toSavingsId);
 
@@ -178,7 +179,8 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             System.err.println("-------------------------error thrown there ? ---------------------");
 
-            transactionId = deposit.getId();
+            transactionId = withdrawal.getId();
+            subEntityId = deposit.getId();
 
             final AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleSavingsToSavingsTransfer(command,
                     fromSavingsAccount, toSavingsAccount, withdrawal, deposit);
@@ -310,7 +312,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         // added feature 14/04/2022
         if(toAccountType.isSavingsAccount()){
-            System.err.println("---------------------set another id here son -----------------");
+            System.err.println("---------------------set another id here son -----------------"+subEntityId);
         }
 
         if(toAccountType.isLoanAccount()){
