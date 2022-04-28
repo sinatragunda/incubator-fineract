@@ -9,7 +9,7 @@ JOIN m_product_loan mp ON mp.id = ml.product_id
 left JOIN m_code_value mcv ON mcv.id = mc.gender_cv_id 
 WHERE ml.loan_status_id = 300
 AND mc.office_id = ${officeId}
-GROUP BY mc.gender_cv_id','Loans Gender Distrubution Summary', 0, 1);
+GROUP BY mc.gender_cv_id','Loans Gender Distrubution Summary', 0, 1 ,1);
 
 INSERT INTO stretchy_report_parameter ( report_id, parameter_id, report_parameter_name) 
 VALUES ((select sr.id from stretchy_report sr where sr.report_name='LoansGenderDistrubution'),

@@ -8,7 +8,7 @@ JOIN m_product_loan mp ON mp.id = ml.product_id
 WHERE ml.loan_status_id = 300
 AND mc.office_id = ${officeId}
 GROUP BY mp.name
-','Loan Products Portfolio Summary', 0, 1);
+','Loan Products Portfolio Summary', 0, 1 ,1);
 
 INSERT INTO stretchy_report_parameter ( report_id, parameter_id, report_parameter_name) 
 VALUES ((select sr.id from stretchy_report sr where sr.report_name='LoanProductsPortfolio'),
