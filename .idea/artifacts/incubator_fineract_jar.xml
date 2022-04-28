@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="incubator-fineract:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/incubator_fineract_jar</output-path>
+    <root id="archive" name="incubator-fineract.jar">
+      <element id="module-output" name="incubator-fineract" />
+    </root>
+  </artifact>
+</component>

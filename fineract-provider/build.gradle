@@ -400,6 +400,7 @@ configurations {
 }
 dependencies {
     driver 'mysql:mysql-connector-java:5.1.16'
+    compile(files('D:\\Downloads\\pentaho-reporting-engine-classic-core-3.9.1-GA.jar'))
 }
 
 test {
@@ -412,6 +413,16 @@ test {
 URLClassLoader loader = GroovyObject.class.classLoader
 configurations.driver.each {File file ->
     loader.addURL(file.toURL())
+}
+
+task fatJar(type: Jar) {
+    classifier = 'all'
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+    manifest {
+        attributes 'Main-Class': 'org.apache.fineract.ServerApplication'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 task createDB<<{

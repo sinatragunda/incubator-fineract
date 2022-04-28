@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="pentaho-reporting-engine-classic-core-3.9.1-GA">
+    <CLASSES>
+      <root url="jar://D:/Downloads/pentaho-reporting-engine-classic-core-3.9.1-GA.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
