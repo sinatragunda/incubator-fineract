@@ -103,6 +103,7 @@ public class CentersWorkbookPopulator extends AbstractWorkbookPopulator {
 		writeString(CenterConstants.LOOKUP_REPEAT_NORMAL_COL, rowHeader, "Repeat Normal Range");
 		writeString(CenterConstants.LOOKUP_REPEAT_MONTHLY_COL, rowHeader, "Repeat Monthly Range");
 		writeString(CenterConstants.LOOKUP_IF_REPEAT_WEEKLY_COL, rowHeader, "If Repeat Weekly Range");
+
 	}
 	private void setLookupTable(Sheet centerSheet,String dateFormat) {
 		setOfficeDateLookupTable(centerSheet, officeSheetPopulator.getOffices(), CenterConstants.LOOKUP_OFFICE_NAME_COL,CenterConstants.LOOKUP_OFFICE_OPENING_DATE_COL,dateFormat);

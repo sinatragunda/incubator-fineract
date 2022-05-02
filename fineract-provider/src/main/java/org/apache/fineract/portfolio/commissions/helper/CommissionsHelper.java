@@ -49,8 +49,6 @@ public class CommissionsHelper {
         final JsonElement jsonElement = jsonCommand.parsedJson();
         boolean parameterExists = fromJsonHelper.parameterExists(CommissionsApiConstants.agentDataParam, jsonElement);
 
-        System.err.println("-------------------------------parameter exists here ----------------"+parameterExists);
-
         Optional.of(parameterExists).filter(f -> f).ifPresent(e->{
             /// do a whole lot of things to do with creating new commission data
             final JsonObject topLevelJsonElement = jsonElement.getAsJsonObject();
@@ -81,11 +79,7 @@ public class CommissionsHelper {
             loanAgentDataBridge.setLoansFromAgents(loansFromAgents);
 
             CommandProcessingResult commandProcessingResult = attachedCommissionChargesWritePlatformService.create(loanAgentDataBridge);
-
             Long entityId = commandProcessingResult.resourceId();
-
-            System.err.println("----------------------------create new agent data --------since all been validated ---------"+entityId);
-
         });
 
     }
@@ -127,15 +121,7 @@ public class CommissionsHelper {
 
     public static BigDecimal calculateCommission(LoansFromAgents loansFromAgents, CommissionCharge commissionCharge ,ChargeTimeType currentChargeTimeType){
 
-        System.err.println("---------------------loan could have been null ,but is loansfromagents present  ? -------------------"+Optional.ofNullable(loansFromAgents).isPresent());
-
         Loan loan = loansFromAgents.getLoan();
-
-
-        System.err.println("====================of nullable loan ? ===================="+Optional.ofNullable(loan).isPresent());
-
-        System.err.println("----------------------------we crush here now ------------------");
-
 
         ChargeTimeType loanCommissionChargeTime = commissionCharge.getChargeTimeType();
 

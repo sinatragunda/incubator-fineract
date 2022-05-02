@@ -56,7 +56,7 @@ public class Fund extends AbstractPersistableCustom<Long> {
         //
     }
 
-    private Fund(final String fundName, final String externalId) {
+    protected Fund(final String fundName, final String externalId) {
         this.name = StringUtils.defaultIfEmpty(fundName, null);
         this.externalId = StringUtils.defaultIfEmpty(externalId, null);
     }
