@@ -663,6 +663,25 @@ public class LoansApiResource {
         return this.toApiJsonSerializer.serialize(settings, loanBasicDetails, this.LOAN_DATA_PARAMETERS);
     }
 
+    // Added 04/05/2022
+
+    @GET
+    @Path("/client/{clientId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAllForClient(@Context final UriInfo uriInfo,@PathParam("clientId") final Long clientId) {
+
+        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+
+        final SearchParameters searchParameters = SearchParameters.forLoans(sqlSearch, externalId, offset, limit, orderBy, sortOrder,
+                accountNo);
+
+        final Page<LoanAccountData> loanBasicDetails = this.loanReadPlatformService.retrieveAllForClient(clientId);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, loanBasicDetails, this.LOAN_DATA_PARAMETERS);
+    }
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })

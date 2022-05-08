@@ -9,6 +9,9 @@
         <webroots>
           <root url="file://$MODULE_DIR$/fineract-provider/src/main/webapp" relative="/" />
         </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/fineract-provider/src" />
+        </sourceRoots>
       </configuration>
     </facet>
     <facet type="jpa" name="JPA">
@@ -27,10 +30,13 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/fineract-provider/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/fineract-provider/src/main/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/fineract-provider/src/main" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Component" level="project" />
   </component>
 </module>

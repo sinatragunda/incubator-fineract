@@ -67,17 +67,6 @@ public class AccountNumberFormatsApiResource {
 			AccountNumberFormatConstants.prefixTypeOptionsParamName));
 
     @Autowired
-    public AccountNumberFormatsApiResource(final PlatformSecurityContext context,
-            final ToApiJsonSerializer<AccountNumberFormatData> toApiJsonSerializer,
-            final AccountNumberFormatReadPlatformService accountNumberFormatReadPlatformService,
-            final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
-        this.context = context;
-        this.accountNumberFormatReadPlatformService = accountNumberFormatReadPlatformService;
-        this.apiRequestParameterHelper = apiRequestParameterHelper;
-        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.toApiJsonSerializer = toApiJsonSerializer;
-    }
 
     @GET
     @Path("template")

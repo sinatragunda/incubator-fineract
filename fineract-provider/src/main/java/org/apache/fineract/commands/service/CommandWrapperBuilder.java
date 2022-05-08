@@ -3175,4 +3175,30 @@ public class CommandWrapperBuilder {
         this.href = "loansfromagents/template";
         return this;
     }
+
+    // Added 05/02/2022
+    public CommandWrapperBuilder createValidation() {
+        this.actionName = "CREATE";
+        this.entityName = "VALIDATION";
+        this.href = "/validation";
+        return this;
+    }
+
+    public CommandWrapperBuilder updateValidation(final Long resourceId) {
+        this.actionName = "UPDATE";
+        this.entityName = "VALIDATION";
+        this.entityId = resourceId;
+        this.href = "/validation/"+resourceId;
+        return this;
+    }
+
+
+    public CommandWrapperBuilder deleteValidation(final Long resourceId) {
+        this.actionName = "DELETE";
+        this.entityName = "VALIDATION";
+        this.entityId = resourceId;
+        this.href = "/validation/"+resourceId;
+        return this;
+    }
+
 }
