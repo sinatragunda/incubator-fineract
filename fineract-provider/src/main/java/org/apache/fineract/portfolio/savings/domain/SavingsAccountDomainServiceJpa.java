@@ -115,7 +115,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 paymentDetail, new Date(), user, accountType);
 
 
-        System.err.println("----------------------account withdrawal there son -------------------");
+        //System.err.println("----------------------account withdrawal there son -------------------");
 
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
 
@@ -134,18 +134,18 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             depositAccountOnHoldTransactions = this.depositAccountOnHoldTransactionRepository
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
-        System.out.println("-----------------validate negative thing here --------------");
+        //System.out.println("-----------------validate negative thing here --------------");
 
         // added 28/03/2022
         // added so that products that allow overdrawing can actually transfer money out of this account
         SavingsProduct savingsProduct = account.savingsProduct();
         boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
 
-        System.err.println("-------------------account overdraft ? "+isOverdraftAccount);
+        //System.err.println("-------------------account overdraft ? "+isOverdraftAccount);
 
         if(!isOverdraftAccount) {
 
-            System.err.println("--------------if you see this and you in overdraft ?-----------");
+            //System.err.println("--------------if you see this and you in overdraft ?-----------");
             account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
                     depositAccountOnHoldTransactions);
 

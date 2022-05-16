@@ -3478,7 +3478,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
                 transactionForAdjustment.getTransactionDate());
 
 
-        System.err.println("-----------------jump transaction here reverse it son ------------------");
+        //System.err.println("-----------------jump transaction here reverse it son ------------------");
 //
 //        if (transactionForAdjustment.isNotRepayment() && transactionForAdjustment.isNotWaiver()) {
 //            final String errorMessage = "Only transactions of type repayment or waiver can be adjusted.";
@@ -3493,7 +3493,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     private ChangedTransactionDetail reverseLoanTransaction(LoanTransaction newTransactionDetail, LoanLifecycleStateMachine loanLifecycleStateMachine, LoanTransaction transactionForAdjustment, ScheduleGeneratorDTO scheduleGeneratorDTO, AppUser currentUser, ChangedTransactionDetail changedTransactionDetail) {
 
-        System.err.println("=---------------------------reversing loan transaction --------------");
+        //System.err.println("=---------------------------reversing loan transaction --------------");
 
         transactionForAdjustment.reverse();
         transactionForAdjustment.manuallyAdjustedOrReversed();

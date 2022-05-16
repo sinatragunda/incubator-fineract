@@ -163,6 +163,10 @@ public class ClientPersonWorkbookPopulator extends AbstractWorkbookPopulator {
     worksheet.setColumnWidth(ClientPersonConstants.LOOKUP_ADDRESS_TYPE_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
     worksheet.setColumnWidth(ClientPersonConstants.LOOKUP_STATE_PROVINCE_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
     worksheet.setColumnWidth(ClientPersonConstants.LOOKUP_COUNTRY_COL,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+    
+    // added 09/05/2022
+    worksheet.setColumnWidth(ClientPersonConstants.TAG_COL ,TemplatePopulateImportConstants.SMALL_COL_SIZE);
+    
     writeString(ClientPersonConstants.OFFICE_NAME_COL, rowHeader, "Office Name*");
     writeString(ClientPersonConstants.STAFF_NAME_COL, rowHeader, "Staff Name");
     writeString(ClientPersonConstants.EXTERNAL_ID_COL, rowHeader, "External ID ");
@@ -203,6 +207,10 @@ public class ClientPersonWorkbookPopulator extends AbstractWorkbookPopulator {
     writeString(ClientPersonConstants.SAVINGS_PRODUCT_ID_COL, rowHeader, "Savings Product Id ");
     writeString(ClientPersonConstants.SHARES_PRODUCT_ID_COL, rowHeader, "Shares Product Id ");
     writeString(ClientPersonConstants.CREATE_SELF_SERVICE_USER_ID_COL, rowHeader, "Create Self Service User ");
+
+
+    // added 09/05/2022
+    writeString(ClientPersonConstants.TAG_COL, rowHeader, "Tag");
 
 
   }

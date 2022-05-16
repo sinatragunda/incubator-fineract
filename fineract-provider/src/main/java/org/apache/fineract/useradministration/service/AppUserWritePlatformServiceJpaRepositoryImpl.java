@@ -214,24 +214,24 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
 
             this.fromApiJsonDeserializer.validateForUpdate(json);
 
-            System.err.println("--------------------validate --------------");
+            //System.err.println("--------------------validate --------------");
 
             final AppUser userToUpdate = this.appUserRepository.findOne(userId);
 
-            System.err.println("----------------update user--------------");
+            //System.err.println("----------------update user--------------");
 
             boolean isUserFound = Optional.ofNullable(userToUpdate).isPresent();
 
             if(!isUserFound){
-                System.err.println("==============user not found here ===========");
+               // System.err.println("==============user not found here ===========");
                 throw new UserNotFoundException(userId); 
             };
 
-            System.err.println("-------------dome some password thing ---------------");
+            //System.err.println("-------------dome some password thing ---------------");
 
             final AppUserPreviousPassword currentPasswordToSaveAsPreview = getCurrentPasswordToSaveAsPreview(userToUpdate, command);
 
-            System.err.println("-------------------fails to work from here -----------------");
+           // System.err.println("-------------------fails to work from here -----------------");
 
             Collection<Client> clients = null;
 

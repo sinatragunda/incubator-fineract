@@ -106,4 +106,8 @@ final public class ReportData {
 
     }
 
+    public String reportName(){
+        return this.reportName ;
+    }
+
 }

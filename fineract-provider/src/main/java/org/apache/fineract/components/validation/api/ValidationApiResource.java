@@ -4,7 +4,7 @@
     At 5:36 AM on 5/2/2022
 
 */
-package main.java.org.apache.fineract.components.validation.api;
+package org.apache.fineract.components.validation.api;
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -60,7 +60,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Path(ComponentsApiConstants.validationApiUrl)
+
+@Path(ComponentsApiConstants.VALIDATION_API_URL)
 @Component
 @Scope("singleton")
 public class ValidationApiResource {

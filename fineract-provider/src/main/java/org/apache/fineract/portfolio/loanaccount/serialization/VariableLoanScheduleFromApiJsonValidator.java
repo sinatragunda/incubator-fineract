@@ -71,7 +71,7 @@ public class VariableLoanScheduleFromApiJsonValidator {
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
 
-        System.err.println("----------------------validate schedule son ---------------------");
+        //System.err.println("----------------------validate schedule son ---------------------");
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.variableSchedulesupportedParameters);

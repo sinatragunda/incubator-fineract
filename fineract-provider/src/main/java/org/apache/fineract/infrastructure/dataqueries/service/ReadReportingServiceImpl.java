@@ -163,9 +163,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     private StringBuffer generateCsvFileBuffer(final GenericResultsetData result) {
         final StringBuffer writer = new StringBuffer();
 
-
-        System.err.println("------------------------some generic file buffer class");
-
         final List<ResultsetColumnHeaderData> columnHeaders = result.getColumnHeaders();
         logger.info("NO. of Columns: " + columnHeaders.size());
         final Integer chSize = columnHeaders.size();
@@ -208,9 +205,6 @@ public class ReadReportingServiceImpl implements ReadReportingService {
             }
             writer.append('\n');
         }
-
-        System.err.println("------------------out of this function now -----------");
-
         return writer;
     }
 
@@ -357,9 +351,23 @@ public class ReadReportingServiceImpl implements ReadReportingService {
     @Override
     public ReportData retrieveReport(final Long id) {
         final Collection<ReportData> reports = retrieveReports(id);
-
         for (final ReportData report : reports) {
             return report;
+        }
+        return null;
+    }
+
+    // added 15/05/2022
+    // feeling lazy to validate a lot of stuff so we just call all reports and filter
+    @Override
+    public ReportData retrieveReport(final String reportName) {
+        final Collection<ReportData> reports = retrieveReports(null);
+        for (final ReportData report : reports) {
+            
+            boolean equals = report.reportName().equalsIgnoreCase(reportName);
+            if(equals){
+                return report;
+            }
         }
         return null;
     }

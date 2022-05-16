@@ -260,9 +260,35 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 "Unknown data integrity issue with resource.");
     }
 
+    // return bool error is its suppose to update etc 
+    private boolean handleDataIntegrityIssuesEx(final JsonCommand command, final Throwable realCause, final Exception dve) {
+        
+        if (realCause.getMessage().contains("external_id")) {
+
+            final String externalId = command.stringValueOfParameterNamed("externalId");
+            throw new PlatformDataIntegrityException("error.msg.client.duplicate.externalId", "Client with externalId `" + externalId
+                    + "` already exists", "externalId", externalId);
+        } else if (realCause.getMessage().contains("account_no_UNIQUE")) {
+            final String accountNo = command.stringValueOfParameterNamed("accountNo");
+            throw new PlatformDataIntegrityException("error.msg.client.duplicate.accountNo", "Client with accountNo `" + accountNo
+                    + "` already exists", "accountNo", accountNo);
+        } else if (realCause.getMessage().contains("mobile_no")) {
+            final String mobileNo = command.stringValueOfParameterNamed("mobileNo");
+            throw new PlatformDataIntegrityException("error.msg.client.duplicate.mobileNo", "Client with mobileNo `" + mobileNo
+                    + "` already exists", "mobileNo", mobileNo);
+        }
+
+        logAsErrorUnexpectedDataIntegrityException(dve);
+        throw new PlatformDataIntegrityException("error.msg.client.unknown.data.integrity.issue",
+                "Unknown data integrity issue with resource.");
+    }
+
     @Transactional
     @Override
     public CommandProcessingResult createClient(final JsonCommand command) {
+
+
+        Client newClient= null ;
 
         try {
             final AppUser currentUser = this.context.authenticatedUser();
@@ -350,8 +376,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 	isEntity = legalForm.isEntity();
                 }
             }
+
+            // added 09/05/2022 added new tag 
+            //final String tag = command.stringValueOfParameterNamed(ClientApiConstants.tagParam);
             
-            final Client newClient = Client.createNew(currentUser, clientOffice, clientParentGroup, staff, savingsProductId, gender,
+            newClient = Client.createNew(currentUser, clientOffice, clientParentGroup, staff, savingsProductId, gender,
                     clientType, clientClassification, legalFormValue, command ,shareProductId);
 
             this.clientRepository.save(newClient);
@@ -364,12 +393,15 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 rollbackTransaction = this.commandProcessingService.validateCommand(commandWrapper, currentUser);
             }
 
-
             // Added 25/09/2021
             createSelfServiceUser(newClient ,isCreateSelfServiceUser);
 
+            System.err.println("---------------error thrown at this stage ? --------------");
 
             this.clientRepository.save(newClient);
+
+            System.err.println("--------------------------def thrown here -------------");
+            
             if (newClient.isActive()) {
                 this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
                         constructEntityMap(BUSINESS_ENTITY.CLIENT, newClient));
@@ -428,11 +460,19 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     .setRollbackTransaction(rollbackTransaction)//
                     .setRollbackTransaction(result.isRollbackTransaction())//
                     .build();
-        } catch (final DataIntegrityViolationException dve) {
+        }catch (final DataIntegrityViolationException dve) {
+            
+            dve.printStackTrace();
+
             handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
             return CommandProcessingResult.empty();
         }catch(final PersistenceException dve) {
-        	Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
+
+            dve.printStackTrace();
+
+            System.err.println("------------item has id ------------------------"+newClient.getId());
+        	
+            Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
             handleDataIntegrityIssues(command, throwable, dve);
          	return CommandProcessingResult.empty();
         }

@@ -902,9 +902,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         this.businessEventNotifierService.notifyBusinessEventToBeExecuted(BUSINESS_EVENTS.LOAN_ADJUST_TRANSACTION,
                 constructEntityMap(BUSINESS_ENTITY.LOAN_ADJUSTED_TRANSACTION, transactionToAdjust));
 
-        System.err.println("---------------executing loan transfer from savings ----------------");
+        //System.err.println("---------------executing loan transfer from savings ----------------");
 
-        System.err.println("-------------------first stage is to let it go the other way ");
+        //System.err.println("-------------------first stage is to let it go the other way ");
 
 //        if (this.accountTransfersReadPlatformService.isAccountTransfer(transactionId, PortfolioAccountType.LOAN)) { throw new PlatformServiceUnavailableException(
 //                "error.msg.loan.transfer.transaction.update.not.allowed", "Loan transaction:" + transactionId

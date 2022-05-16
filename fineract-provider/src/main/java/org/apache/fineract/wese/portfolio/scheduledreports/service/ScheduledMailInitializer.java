@@ -60,9 +60,10 @@ public class ScheduledMailInitializer {
         //Runnable runnable = ()->{
 
         //start session
-            scheduledSendableSession.getScheduledMailSession().init();
+        scheduledSendableSession.getScheduledMailSession().init();
 
         Queue<EmailRecipients> emailRecipientsQueue = scheduledSendableSession.getSendableReport().getEmailRecipientsQueue();
+
         PentahoReportGenerator pentahoReportGenerator = scheduledSendableSession.getSendableReport().getPentahoReportGenerator();
 
         String reportName = pentahoReportGenerator.getReportName();

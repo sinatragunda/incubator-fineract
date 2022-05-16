@@ -1070,18 +1070,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         LocalDate lastSavingsDate = null;
         final BigDecimal withdrawalFee = null;
 
-        System.err.println("---------------------min required balance is -------------------"+minRequiredBalance);
-
         for (final SavingsAccountTransaction transaction : transactionsSortedByDate) {
             if (transaction.isNotReversed() && transaction.isCredit()) {
                 runningBalance = runningBalance.plus(transaction.getAmount(this.currency));
-                System.err.println("---------------deposit running balance "+runningBalance);
             } else if (transaction.isNotReversed() && transaction.isDebit()) {
                 runningBalance = runningBalance.minus(transaction.getAmount(this.currency));
-                System.err.println("--------------withdrawal running balance ---------"+runningBalance);
             }else {
                 runningBalance.plus(transaction.getAmount(this.currency));
-                System.err.println("-----------------unspecified running balance --------------"+runningBalance);
                 continue;
             }
 
@@ -1091,7 +1086,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
              * was made:
              */
             if (depositAccountOnHoldTransactions != null) {
-                System.err.println("------------------not on hold transactions -------------");
                 for (final DepositAccountOnHoldTransaction onHoldTransaction : depositAccountOnHoldTransactions) {
                     // Compare the balance of the on hold:
                     if ((onHoldTransaction.getTransactionDate().isBefore(transaction.transactionLocalDate()) || onHoldTransaction
@@ -1107,7 +1101,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
 
-            System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
+            //System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
 
 
 
@@ -1115,9 +1109,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             // enforceMinRequiredBalance
             if (!isException && transaction.canProcessBalanceCheck() && !isOverdraft()) {
                 if (runningBalance.minus(minRequiredBalance).isLessThanZero()){
-
-                    System.err.println("--------------------------------allow overdraft "+isOverdraft());
-                    System.err.println("--------------------enfroced min balance ----------"+runningBalance);
                     throw new InsufficientAccountBalanceException(
                         "transactionAmount", getAccountBalance(), withdrawalFee, transactionAmount); }
             }
@@ -1127,10 +1118,10 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         
         //In overdraft cases, minRequiredBalance can be in violation after interest posting
         //and should be checked after processing all transactions
-        System.err.println("--------------------checking that overdraft error thing --------------------"+isOverdraft());
+        //System.err.println("--------------------checking that overdraft error thing --------------------"+isOverdraft());
 
         if(isOverdraft()) {
-                System.err.println("----------------------balance check for 0 when in overdraft ---------");
+               // System.err.println("----------------------balance check for 0 when in overdraft ---------");
 	        	if (runningBalance.minus(minRequiredBalance).isLessThanZero()) { throw new InsufficientAccountBalanceException(
 	                    "transactionAmount", getAccountBalance(), withdrawalFee, transactionAmount); }
         }
@@ -1178,8 +1169,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
             // enforceMinRequiredBalance
-            System.err.println("----------------------bring back this mean balance violation rule thing -------------------");
-           if (transaction.canProcessBalanceCheck()) {
+            //System.err.println("----------------------bring back this mean balance violation rule thing -------------------");
+
+            if (transaction.canProcessBalanceCheck()) {
                if (runningBalance.minus(minRequiredBalance).isLessThanZero()) {
                    final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                    final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)

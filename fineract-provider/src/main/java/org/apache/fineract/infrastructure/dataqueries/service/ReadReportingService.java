@@ -72,4 +72,9 @@ public interface ReadReportingService {
 
 	ByteArrayOutputStream generatePentahoReportAsOutputStream(String reportName, String outputTypeParam,
             Map<String, String> queryParams, Locale locale, AppUser runReportAsUser, StringBuilder errorLog);
+
+    // added 15/05/2022
+
+    ReportData retrieveReport(final String reportName);
+
 }

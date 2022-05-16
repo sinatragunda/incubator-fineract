@@ -187,17 +187,24 @@ public class ClientPersonImportHandler implements ImportHandler {
         // added 25/09/2021 include capability to put client type
         //String clientType = ImportHandlerUtils.readAsString(ClientPersonConstants.CLIENT_TYPE_COL ,row);
 
-        //System.err.println("------------------------is anything null son ----------------");
+        // added 09/05/2022
+        String tag = ImportHandlerUtils.readAsString(ClientPersonConstants.TAG_COL ,row);
+
         boolean isAnyNull = ExceptionsHelper.isAnyNull(firstName ,lastName);
 
         if(isAnyNull){
             return null ;
         }
 
-        return ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
+        ClientData clientData = ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
                 officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService);
 
-        }
+        Optional.ofNullable(tag).ifPresent(e->{
+            clientData.setTag(tag);
+        });
+
+        return clientData ;
+    }
 
     public Count importEntity(String dateFormat) {
         Sheet clientSheet=workbook.getSheet(TemplatePopulateImportConstants.CLIENT_PERSON_SHEET_NAME);

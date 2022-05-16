@@ -495,7 +495,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (savingsAccountTransaction == null) { throw new SavingsAccountTransactionNotFoundException(savingsId, transactionId); }
 
 
-        System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
+        //System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
         //
 //        if (!allowAccountTransferModification && this.accountTransfersReadPlatformService.isAccountTransfer(transactionId,
 //                PortfolioAccountType.SAVINGS)) { throw new PlatformServiceUnavailableException(

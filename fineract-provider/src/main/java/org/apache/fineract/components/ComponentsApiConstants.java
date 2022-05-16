@@ -8,7 +8,7 @@ package org.apache.fineract.components;
 
 public class ComponentsApiConstants {
 
-    public static String validationApiUrl = "/validation";
+    public static final String VALIDATION_API_URL = "/validation";
     public static String ENTITY_NAME ="COMPONENTS";
 
 }

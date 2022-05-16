@@ -43,7 +43,7 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
 
         // 10 > 10
         if(limitCount >= limit){
-            System.err.println("------------limit already reach to stop auto sleep lets reset limitCount now---------");
+            //System.err.println("------------limit already reach to stop auto sleep lets reset limitCount now---------");
             limitCount = 0 ;
             return false ;
         }
@@ -59,7 +59,6 @@ public class AttachedMailSenderMetered implements IAttachedMailSender {
         // guard against all other threads continuing
         if(isWithinQuota){
 
-            System.err.println("-------------------limit count ---------------"+limitCount);
             //send reports here son
             SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath());
             updateLimit();

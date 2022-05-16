@@ -241,6 +241,10 @@ public final class Client extends AbstractPersistableCustom<Long> {
     private Long shareProductId ;
 
 
+    @Column(name="tag")
+    private String tag ;
+
+
     public static Client createNew(final AppUser currentUser, final Office clientOffice, final Group clientParentGroup, final Staff staff,
             final Long savingsProductId, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification,
             final Integer legalForm, final JsonCommand command ,final Long shareProductId) {
@@ -282,9 +286,12 @@ public final class Client extends AbstractPersistableCustom<Long> {
         }
         final Long savingsAccountId = null;
         final Long shareAccountId = null;
+
+        final String tag = command.stringValueOfParameterNamed(ClientApiConstants.tagParam);
+
         return new Client(currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename, lastname, fullname,
                 activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId, savingsAccountId, dataOfBirth,
-                gender, clientType, clientClassification, legalForm, isStaff ,shareProductId ,shareAccountId);
+                gender, clientType, clientClassification, legalForm, isStaff ,shareProductId ,shareAccountId ,tag);
     }
 
     protected Client() {
@@ -295,7 +302,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
             final String accountNo, final String firstname, final String middlename, final String lastname, final String fullname,
             final LocalDate activationDate, final LocalDate officeJoiningDate, final String externalId, final String mobileNo, final String emailAddress,
             final Staff staff, final LocalDate submittedOnDate, final Long savingsProductId, final Long savingsAccountId,
-            final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId) {
+            final LocalDate dateOfBirth, final CodeValue gender, final CodeValue clientType, final CodeValue clientClassification, final Integer legalForm, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId,final String tag) {
 
         if (StringUtils.isBlank(accountNo)) {
             this.accountNumber = new RandomPasswordGenerator(19).generate();
@@ -380,6 +387,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
         // added 03/07/2021
         this.shareAccountId = shareAccountId ;
         this.shareProductId = shareProductId;
+
+        this.tag = tag ;
 
         deriveDisplayName();
         validate();
@@ -498,6 +507,13 @@ public final class Client extends AbstractPersistableCustom<Long> {
     public Map<String, Object> update(final JsonCommand command) {
 
         final Map<String, Object> actualChanges = new LinkedHashMap<>(9);
+
+        if (command.isChangeInStringParameterNamed(ClientApiConstants.tagParam, this.tag)) {
+            final String newValue = command.stringValueOfParameterNamed(ClientApiConstants.tagParam);
+            actualChanges.put(ClientApiConstants.tagParam, newValue);
+            this.tag = StringUtils.defaultIfEmpty(newValue, null);
+        }
+
 
         if (command.isChangeInIntegerParameterNamed(ClientApiConstants.statusParamName, this.status)) {
             final Integer newValue = command.integerValueOfParameterNamed(ClientApiConstants.statusParamName);
@@ -1100,6 +1116,15 @@ public final class Client extends AbstractPersistableCustom<Long> {
     // Added 27/09/2021
     public String getAccountNumber(){
         return this.accountNumber;
+    }
+
+    // added 09/05/2022
+    public String getTag(){
+        return this.tag;
+    }
+
+    public void setTag(String tag){
+        this.tag = tag ;
     }
 
     @Override

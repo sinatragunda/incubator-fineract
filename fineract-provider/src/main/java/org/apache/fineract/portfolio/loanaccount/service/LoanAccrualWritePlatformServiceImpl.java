@@ -256,8 +256,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
     @Transactional
     public void addAccrualAccounting(LoanScheduleAccrualData scheduleAccrualData) throws Exception {
 
-        System.err.println("--------------------add acrrual accounting with LoanScheduleAccrualData---------------");
-
+        //System.err.println("--------------------add acrrual accounting with LoanScheduleAccrualData---------------");
         BigDecimal amount = BigDecimal.ZERO;
         BigDecimal interestportion = null;
         BigDecimal totalAccInterest = null;
@@ -301,7 +300,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
             }
         }
 
-        System.err.println("------------------acrrue for interest portion --------------------"+interestportion.doubleValue());
+        //System.err.println("------------------acrrue for interest portion --------------------"+interestportion.doubleValue());
 
         if (amount.compareTo(BigDecimal.ZERO) == 1) {
             addAccrualAccounting(scheduleAccrualData, amount, interestportion, totalAccInterest, feeportion, totalAccFee, penaltyportion,
@@ -313,7 +312,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
             BigDecimal totalAccInterest, BigDecimal feeportion, BigDecimal totalAccFee, BigDecimal penaltyportion,
             BigDecimal totalAccPenalty, final LocalDate accruedTill) throws DataAccessException {
         
-        System.err.println("--------------------------addaccrualaccounting with sql statements --------------");
+        //System.err.println("--------------------------addaccrualaccounting with sql statements --------------");
 
         String transactionSql = "INSERT INTO m_loan_transaction  (loan_id,office_id,is_reversed,transaction_type_enum,transaction_date,amount,interest_portion_derived,"
                 + "fee_charges_portion_derived,penalty_charges_portion_derived, submitted_on_date) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?)";
@@ -327,6 +326,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
         final Long transactonId = this.jdbcTemplate.queryForLong("SELECT LAST_INSERT_ID()");
 
         Optional.ofNullable(scheduleAccrualData.getApplicableCharges()).ifPresent(e->{
+
             Map<LoanChargeData, BigDecimal> applicableCharges = e;
             String chargespaidSql = "INSERT INTO m_loan_charge_paid_by (loan_transaction_id, loan_charge_id, amount,installment_number) VALUES (?,?,?,?)";
             for (Map.Entry<LoanChargeData, BigDecimal> entry : applicableCharges.entrySet()) {
@@ -345,7 +345,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
         this.jdbcTemplate.update(repaymetUpdatesql, totalAccInterest, totalAccFee, totalAccPenalty,
                 scheduleAccrualData.getRepaymentScheduleId());
 
-        String updateLoan = "UPDATE m_loan  SET accrued_till=?  WHERE  id=?";
+        String updateLoan = "UPDATE m_loan SET accrued_till=?  WHERE  id=?";
 
         this.jdbcTemplate.update(updateLoan, accruedTill.toDate(), scheduleAccrualData.getLoanId());
         final Map<String, Object> accountingBridgeData = deriveAccountingBridgeData(scheduleAccrualData, transactionMap);
@@ -356,7 +356,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
             final Map<String, Object> transactionMap) {
 
 
-        System.err.println("-------------------loan accounting data bridge class -------------------");
+        //System.err.println("-------------------loan accounting data bridge class -------------------");
 
         final Map<String, Object> accountingBridgeData = new LinkedHashMap<>();
         accountingBridgeData.put("loanId", loanScheduleAccrualData.getLoanId());

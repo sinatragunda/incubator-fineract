@@ -16,10 +16,9 @@
 -- specific language governing permissions and limitations
 -- under the License.
 
--- Created 22/02/2022 2014 
--- fixed with 7033 to avoid some problem not realized before this
+-- Created 09/05/2022 at 0221 
 
---ALTER TABLE `stretchy_report` ADD COLUMN `self_service_user_report` smallint(5) default 0 ;
+ALTER TABLE `m_client` ADD COLUMN `tag` VARCHAR(200) default null ;
 
 
 

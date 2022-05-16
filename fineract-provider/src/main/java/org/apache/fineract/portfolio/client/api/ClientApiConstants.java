@@ -198,6 +198,10 @@ public class ClientApiConstants {
     public static final String createSelfServiceUserParam ="createSelfServiceUser";
 
 
+    // added 09/05/2022
+    public static final String tagParam ="tag";
+
+
     /**
      * These parameters will match the class level parameters of
      * {@link ClientData}. Where possible, we try to get response parameters to
@@ -210,7 +214,7 @@ public class ClientApiConstants {
             transferToOfficeIdParamName, transferToOfficeNameParamName, hierarchyParamName, imageIdParamName, imagePresentParamName,
             staffIdParamName, staffNameParamName, timelineParamName, groupsParamName, officeOptionsParamName, staffOptionsParamName,
             dateOfBirthParamName, genderParamName, clientTypeParamName, clientClassificationParamName, legalFormParamName, 
-            clientNonPersonDetailsParamName, isStaffParamName));
+            clientNonPersonDetailsParamName, isStaffParamName ,tagParam));
 
     protected static final Set<String> CLIENT_CHARGES_RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList
             (chargeIdParamName,

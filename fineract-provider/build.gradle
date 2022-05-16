@@ -400,7 +400,7 @@ configurations {
 }
 dependencies {
     driver 'mysql:mysql-connector-java:5.1.16'
-    compile(files('D:\\Downloads\\pentaho-reporting-engine-classic-core-3.9.1-GA.jar'))
+    compile(files('D:\\Downloads\\pentaho-reporting-engine-classic-core-3.9.1-GA.jar','D:\\Documents\\Coding\\Java\\WeseComponents\\Component\\out\\artifacts\\Component_jar\\Component.jar'))
 }
 
 test {

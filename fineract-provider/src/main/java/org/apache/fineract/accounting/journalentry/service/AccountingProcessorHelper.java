@@ -362,8 +362,7 @@ public class AccountingProcessorHelper {
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
 
-        System.err.println("----------------credit account id "+accountTypeToCreditId+"--------------------debit --------"+accountTypeToDebitId);
-
+        //System.err.println("----------------credit account id "+accountTypeToCreditId+"--------------------debit --------"+accountTypeToDebitId);
 
         if (isReversal) {
             accountTypeToDebitId = accountTypeToBeCredited;
@@ -373,7 +372,7 @@ public class AccountingProcessorHelper {
         createJournalEntriesForLoan(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, loanProductId, paymentTypeId,
                 loanId, transactionId, transactionDate, amount);
 
-        System.err.println("-------------------we out of accounting processor for this function--------------");
+        //System.err.println("-------------------we out of accounting processor for this function--------------");
     }
 
     /**
@@ -469,7 +468,7 @@ public class AccountingProcessorHelper {
         }
 
         // could we check these if there are null for simplicity ? 
-        System.err.println("---------------------create entries ---------"+accountTypeToDebitId+"----------------credit ------"+accountTypeToCreditId);
+        //System.err.println("---------------------create entries ---------"+accountTypeToDebitId+"----------------credit ------"+accountTypeToCreditId);
 
         createJournalEntriesForSavings(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, savingsProductId, paymentTypeId,
                 loanId, transactionId, transactionDate, amount);
@@ -553,7 +552,7 @@ public class AccountingProcessorHelper {
             final int accountTypeToCreditId, final Long loanProductId, final Long paymentTypeId, final Long loanId,
             final String transactionId, final Date transactionDate, final BigDecimal amount) {
 
-        System.err.println("-----------------------create journal entries for loan class --------------");
+        //System.err.println("-----------------------create journal entries for loan class --------------");
 
         GLAccount debitAccount = null ;
         GLAccount creditAccount = null ;
@@ -563,16 +562,16 @@ public class AccountingProcessorHelper {
             creditAccount = getLinkedGLAccountForLoanProduct(loanProductId, accountTypeToCreditId, paymentTypeId);
         }
         catch(Exception n){
-            System.err.println("----------------null pointer throwed ,move to next loan---------------"+n.getMessage());
+            //System.err.println("----------------null pointer throwed ,move to next loan---------------"+n.getMessage());
             return ;
         }
 
-        System.err.println("------------------------linked accounts now gotten ----------------"+debitAccount.getName()+"--------------------and credit account -----------"+creditAccount.getName());
+        //System.err.println("------------------------linked accounts now gotten ----------------"+debitAccount.getName()+"--------------------and credit account -----------"+creditAccount.getName());
         
         createDebitJournalEntryForLoan(office, currencyCode, debitAccount, loanId, transactionId, transactionDate, amount);
         createCreditJournalEntryForLoan(office, currencyCode, creditAccount, loanId, transactionId, transactionDate, amount);
         
-        System.err.println("------------------process another loan accrual --------------------");
+        //System.err.println("------------------process another loan accrual --------------------");
     }
 
     private void createJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToDebitId,
@@ -924,7 +923,7 @@ public class AccountingProcessorHelper {
     private void createDebitJournalEntryForLoan(final Office office, final String currencyCode, final GLAccount account, final Long loanId,
             final String transactionId, final Date transactionDate, final BigDecimal amount) {
         
-        System.err.println("------------------createdebit------------------"+transactionId);
+        //System.err.println("------------------createdebit------------------"+transactionId);
 
         final boolean manualEntry = false;
         LoanTransaction loanTransaction = null;
@@ -936,12 +935,11 @@ public class AccountingProcessorHelper {
         if (StringUtils.isNumeric(transactionId)) {
             long id = Long.parseLong(transactionId);
             loanTransaction = this.loanTransactionRepository.findOne(id);
-
-            System.err.println("---------------------loantransaction object with identifier-----------");
+            //System.err.println("---------------------loantransaction object with identifier-----------");
             modifiedTransactionId = LOAN_TRANSACTION_IDENTIFIER + transactionId;
         }
 
-        System.err.println("-----------------------create journalentry object -----------------");
+        //System.err.println("-----------------------create journalentry object -----------------");
 
         final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,
                 manualEntry, transactionDate, JournalEntryType.DEBIT, amount, null, PortfolioProductType.LOAN.getValue(), loanId, null,

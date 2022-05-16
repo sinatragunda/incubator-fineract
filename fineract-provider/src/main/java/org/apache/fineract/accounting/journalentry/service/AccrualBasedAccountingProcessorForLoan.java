@@ -386,14 +386,14 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
         final boolean isReversed = loanTransactionDTO.isReversed();
         final Long paymentTypeId = loanTransactionDTO.getPaymentTypeId();
 
-
         final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId);
 
         boolean isNpa = loan.isNpa();
 
-        // l usually hate using if else statements but no option here
+        // i usually hate using if else statements but no option here
+        // modified 16/05/2022 we have discovered that npa loans never get here as they have accrue till date this disables them from accruing past till maturity date
         if(isNpa){
-            System.err.println("---------------------create journal for non perfoming loan son ----------------------"+loanId);
+            //System.err.println("---------------------create journal for non perfoming loan son ----------------------"+loanId);
             createJournalEntriesForNonPerfomingLoans(loanTransactionDTO ,office ,loanProductId ,loanId ,currencyCode ,transactionId ,transactionDate ,interestAmount ,feesAmount ,penaltiesAmount ,isReversed ,paymentTypeId);
             return ;
         }
@@ -432,7 +432,7 @@ public class AccrualBasedAccountingProcessorForLoan implements AccountingProcess
 
         /// create journal entries for recognizing interest (or reversal)
         if (interestAmount != null && !(interestAmount.compareTo(BigDecimal.ZERO) == 0)) {
-            System.err.println("-----------------------create non perfoming loan journal entryy ------------");
+            //System.err.println("-----------------------create non perfoming loan journal entryy ------------");
             this.helper.createAccrualBasedJournalEntriesAndReversalsForLoan(office, currencyCode,
                     ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_IN_SUSPENSE.getValue(), ACCRUAL_ACCOUNTS_FOR_LOAN.INTEREST_RECEIVABLE.getValue(),
                     loanProductId, paymentTypeId, loanId, transactionId, transactionDate, interestAmount, isReversed);

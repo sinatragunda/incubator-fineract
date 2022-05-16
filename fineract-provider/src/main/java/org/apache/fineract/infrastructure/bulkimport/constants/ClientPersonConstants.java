@@ -59,6 +59,9 @@ public class ClientPersonConstants {
     public static final int CREATE_SELF_SERVICE_USER_ID_COL = 31; // AF
     //public static final int CREATE_SELF_SERVICE_USER_ID_COL = 31
 
+    /// added 09/05/2021
+    public static final int TAG_COL = 32;// AG
+
     public static final int RELATIONAL_OFFICE_NAME_COL = 35;//AJ
     public static final int RELATIONAL_OFFICE_OPENING_DATE_COL = 36;//AK
     public static final int LOOKUP_GENDER_COL = 37;//AL
@@ -68,6 +71,4 @@ public class ClientPersonConstants {
     public static final int LOOKUP_STATE_PROVINCE_COL = 41;//AP
     public static final int LOOKUP_COUNTRY_COL = 42;//AQ
 
-
-    /// added 24/08/2021
 }

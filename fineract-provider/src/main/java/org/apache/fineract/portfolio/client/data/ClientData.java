@@ -127,6 +127,10 @@ final public class ClientData implements Comparable<ClientData> {
     // added 25/09/2021 
     private Boolean createSelfServiceUser ;
 
+
+    // added 09/05/2022
+    private String tag ;
+
     public static ClientData importClientEntityInstance(Long legalFormId,Integer rowIndex,String fullname,Long officeId, Long clientTypeId,
             Long clientClassificationId,Long staffId,Boolean active,LocalDate activationDate,LocalDate submittedOnDate,
             String externalId,LocalDate dateOfBirth,String mobileNo,ClientNonPersonData clientNonPersonDetails,
@@ -657,5 +661,16 @@ final public class ClientData implements Comparable<ClientData> {
 
     public CodeValueData getClientType() {
         return clientType;
+    }
+
+
+    // added 09/05/2022
+    public void setTag(String tag){
+        this.tag = tag ;
+    }
+
+
+    public String getTag(){
+        return this.tag ;
     }
 }
