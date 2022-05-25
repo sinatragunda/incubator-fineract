@@ -15,12 +15,15 @@
 -- KIND, either express or implied. See the License for the
 -- specific language governing permissions and limitations
 -- under the License.
--- Added 25/05/2022
 
-INSERT INTO `stretchy_report` (`report_name`, `report_type`, `report_subtype`, `report_category`, `report_sql`, `description`, `core_report`, `use_report`) VALUES ('Client Summary Ex', 'Pentaho', NULL, 'Client', NULL, NULL, 1, 1);
+-- Created 25/05/2022 12:56 pm
 
-INSERT INTO `stretchy_report_parameter` (`report_id`, `parameter_id`, `report_parameter_name`) VALUES
- ((select sr.id from stretchy_report sr where sr.report_name='Client Summary Ex'), 
- (select sp.id from stretchy_parameter sp where sp.parameter_name='selectClientId'), 
-  'clientId');
-  
+CREATE TABLE `m_hire_purchase` (
+	`name` VARCHAR(500) NOT NULL COLLATE 'latin1_swedish_ci',
+	`loan_id` BIGINT(20) NOT NULL COLLATE 'latin1_swedish_ci',
+	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+COMMENT="Table to collect item names for hire purchased products or loans ";

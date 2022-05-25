@@ -269,7 +269,7 @@ public class LoanAssembler {
             loanApplication = Loan.newGroupLoanApplication(accountNo, group, loanType.getId().intValue(), loanProduct, fund, loanOfficer,
                     loanPurpose, loanTransactionProcessingStrategy, loanProductRelatedDetail, loanCharges, collateral,
                     syncDisbursementWithMeeting, fixedEmiAmount, disbursementDetails, maxOutstandingLoanBalance,
-                    createStandingInstructionAtDisbursement,isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
+                    createStandingInstructionAtDisbursement,isFloatingInterestRate, interestRateDifferential ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId,null);
 
         } else if (client != null) {
 

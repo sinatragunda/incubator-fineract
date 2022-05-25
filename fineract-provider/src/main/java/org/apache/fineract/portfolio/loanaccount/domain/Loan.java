@@ -95,6 +95,7 @@ import org.apache.fineract.portfolio.floatingrates.data.FloatingRateDTO;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRatePeriodData;
 import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.hirepurchase.domain.HirePurchase;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.command.LoanChargeCommand;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
@@ -389,7 +390,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Column(name = "is_topup", nullable = false)
     private boolean isTopup = false;
 
-
     @Column(name = "revolving_account_id", nullable = true)
     private String revolvingAccountId = null;
 
@@ -399,9 +399,12 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Column(name = "auto_settlement_at_disbursement", nullable = true)
     private Boolean autoSettlementAtDisbursement;
 
-
     @Column(name = "loan_factor_account_id", nullable = true)
     private Long loanFactorAccountId;
+
+    @Transient
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "loan", orphanRemoval = true, fetch=FetchType.LAZY)
+    private HirePurchase hirePurchase;
 
 
     public static Loan newIndividualLoanApplication(final String accountNo, final Client client, final Integer loanType,
@@ -427,7 +430,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
             final Set<LoanCollateral> collateral, final Boolean syncDisbursementWithMeeting, final BigDecimal fixedEmiAmount,
             final List<LoanDisbursementDetails> disbursementDetails, final BigDecimal maxOutstandingLoanBalance,
             final Boolean createStandingInstructionAtDisbursement, final Boolean isFloatingInterestRate,
-            final BigDecimal interestRateDifferential ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId) {
+            final BigDecimal interestRateDifferential ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId,final Boolean isHirePurchase) {
         final LoanStatus status = null;
         final Client client = null;
         return new Loan(accountNo, client, group, loanType, fund, officer, loanPurpose, transactionProcessingStrategy, loanProduct,
@@ -6588,6 +6591,17 @@ public class Loan extends AbstractPersistableCustom<Long> {
         return this.loanFactorAccountId;
     }
 
+
+    // added 22/05/2022
+    public HirePurchase getHirePurchase(){
+        return hirePurchase;
+    }
+
+    public void setHirePurchase(HirePurchase hirePurchase){
+        this.hirePurchase = hirePurchase;
+        this.hirePurchase.setLoan(this);
+
+    }
 
 
 }

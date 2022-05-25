@@ -23,13 +23,7 @@ import static org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.common.AccountingRuleType;
@@ -76,6 +70,7 @@ import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.group.data.GroupRoleData;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
+import org.apache.fineract.portfolio.hirepurchase.data.HirePurchaseData;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.DisbursementData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
@@ -252,6 +247,20 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId});
 
     }
+
+    // added 25/05/2022
+    @Override
+    public List<LoanAccountData> retrieveAllHirePurchaseLoans()
+    {
+        //final AppUser currentUser = this.context.authenticatedUser();
+        this.context.authenticatedUser();
+        final LoanMapper rm = new LoanMapper();
+        String sql="select "+rm.loanSchema()+" where hp.id != null";
+        return this.jdbcTemplate.query(sql, rm);
+
+    }
+
+
 
     @Override
     public LoanScheduleData retrieveRepaymentSchedule(final Long loanId,
@@ -671,7 +680,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     + " l.is_topup as isTopup, "
                     + " topup.closure_loan_id as closureLoanId, "
                     + " topuploan.account_no as closureLoanAccountNo, "
-                    + " topup.topup_amount as topupAmount "
+                    + " topup.topup_amount as topupAmount, "
+                    + " hp.name as hirePurchaseItem "
                     + " from m_loan l" //
                     + " join m_product_loan lp on lp.id = l.product_id" //
                     + " left join m_loan_recalculation_details lir on lir.loan_id = l.id "
@@ -692,7 +702,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     + " left join ref_loan_transaction_processing_strategy lps on lps.id = l.loan_transaction_strategy_id"
                     + " left join m_product_loan_variable_installment_config lpvi on lpvi.loan_product_id = l.product_id"
                     + " left join m_loan_topup as topup on l.id = topup.loan_id"
-                    + " left join m_loan as topuploan on topuploan.id = topup.closure_loan_id";
+                    + " left join m_loan as topuploan on topuploan.id = topup.closure_loan_id"
+                    + " left join m_hire_purchase as hp on hp.loan_id = l.id ";
 
         }
 
@@ -1006,7 +1017,16 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             //added 21/08/2021
             final Long loanFactorAccountId = JdbcSupport.getLongDefaultToNullIfZero(rs ,LoanApiConstants.loanFactorAccountIdParam);
 
-            return LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
+            // added 25/05/2022
+            final String hirePurchaseItem = rs.getString("hirePurchaseItem");
+
+            HirePurchaseData hirePurchaseData[] = {null};
+
+            Optional.ofNullable(hirePurchaseItem).ifPresent(e->{
+                hirePurchaseData[0] = new HirePurchaseData(hirePurchaseItem ,null);
+            });
+
+            LoanAccountData loanAccountData = LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
                     isLoanProductLinkedToFloatingRate, fundId, fundName, loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName,
                     currencyData, proposedPrincipal, principal, approvedPrincipal, totalOverpaid, inArrearsTolerance, termFrequency,
@@ -1019,7 +1039,12 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     loanProductCounter, multiDisburseLoan, canDefineInstallmentAmount, fixedEmiAmount, outstandingLoanBalance, inArrears,
                     graceOnArrearsAgeing, isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
                     interestRecalculationData, createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap,
-                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId);
+                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData[0]);
+
+
+            return loanAccountData ;
+
+
         }
     }
 

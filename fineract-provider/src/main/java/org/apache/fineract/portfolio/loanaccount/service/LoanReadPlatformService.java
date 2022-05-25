@@ -138,4 +138,7 @@ public interface LoanReadPlatformService {
     List<LoanAccountData> retrieveAllForClient(Long clientId);
 
     List<LoanAccountData> retrieveAllForLoanProduct(Long loanProductId);
+
+    // added 25/05/2022
+    List<LoanAccountData> retrieveAllHirePurchaseLoans();
 }

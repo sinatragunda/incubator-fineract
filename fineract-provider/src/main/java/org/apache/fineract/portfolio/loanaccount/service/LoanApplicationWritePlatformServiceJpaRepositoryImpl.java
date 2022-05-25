@@ -79,6 +79,8 @@ import org.apache.fineract.portfolio.fund.domain.Fund;
 import org.apache.fineract.portfolio.group.domain.Group;
 import org.apache.fineract.portfolio.group.domain.GroupRepositoryWrapper;
 import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
+import org.apache.fineract.portfolio.hirepurchase.helper.HirePurchaseCreateLoan;
+import org.apache.fineract.portfolio.hirepurchase.repo.HirePurchaseRepository;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
@@ -180,6 +182,9 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ;
     private final CommissionsHelperService commissionsHelperService ;
 
+    // added 25/05/2022
+    private final HirePurchaseRepository hirePurchaseRepository;
+
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
                                                                 final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
@@ -203,7 +208,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                                                                 final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
                                                                 final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
                                                                 final AccountDetailsReadPlatformService accountDetailsReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-                                                                final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService , final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService , final CommissionsHelperService commissionsHelperService) {
+                                                                final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService , final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService , final CommissionsHelperService commissionsHelperService ,final HirePurchaseRepository hirePurchaseRepository) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -244,6 +249,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.attachedCommissionChargesWritePlatformService = attachedCommissionChargesWritePlatformService;
         this.commissionsHelperService = commissionsHelperService;
 
+        this.hirePurchaseRepository = hirePurchaseRepository ;
+
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -256,8 +263,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     public CommandProcessingResult submitApplication(final JsonCommand command) {
 
         try {
-
-            System.err.println("----------submit new application and test our little friend -------------");
 
             final AppUser currentUser = getAppUserIfPresent();
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
@@ -406,10 +411,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // should also have checker to check if loan is being submitted through a loan agent
             CommissionsHelper.linkLoanToCommissions(newLoanApplication ,loansFromAgentsWritePlatformService ,attachedCommissionChargesWritePlatformService , fromJsonHelper ,command);
 
-
             // at this stage chargetime is loan application
-            //CommissionsHelper.depositCommissionCharges(commissionsHelperService ,newLoanApplication ,ChargeTimeType.LOAN_APPLICATION);
+            // CommissionsHelper.depositCommissionCharges(commissionsHelperService ,newLoanApplication ,ChargeTimeType.LOAN_APPLICATION);
 
+
+            // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists
+            HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
 
             if (loanProduct.isInterestRecalculationEnabled()) {
                 this.fromApiJsonDeserializer.validateLoanForInterestRecalculation(newLoanApplication);
