@@ -85,20 +85,38 @@ public class JsonHelper {
     }
 
 
-   public static JSONObject put(String key ,Object data){
+    public static JSONObject put(String key ,Object value){
+        return put(null ,key ,value);
+    }
 
-       JSONObject json = new JSONObject() ;
-       try{
 
-           json.put(key ,data);
+    public static JSONObject put(String payload ,String key ,Object data){
+
+       boolean isPayloadPresent = Optional.ofNullable(payload).isPresent();
        
+       JSONObject json = new JSONObject() ;
+
+       if(isPayloadPresent){
+            json = new JSONObject(payload);
+       }
+       
+       try{
+           json.put(key ,data);
        }
 
        catch (JSONException j){
            System.err.println(Constants.separator+" json exception here ");
            j.printStackTrace();
        }
+
        return json ;
+   }
+
+   // added 25/05/2022
+   public static String update(String payload ,String key ,Object value){
+
+        JSONObject json = put(payload ,key ,value);
+        return json.toString();
    }
 
 

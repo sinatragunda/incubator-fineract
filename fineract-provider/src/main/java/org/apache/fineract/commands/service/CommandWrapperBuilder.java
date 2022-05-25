@@ -3199,6 +3199,17 @@ public class CommandWrapperBuilder {
         this.entityId = resourceId;
         this.href = "/validation/"+resourceId;
         return this;
+
     }
+
+    // added 24/05/2022
+    public CommandWrapperBuilder nkwaziWithdrawal(final Long resourceId) {
+        this.actionName = "UPDATE";
+        this.entityName = "SAVINGSACCOUNT";
+        this.entityId = resourceId;
+        this.href = "/savingsaccounts/nkwazi/"+resourceId;
+        return this;
+    }
+
 
 }

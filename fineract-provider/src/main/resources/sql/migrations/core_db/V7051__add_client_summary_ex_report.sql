@@ -15,7 +15,7 @@
 -- KIND, either express or implied. See the License for the
 -- specific language governing permissions and limitations
 -- under the License.
---
+-- Added 25/05/2022
 
 INSERT INTO `stretchy_report` (`report_name`, `report_type`, `report_subtype`, `report_category`, `report_sql`, `description`, `core_report`, `use_report`) VALUES ('Client Summary Ex', 'Pentaho', NULL, 'Client', NULL, NULL, 0, 1);
 
