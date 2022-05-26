@@ -78,6 +78,7 @@ public class LoanScheduleApiResource {
 
         CommandWrapper commandRequest = null;
         if (is(commandParam, "calculateLoanSchedule")) {
+            System.err.println("------------------calculate loan schedule ---------------");
             this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
             final LoanScheduleData loanSchedule = this.calculationPlatformService.generateLoanScheduleForVariableInstallmentRequest(loanId,
                     apiRequestBodyAsJson);

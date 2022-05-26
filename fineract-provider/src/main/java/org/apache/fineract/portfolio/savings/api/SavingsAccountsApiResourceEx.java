@@ -67,6 +67,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import io.swagger.annotations.*;
+import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.infrastructure.documentmanagement.command.DocumentCommand;
+import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
+import org.apache.fineract.infrastructure.documentmanagement.data.FileData;
+import org.apache.fineract.infrastructure.documentmanagement.service.DocumentReadPlatformService;
+import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
+import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 
 // Added 16/12/2021
@@ -81,7 +95,7 @@ import com.sun.jersey.multipart.FormDataParam;
 
 
 
-@Path("/savingsaccounts")
+@Path("/savingsaccounts/ex")
 @Component
 @Scope("singleton")
 public class SavingsAccountsApiResourceEx {
@@ -132,32 +146,33 @@ public class SavingsAccountsApiResourceEx {
         this.savingsAccountAssembler = savingsAccountAssembler ;
     }
 
-    @POST
-    @Path("nkwazi/{accountId}/{command}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String handleCommand(@FormDataParam("file") InputStream uploadedInputStream,@PathParam("accountId") Long accountId ,@PathParam("command")String command ,String apiBody ,@HeaderParam("Content-Length") @ApiParam(value = "Content-Length") final Long fileSize, @FormDataParam("file") @ApiParam(value = "file") final InputStream inputStream,
-            @FormDataParam("file") final @ApiParam(value = "file") FormDataContentDisposition fileDetails, @FormDataParam("file") @ApiParam(value = "file") final FormDataBodyPart bodyPart){
+    // @POST
+    // @Path("nkwazi/{accountId}/{command}")
+    // @Consumes({ MediaType.MULTIPART_FORM_DATA })
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public String handleCommand(@FormDataParam("file") @ApiParam(value = "file") InputStream uploadedInputStream,@PathParam("accountId") Long accountId ,@PathParam("command")String command ,String apiBody ,@HeaderParam("Content-Length") @ApiParam(value = "Content-Length") final Long fileSize,
+    //         @FormDataParam("file") @ApiParam(value = "file") final FormDataContentDisposition fileDetails, @FormDataParam("file") @ApiParam(value = "file") final FormDataBodyPart bodyPart){
 
-        String response[] = {null};
+    //     String response[] = {null};
 
-        if(command.equals("withdraw")){
+    //     if(command.equals("withdraw")){
 
-            String entityType = "savings";
-            String description = "Savings Withdrawal Document";
-            String name = String.format("%s",fileDetails.getFileName());
+    //         String entityType = "savings";
+    //         String description = "Savings Withdrawal Document";
+    //         String name = String.format("%s",fileDetails.getFileName());
 
-            final DocumentCommand documentCommand = new DocumentCommand(null, null, entityType, accountId, name, fileDetails.getFileName(),
-                fileSize, bodyPart.getMediaType().toString(), description, null);
+    //         final DocumentCommand documentCommand = new DocumentCommand(null, null, entityType, accountId, name, fileDetails.getFileName(),
+    //             fileSize, bodyPart.getMediaType().toString(), description, null);
 
-            final Long documentId = this.documentWritePlatformService.createDocument(documentCommand, uploadedInputStream);
+    //         final Long documentId = this.documentWritePlatformService.createDocument(documentCommand, uploadedInputStream);
 
-            Optional.ofNullable(documentId).ifPresent(e->{
-                final Long transactionId = NkwaziSavingsAccountHelper.withdraw(savingsAccountWritePlatformService ,savingsAccountAssembler, fromJsonHelper , accountId ,apiBody);
-                response[0] = this.toApiJsonSerializer.serialize(transactionId);
-                //return response[0];
-            });
-        }
-        return response[0] ;
-    }
+    //         Optional.ofNullable(documentId).ifPresent(e->{
+    //             final Long transactionId = NkwaziSavingsAccountHelper.withdraw(savingsAccountWritePlatformService ,savingsAccountAssembler, fromJsonHelper , accountId ,apiBody);
+    //             response[0] = this.toApiJsonSerializer.serialize(transactionId);
+    //             //return response[0];
+    //         });
+    //     }
+    //     return response[0] ;
+    // }
 
 }

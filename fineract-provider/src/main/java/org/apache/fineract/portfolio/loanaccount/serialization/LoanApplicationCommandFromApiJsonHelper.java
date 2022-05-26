@@ -39,6 +39,7 @@ import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.commissions.data.LoanAgentDataBridge;
 import org.apache.fineract.portfolio.commissions.helper.AttachedCommissionChargesHelper;
+import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanCharge;
@@ -95,7 +96,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.linkAccountIdParameterName, LoanApiConstants.disbursementDataParameterName,
             LoanApiConstants.emiAmountParameterName, LoanApiConstants.maxOutstandingBalanceParameterName,
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,LoanApiConstants.agentDataParam));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -555,10 +556,10 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         
         if (!dataValidationErrors.isEmpty()) { 
 
-            //System.err.println("------------throwing error at this stage-----------");
+            System.err.println("------------throwing error at this stage-----------");
 
             for(ApiParameterError a : dataValidationErrors){
-                //System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
+                System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
             }
 
             throw new PlatformApiDataValidationException(dataValidationErrors); 

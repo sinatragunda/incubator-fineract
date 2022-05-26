@@ -693,6 +693,9 @@ public class LoansApiResource {
             final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
             final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
 
+
+            System.err.println("-----------------calculate loan schedule first ---------------");
+
             /// phase A change 
             /// changing this line so that we can add value of false so that loan calculator doesnt validate params and fail    
             /// final LoanScheduleModel loanSchedule = this.calculationPlatformService.calculateLoanSchedule(query, true);

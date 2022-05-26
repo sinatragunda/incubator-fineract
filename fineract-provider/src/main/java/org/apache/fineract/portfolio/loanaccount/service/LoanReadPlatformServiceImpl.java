@@ -255,7 +255,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         //final AppUser currentUser = this.context.authenticatedUser();
         this.context.authenticatedUser();
         final LoanMapper rm = new LoanMapper();
-        String sql="select "+rm.loanSchema()+" where hp.id != null";
+        String sql="select "+rm.loanSchema()+" where hp.id is not null";
         return this.jdbcTemplate.query(sql, rm);
 
     }
