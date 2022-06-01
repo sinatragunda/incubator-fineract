@@ -110,7 +110,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
 
     public void validateForCreate(final String json, final boolean isMeetingMandatoryForJLGLoans, final LoanProduct loanProduct) {
 
-
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -392,7 +391,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             baseDataValidator.reset().parameter(linkAccountIdParameterName).value(linkAccountId).ignoreIfNull().longGreaterThanZero();
         }
 
-
         ///Added 26/05/2021
 
         if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.revolvingAccountIdParam, element)) {
@@ -561,7 +559,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             for(ApiParameterError a : dataValidationErrors){
                 System.err.println("------param error -----------"+a.getParameterName()+"----dev message --------"+a.getDeveloperMessage());
             }
-
             throw new PlatformApiDataValidationException(dataValidationErrors); 
         }
     }

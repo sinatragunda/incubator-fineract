@@ -152,5 +152,9 @@ public interface LoanProductConstants {
     public static final String isCrossLinkParam = "crossLink";
 
 
+    /// added 30/05/2022
+    public static final String loanProductSettingsParam = "loanProductSettings";
+
+
 
 }

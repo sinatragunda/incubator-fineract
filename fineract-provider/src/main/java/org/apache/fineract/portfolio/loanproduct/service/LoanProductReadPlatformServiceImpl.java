@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.apache.fineract.accounting.common.AccountingEnumerations;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -37,10 +38,7 @@ import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.common.service.CommonEnumerations;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductBorrowerCycleVariationData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductGuaranteeData;
-import org.apache.fineract.portfolio.loanproduct.data.LoanProductInterestRecalculationData;
+import org.apache.fineract.portfolio.loanproduct.data.*;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableAttributes;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductParamType;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
@@ -241,7 +239,8 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     // added 21/08/2021
                     + "lp.loan_factor_source_account_type as loanFactorSourceAccountType, "
                     + "lp.cross_link as crossLink, "
-                    ///
+                    // added 30/05/2022
+                    + "lps.settlement_account_id as settlementAccountId ,"
                     + "lp.can_use_for_topup as canUseForTopup, lp.is_equal_amortization as isEqualAmortization "
                     + " from m_product_loan lp "
                     + " left join m_fund f on f.id = lp.fund_id "
@@ -252,7 +251,8 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     + " left join m_product_loan_floating_rates as lfr on lfr.loan_product_id = lp.id "
                     + " left join m_floating_rates as fr on lfr.floating_rates_id = fr.id "
                     + " left join m_product_loan_variable_installment_config as lvi on lvi.loan_product_id = lp.id "
-                    + " join m_currency curr on curr.code = lp.currency_code";
+                    + " join m_currency curr on curr.code = lp.currency_code "
+                    + " left join m_loan_product_settings lps on lps.loan_product_id = lp.id ";
 
         }
 
@@ -395,8 +395,8 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             final boolean isInterestRecalculationEnabled = rs.getBoolean("isInterestRecalculationEnabled");
 
             LoanProductInterestRecalculationData interestRecalculationData = null;
+            
             if (isInterestRecalculationEnabled) {
-
                 final Long lprId = JdbcSupport.getLong(rs, "lprId");
                 final Long productId = JdbcSupport.getLong(rs, "productId");
                 final int compoundTypeEnumValue = JdbcSupport.getInteger(rs, "compoundType");
@@ -484,6 +484,14 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
             
             final boolean canUseForTopup = rs.getBoolean("canUseForTopup");
 
+            // added 30/05/2022
+            final Long settlementAccountId = rs.getLong("settlementAccountId");
+            LoanProductSettingsData loanProductSettingsData[] = {null};
+
+            Optional.ofNullable(settlementAccountId).ifPresent(e->{
+                loanProductSettingsData[0] = new LoanProductSettingsData(e);
+            });
+
             return new LoanProductData(id, name, shortName, description, currency, principal, minPrincipal, maxPrincipal, tolerance,
                     numberOfRepayments, minNumberOfRepayments, maxNumberOfRepayments, repaymentEvery, interestRatePerPeriod,
                     minInterestRatePerPeriod, maxInterestRatePerPeriod, annualInterestRate, repaymentFrequencyType,
@@ -499,7 +507,7 @@ public class LoanProductReadPlatformServiceImpl implements LoanProductReadPlatfo
                     installmentAmountInMultiplesOf, allowAttributeOverrides, isLinkedToFloatingInterestRates, floatingRateId,
                     floatingRateName, interestRateDifferential, minDifferentialLendingRate, defaultDifferentialLendingRate,
                     maxDifferentialLendingRate, isFloatingInterestRateCalculationAllowed, isVariableIntallmentsAllowed, minimumGap,
-                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink);
+                    maximumGap, syncExpectedWithDisbursementDate, canUseForTopup, isEqualAmortization ,isSettlementPartialPayment ,isSaccoProduct ,loanFactor ,shareAccountValidity ,saccoLoanLock ,allowMultipleInstances ,loanFactorSourceAccountType ,isCrossLink ,loanProductSettingsData[0]);
         }
     }
 

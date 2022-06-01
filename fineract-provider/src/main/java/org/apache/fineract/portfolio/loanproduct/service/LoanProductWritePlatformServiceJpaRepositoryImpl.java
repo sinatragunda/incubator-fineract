@@ -58,6 +58,7 @@ import org.apache.fineract.portfolio.loanproduct.exception.InvalidCurrencyExcept
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductCannotBeModifiedDueToNonClosedLoansException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductDateException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
+import org.apache.fineract.portfolio.loanproduct.helper.LoanProductSettingsHelper;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -87,6 +88,9 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
     private final LoanRepositoryWrapper loanRepositoryWrapper;
     private final BusinessEventNotifierService businessEventNotifierService;
 
+    // added 31/05/2022
+    private final LoanProductSettingsWritePlatformService loanProductSettingsWritePlatformService ;
+
     @Autowired
     public LoanProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final LoanProductDataValidator fromApiJsonDeserializer, final LoanProductRepository loanProductRepository,
@@ -97,7 +101,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             final FineractEntityAccessUtil fineractEntityAccessUtil,
             final FloatingRateRepositoryWrapper floatingRateRepository,
             final LoanRepositoryWrapper loanRepositoryWrapper,
-            final BusinessEventNotifierService businessEventNotifierService) {
+            final BusinessEventNotifierService businessEventNotifierService,final LoanProductSettingsWritePlatformService loanProductSettingsWritePlatformService) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.loanProductRepository = loanProductRepository;
@@ -110,6 +114,7 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
         this.floatingRateRepository = floatingRateRepository;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.businessEventNotifierService = businessEventNotifierService;
+        this.loanProductSettingsWritePlatformService = loanProductSettingsWritePlatformService;
     }
 
     @Transactional
@@ -136,11 +141,16 @@ public class LoanProductWritePlatformServiceJpaRepositoryImpl implements LoanPro
             	floatingRate = this.floatingRateRepository
             			.findOneWithNotFoundDetection(command.longValueOfParameterNamed("floatingRatesId"));
             }
+
             final LoanProduct loanproduct = LoanProduct.assembleFromJson(fund, loanTransactionProcessingStrategy, charges, command,
                     this.aprCalculator, floatingRate);
+
             loanproduct.updateLoanProductInRelatedClasses();
 
             this.loanProductRepository.save(loanproduct);
+
+            // added 31/05/2022 ,for adding loan product settings 
+            LoanProductSettingsHelper.create(loanProductSettingsWritePlatformService ,loanproduct,command);
 
             // save accounting mappings
             this.accountMappingWritePlatformService.createLoanProductToGLAccountMapping(loanproduct.getId(), command);

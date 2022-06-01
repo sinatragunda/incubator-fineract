@@ -19,10 +19,7 @@
 package org.apache.fineract.infrastructure.documentmanagement.api;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -43,6 +40,7 @@ import io.swagger.annotations.*;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.documentmanagement.command.DocumentCommand;
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
@@ -50,6 +48,9 @@ import org.apache.fineract.infrastructure.documentmanagement.data.FileData;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.savings.helper.NkwaziSavingsAccountHelper;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -75,15 +76,25 @@ public class DocumentManagementApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final ToApiJsonSerializer<DocumentData> toApiJsonSerializer;
 
+
+    private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
+    private final FromJsonHelper fromJsonHelper ;
+    private final SavingsAccountAssembler savingsAccountAssembler ;
+
     @Autowired
     public DocumentManagementApiResource(final PlatformSecurityContext context,
             final DocumentReadPlatformService documentReadPlatformService, final DocumentWritePlatformService documentWritePlatformService,
-            final ApiRequestParameterHelper apiRequestParameterHelper, final ToApiJsonSerializer<DocumentData> toApiJsonSerializer) {
+            final ApiRequestParameterHelper apiRequestParameterHelper, final ToApiJsonSerializer<DocumentData> toApiJsonSerializer ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final FromJsonHelper fromJsonHelper ,final SavingsAccountAssembler savingsAccountAssembler) {
         this.context = context;
         this.documentReadPlatformService = documentReadPlatformService;
         this.documentWritePlatformService = documentWritePlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.toApiJsonSerializer = toApiJsonSerializer;
+
+        // added 01/06/2022
+        this.savingsAccountAssembler = savingsAccountAssembler ;
+        this.fromJsonHelper = fromJsonHelper ;
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService ;
     }
 
     @GET
@@ -222,4 +233,5 @@ public class DocumentManagementApiResource {
 
         return this.toApiJsonSerializer.serialize(documentIdentifier);
     }
+
 }

@@ -40,6 +40,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
+import org.apache.fineract.portfolio.loanproduct.api.LoanProductSettingsConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestCalculationPeriodMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.InterestRecalculationCompoundingMethod;
@@ -113,7 +114,7 @@ public final class LoanProductDataValidator {
             LoanProductConstants.recalculationRestFrequencyWeekdayParamName,
             LoanProductConstants.recalculationRestFrequencyNthDayParamName, LoanProductConstants.recalculationRestFrequencyOnDayParamName,
             LoanProductConstants.isCompoundingToBePostedAsTransactionParamName, LoanProductConstants.allowCompoundingOnEodParamName,
-            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam ,LoanProductConstants.loanFactorSourceAccountTypeParam ,LoanProductConstants.isCrossLinkParam ,LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue()));
+            LoanProductConstants.canUseForTopup, LoanProductConstants.isEqualAmortizationParam ,LoanProductConstants.isSettlementPartialPaymentParam ,LoanProductConstants.isSaccoProductParam ,LoanProductConstants.loanFactorParam ,LoanProductConstants.shareAccountValidityParam ,LoanProductConstants.saccoLoanLockParam ,LoanProductConstants.allowMultipleInstancesParam ,LoanProductConstants.loanFactorSourceAccountTypeParam ,LoanProductConstants.isCrossLinkParam ,LOAN_PRODUCT_ACCOUNTING_PARAMS.INTEREST_IN_SUSPENSE.getValue(),LoanProductConstants.loanProductSettingsParam , LoanProductSettingsConstants.settlementAccountIdParam));
 
     private static final String[] supportedloanConfigurableAttributes = {LoanProductConstants.amortizationTypeParamName,
             LoanProductConstants.interestTypeParamName, LoanProductConstants.transactionProcessingStrategyIdParamName,

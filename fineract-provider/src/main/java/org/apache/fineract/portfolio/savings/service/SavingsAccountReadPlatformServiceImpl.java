@@ -1364,10 +1364,9 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
         try {
             final String sql = "select " + this.savingAccountMapper.schema() + " where sa.product_id = ? and sa.client_id = ?";
-            return this.jdbcTemplate.query(sql, this.savingAccountMapper, new Object[] { clientId ,savingsProductId });
+            return this.jdbcTemplate.query(sql, this.savingAccountMapper, new Object[] { savingsProductId ,clientId });
         } catch (final EmptyResultDataAccessException e) {
             throw new SavingsProductNotFoundException(savingsProductId);
         }
-
     }
 }

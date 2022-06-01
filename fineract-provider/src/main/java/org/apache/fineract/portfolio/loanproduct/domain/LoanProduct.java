@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanproduct.domain;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -203,7 +204,6 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
     @Column(name = "share_account_validity", nullable = true)
     private Integer shareAccountValidity = null;
 
-
     //added 22/10/2020
     @Column(name = "sacco_loan_lock", nullable = true)
     private SACCO_LOAN_LOCK saccoLoanLock = null;
@@ -220,6 +220,10 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
 
     @Column(name = "cross_link", nullable = true)
     private boolean isCrossLink = true;
+
+    //added 30/05/2022
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "loanProduct", orphanRemoval = true, fetch=FetchType.EAGER)
+    private LoanProductSettings loanProductSettings ;
 
 
     public static LoanProduct assembleFromJson(final Fund fund, final LoanTransactionProcessingStrategy loanTransactionProcessingStrategy,
@@ -1575,5 +1579,9 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
 
     public Boolean isCrossLink(){
         return this.isCrossLink ;
+    }
+
+    public LoanProductSettings loanProductSettings(){
+        return this.loanProductSettings ;
     }
 }

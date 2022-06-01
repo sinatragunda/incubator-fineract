@@ -72,7 +72,7 @@ public class WeseApiResource {
         
         String message = null ;
         if(status){
-            message = String.format("You have successfully created a new tenant %s .To login use these credentials : Username = wese and Password = ",tenantIdentifier);
+            message = String.format("You have successfully created a new tenant %s .To login use these credentials : Username = wesecbs and Password = ",tenantIdentifier);
         }
         return ObjectNodeHelper.statusNode(status).put("message",message);
     

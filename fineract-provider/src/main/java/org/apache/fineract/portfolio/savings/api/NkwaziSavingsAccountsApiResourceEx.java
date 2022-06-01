@@ -63,6 +63,7 @@ import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRe
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -88,91 +89,63 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 
-// Added 25/05/2022
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataParam;
 
 
 
-@Path("/savingsaccounts/ex")
+@Path("/nkwazisavings")
 @Component
 @Scope("singleton")
-public class SavingsAccountsApiResourceEx {
+public class NkwaziSavingsAccountsApiResourceEx {
 
-    private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer;
-    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
-    private final BulkImportWorkbookService bulkImportWorkbookService;
-    private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
-    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ;
 
     // Added 16/12/2021
-    private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
-    private final ClientWritePlatformService clientWritePlatformService;
+    //private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     // Added 24/05/2022
     private final FromJsonHelper fromJsonHelper ;
     private final DocumentWritePlatformService documentWritePlatformService ;
     private final SavingsAccountAssembler savingsAccountAssembler ;
+    private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     @Autowired
-    public SavingsAccountsApiResourceEx(final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-                                        final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer,
-                                        final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-                                        final ApiRequestParameterHelper apiRequestParameterHelper,
-                                        final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
-                                        final BulkImportWorkbookService bulkImportWorkbookService,
-                                        final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService ,
-                                        final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , final SavingsAccountWritePlatformService savingsAccountWritePlatformService , final ClientWritePlatformService clientWritePlatformService , final FromJsonHelper fromJsonHelper , final DocumentWritePlatformService documentWritePlatformService ,final  SavingsAccountAssembler savingsAccountAssembler) {
-        this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
+    public NkwaziSavingsAccountsApiResourceEx(final SavingsAccountWritePlatformService savingsAccountWritePlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
+                                              final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer
+                                               ,final FromJsonHelper fromJsonHelper , final DocumentWritePlatformService documentWritePlatformService , final  SavingsAccountAssembler savingsAccountAssembler) {
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
-        this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-        this.apiRequestParameterHelper = apiRequestParameterHelper;
-        this.savingsAccountChargeReadPlatformService = savingsAccountChargeReadPlatformService;
-        this.bulkImportWorkbookService=bulkImportWorkbookService;
-        this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
-        this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
-
         // added 16/12/2021
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService ;
-        this.clientWritePlatformService = clientWritePlatformService;
         this.fromJsonHelper = fromJsonHelper ;
         this.documentWritePlatformService = documentWritePlatformService ;
         this.savingsAccountAssembler = savingsAccountAssembler ;
     }
 
-    // @POST
-    // @Path("nkwazi/{accountId}/{command}")
-    // @Consumes({ MediaType.MULTIPART_FORM_DATA })
-    // @Produces({ MediaType.APPLICATION_JSON })
-    // public String handleCommand(@FormDataParam("file") @ApiParam(value = "file") InputStream uploadedInputStream,@PathParam("accountId") Long accountId ,@PathParam("command")String command ,String apiBody ,@HeaderParam("Content-Length") @ApiParam(value = "Content-Length") final Long fileSize,
-    //         @FormDataParam("file") @ApiParam(value = "file") final FormDataContentDisposition fileDetails, @FormDataParam("file") @ApiParam(value = "file") final FormDataBodyPart bodyPart){
+     @POST
+     @Path("{accountId}/{command}/{status}")
+     @Consumes({ MediaType.APPLICATION_JSON })
+     @Produces({ MediaType.APPLICATION_JSON })
+     public String accountAction(@PathParam("command")final String command ,@PathParam("accountId") Long accountId ,@PathParam("status") boolean isEmployed ,String apiBody){
 
-    //     String response[] = {null};
+         String response[] = {null};
 
-    //     if(command.equals("withdraw")){
+         if(command.equals("withdraw")){
 
-    //         String entityType = "savings";
-    //         String description = "Savings Withdrawal Document";
-    //         String name = String.format("%s",fileDetails.getFileName());
+             System.err.println("--------------------do some withdrawl son -----------------"+apiBody);
 
-    //         final DocumentCommand documentCommand = new DocumentCommand(null, null, entityType, accountId, name, fileDetails.getFileName(),
-    //             fileSize, bodyPart.getMediaType().toString(), description, null);
+             final Long transactionId = NkwaziSavingsAccountHelper.withdraw(savingsAccountWritePlatformService ,savingsAccountAssembler, fromJsonHelper , accountId ,apiBody ,isEmployed);
 
-    //         final Long documentId = this.documentWritePlatformService.createDocument(documentCommand, uploadedInputStream);
+             if(transactionId==null){
+                 // error here
+                 response[0] = ObjectNodeHelper.statusNode(false).put("message","Failed to make withdrawal .Amount greater than allowed max amount").toString();
+                 return response[0];
+             }
 
-    //         Optional.ofNullable(documentId).ifPresent(e->{
-    //             final Long transactionId = NkwaziSavingsAccountHelper.withdraw(savingsAccountWritePlatformService ,savingsAccountAssembler, fromJsonHelper , accountId ,apiBody);
-    //             response[0] = this.toApiJsonSerializer.serialize(transactionId);
-    //             //return response[0];
-    //         });
-    //     }
-    //     return response[0] ;
-    // }
+             response[0] = ObjectNodeHelper.statusNode(true).put("message","You have successfully withdrawn money .Now wait for feedback").toString();
+                 //return response[0];
+         }
+         return response[0] ;
+     }
 
 }

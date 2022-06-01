@@ -105,10 +105,14 @@ import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundEx
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
+import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
+import org.apache.fineract.wese.helper.JsonHelper;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -260,7 +264,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     @Transactional
     @Override
-    public CommandProcessingResult submitApplication(final JsonCommand command) {
+    public CommandProcessingResult submitApplication(JsonCommand command) {
 
         try {
 
@@ -292,15 +296,16 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
             }
 
-
             // modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client);
+
+            // inject account id into command ,just in case product has default settlement .Do this before validation
+            command = injectAccountId(command ,loanProduct ,clientId);
 
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
-
 
             if (loanProduct.useBorrowerCycle()) {
                 Integer cycleNumber = 0;
@@ -470,15 +475,14 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
 
             // Save linked account information
+            // Modified 31/05/2022 get linked account from product id if one exists
             final Long savingsAccountId = command.longValueOfParameterNamed("linkAccountId");
-            if (savingsAccountId != null) {
-                final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(savingsAccountId);
-                this.fromApiJsonDeserializer.validatelinkedSavingsAccount(savingsAccount, newLoanApplication);
-                boolean isActive = true;
-                final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(newLoanApplication,
-                        savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
-                this.accountAssociationsRepository.save(accountAssociations);
-            }
+
+            System.err.println("-----------------------linked account id is ------------"+savingsAccountId);
+
+            // added 31/05/2022 ,this method associates savings account id to loan but it needs to do lot more now
+            associateLoanWithSettlementAccount(newLoanApplication, savingsAccountId);
+
 
             if(command.parameterExists(LoanApiConstants.datatables)){
                 this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getCode().longValue(),
@@ -509,6 +513,78 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             handleDataIntegrityIssues(command, throwable, dve);
             return CommandProcessingResult.empty();
         }
+    }
+
+    // private function to inject account id into the json payload if its not present ,by using settings
+    private JsonCommand injectAccountId(JsonCommand command ,LoanProduct loanProduct ,Long clientId){
+
+        Long accountId = command.longValueOfParameterNamed("linkAccountId");
+
+        boolean isPresent = Optional.ofNullable(accountId).isPresent();
+
+        if(!isPresent){
+
+            String json[] = {command.json()};
+
+            System.err.println("-------system to collect loan product settings -----------");
+            // get it from product settings now ..but need to validate it against null values as well
+            LoanProductSettings loanProductSettings = loanProduct.loanProductSettings();
+
+            Long settlementAccountId[] = {null};
+
+            Optional.ofNullable(loanProductSettings).ifPresent(e->{
+
+                System.err.println("-------------------------loan product has settings --------------,with client id "+clientId);
+
+                settlementAccountId[0] = loanProductSettings.getSettlementAccountId();
+
+                System.err.println("----------------settlement product id is -------------"+settlementAccountId[0]);
+
+                List<SavingsAccountData> savingsAccounts =  savingsAccountReadPlatformService.retrieveAllForClientUnderPortfolio(clientId ,settlementAccountId[0]);
+                
+                System.err.println("------------savingsaccounts ----------"+savingsAccounts.size());
+
+                boolean hasAccount = savingsAccounts.stream().findFirst().isPresent();
+
+                if(hasAccount){
+                    
+                    System.err.println("-----------------------has account ? ------------------");
+                    
+                    SavingsAccountData savingsAccountData = savingsAccounts.stream().findFirst().get();
+                    
+                    Long savingsAccountId = savingsAccountData.getId();
+
+                    System.err.println("--------------account id is is -------------"+savingsAccountId);
+
+                    json[0] = JsonHelper.update(json[0] ,"linkAccountId",savingsAccountId);
+                }
+            });
+
+            System.err.println("--------------------------new json -------------------------"+json[0]);
+
+            command = JsonCommandHelper.jsonCommand(fromJsonHelper ,json[0]);
+        }
+
+        return command ;
+    }
+
+    private void associateLoanWithSettlementAccount(Loan newLoanApplication, Long savingsAccountIdArg) {
+
+        boolean isPresent = Optional.ofNullable(savingsAccountIdArg).isPresent();
+
+        System.err.println("----------------------------------is present -------------"+isPresent);
+
+        Long savingsAccountId[] = {savingsAccountIdArg};
+
+        // we also need to make sure at this instance we still got our account id before proceeding
+        Optional.ofNullable(savingsAccountId[0]).ifPresent(e->{
+            final SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(savingsAccountId[0]);
+            this.fromApiJsonDeserializer.validatelinkedSavingsAccount(savingsAccount, newLoanApplication);
+            boolean isActive = true;
+            final AccountAssociations accountAssociations = AccountAssociations.associateSavingsAccount(newLoanApplication,
+                    savingsAccount, AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue(), isActive);
+            this.accountAssociationsRepository.save(accountAssociations);
+        });
     }
 
 
@@ -1167,8 +1243,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
         final AppUser currentUser = getAppUserIfPresent();
         LocalDate expectedDisbursementDate = null;
-
-        System.err.println("-------------------loan approval here son ---------------");
 
         this.loanApplicationTransitionApiJsonValidator.validateApproval(command.json());
 
