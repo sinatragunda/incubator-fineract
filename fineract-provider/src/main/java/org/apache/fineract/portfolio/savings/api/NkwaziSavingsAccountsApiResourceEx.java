@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.savings.api;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 
 import javax.annotation.PostConstruct;
@@ -104,15 +105,19 @@ public class NkwaziSavingsAccountsApiResourceEx {
     //private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
     // Added 24/05/2022
+
     private final FromJsonHelper fromJsonHelper ;
     private final DocumentWritePlatformService documentWritePlatformService ;
     private final SavingsAccountAssembler savingsAccountAssembler ;
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
 
+    // Added 02/06/2022
+    private final NkwaziSavingsAccountHelper nkwaziSavingsAccountHelper;
+
     @Autowired
     public NkwaziSavingsAccountsApiResourceEx(final SavingsAccountWritePlatformService savingsAccountWritePlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
                                               final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer
-                                               ,final FromJsonHelper fromJsonHelper , final DocumentWritePlatformService documentWritePlatformService , final  SavingsAccountAssembler savingsAccountAssembler) {
+                                               ,final FromJsonHelper fromJsonHelper , final DocumentWritePlatformService documentWritePlatformService , final  SavingsAccountAssembler savingsAccountAssembler ,final NkwaziSavingsAccountHelper nkwaziSavingsAccountHelper) {
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
         // added 16/12/2021
@@ -120,7 +125,23 @@ public class NkwaziSavingsAccountsApiResourceEx {
         this.fromJsonHelper = fromJsonHelper ;
         this.documentWritePlatformService = documentWritePlatformService ;
         this.savingsAccountAssembler = savingsAccountAssembler ;
+        this.nkwaziSavingsAccountHelper = nkwaziSavingsAccountHelper ;
     }
+
+
+     @GET
+     @Path("/template/{clientId}")
+     @Produces({ MediaType.APPLICATION_JSON })
+     public String template(@PathParam("clientId")final Long clientId){
+         context.authenticatedUser();
+         BigDecimal maxAllowable = nkwaziSavingsAccountHelper.maxAllowableWithdrawal(clientId);
+         String node = ObjectNodeHelper.statusNode(true).put("maxAllowable" ,maxAllowable).toString();
+
+         System.err.println("------------------------------"+node);
+
+         return node ;
+     }
+
 
      @POST
      @Path("{accountId}/{command}/{status}")
@@ -128,14 +149,12 @@ public class NkwaziSavingsAccountsApiResourceEx {
      @Produces({ MediaType.APPLICATION_JSON })
      public String accountAction(@PathParam("command")final String command ,@PathParam("accountId") Long accountId ,@PathParam("status") boolean isEmployed ,String apiBody){
 
-         String response[] = {null};
+         context.authenticatedUser();
 
+         String response[] = {null};
          if(command.equals("withdraw")){
 
-             System.err.println("--------------------do some withdrawl son -----------------"+apiBody);
-
-             final Long transactionId = NkwaziSavingsAccountHelper.withdraw(savingsAccountWritePlatformService ,savingsAccountAssembler, fromJsonHelper , accountId ,apiBody ,isEmployed);
-
+             final Long transactionId = nkwaziSavingsAccountHelper.withdraw(accountId ,apiBody ,isEmployed);
              if(transactionId==null){
                  // error here
                  response[0] = ObjectNodeHelper.statusNode(false).put("message","Failed to make withdrawal .Amount greater than allowed max amount").toString();
