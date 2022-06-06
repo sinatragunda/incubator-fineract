@@ -199,7 +199,7 @@ public class LoanProduct extends AbstractPersistableCustom<Long> {
 
 
     @Column(name = "loan_factor", nullable = true)
-    private Integer loanFactor = null;
+    private Integer loanFactor = 0;
 
     @Column(name = "share_account_validity", nullable = true)
     private Integer shareAccountValidity = null;

@@ -58,9 +58,6 @@ public class NkwaziSavingsAccountHelper{
 
 		BigDecimal balance = savingsAccount.accountBalance();
 		BigDecimal maxBalance = maxAllowableWithdrawal(clientId);
-
-		System.err.println("--------------------------------amount is --------------"+amount);
-
 		// this isnt the best of programming standards but okay nothing to do now
 		//int cmp = 0 ;
 		if(isEmployed){
@@ -72,12 +69,7 @@ public class NkwaziSavingsAccountHelper{
 			maxBalance = balance.multiply(new BigDecimal(0.5));
 		}
 
-		System.err.println("--------------------------max balance is --------------"+maxBalance);
-
 		int cmp = maxBalance.compareTo(amount);
-
-		System.err.println("-------------cmp is -----------"+cmp);
-
 		if(cmp < 0){
 			// balance is greater 
 			return null ;
