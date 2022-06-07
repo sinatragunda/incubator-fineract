@@ -129,16 +129,15 @@ public class NkwaziSavingsAccountsApiResourceEx {
     }
 
 
+        // template to get max allowable balance for savings account under nkwazi 
      @GET
      @Path("/template/{clientId}")
      @Produces({ MediaType.APPLICATION_JSON })
-     public String template(@PathParam("clientId")final Long clientId){
+     public String template(@PathParam("clientId")final Long clientId ,@QueryParam("isEmployed")final boolean isEmployed){
          context.authenticatedUser();
-         BigDecimal maxAllowable = nkwaziSavingsAccountHelper.maxAllowableWithdrawal(clientId);
+         BigDecimal maxAllowable = nkwaziSavingsAccountHelper.maxAllowableWithdrawal(clientId ,isEmployed);
          String node = ObjectNodeHelper.statusNode(true).put("maxAllowable" ,maxAllowable).toString();
-
          System.err.println("------------------------------"+node);
-
          return node ;
      }
 
@@ -150,7 +149,6 @@ public class NkwaziSavingsAccountsApiResourceEx {
      public String accountAction(@PathParam("command")final String command ,@PathParam("accountId") Long accountId ,@PathParam("status") boolean isEmployed ,String apiBody){
 
          context.authenticatedUser();
-
          String response[] = {null};
          if(command.equals("withdraw")){
 

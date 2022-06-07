@@ -823,9 +823,11 @@ public class SavingsAccountData {
         return BigDecimal.ZERO;
     }
 
-
     public BigDecimal getAccountBalance(){
-        return summary.getAccountBalance();
+        System.err.println("------------get some balance here------------");
+        BigDecimal amount = summary.getAccountBalance();
+        System.err.println("---------------------amount is ----------------"+amount);
+        return amount;
     }
 
     // added 22/07/2021

@@ -1217,8 +1217,8 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     @Override
     public Collection<SavingsAccountData> retrieveForLookup(Long clientId, Boolean overdraft) {
 
-        SavingAccountMapperForLookup accountMapperForLookup = new SavingAccountMapperForLookup();
-        final StringBuilder sqlBuilder = new StringBuilder("select " + accountMapperForLookup.schema());
+        SavingAccountMapper accountMapper = new SavingAccountMapper();
+        final StringBuilder sqlBuilder = new StringBuilder("select " + accountMapper.schema());
         sqlBuilder.append(" where sa.client_id = ? and sa.status_enum = 300");
         Object[] queryParameters = null;
         if (overdraft == null) {
@@ -1227,7 +1227,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             sqlBuilder.append(" and sa.allow_overdraft = ?");
             queryParameters = new Object[] { clientId, overdraft };
         }
-        return this.jdbcTemplate.query(sqlBuilder.toString(), accountMapperForLookup, queryParameters);
+        return this.jdbcTemplate.query(sqlBuilder.toString(), accountMapper, queryParameters);
 
     }
 

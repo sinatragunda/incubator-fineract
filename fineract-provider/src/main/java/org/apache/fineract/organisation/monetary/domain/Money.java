@@ -334,4 +334,5 @@ public class Money implements Comparable<Money> {
     public Money zero() {
         return Money.zero(getCurrency());
     }
+
 }

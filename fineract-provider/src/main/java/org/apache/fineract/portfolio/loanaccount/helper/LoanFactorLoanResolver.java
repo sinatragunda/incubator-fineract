@@ -21,6 +21,7 @@ import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformS
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LoanFactorLoanResolver {
@@ -59,7 +60,7 @@ public class LoanFactorLoanResolver {
 
             System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
 
-            //System.err.println("---------------- loan factor source -------"+loanFactorSourceAccountType);
+            System.err.println("---------------- is loan product present ?-------"+ Optional.ofNullable(loanProduct).isPresent());
 
             boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
             //if successful just proceed with this loan and throw no errors

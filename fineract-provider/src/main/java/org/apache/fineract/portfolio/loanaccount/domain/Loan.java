@@ -1228,25 +1228,44 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     private void applyPeriodicAccruals(final Collection<LoanTransaction> accruals) {
         List<LoanRepaymentScheduleInstallment> installments = getRepaymentScheduleInstallments() ;
+        
         for (LoanRepaymentScheduleInstallment installment : installments) {
             Money interest = Money.zero(getCurrency());
             Money fee = Money.zero(getCurrency());
             Money penality = Money.zero(getCurrency());
+            
             for (LoanTransaction loanTransaction : accruals) {
                 if (loanTransaction.getTransactionDate().isAfter(installment.getFromDate())
                         && !loanTransaction.getTransactionDate().isAfter(installment.getDueDate())) {
                     interest = interest.plus(loanTransaction.getInterestPortion(getCurrency()));
                     fee = fee.plus(loanTransaction.getFeeChargesPortion(getCurrency()));
                     penality = penality.plus(loanTransaction.getPenaltyChargesPortion(getCurrency()));
-                    if (installment.getFeeChargesCharged(getCurrency()).isLessThan(fee)
-                            || installment.getInterestCharged(getCurrency()).isLessThan(interest)
-                            || installment.getPenaltyChargesCharged(getCurrency()).isLessThan(penality)
-                            || (getAccruedTill().isEqual(loanTransaction.getTransactionDate()) && !installment.getDueDate().isEqual(
-                                    getAccruedTill()))) {
-                        interest = interest.minus(loanTransaction.getInterestPortion(getCurrency()));
-                        fee = fee.minus(loanTransaction.getFeeChargesPortion(getCurrency()));
-                        penality = penality.minus(loanTransaction.getPenaltyChargesPortion(getCurrency()));
-                        loanTransaction.reverse();
+
+
+                    System.err.println("------interest is ------"+interest);
+
+                    System.err.println("------fee is ------"+fee);
+                    
+                    try{
+                        if (installment.getFeeChargesCharged(getCurrency()).isLessThan(fee)
+                                || installment.getInterestCharged(getCurrency()).isLessThan(interest)
+                                || installment.getPenaltyChargesCharged(getCurrency()).isLessThan(penality)
+                                || (getAccruedTill().isEqual(loanTransaction.getTransactionDate()) && !installment.getDueDate().isEqual(
+                                        getAccruedTill()))) {
+                        
+                            System.err.println("------still no null");
+
+                            interest = interest.minus(loanTransaction.getInterestPortion(getCurrency()));
+                            fee = fee.minus(loanTransaction.getFeeChargesPortion(getCurrency()));
+                            penality = penality.minus(loanTransaction.getPenaltyChargesPortion(getCurrency()));
+
+                            System.err.println("-----new interest is ------"+interest);
+
+                            loanTransaction.reverse();
+                        }
+                    }
+                    catch(NullPointerException n){
+                        System.err.println(n.getMessage());
                     }
                 }
             }

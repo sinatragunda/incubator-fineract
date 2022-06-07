@@ -56,25 +56,18 @@ public class NkwaziSavingsAccountHelper{
 		// get client id from savings account ;
 		Long clientId = savingsAccount.clientId();
 
-		BigDecimal balance = savingsAccount.accountBalance();
-		BigDecimal maxBalance = maxAllowableWithdrawal(clientId);
+		BigDecimal maxBalance = maxAllowableWithdrawal(clientId ,isEmployed);
 		// this isnt the best of programming standards but okay nothing to do now
 		//int cmp = 0 ;
-		if(isEmployed){
-			// do something withdraw 25% of that account balance ;
-			// maximum balance should be 25%
-			maxBalance = balance.multiply(new BigDecimal(0.25));
-		}
-		else{
-			maxBalance = balance.multiply(new BigDecimal(0.5));
-		}
 
 		int cmp = maxBalance.compareTo(amount);
-		if(cmp < 0){
-			// balance is greater 
+
+		System.err.println("----------------compare amount "+amount+"--------------to max balance -------"+maxBalance);
+
+		if(cmp < 0 ){
 			return null ;
 		}
-
+		
 		payload = JsonHelper.update(payload ,"transactionAmount" ,amount);
 
 		jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
@@ -86,15 +79,32 @@ public class NkwaziSavingsAccountHelper{
 		return transactionId ;
 	}
 
-	public BigDecimal maxAllowableWithdrawal(Long clientId){
+	public BigDecimal maxAllowableWithdrawal(Long clientId ,boolean isEmployed){
 
 		Collection<SavingsAccountData> savingsAccountDataList = savingsAccountReadPlatformService.retrieveForLookup(clientId ,false);
 		List<LoanAccountData> loanAccountDataList =  loanReadPlatformService.retrieveAllForClient(clientId);
 
+		System.err.println("----------------accounts are ------------"+savingsAccountDataList.size());
+
+
+		BigDecimal maxBalance = BigDecimal.ZERO;
 		BigDecimal totalSavings = savingsAccountDataList.stream().map(SavingsAccountData::getAccountBalance).reduce(BigDecimal.ZERO ,BigDecimal::add);
 		BigDecimal totalLoans = loanAccountDataList.stream().filter(LoanAccountData::isActive).map(LoanAccountData::getTotalOutstandingAmount).reduce(BigDecimal.ZERO ,BigDecimal::add);
 
-		return totalSavings.add(totalLoans);
+		System.err.println("-------------total savings is ----------------------"+totalSavings);
+
+		BigDecimal net = totalLoans.subtract(totalSavings).abs();
+
+		if(isEmployed){
+			// do something withdraw 25% of that account balance ;
+			// maximum balance should be 25%
+			maxBalance = net.multiply(new BigDecimal(0.25));
+		}
+		else{
+			maxBalance = net.multiply(new BigDecimal(0.5));
+		}
+
+		return maxBalance;
 
 	}
 

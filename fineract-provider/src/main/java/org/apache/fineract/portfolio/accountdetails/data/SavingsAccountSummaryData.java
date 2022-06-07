@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.accountdetails.data;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -69,7 +70,13 @@ public class SavingsAccountSummaryData {
         this.depositType = depositType;
         this.subStatus = subStatus;
         this.lastActiveTransactionDate = lastActiveTransactionDate;
+
     }
+//
+//    public SavingsAccountSummaryData(final Long id ,BigDecimal accountBalance){
+//        this.id = id ;
+//        this.accountBalance = Optional.ofNullable(accountBalance).orElse(BigDecimal.ZERO);
+//    }
 
     public BigDecimal getAccountBalance(){
         return this.accountBalance ;

@@ -27,7 +27,7 @@ package org.apache.fineract.portfolio.loanaccount.helper;
  * under the License.
  */
 
-import java.util.ArrayList;
+import java.util.*;
 import java.math.BigDecimal ;
 
 import org.apache.fineract.portfolio.client.domain.Client;
@@ -55,9 +55,6 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProductRepository;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanFactorException ;
 
 /// added 30/10/2020
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -99,16 +96,18 @@ public class LoanFactorSavingsAccountHelper {
     }
 
     public boolean transact(SavingsAccountReadPlatformService savingsAccountReadPlatformService ,LoanReadPlatformService loanReadPlatformService ,LoanProduct loanProduct ,Client client ,Long loanFactorAccountId ,BigDecimal principal){
-
         return savingsAccountBasedLoanFactoring(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProductRepository,loanProduct ,client ,loanFactorAccountId ,principal);
-
     }
 
 
     public boolean savingsAccountBasedLoanFactoring(SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanReadPlatformService loanReadPlatformService ,LoanProductRepository loanProductRepository , LoanProduct loanProduct , Client client ,Long loanFactorAccountId , BigDecimal principal){
 
+        System.err.println("------------------------is number present here "+Optional.ofNullable(loanProduct.loanFactor()).isPresent());
 
-        this.loanFactor = loanProduct.loanFactor();
+        this.loanFactor = Optional.ofNullable(loanProduct.loanFactor()).orElse(0);
+
+        System.err.println("-----------loan factor is ---------------"+this.loanFactor);
+
         Long loanProductId = loanProduct.getId();
 
         boolean isCrossLink = loanProduct.isCrossLink();
