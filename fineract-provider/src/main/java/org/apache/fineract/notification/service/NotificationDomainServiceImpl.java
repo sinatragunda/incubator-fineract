@@ -109,18 +109,21 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 				new LoanClosedListener());
 		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_CLOSE_AS_RESCHEDULE,
 				new LoanCloseAsRescheduledListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_MAKE_REPAYMENT,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_MAKE_REPAYMENT,
 				 new LoanMakeRepaymentListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_PRODUCT_CREATE,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_PRODUCT_CREATE,
 				 new LoanProductCreatedListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_CREATE,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_CREATE,
 				 new SavingsAccountCreatedListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_CLOSE,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_CLOSE,
 				 new SavingsAccountClosedListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SHARE_ACCOUNT_CREATE,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SHARE_ACCOUNT_CREATE,
 				 new ShareAccountCreatedListener());
-		 businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SHARE_ACCOUNT_APPROVE,
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SHARE_ACCOUNT_APPROVE,
 				 new ShareAccountApprovedListener());
+
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
+				new SavingsAccountWithdrawListener());
 	}
 	
 	private abstract class NotificationBusinessEventAdapter implements BusinessEventListner {
@@ -206,6 +209,27 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						savingsAccountTransaction.getSavingsAccount().getId(),
 						"Deposit made",
 						"depositMade",
+						context.authenticatedUser().getId(),
+						savingsAccountTransaction.getSavingsAccount().officeId()
+				);
+			}
+		}
+	}
+
+	private class SavingsAccountWithdrawListener extends NotificationBusinessEventAdapter {
+
+		@Override
+		public void businessEventWasExecuted(Map<BUSINESS_ENTITY, Object> businessEventEntity) {
+			SavingsAccountTransaction savingsAccountTransaction;
+			Object entity = businessEventEntity.get(BUSINESS_ENTITY.SAVINGS_TRANSACTION);
+			if (entity != null) {
+				savingsAccountTransaction = (SavingsAccountTransaction) entity;
+				buildNotification(
+						"WITHDRAWAL_SAVINGSACCOUNT_CHECKER",
+						"savingsAccount",
+						savingsAccountTransaction.getSavingsAccount().getId(),
+						"Withdrawal made",
+						"withdrawalMade",
 						context.authenticatedUser().getId(),
 						savingsAccountTransaction.getSavingsAccount().officeId()
 				);

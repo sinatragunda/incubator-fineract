@@ -317,6 +317,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     @Override
     public CommandProcessingResult withdrawal(final Long savingsId, final JsonCommand command) {
 
+        System.err.println("-----------------is this the withdrawal command---------");
+
         this.savingsAccountTransactionDataValidator.validate(command);
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
@@ -344,6 +346,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final Note note = Note.savingsTransactionNote(account, withdrawal, noteText);
             this.noteRepository.save(note) ;
         }
+
+        this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
+                constructEntityMap(BUSINESS_ENTITY.SAVING, account));
         
         return new CommandProcessingResultBuilder() //
                 .withEntityId(withdrawal.getId()) //
