@@ -39,6 +39,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.portfolio.client.data.ClientApiCollectionConstants;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.client.domain.Client;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -218,6 +219,11 @@ public final class ClientDataValidator {
 		if (this.fromApiJsonHelper.parameterExists("isStaff", element)) {
             final Boolean isStaffFlag = this.fromApiJsonHelper.extractBooleanNamed("isStaff", element);
             baseDataValidator.reset().parameter("isStaff").value(isStaffFlag).notNull();
+        }
+
+        if (this.fromApiJsonHelper.parameterExists(ClientApiConstants.tagParam, element)) {
+            final String tag = this.fromApiJsonHelper.extractStringNamed(ClientApiConstants.tagParam, element);
+            baseDataValidator.reset().parameter(ClientApiConstants.tagParam).value(tag).ignoreIfNull().notBlank();
         }
 		
         List<ApiParameterError> dataValidationErrorsForClientNonPerson = getDataValidationErrorsForCreateOnClientNonPerson(element.getAsJsonObject().get(ClientApiConstants.clientNonPersonDetailsParamName));

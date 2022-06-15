@@ -240,7 +240,6 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "default_share_product", nullable = true) 
     private Long shareProductId ;
 
-
     @Column(name="tag")
     private String tag ;
 
