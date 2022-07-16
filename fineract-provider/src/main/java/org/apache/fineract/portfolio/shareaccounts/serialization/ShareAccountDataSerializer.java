@@ -705,9 +705,7 @@ public class ShareAccountDataSerializer {
             }
         }
         boolean isTransactionBeforeExistingTransactions = false ;
-        
-        System.err.println("----------------any exceptions here ----------------");
-
+        //System.err.println("----------------any exceptions here ----------------");
         Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions() ;
 
         boolean isPresent  = Optional.ofNullable(transactions).isPresent();
@@ -751,11 +749,9 @@ public class ShareAccountDataSerializer {
         catch (NullPointerException e){
             e.printStackTrace();
         }
-
         handleAdditionalSharesChargeTransactions(account, purchaseTransaction);
 
-        System.err.println("----------------done handling additional shares charge transactions------");
-
+        //System.err.println("----------------done handling additional shares charge transactions------");
         actualChanges.put(ShareAccountApiConstants.additionalshares_paramname, purchaseTransaction);
         return actualChanges;
     }

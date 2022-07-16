@@ -363,7 +363,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public void addAddtionalShares(Set<ShareAccountTransaction> additionalShares) {
-        System.err.println("---------------------is set share empty ---------"+shareAccountTransactions.isEmpty());
+        //System.err.println("---------------------is set share empty ---------"+shareAccountTransactions.isEmpty());
         this.shareAccountTransactions.addAll(additionalShares);
     }
 
@@ -383,8 +383,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
 
     public void updateRequestedShares(ShareAccountTransaction purchased) {
         
-        System.err.println("--------------update requested shares ------------");
-
+        //System.err.println("--------------update requested shares ------------");
     	for(ShareAccountTransaction transaction: this.shareAccountTransactions) {
             if(!transaction.isChargeTransaction() && transaction.getId().equals(purchased.getId())) {
                 transaction.update(purchased.getPurchasedDate(), purchased.getTotalShares(), purchased.getPurchasePrice());    
@@ -410,10 +409,8 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         if(!isShareTransactionPresent){
             this.shareAccountTransactions = new HashSet<>();
         }
-
-
         this.shareAccountTransactions.add(purchased);
-        System.err.println("---------------add share purchased");
+        //System.err.println("---------------add share purchased");
 
     }
 

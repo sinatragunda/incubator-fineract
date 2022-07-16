@@ -180,9 +180,10 @@ public class ClientEntityImportHandler implements ImportHandler {
         Long savingsProductId = ImportHandlerUtils.readAsLong(ClientEntityConstants.SAVINGS_PRODUCT_ID_COL ,row);
         Long shareProductId = ImportHandlerUtils.readAsLong(ClientEntityConstants.SHARES_PRODUCT_ID_COL ,row);
 
+        String tag = null;
 
         return ClientData.importClientEntityInstance(legalFormId,row.getRowNum(),name,officeId,clientTypeId,clientClassicationId,
-                staffId,active,activationDate,submittedOn, externalId,incorportionDate,mobileNo,clientNonPersonData,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId);
+                staffId,active,activationDate,submittedOn, externalId,incorportionDate,mobileNo,clientNonPersonData,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,tag);
     }
 
     public Count importEntity(String dateFormat) {

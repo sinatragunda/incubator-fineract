@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSe
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.*;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.wese.helper.TimeHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -238,10 +239,13 @@ public class JournalEntriesImportHandler implements ImportHandler {
 
     private String randomTransactionId(){
 
-        Long seed = Instant.now().toEpochMilli();
-        Random ra = new Random(seed);
-        Long id = ra.nextLong();
-        return id.toString();
+        Long nano = System.nanoTime();
+        return nano.toString();
+//
+//        Long seed = Instant.now().toEpochMilli();
+//        Random ra = new Random(seed);
+//        Long id = ra.nextLong();
+//        return id.toString();
     }
 
 

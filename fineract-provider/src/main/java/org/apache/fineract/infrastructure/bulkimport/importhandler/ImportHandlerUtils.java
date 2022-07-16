@@ -147,7 +147,8 @@ public class ImportHandlerUtils {
                     res = trimEmptyDecimalPortion(val.getStringValue());
                 }
                 catch (NullPointerException n){
-                    n.printStackTrace();
+                    System.err.println("------------------readAsString threw null pointer exception -");
+                    //n.printStackTrace();
                 }
                 if (res!=null) {
                     if (!res.equals("")) {
@@ -180,6 +181,8 @@ public class ImportHandlerUtils {
         }else {
             return null;
         }
+
+        //return null ;
     }
 
 

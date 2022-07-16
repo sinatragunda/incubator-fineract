@@ -33,6 +33,11 @@ public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
     @Column(name="office_id" ,nullable=true)
     private Long officeId;
 
+    // added 15/06/2022
+    @Column(name="is_client_event_notification" ,nullable=true)
+    private Boolean isClientEventNotification;
+
+
     @Transient
     private List<EmailRecipients> emailRecipientsList = new ArrayList<>();
 
@@ -87,4 +92,5 @@ public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
     public void setEmailRecipientsList(List<EmailRecipients> emailRecipientsList) {
         this.emailRecipientsList = emailRecipientsList;
     }
+
 }

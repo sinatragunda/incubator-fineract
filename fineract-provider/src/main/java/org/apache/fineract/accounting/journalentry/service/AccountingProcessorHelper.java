@@ -1102,9 +1102,7 @@ public class AccountingProcessorHelper {
             shareTransactionId[0] = Long.parseLong(transactionId);
             modifiedTransactionId[0] = SHARE_TRANSACTION_IDENTIFIER + transactionId;
         }
-
-        System.err.println("-------------------gl account might be null can we rectify that now ? ------");
-        
+        //System.err.println("-------------------gl account might be null can we rectify that now ? ------");
         Optional.ofNullable(account).ifPresent(e->{
             
             final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId[0],
@@ -1130,8 +1128,7 @@ public class AccountingProcessorHelper {
             modifiedTransactionId = SHARE_TRANSACTION_IDENTIFIER + transactionId;
         }
 
-
-        System.err.println("-----------------check if gl account is null or not then verify error on credit --------");
+        //System.err.println("-----------------check if gl account is null or not then verify error on credit --------");
 
         //Optional.ofNullable(account).ifPresent(e->{
             final JournalEntry journalEntry = JournalEntry.createNew(office, paymentDetail, account, currencyCode, modifiedTransactionId,

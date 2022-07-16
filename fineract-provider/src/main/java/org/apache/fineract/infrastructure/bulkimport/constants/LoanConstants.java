@@ -31,7 +31,7 @@ public class LoanConstants {
     public static final int DISBURSED_DATE_COL = 8;//I
     public static final int DISBURSED_PAYMENT_TYPE_COL = 9;//J
     public static final int FUND_NAME_COL = 10;//K
-    public static final int PRINCIPAL_COL = 11;//L
+    //public static final int PRINCIPAL_COL = 11;//L
     public static final int NO_OF_REPAYMENTS_COL = 12;//M
     public static final int REPAID_EVERY_COL = 13;//N
     public static final int REPAID_EVERY_FREQUENCY_COL = 14;//O
@@ -71,5 +71,8 @@ public class LoanConstants {
     public static final String LOAN_TYPE_INDIVIDUAL="Individual";
     public static final String LOAN_TYPE_GROUP="Group";
     public static final String LOAN_TYPE_JLG="JLG" ;
+
+    public static final int PRINCIPAL_COL = 50;//AY
+    
 
 }

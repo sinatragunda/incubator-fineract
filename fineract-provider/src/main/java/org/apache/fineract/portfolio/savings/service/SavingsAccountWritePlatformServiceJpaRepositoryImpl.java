@@ -270,6 +270,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         this.savingsAccountTransactionDataValidator.validate(command);
 
+        System.err.println("------------------------deposit into transaction now --------------------");
+
         final SavingsAccount account = this.savingAccountAssembler.assembleFrom(savingsId);
         checkClientOrGroupActive(account);
         final Locale locale = command.extractLocale();

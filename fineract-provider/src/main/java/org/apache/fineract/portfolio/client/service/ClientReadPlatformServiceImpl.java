@@ -413,6 +413,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             sqlBuilder.append("c.default_share_product as shareProductId,");
 
 
+            // added 16/06/2022
+            sqlBuilder.append("c.tag as tag, ");
+            
+
+
             sqlBuilder.append("c.submittedon_date as submittedOnDate, ");
             sqlBuilder.append("sbu.username as submittedByUsername, ");
             sqlBuilder.append("sbu.firstname as submittedByFirstname, ");
@@ -544,6 +549,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
             final Long shareAccountId = rs.getLong("shareAccountId");
             final Long shareProductId = rs.getLong("shareProductId");
+
+            final String tag = rs.getString("tag");
             
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
@@ -554,7 +561,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false ,tag);
 
         }
     }
@@ -597,6 +604,10 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             builder.append("c.client_classification_cv_id as classificationId, ");
             builder.append("cvclassification.code_value as classificationValue, ");
             builder.append("c.legal_form_enum as legalFormEnum, ");
+
+            // added 16/06/2022
+            builder.append("c.tag as tag, ");
+            
 
             builder.append("c.submittedon_date as submittedOnDate, ");
             builder.append("sbu.username as submittedByUsername, ");
@@ -737,6 +748,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final Long shareAccountId = rs.getLong("shareAccountId");
             final Long shareProductId = rs.getLong("shareProductId");
 
+            // added 16/06/2022 
+            final String tag = rs.getString("tag");
+
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
             final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
@@ -746,7 +760,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false, tag);
 
         }
     }

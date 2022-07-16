@@ -489,13 +489,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
             final Collection<LoanTransactionData> loanWaiverTansactions, final Collection<LoanSchedulePeriodData> loanSchedulePeriodDatas,
             final LocalDate tilldate) {
 
-
-        System.err.println("------------------update interest income ---------------------");
-
         BigDecimal interestIncome = accrualData.getInterestIncome();
-
-        System.err.println("--------------accrualData.getInterestIncome-------------------"+interestIncome.doubleValue());
-
         if (accrualData.getWaivedInterestIncome() != null) {
             BigDecimal recognized = BigDecimal.ZERO;
             BigDecimal unrecognized = BigDecimal.ZERO;
@@ -543,9 +537,6 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
                 interestIncome = interestIncome.subtract(interestWaived.subtract(recognized));
             }
         }
-
-        System.err.println("----------------------udpate accruable income -----------------------");
-
         accrualData.updateAccruableIncome(interestIncome);
     }
 

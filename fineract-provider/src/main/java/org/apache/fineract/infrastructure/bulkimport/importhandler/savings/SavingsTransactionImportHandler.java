@@ -233,13 +233,21 @@ public class SavingsTransactionImportHandler implements ImportHandler {
 
                 final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
                 successCount++;
+
+                System.err.println("-----------------------------------success count is ---------------"+successCount);
+
+
                 Cell statusCell = savingsTransactionSheet.getRow(transaction.getRowIndex()).createCell(TransactionConstants.STATUS_COL);
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
             }catch (RuntimeException ex){
                 errorCount++;
+
+                System.err.println("----------------------------------errror count is ----------------------"+errorCount);
                 ex.printStackTrace();
+
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);
+                
                 ImportHandlerUtils.writeErrorMessage(savingsTransactionSheet,transaction.getRowIndex(),errorMessage,TransactionConstants.STATUS_COL);
             }
         }

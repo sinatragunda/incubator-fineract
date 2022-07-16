@@ -18,13 +18,7 @@
  */
 package org.apache.fineract.portfolio.client.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -240,7 +234,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "default_share_product", nullable = true) 
     private Long shareProductId ;
 
-    @Column(name="tag")
+    @Column(name="tag" ,nullable=true)
     private String tag ;
 
 
@@ -287,7 +281,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
         final Long shareAccountId = null;
 
         final String tag = command.stringValueOfParameterNamed(ClientApiConstants.tagParam);
-
+     
         return new Client(currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename, lastname, fullname,
                 activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId, savingsAccountId, dataOfBirth,
                 gender, clientType, clientClassification, legalForm, isStaff ,shareProductId ,shareAccountId ,tag);

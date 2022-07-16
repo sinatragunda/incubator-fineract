@@ -396,12 +396,8 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             // Added 25/09/2021
             createSelfServiceUser(newClient ,isCreateSelfServiceUser);
 
-            System.err.println("---------------error thrown at this stage ? --------------");
-
             this.clientRepository.save(newClient);
 
-            System.err.println("--------------------------def thrown here -------------");
-            
             if (newClient.isActive()) {
                 this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
                         constructEntityMap(BUSINESS_ENTITY.CLIENT, newClient));
@@ -415,11 +411,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             final Locale locale = command.extractLocale();
             final DateTimeFormatter fmt = DateTimeFormat.forPattern(command.dateFormat()).withLocale(locale);
             CommandProcessingResult result = openSavingsAccount(newClient, fmt);
+
             if (result.getSavingsId() != null) {
                 this.clientRepository.save(newClient);
                 ///we now have a savings account son better time to create a share account
-                openShareAccount(newClient ,result.getSavingsId(), fmt); 
+                openShareAccount(newClient ,result.getSavingsId(), fmt);
                 this.clientRepository.save(newClient);
+                newClient.updateSavingsAccount(result.getSavingsId());
             }
 
             /// We should refactor out a lot of other garbage there so that code becomes clean now its too much scatter and so unproffessional
@@ -701,6 +699,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             this.clientRepository.saveAndFlush(client);
             this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
                     constructEntityMap(BUSINESS_ENTITY.CLIENT, client));
+            
             return new CommandProcessingResultBuilder() //
                     .withCommandId(command.commandId()) //
                     .withOfficeId(client.officeId()) //
@@ -719,7 +718,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
         CommandProcessingResult commandProcessingResult = CommandProcessingResult.empty();
 
-        if (client.isActive() && client.savingsProductId() != null) {
+        // check if savingsproductid is not null since its needed for getting product to be used for creating account
+        boolean isSavingsAccountPresent = Optional.ofNullable(client.savingsProductId()).isPresent();
+
+        //boolean isActive = client.isActive();
+
+        if (client.isActive() && isSavingsAccountPresent) {
 
             SavingsAccountDataDTO savingsAccountDataDTO = new SavingsAccountDataDTO(client, null, client.savingsProductId(),
                     client.getActivationLocalDate(), client.activatedBy(), fmt);

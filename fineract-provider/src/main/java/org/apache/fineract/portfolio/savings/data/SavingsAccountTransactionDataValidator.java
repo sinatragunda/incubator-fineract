@@ -253,7 +253,11 @@ public class SavingsAccountTransactionDataValidator {
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
         if (!dataValidationErrors.isEmpty()) {
-            //
+            
+            dataValidationErrors.stream().forEach(e->{
+                System.err.println("-----------------------------deposit error is "+e.getDeveloperMessage());
+            });
+
             throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
                     dataValidationErrors);
         }

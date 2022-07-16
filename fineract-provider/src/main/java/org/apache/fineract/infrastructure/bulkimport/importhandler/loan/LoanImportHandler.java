@@ -36,6 +36,7 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.*;
+import org.apache.fineract.portfolio.loanaccount.helper.NkwaziLoanAdjustmentsHelper;
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.apache.poi.ss.formula.FormulaParseException;
@@ -94,21 +95,16 @@ public class LoanImportHandler implements ImportHandler {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
 
-
         try{    
             for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
 
                     Row row;
                     row = loanSheet.getRow(rowIndex);
-                    System.err.println("-------------------working with column index --------------"+rowIndex);
-
                     if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
                         try{
-                            System.err.println("--------------its imported or ?");
                             addLoanToList(locale, dateFormat, row);
                         }
                         catch (FormulaParseException f){
-                            System.err.println("-----------------formula parse exception caught ------------");
                             continue;
                         }
                     }
@@ -118,10 +114,10 @@ public class LoanImportHandler implements ImportHandler {
         }
         catch(Exception n){
             n.printStackTrace();
-            System.err.println("-------------------some error caught there no idea where ------------"+n.getMessage());
         }
 
 
+        System.err.println("------------------------done now processing loans ------------"+noOfEntries);
     }
 
     private void addLoanToList(String locale, String dateFormat, Row row) {
@@ -132,8 +128,10 @@ public class LoanImportHandler implements ImportHandler {
 
             loans.add(loanAccountData);
             approvalDates.add(readLoanApproval(row,locale,dateFormat));
+            
             disbursalDates.add(readDisbursalData(row,locale,dateFormat));
             LoanTransactionData loanTransactionData = readLoanRepayment(row ,locale ,dateFormat);
+            
             Optional.ofNullable(loanTransactionData).ifPresent(e1->{
                 loanRepayments.add(e1);
             });
@@ -147,7 +145,7 @@ public class LoanImportHandler implements ImportHandler {
         
         LocalDate lastRepaymentDate = ImportHandlerUtils.readAsDate(LoanConstants.LAST_REPAYMENT_DATE_COL, row);
         
-        // if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
+        /// if last repayment date is in future lets make it to today current date ,some system errors regarding imported data from Nkwazi 
         if(lastRepaymentDate.isAfter(DateUtils.getLocalDateOfTenant())){
             lastRepaymentDate = DateUtils.getLocalDateOfTenant();
         }
@@ -170,9 +168,10 @@ public class LoanImportHandler implements ImportHandler {
 
     private DisbursementData readDisbursalData(Row row,String locale,String dateFormat) {
 
-        LocalDate disbursedDate = ImportHandlerUtils.readAsDate(LoanConstants.DISBURSED_DATE_COL, row);
+        //LocalDate disbursedDate = ImportHandlerUtils.readAsDate(LoanConstants.DISBURSED_DATE_COL, row);
+        LocalDate disbursedDate = DateUtils.parseLocalDate("31/12/2021" ,"dd/MM/YYYY");
 
-        String linkAccountId=null;
+        String linkAccountId = null;
         if ( ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row)!=null){
             linkAccountId =  ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row).toString();
         }
@@ -185,7 +184,10 @@ public class LoanImportHandler implements ImportHandler {
     }
 
     private LoanApprovalData readLoanApproval(Row row,String locale,String dateFormat) {
-        LocalDate approvedDate = ImportHandlerUtils.readAsDate(LoanConstants.APPROVED_DATE_COL, row);
+        
+        //LocalDate approvedDate = ImportHandlerUtils.readAsDate(LoanConstants.APPROVED_DATE_COL, row);
+        LocalDate approvedDate = DateUtils.parseLocalDate("31/12/2021","dd/MM/YYYY");
+        
         if (approvedDate!=null)
             return LoanApprovalData.importInstance(approvedDate, row.getRowNum(),locale,dateFormat);
         else
@@ -203,9 +205,9 @@ public class LoanImportHandler implements ImportHandler {
         Long productId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.PRODUCT_SHEET_NAME), productName);
         String loanOfficerName =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_OFFICER_NAME_COL, row);
         Long loanOfficerId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.STAFF_SHEET_NAME), loanOfficerName);
+        
         LocalDate submittedOnDate =  ImportHandlerUtils.readAsDate(LoanConstants.SUBMITTED_ON_DATE_COL, row);
-
-        String fundName =  ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row);
+        String fundName =  Optional.ofNullable(ImportHandlerUtils.readAsString(LoanConstants.FUND_NAME_COL, row)).orElse(null);
 
         final Long[] fundId = {0L} ;
 
@@ -216,10 +218,14 @@ public class LoanImportHandler implements ImportHandler {
         Optional.ofNullable(fundName).ifPresent(fundNameConsumer);
 
         BigDecimal principal = null;
-        if ( ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row) != null)
-            principal = BigDecimal.valueOf( ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row));
+        if ( ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row) != null) {
+            principal = BigDecimal.valueOf(ImportHandlerUtils.readAsDouble(LoanConstants.PRINCIPAL_COL, row));
+        }
+
         Integer numberOfRepayments =  ImportHandlerUtils.readAsInt(LoanConstants.NO_OF_REPAYMENTS_COL, row);
         Integer repaidEvery =  ImportHandlerUtils.readAsInt(LoanConstants.REPAID_EVERY_COL, row);
+
+
         String repaidEveryFrequency =  ImportHandlerUtils.readAsString(LoanConstants.REPAID_EVERY_FREQUENCY_COL, row);
         String repaidEveryFrequencyId = "";
         EnumOptionData repaidEveryFrequencyEnums = null;
@@ -231,7 +237,9 @@ public class LoanImportHandler implements ImportHandler {
             else if (repaidEveryFrequency.equalsIgnoreCase("Months")) repaidEveryFrequencyId = "2";
             repaidEveryFrequencyEnums = new EnumOptionData(null, null, repaidEveryFrequencyId);
         }
+
         Integer loanTerm =  ImportHandlerUtils.readAsInt(LoanConstants.LOAN_TERM_COL, row);
+        
         String loanTermFrequency =  ImportHandlerUtils.readAsString(LoanConstants.LOAN_TERM_FREQUENCY_COL, row);
         EnumOptionData loanTermFrequencyEnum = null;
         if (loanTermFrequency != null) {
@@ -245,6 +253,18 @@ public class LoanImportHandler implements ImportHandler {
                 loanTermFrequencyId = "2";
             loanTermFrequencyEnum = new EnumOptionData(null, null, loanTermFrequencyId);
         }
+
+        // loan adjustments here 
+        int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan("31/12/2021" ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
+
+        /// nkwazi adjustments to be removed 
+        if(newNumberOfRepayments <= 0){
+            return null;
+        }
+
+        submittedOnDate = DateUtils.parseLocalDate("31/12/2021" ,"dd/MM/YYYY");
+
+        numberOfRepayments = newNumberOfRepayments;
 
         BigDecimal nominalInterestRate = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.NOMINAL_INTEREST_RATE_COL, row) != null)
@@ -278,6 +298,7 @@ public class LoanImportHandler implements ImportHandler {
             interestCalculationPeriodEnum = new EnumOptionData(null, null, interestCalculationPeriodId);
 
         }
+
         BigDecimal arrearsTolerance = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.ARREARS_TOLERANCE_COL, row) != null)
             arrearsTolerance = BigDecimal.valueOf( ImportHandlerUtils.readAsDouble(LoanConstants.ARREARS_TOLERANCE_COL, row));
@@ -356,19 +377,21 @@ public class LoanImportHandler implements ImportHandler {
             }
         }
 
+
+        System.err.println("------------------------------loan added somewhere is error ----------------");
+
         /// bulk imports dont work for revolving accounts 
         /// added 21/08/2021  ,loanfactoring doesnt work at this stage maybe in the later versions it will work
         
         final  Long loanFactorAccountId = null ;
         statuses.add(status);
+
         if (loanType!=null) {
             if (loanType.equals("individual")) {
-
 
                 // returns 0L if value of clientId is null ,so we must search using client external id
                 // check if client exist first by using client external id . 
                 Long clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
-
 
                 Boolean notValidClientId = ComparatorUtility.isLongZero(clientId);
 
@@ -439,6 +462,8 @@ public class LoanImportHandler implements ImportHandler {
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
             }catch (RuntimeException ex){
+
+                System.err.println("-------------------------------------failed processing loan ----------------");
                 errorCount++;
                 ex.printStackTrace();
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);

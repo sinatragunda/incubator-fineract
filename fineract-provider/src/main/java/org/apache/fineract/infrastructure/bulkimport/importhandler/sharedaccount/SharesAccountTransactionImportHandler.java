@@ -219,9 +219,7 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
                 String commandParam = "applyadditionalshares";
                 String approveCommandParam = "approveadditionalshares";
 
-                System.err.println("-------------share account id -------------"+shareAccountId);
-
-
+                //System.err.println("-------------share account id -------------"+shareAccountId);
                 CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, shareAccountId, commandParam).withJson(payload).build();
                 final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
 
@@ -238,8 +236,7 @@ public class SharesAccountTransactionImportHandler implements ImportHandler {
                     objectNode.put("requestedShares" ,array);
 
                     String approvePayload = objectNode.toString();
-
-                    System.err.println("-----------------approve payload is -----------"+approvePayload);
+                    //System.err.println("-----------------approve payload is -----------"+approvePayload);
 
                     CommandWrapper approveCommandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, shareAccountId, approveCommandParam).withJson(approvePayload).build();
                     final CommandProcessingResult approveResults = this.commandsSourceWritePlatformService.logCommandSource(approveCommandWrapper);

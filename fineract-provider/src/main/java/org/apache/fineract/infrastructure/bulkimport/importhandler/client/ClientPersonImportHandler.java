@@ -197,11 +197,11 @@ public class ClientPersonImportHandler implements ImportHandler {
         }
 
         ClientData clientData = ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
-                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService);
+                officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService,tag);
 
-        Optional.ofNullable(tag).ifPresent(e->{
-            clientData.setTag(tag);
-        });
+        // Optional.ofNullable(tag).ifPresent(e->{
+        //     clientData.setTag(tag);
+        // });
 
         return clientData ;
     }
