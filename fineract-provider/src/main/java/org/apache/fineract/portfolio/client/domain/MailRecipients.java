@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name="m_mail_recipients")
-public class EmailRecipients extends AbstractPersistableCustom<Long> {
+public class MailRecipients extends AbstractPersistableCustom<Long> {
 
     @Column(name ="name")
     private String name ;
@@ -36,16 +36,16 @@ public class EmailRecipients extends AbstractPersistableCustom<Long> {
 
     @ManyToOne
     @JoinColumn(name="mail_recipients_key_id")
-    private EmailRecipientsKey emailRecipientsKey ;
+    private MailRecipientsKey mailRecipientsKey;
 
 
     // added 26/08/2021
     @Transient
     private boolean deliveryStatus ;
 
-    public EmailRecipients(){}
+    public MailRecipients(){}
 
-    public EmailRecipients(String displayName, String emailAddress, Boolean linkedToClient,Long clientId) {
+    public MailRecipients(String displayName, String emailAddress, Boolean linkedToClient, Long clientId) {
         this.name = displayName;
         this.emailAddress = emailAddress;
         this.linkedToClient = linkedToClient;
@@ -60,12 +60,12 @@ public class EmailRecipients extends AbstractPersistableCustom<Long> {
         this.name = name;
     }
 
-    public EmailRecipientsKey getEmailRecipientsKey() {
-        return emailRecipientsKey;
+    public MailRecipientsKey getMailRecipientsKey() {
+        return mailRecipientsKey;
     }
 
-    public void setEmailRecipientsKey(EmailRecipientsKey emailRecipientsKey) {
-        this.emailRecipientsKey = emailRecipientsKey;
+    public void setMailRecipientsKey(MailRecipientsKey mailRecipientsKey) {
+        this.mailRecipientsKey = mailRecipientsKey;
     }
 
     public String getEmailAddress() {

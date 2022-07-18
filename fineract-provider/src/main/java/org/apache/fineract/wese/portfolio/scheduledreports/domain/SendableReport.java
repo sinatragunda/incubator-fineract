@@ -6,7 +6,7 @@
 */
 package org.apache.fineract.wese.portfolio.scheduledreports.domain;
 
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.wese.helper.SessionIDGenerator;
 
 import java.util.Queue;
@@ -15,13 +15,13 @@ public class SendableReport {
 
     private String sessionId;
     private PentahoReportGenerator pentahoReportGenerator;
-    private Queue<EmailRecipients> emailRecipientsQueue ;
+    private Queue<MailRecipients> mailRecipientsQueue;
 
-    public SendableReport(PentahoReportGenerator pentahoReportGenerator, Queue<EmailRecipients> emailRecipientsQueue) {
+    public SendableReport(PentahoReportGenerator pentahoReportGenerator, Queue<MailRecipients> mailRecipientsQueue) {
         // generate unique session upon init of this function
         this.sessionId = SessionIDGenerator.sessionId();
         this.pentahoReportGenerator = pentahoReportGenerator;
-        this.emailRecipientsQueue = emailRecipientsQueue;
+        this.mailRecipientsQueue = mailRecipientsQueue;
     }
 
     public String getSessionId() {
@@ -40,11 +40,11 @@ public class SendableReport {
         this.pentahoReportGenerator = pentahoReportGenerator;
     }
 
-    public Queue<EmailRecipients> getEmailRecipientsQueue() {
-        return emailRecipientsQueue;
+    public Queue<MailRecipients> getMailRecipientsQueue() {
+        return mailRecipientsQueue;
     }
 
-    public void setEmailRecipientsQueue(Queue<EmailRecipients> emailRecipientsQueue) {
-        this.emailRecipientsQueue = emailRecipientsQueue;
+    public void setMailRecipientsQueue(Queue<MailRecipients> mailRecipientsQueue) {
+        this.mailRecipientsQueue = mailRecipientsQueue;
     }
 }

@@ -12,7 +12,6 @@ import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
 import org.apache.fineract.infrastructure.dataqueries.service.ScheduledReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
 
-import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -25,8 +24,8 @@ import com.google.gson.JsonParser;
 import org.apache.fineract.infrastructure.jobs.service.JobName;
 import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
-import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
+import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
 import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
@@ -34,7 +33,6 @@ import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.spm.repository.EmailSendStatusRepository;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
 import org.apache.fineract.spm.repository.ScheduledMailSessionRepository;
-import org.apache.fineract.wese.helper.ReportsEmailHelper;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.PentahoReportGenerator;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.ScheduledSendableSession;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.SendableReport;
@@ -63,7 +61,7 @@ public class ScheduledReportHelper {
         String name = jsonObject.get("name").getAsString();
         Long id = jsonObject.get("emailRecipientsKey").getAsLong();
 
-        EmailRecipientsKey emailRecipientKey = new EmailRecipientsKey(id);
+        MailRecipientsKey emailRecipientKey = new MailRecipientsKey(id);
 
         JobName jobName = JobName.SCHEDULED_EMAIL_CLIENT_REPORTS;
 
@@ -78,7 +76,7 @@ public class ScheduledReportHelper {
 
         Long jobId = scheduledJobDetail.getId();
         ScheduledReport scheduledReport = new ScheduledReport(reportName ,parameters ,jobId);
-        scheduledReport.setEmailRecipientsKey(emailRecipientKey);
+        scheduledReport.setMailRecipientsKey(emailRecipientKey);
 
         scheduledReportRepositoryWrapper.saveOrUpdate(scheduledReport);
         return jobId ;
@@ -100,12 +98,12 @@ public class ScheduledReportHelper {
 
         PentahoReportGenerator pentahoReportGenerator = new PentahoReportGenerator(pentahoReportingProcessService);
         
-        Long recipientsKey = scheduledReport.getEmailRecipientsKey().getId();
-        Queue<EmailRecipients> emailRecipientsQueue = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
+        Long recipientsKey = scheduledReport.getMailRecipientsKey().getId();
+        Queue<MailRecipients> mailRecipientsQueue = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
 
-        int recipientsCount = emailRecipientsQueue.size();
+        int recipientsCount = mailRecipientsQueue.size();
     
-        SendableReport sendableReport = new SendableReport(pentahoReportGenerator ,emailRecipientsQueue);
+        SendableReport sendableReport = new SendableReport(pentahoReportGenerator , mailRecipientsQueue);
         ScheduledMailSession scheduledMailSession = new ScheduledMailSession(scheduledReport);
         ScheduledSendableSession scheduledSendableSession = new ScheduledSendableSession(scheduledMailSession ,sendableReport);
 

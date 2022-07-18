@@ -7,18 +7,13 @@
 package org.apache.fineract.wese.portfolio.scheduledreports.service;
 
 import org.apache.fineract.infrastructure.core.domain.EmailDetail;
-import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
-import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
-import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
-import org.apache.fineract.portfolio.mailserver.domain.MailServerSettings;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.spm.repository.EmailSendStatusRepository;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
 import org.apache.fineract.spm.repository.ScheduledMailSessionRepository;
 import org.apache.fineract.wese.enumerations.SEND_MAIL_MESSAGE_STATUS;
 import org.apache.fineract.wese.helper.ComparatorUtility;
-import org.apache.fineract.wese.helper.ThreadCheat;
 import org.apache.fineract.wese.portfolio.scheduledreports.domain.*;
 import org.apache.fineract.wese.portfolio.scheduledreports.enumerations.ACTIVE_MAIL_SESSION_STATUS;
 import org.apache.fineract.wese.portfolio.scheduledreports.helper.ScheduledMailSessionHelper;
@@ -26,12 +21,8 @@ import org.apache.fineract.wese.service.WeseEmailService;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ScheduledMailInitializer {
@@ -62,7 +53,7 @@ public class ScheduledMailInitializer {
         //start session
         scheduledSendableSession.getScheduledMailSession().init();
 
-        Queue<EmailRecipients> emailRecipientsQueue = scheduledSendableSession.getSendableReport().getEmailRecipientsQueue();
+        Queue<MailRecipients> mailRecipientsQueue = scheduledSendableSession.getSendableReport().getMailRecipientsQueue();
 
         PentahoReportGenerator pentahoReportGenerator = scheduledSendableSession.getSendableReport().getPentahoReportGenerator();
 
@@ -75,12 +66,12 @@ public class ScheduledMailInitializer {
         Map<String ,String> queryParams = pentahoReportGenerator.reportParameters(scheduledReport);
         boolean clientReport = pentahoReportGenerator.clientFacingReport(queryParams);
 
-        //emailRecipientsQueue poll and iterate ,if quota reached return item back to queue
+        //mailRecipientsQueue poll and iterate ,if quota reached return item back to queue
         for(;;){
 
-            EmailRecipients emailRecipients = emailRecipientsQueue.poll();
+            MailRecipients mailRecipients = mailRecipientsQueue.poll();
             // if no more items in queue then processing is done return
-            boolean isPresent = Optional.ofNullable(emailRecipients).isPresent();
+            boolean isPresent = Optional.ofNullable(mailRecipients).isPresent();
             if(!isPresent){
                 // mark process as over
                 closeSession(scheduledMailSessionRepository ,emailSendStatusRepository ,scheduledSendableSession);
@@ -88,7 +79,7 @@ public class ScheduledMailInitializer {
             }
 
             // for each item send and generate some report
-            Long clientId = emailRecipients.getClientId();
+            Long clientId = mailRecipients.getClientId();
 
             File file = null ;
             if(clientReport){
@@ -100,7 +91,7 @@ public class ScheduledMailInitializer {
                 file = pentahoReportGenerator.getReccuringFile();
             }
 
-            EmailDetail emailDetail = emailDetail(emailRecipients ,description);
+            EmailDetail emailDetail = emailDetail(mailRecipients,description);
             SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = attachedMailSender.sendMail(file,emailDetail);
 
             System.err.println("---------send mail status-------------"+sendMailMessageStatus);
@@ -113,7 +104,7 @@ public class ScheduledMailInitializer {
             switch (sendMailMessageStatus){
                 case QOUTA_LIMIT:
                     // return last polled item to queue ,either back or front but we think its back due to implementation
-                    emailRecipientsQueue.add(emailRecipients);
+                    mailRecipientsQueue.add(mailRecipients);
                     updateScheduledSessionStatus(scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
                     Long sleepTime = attachedMailSender.sleepTime();
                     sleepThread(sleepTime);
@@ -143,10 +134,10 @@ public class ScheduledMailInitializer {
 
     }
 
-    public EmailDetail emailDetail(EmailRecipients emailRecipients ,String body){
+    public EmailDetail emailDetail(MailRecipients mailRecipients, String body){
 
-        String emailAddress = emailRecipients.getEmailAddress();
-        String name = emailRecipients.getName();
+        String emailAddress = mailRecipients.getEmailAddress();
+        String name = mailRecipients.getName();
         System.err.println("-----------------send email to ------------"+emailAddress);
         String subject = "Scheduled Report";
 

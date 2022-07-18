@@ -7,7 +7,7 @@
 package org.apache.fineract.portfolio.client.repo;
 
 
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
 
 import java.util.List;
 
@@ -15,9 +15,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
-public interface EmailRecipientsRepository extends JpaRepository<EmailRecipients ,Long> ,JpaSpecificationExecutor<EmailRecipients>{
+public interface EmailRecipientsRepository extends JpaRepository<MailRecipients,Long> ,JpaSpecificationExecutor<MailRecipients>{
 
-    List<EmailRecipients> findByEmailRecipientsKeyId(Long id);
+    List<MailRecipients> findByEmailRecipientsKeyId(Long id);
 
 
 }

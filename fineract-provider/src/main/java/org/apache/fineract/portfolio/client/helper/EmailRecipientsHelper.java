@@ -8,85 +8,76 @@ package org.apache.fineract.portfolio.client.helper;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
-import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
+import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class EmailRecipientsHelper {
 
-    public static Long createMailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , EmailRecipientsKey emailRecipientsKey){
+    public static Long createMailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , MailRecipientsKey mailRecipientsKey){
 
-        int count = emailRecipientsKey.getEmailRecipientsList().size();
-        emailRecipientsKey.setCount(count);
-        emailRecipientsKeyRepository.saveAndFlush(emailRecipientsKey);
+        int count = mailRecipientsKey.getMailRecipientsList().size();
+        mailRecipientsKey.setCount(count);
+        emailRecipientsKeyRepository.saveAndFlush(mailRecipientsKey);
 
         /// we need to do a whole lot of logics here
-        List<EmailRecipients> emailRecipientsList = emailRecipientsKey.getEmailRecipientsList();
+        List<MailRecipients> mailRecipientsList = mailRecipientsKey.getMailRecipientsList();
 
-        for(EmailRecipients emailRecipients : emailRecipientsList){
-            emailRecipients.setEmailRecipientsKey(emailRecipientsKey);
-            emailRecipientsRepository.save(emailRecipients);
+        for(MailRecipients mailRecipients : mailRecipientsList){
+            mailRecipients.setMailRecipientsKey(mailRecipientsKey);
+            emailRecipientsRepository.save(mailRecipients);
         }
 
-        Long id = emailRecipientsKey.getId();
+        Long id = mailRecipientsKey.getId();
         return id ;
-
     }
 
-    public static Queue<EmailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
+    public static Queue<MailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
 
-        EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(keyId);
+        MailRecipientsKey mailRecipientsKey = emailRecipientsKeyRepository.findOne(keyId);
 
         // if true then get office id and fill lists with recipients of clients
-        boolean selectAllMode = emailRecipientsKey.getSelectAllMode();
-        Queue<EmailRecipients> mailRecipientsQueue = new LinkedList<>();
+        boolean selectAllMode = mailRecipientsKey.getSelectAllMode();
+        Queue<MailRecipients> mailRecipientsQueue = new LinkedList<>();
 
         if(selectAllMode){
 
-            Long officeId = emailRecipientsKey.getOfficeId();
-            Long zero = new Long(0);
+            Long officeId = mailRecipientsKey.getOfficeId();
             
-            if(officeId==null){
-                officeId = zero ;
-            }
             // we need to implement new nullable stuff here
 
             // some stupid glitch exists here
-            //Optional.ofNullable(officeId)
+            
+            
+            boolean officeIdPresent = Optional.ofNullable(officeId).isPresent();
 
-            boolean status = officeId.equals(zero);
-            int cmp = officeId.compareTo(zero);
-
-            Consumer<EmailRecipients> addNewToQueue = (e)-> mailRecipientsQueue.add(e);
+            Consumer<MailRecipients> addNewToQueue = (e)-> mailRecipientsQueue.add(e);
                     
-            if(officeId.equals(zero)){
-                //we taking all clients
+            if(!officeIdPresent){
+                //we taking all clients since no office has been specified
 
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
                 Consumer<ClientData> mailRecipientsConsumer = (clientData) ->{
-                    EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    //Consumer<EmailRecipients> addNew = (e)-> mailRecipientsQueue.put(e);
-                    Optional.ofNullable(emailRecipients).ifPresent(addNewToQueue);
+                    MailRecipients mailRecipients = createMailRecipientObject(clientData);
+                    //Consumer<MailRecipients> addNew = (e)-> mailRecipientsQueue.put(e);
+                    Optional.ofNullable(mailRecipients).ifPresent(addNewToQueue);
                 };
 
                 clientDataList.getPageItems().stream().forEach(mailRecipientsConsumer);
             }
             else{
 
-                System.err.println("------- else not select all----------------");
                 String lookUpCriteria = String.format("office_id=%d",officeId);
-
                 Collection<ClientData> clientDataList = clientReadPlatformService.retrieveAllForLookup(lookUpCriteria);
                 Consumer<ClientData> clientDataConsumer = (clientData)->{
 
-                    EmailRecipients emailRecipients = createMailRecipientObject(clientData);
-                    Optional.ofNullable(emailRecipients).ifPresent(addNewToQueue);
+                    MailRecipients mailRecipients = createMailRecipientObject(clientData);
+                    Optional.ofNullable(mailRecipients).ifPresent(addNewToQueue);
 
                 };
 
@@ -96,18 +87,19 @@ public class EmailRecipientsHelper {
 
             /// update email addressed here son
 
-            Consumer<EmailRecipients> updateEmails = (e)->{
+            Consumer<MailRecipients> updateEmails = (e)->{
                 Long clientId = e.getClientId();
                 ClientData clientData = clientReadPlatformService.retrieveOne(clientId);
                 String emailCurrent = clientData.getEmailAddress();
                 e.setEmailAddress(emailCurrent);
             };
 
-            mailRecipientsQueue.stream().forEach(updateEmails);
+            // is it necessary since we taking data from client readplarform on retrieving already ?
+            // mailRecipientsQueue.stream().forEach(updateEmails);
             return mailRecipientsQueue ;
         }
 
-        List<EmailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
+        List<MailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
         mailRecipientsList.stream().forEach((e)->{
             mailRecipientsQueue.add(e);
         });
@@ -115,13 +107,13 @@ public class EmailRecipientsHelper {
         return mailRecipientsQueue ;
     }
 
-    public static EmailRecipients createMailRecipientObject(ClientData clientData){
+    public static MailRecipients createMailRecipientObject(ClientData clientData){
 
         String name = clientData.displayName();
         String email = clientData.getEmailAddress();
         Long clientId = clientData.getId();
 
-        return new EmailRecipients(name ,email ,true ,clientId);
+        return new MailRecipients(name ,email ,true ,clientId);
 
     }
 }

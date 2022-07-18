@@ -15,7 +15,7 @@ import javax.persistence.Transient;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobDetail;
-import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
 
 
 @Table(name ="m_scheduled_report")
@@ -36,7 +36,7 @@ public class ScheduledReport extends AbstractPersistableCustom<Long> {
 
     @ManyToOne
     @JoinColumn(name="mail_recipients_key_id")
-    private EmailRecipientsKey emailRecipientsKey;
+    private MailRecipientsKey mailRecipientsKey;
 
     // Added 02/09/2021
     @Transient
@@ -74,12 +74,12 @@ public class ScheduledReport extends AbstractPersistableCustom<Long> {
         this.parameters = parameters;
     }
 
-    public EmailRecipientsKey getEmailRecipientsKey() {
-        return emailRecipientsKey;
+    public MailRecipientsKey getMailRecipientsKey() {
+        return mailRecipientsKey;
     }
 
-    public void setEmailRecipientsKey(EmailRecipientsKey emailRecipientsKey) {
-        this.emailRecipientsKey = emailRecipientsKey;
+    public void setMailRecipientsKey(MailRecipientsKey mailRecipientsKey) {
+        this.mailRecipientsKey = mailRecipientsKey;
     }
 
     public Boolean getEniqueReport() {

@@ -46,6 +46,15 @@ public class BusinessEventNotificationConstants {
             this.value = value;
         }
 
+        public static BUSINESS_EVENTS fromInt(int arg){
+            for(BUSINESS_EVENTS b : values()){
+                if(b.ordinal()==arg){
+                    return b;
+                }
+            }
+            return null ;
+        }
+
         private static final Set<String> values = new HashSet<>();
         static {
             for (final BUSINESS_EVENTS type : BUSINESS_EVENTS.values()) {

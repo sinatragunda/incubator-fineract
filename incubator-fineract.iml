@@ -20,7 +20,6 @@
         <setting name="provider-name" value="" />
         <datasource-mapping>
           <factory-entry name="Entities" />
-          <factory-entry name="jpa-pu" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/build/classes/main/META-INF/persistence.xml" />
       </configuration>

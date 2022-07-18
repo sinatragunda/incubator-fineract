@@ -19,7 +19,7 @@ import javax.persistence.Transient ;
 
 @Entity
 @Table(name="m_mail_recipients_key")
-public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
+public class MailRecipientsKey extends AbstractPersistableCustom<Long>{
 
     @Column(name="name")
     private String name ;
@@ -34,20 +34,20 @@ public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
     private Long officeId;
 
     // added 15/06/2022
-    @Column(name="is_client_event_notification" ,nullable=true)
-    private Boolean isClientEventNotification;
-
+    // this specifies the fact that its a client event hence its only broadcasting to specific clients for that event only 
+    @Column(name="event_notification_type" ,nullable=true)
+    private EVENT_NOTIFICATION_TYPE eventNotificationType;
 
     @Transient
-    private List<EmailRecipients> emailRecipientsList = new ArrayList<>();
+    private List<MailRecipients> mailRecipientsList = new ArrayList<>();
 
-    public EmailRecipientsKey(){}
+    public MailRecipientsKey(){}
 
-    public EmailRecipientsKey(Long id){
+    public MailRecipientsKey(Long id){
         setId(id);
     }
 
-    public EmailRecipientsKey(String name, Boolean selectAllMode, Long officeId) {
+    public MailRecipientsKey(String name, Boolean selectAllMode, Long officeId) {
         this.name = name;
         this.selectAllMode = selectAllMode;
         this.officeId = officeId;
@@ -85,12 +85,12 @@ public class EmailRecipientsKey extends AbstractPersistableCustom<Long>{
         this.officeId = officeId;
     }
 
-    public List<EmailRecipients> getEmailRecipientsList() {
-        return emailRecipientsList;
+    public List<MailRecipients> getMailRecipientsList() {
+        return mailRecipientsList;
     }
 
-    public void setEmailRecipientsList(List<EmailRecipients> emailRecipientsList) {
-        this.emailRecipientsList = emailRecipientsList;
+    public void setMailRecipientsList(List<MailRecipients> mailRecipientsList) {
+        this.mailRecipientsList = mailRecipientsList;
     }
 
 }

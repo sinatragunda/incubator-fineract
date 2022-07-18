@@ -55,8 +55,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
-import org.apache.fineract.portfolio.client.domain.EmailRecipients;
-import org.apache.fineract.portfolio.client.domain.EmailRecipientsKey;
+import org.apache.fineract.portfolio.client.domain.MailRecipients;
+import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
 import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
@@ -379,13 +379,13 @@ public class ClientsApiResource {
     @Path("/mailrecipients/{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public EmailRecipientsKey viewMailRecipient(@PathParam("id") final Long id) {
+    public MailRecipientsKey viewMailRecipient(@PathParam("id") final Long id) {
 
-        EmailRecipientsKey emailRecipientsKey = emailRecipientsKeyRepository.findOne(id);
-        List<EmailRecipients> emailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
-        //emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
-        emailRecipientsKey.setEmailRecipientsList(emailRecipientsList);
-        return emailRecipientsKey ;
+        MailRecipientsKey mailRecipientsKey = emailRecipientsKeyRepository.findOne(id);
+        List<MailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
+        //mailRecipientsKey.setMailRecipientsList(mailRecipientsList);
+        mailRecipientsKey.setMailRecipientsList(mailRecipientsList);
+        return mailRecipientsKey;
 
     }
 
@@ -394,10 +394,10 @@ public class ClientsApiResource {
     @Path("/mailrecipients")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public List<EmailRecipientsKey> getMailRecipient(){
+    public List<MailRecipientsKey> getMailRecipient(){
 
-        List<EmailRecipientsKey> emailRecipientsKeyList = emailRecipientsKeyRepository.findAll();
-        return emailRecipientsKeyList;
+        List<MailRecipientsKey> mailRecipientsKeyList = emailRecipientsKeyRepository.findAll();
+        return mailRecipientsKeyList;
     }
 
     // Added 15/08/2021
@@ -405,9 +405,9 @@ public class ClientsApiResource {
     @Path("/mailrecipients")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String createMailRecipient(@RequestBody EmailRecipientsKey emailRecipientsKey){
+    public String createMailRecipient(@RequestBody MailRecipientsKey mailRecipientsKey){
 
-        Long id = EmailRecipientsHelper.createMailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository, emailRecipientsKey);
+        Long id = EmailRecipientsHelper.createMailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository, mailRecipientsKey);
 
         if(id==null){
             return ObjectNodeHelper.statusNode(false).put("message","Failed to create mail recipients").toString();
