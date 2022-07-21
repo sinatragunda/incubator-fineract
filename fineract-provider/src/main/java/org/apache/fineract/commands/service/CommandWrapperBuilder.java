@@ -3211,5 +3211,12 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    public CommandWrapperBuilder createEventSubscription() {
+        this.actionName = "CREATE";
+        this.entityName = "EVENT_SUBSCRIPTION";
+        this.href = "/eventsubscription";
+        return this;
+    }
+
 
 }

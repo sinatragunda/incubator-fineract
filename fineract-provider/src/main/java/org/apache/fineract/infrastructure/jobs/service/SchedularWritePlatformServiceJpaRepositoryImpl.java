@@ -26,9 +26,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReport;
 import org.apache.fineract.infrastructure.dataqueries.helper.ScheduledReportHelper;
-import org.apache.fineract.infrastructure.dataqueries.domain.ScheduledReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.service.ScheduledReportRepositoryWrapper;
 import org.apache.fineract.infrastructure.jobs.annotation.CronTarget;
 import org.apache.fineract.infrastructure.jobs.data.JobDetailDataValidator;
@@ -38,11 +36,10 @@ import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistory;
 import org.apache.fineract.infrastructure.jobs.domain.ScheduledJobRunHistoryRepository;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetail;
 import org.apache.fineract.infrastructure.jobs.domain.SchedulerDetailRepository;
-import org.apache.fineract.infrastructure.jobs.exception.JobExecutionException;
 import org.apache.fineract.infrastructure.jobs.exception.JobNotFoundException;
 import org.apache.fineract.infrastructure.jobs.helper.ScheduledJobsHelper;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.spm.repository.EmailSendStatusRepository;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
@@ -52,8 +49,6 @@ import org.mifosplatform.infrastructure.report.service.PentahoReportingProcessSe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import org.apache.fineract.infrastructure.jobs.annotation.CronTarget;
 
 
 @Service
@@ -68,8 +63,8 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     private final PentahoReportingProcessServiceImpl pentahoReportingProcessService;
     private final WeseEmailService weseEmailService ;
     private final ClientReadPlatformService clientReadPlatformService ;
-    private final EmailRecipientsKeyRepository emailRecipientsKeyRepository ;
-    private final EmailRecipientsRepository emailRecipientsRepository;
+    private final MailRecipientsKeyRepository mailRecipientsKeyRepository;
+    private final MailRecipientsRepository mailRecipientsRepository;
     private final MailServerSettingsRepository mailServerSettingsRepository ;
 
     // Added 06/09/2021
@@ -80,7 +75,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
     @Autowired
     public SchedularWritePlatformServiceJpaRepositoryImpl(final ScheduledJobDetailRepository scheduledJobDetailsRepository,
                                                           final ScheduledJobRunHistoryRepository scheduledJobRunHistoryRepository, final JobDetailDataValidator dataValidator,
-                                                          final SchedulerDetailRepository schedulerDetailRepository , final FromJsonHelper fromJsonHelper , final  ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper , final WeseEmailService weseEmailService , final PentahoReportingProcessServiceImpl pentahoReportingProcessService , final EmailRecipientsKeyRepository emailRecipientsKeyRepository , final ClientReadPlatformService clientReadPlatformService , final EmailRecipientsRepository emailRecipientsRepository , final MailServerSettingsRepository mailServerSettingsRepository ,final ScheduledMailSessionRepository scheduledMailSessionRepository ,final EmailSendStatusRepository emailSendStatusRepository) {
+                                                          final SchedulerDetailRepository schedulerDetailRepository , final FromJsonHelper fromJsonHelper , final  ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper , final WeseEmailService weseEmailService , final PentahoReportingProcessServiceImpl pentahoReportingProcessService , final MailRecipientsKeyRepository mailRecipientsKeyRepository, final ClientReadPlatformService clientReadPlatformService , final MailRecipientsRepository mailRecipientsRepository, final MailServerSettingsRepository mailServerSettingsRepository , final ScheduledMailSessionRepository scheduledMailSessionRepository , final EmailSendStatusRepository emailSendStatusRepository) {
         this.scheduledJobDetailsRepository = scheduledJobDetailsRepository;
         this.scheduledJobRunHistoryRepository = scheduledJobRunHistoryRepository;
         this.schedulerDetailRepository = schedulerDetailRepository;
@@ -89,9 +84,9 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
         this.scheduledReportRepositoryWrapper = scheduledReportRepositoryWrapper;
         this.pentahoReportingProcessService = pentahoReportingProcessService ;
         this.weseEmailService = weseEmailService;
-        this.emailRecipientsKeyRepository = emailRecipientsKeyRepository;
+        this.mailRecipientsKeyRepository = mailRecipientsKeyRepository;
         this.clientReadPlatformService = clientReadPlatformService;
-        this.emailRecipientsRepository = emailRecipientsRepository;
+        this.mailRecipientsRepository = mailRecipientsRepository;
         this.mailServerSettingsRepository = mailServerSettingsRepository ;
         this.emailSendStatusRepository = emailSendStatusRepository ;
         this.scheduledMailSessionRepository = scheduledMailSessionRepository;
@@ -205,7 +200,7 @@ public class SchedularWritePlatformServiceJpaRepositoryImpl implements Schedular
         ScheduledJobDetail scheduledJobDetail = findByJobId(jobId);
 
         if (jobId !=null){
-            ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper ,emailRecipientsKeyRepository ,emailRecipientsRepository ,mailServerSettingsRepository,scheduledMailSessionRepository ,emailSendStatusRepository , clientReadPlatformService ,scheduledJobDetail);
+            ScheduledReportHelper.runScheduledMailReport(pentahoReportingProcessService ,weseEmailService ,scheduledReportRepositoryWrapper , mailRecipientsKeyRepository, mailRecipientsRepository,mailServerSettingsRepository,scheduledMailSessionRepository ,emailSendStatusRepository , clientReadPlatformService ,scheduledJobDetail);
         }
 
     }

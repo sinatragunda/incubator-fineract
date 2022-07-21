@@ -46,5 +46,9 @@ public interface SavingsAccountDomainService {
 
     // Added 02/01/2021
     SavingsAccountTransaction handleDepositLiteEx(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+
+    // Added 19/07/2022
+    SavingsAccountTransaction handleDepositLiteEx1(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+   
    
 }

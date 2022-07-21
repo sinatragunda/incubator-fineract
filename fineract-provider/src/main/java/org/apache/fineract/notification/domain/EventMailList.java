@@ -17,17 +17,34 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
+
+
 
 @Entity
 @Table(name="m_event_mail_list")
 public class EventMailList extends AbstractPersistableCustom<Long>{
 
     @ManyToOne
-    @JoinColumn(name = "event_subscription_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "event_subscription_id",nullable = false)
     private EventSubscription eventSubscription;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "mail_recipient_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "mail_recipient_id", nullable = false)
     private List<MailRecipientsKey> mailRecipientsKey;
 
 

@@ -57,9 +57,9 @@ import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPl
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
-import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
+import org.apache.fineract.portfolio.client.helper.MailRecipientsHelper;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
@@ -93,20 +93,20 @@ public class ClientsApiResource {
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
-    private final EmailRecipientsKeyRepository emailRecipientsKeyRepository ;
-    private final EmailRecipientsRepository emailRecipientsRepository ;
+    private final MailRecipientsKeyRepository mailRecipientsKeyRepository;
+    private final MailRecipientsRepository mailRecipientsRepository;
     private final SelfServiceReadPlatformService selfServiceReadPlatformService ;
 
     @Autowired
     public ClientsApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,
-            final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
-            final ToApiJsonSerializer<AccountSummaryCollectionData> clientAccountSummaryToApiJsonSerializer,
-            final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
-            final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
-            final BulkImportWorkbookService bulkImportWorkbookService, final EmailRecipientsKeyRepository emailRecipientsKeyRepository , final EmailRecipientsRepository emailRecipientsRepository, final SelfServiceReadPlatformService selfServiceReadPlatformService) {
+                              final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
+                              final ToApiJsonSerializer<AccountSummaryCollectionData> clientAccountSummaryToApiJsonSerializer,
+                              final ApiRequestParameterHelper apiRequestParameterHelper,
+                              final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+                              final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
+                              final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
+                              final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
+                              final BulkImportWorkbookService bulkImportWorkbookService, final MailRecipientsKeyRepository mailRecipientsKeyRepository, final MailRecipientsRepository mailRecipientsRepository, final SelfServiceReadPlatformService selfServiceReadPlatformService) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -117,8 +117,8 @@ public class ClientsApiResource {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
         this.bulkImportWorkbookService=bulkImportWorkbookService;
-        this.emailRecipientsKeyRepository = emailRecipientsKeyRepository;
-        this.emailRecipientsRepository = emailRecipientsRepository;
+        this.mailRecipientsKeyRepository = mailRecipientsKeyRepository;
+        this.mailRecipientsRepository = mailRecipientsRepository;
         this.selfServiceReadPlatformService = selfServiceReadPlatformService ;
     }
 
@@ -381,8 +381,8 @@ public class ClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public MailRecipientsKey viewMailRecipient(@PathParam("id") final Long id) {
 
-        MailRecipientsKey mailRecipientsKey = emailRecipientsKeyRepository.findOne(id);
-        List<MailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(id);
+        MailRecipientsKey mailRecipientsKey = mailRecipientsKeyRepository.findOne(id);
+        List<MailRecipients> mailRecipientsList = mailRecipientsRepository.findByMailRecipientsKeyId(id);
         //mailRecipientsKey.setMailRecipientsList(mailRecipientsList);
         mailRecipientsKey.setMailRecipientsList(mailRecipientsList);
         return mailRecipientsKey;
@@ -396,7 +396,7 @@ public class ClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public List<MailRecipientsKey> getMailRecipient(){
 
-        List<MailRecipientsKey> mailRecipientsKeyList = emailRecipientsKeyRepository.findAll();
+        List<MailRecipientsKey> mailRecipientsKeyList = mailRecipientsKeyRepository.findAll();
         return mailRecipientsKeyList;
     }
 
@@ -407,7 +407,7 @@ public class ClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createMailRecipient(@RequestBody MailRecipientsKey mailRecipientsKey){
 
-        Long id = EmailRecipientsHelper.createMailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository, mailRecipientsKey);
+        Long id = MailRecipientsHelper.createMailRecipients(mailRecipientsKeyRepository, mailRecipientsRepository, mailRecipientsKey);
 
         if(id==null){
             return ObjectNodeHelper.statusNode(false).put("message","Failed to create mail recipients").toString();

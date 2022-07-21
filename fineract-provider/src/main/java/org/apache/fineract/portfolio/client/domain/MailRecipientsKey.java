@@ -33,11 +33,6 @@ public class MailRecipientsKey extends AbstractPersistableCustom<Long>{
     @Column(name="office_id" ,nullable=true)
     private Long officeId;
 
-    // added 15/06/2022
-    // this specifies the fact that its a client event hence its only broadcasting to specific clients for that event only 
-    @Column(name="event_notification_type" ,nullable=true)
-    private EVENT_NOTIFICATION_TYPE eventNotificationType;
-
     @Transient
     private List<MailRecipients> mailRecipientsList = new ArrayList<>();
 

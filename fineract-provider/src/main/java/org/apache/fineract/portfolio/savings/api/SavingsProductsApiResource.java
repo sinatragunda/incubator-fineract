@@ -32,6 +32,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -75,10 +76,7 @@ import org.apache.fineract.portfolio.savings.helper.SavingsProductPortfolioHelpe
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
-import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
-import org.apache.fineract.portfolio.savings.service.SavingsDropdownReadPlatformService;
-import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
-import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.*;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +121,7 @@ public class SavingsProductsApiResource {
     private final EquityGrowthDividendsRepository equityGrowthDividendsRepository ;
     private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository;
     private final SavingsAccountAssembler savingsAccountAssembler;
+    private final SavingsAccountServiceWrapper savingsAccountServiceWrapper;
 
     @Autowired
     public SavingsProductsApiResource(final SavingsProductReadPlatformService savingProductReadPlatformService,
@@ -134,7 +133,7 @@ public class SavingsProductsApiResource {
             final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService,
             final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService,
             final ChargeReadPlatformService chargeReadPlatformService, PaymentTypeReadPlatformService paymentTypeReadPlatformService,
-            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository ,final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountAssembler savingsAccountAssembler) {
+            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository ,final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final SavingsAccountServiceWrapper savingsAccountServiceWrapper) {
         this.savingProductReadPlatformService = savingProductReadPlatformService;
         this.dropdownReadPlatformService = dropdownReadPlatformService;
         this.currencyReadPlatformService = currencyReadPlatformService;
@@ -154,6 +153,7 @@ public class SavingsProductsApiResource {
         this.equityGrowthDividendsRepository = equityGrowthDividendsRepository ;
         this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository ;
         this.savingsAccountAssembler = savingsAccountAssembler;
+        this.savingsAccountServiceWrapper = savingsAccountServiceWrapper;
     }
 
     @POST
@@ -221,7 +221,7 @@ public class SavingsProductsApiResource {
     @Path("/equitygrowth/{productId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public List<EquityGrowthOnSavingsAccount> equityGrowth(@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
+    public List<EquityGrowthOnSavingsAccount> equityGrowth(@QueryParam("transferEarnings")boolean transferEarnings ,@PathParam("productId") final Long productId, final String apiRequestBodyAsJson) {
 
         //this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_PRODUCT_PORTFOLIO);
         JsonParser jsonParser = new JsonParser();
@@ -236,22 +236,23 @@ public class SavingsProductsApiResource {
         LocalDate endDate = fromJsonHelper.extractLocalDateNamed("endDate" ,jsonElement);
         BigDecimal portfolioBalance = fromJsonHelper.extractBigDecimalWithLocaleNamed("portfolioBalance",jsonElement);
         BigDecimal profitAmount = fromJsonHelper.extractBigDecimalWithLocaleNamed("profit" ,jsonElement);
-        Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
+        //Boolean transferEarning = fromJsonHelper.extractBooleanNamed("transferEarnings" ,jsonElement);
         String calculationCriteria = fromJsonHelper.extractStringNamed("calcCriteria" ,jsonElement);
         Boolean includeZeroBeneficiaries = fromJsonHelper.extractBooleanNamed("zeroBeneficiaries" ,jsonElement);
-
 
         SAVINGS_TOTAL_CALC_CRITERIA savingsTotalCalcCriteria = SAVINGS_TOTAL_CALC_CRITERIA.fromString(calculationCriteria);
 
         EquityGrowthHelper equityGrowthHelper = new EquityGrowthHelper(includeZeroBeneficiaries);
         List<EquityGrowthOnSavingsAccount> equityGrowthOnSavingsAccountList =  equityGrowthHelper.calculateEquity(savingsAccountMonthlyDepositRepository, savingsAccountDataList ,savingsTotalCalcCriteria , productId, startDate.toDate() ,endDate.toDate(),portfolioBalance ,profitAmount);
 
-        if(transferEarning){
+        if(transferEarnings){
             /// do something here that does transfer earnings to the said accounts son
+
+            Long transferSourceAccountId = fromJsonHelper.extractLongNamed("transferSourceAccountId" ,jsonElement);
             EquityGrowthDividends equityGrowthDividends = equityGrowthHelper.getEquityGrowthDividends();
             equityGrowthDividends = equityGrowthDividendsRepository.saveAndFlush(equityGrowthDividends);
             equityGrowthHelper.flushToDatabase(equityGrowthOnSavingsAccountRepository,equityGrowthDividends , equityGrowthOnSavingsAccountList);
-            equityGrowthHelper.transferEarnings(savingsAccountDomainService ,equityGrowthOnSavingsAccountList);
+            equityGrowthHelper.transferEarnings(savingsAccountServiceWrapper, equityGrowthOnSavingsAccountList ,transferSourceAccountId);
 
         }
         return equityGrowthOnSavingsAccountList ;

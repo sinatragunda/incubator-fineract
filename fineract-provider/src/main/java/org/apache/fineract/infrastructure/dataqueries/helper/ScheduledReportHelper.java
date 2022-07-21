@@ -26,9 +26,9 @@ import org.apache.fineract.infrastructure.jobs.service.SchedularWritePlatformSer
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
-import org.apache.fineract.portfolio.client.helper.EmailRecipientsHelper;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
+import org.apache.fineract.portfolio.client.helper.MailRecipientsHelper;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.spm.repository.EmailSendStatusRepository;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
@@ -83,7 +83,7 @@ public class ScheduledReportHelper {
 
     }
 
-    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , MailServerSettingsRepository mailServerSettingsRepository , ScheduledMailSessionRepository scheduledMailSessionRepository , EmailSendStatusRepository emailSendStatusRepository, ClientReadPlatformService clientReadPlatformService , ScheduledJobDetail scheduledJobDetail){
+    public static void runScheduledMailReport(PentahoReportingProcessServiceImpl pentahoReportingProcessService , WeseEmailService weseEmailService , ScheduledReportRepositoryWrapper scheduledReportRepositoryWrapper, MailRecipientsKeyRepository mailRecipientsKeyRepository, MailRecipientsRepository mailRecipientsRepository, MailServerSettingsRepository mailServerSettingsRepository , ScheduledMailSessionRepository scheduledMailSessionRepository , EmailSendStatusRepository emailSendStatusRepository, ClientReadPlatformService clientReadPlatformService , ScheduledJobDetail scheduledJobDetail){
 
         Long jobId = scheduledJobDetail.getId();
         
@@ -99,7 +99,7 @@ public class ScheduledReportHelper {
         PentahoReportGenerator pentahoReportGenerator = new PentahoReportGenerator(pentahoReportingProcessService);
         
         Long recipientsKey = scheduledReport.getMailRecipientsKey().getId();
-        Queue<MailRecipients> mailRecipientsQueue = EmailRecipientsHelper.emailRecipients(emailRecipientsKeyRepository ,emailRecipientsRepository  ,clientReadPlatformService ,recipientsKey);
+        Queue<MailRecipients> mailRecipientsQueue = MailRecipientsHelper.emailRecipients(mailRecipientsKeyRepository, mailRecipientsRepository,clientReadPlatformService ,recipientsKey);
 
         int recipientsCount = mailRecipientsQueue.size();
     

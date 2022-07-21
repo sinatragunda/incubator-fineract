@@ -114,9 +114,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
 
-
-        //System.err.println("----------------------account withdrawal there son -------------------");
-
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
 
         final MathContext mc = MathContext.DECIMAL64;
@@ -134,14 +131,13 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             depositAccountOnHoldTransactions = this.depositAccountOnHoldTransactionRepository
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
+
         //System.out.println("-----------------validate negative thing here --------------");
 
         // added 28/03/2022
         // added so that products that allow overdrawing can actually transfer money out of this account
         SavingsProduct savingsProduct = account.savingsProduct();
         boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
-
-        //System.err.println("-------------------account overdraft ? "+isOverdraftAccount);
 
         if(!isOverdraftAccount) {
 
@@ -221,13 +217,26 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
         SavingsAccountTransaction savingsAccountTransaction = handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType);
 
-
         Optional.ofNullable(noteText).ifPresent(e->{
+            
+            System.err.println("-------------note is---------------- "+noteText);
+
             final Note note = Note.savingsTransactionNote (savingsAccount, savingsAccountTransaction, noteText);
             this.noteRepository.save(note);
         });
 
-        return savingsAccountTransaction ;
+        return savingsAccountTransaction;
+    }
+
+
+    // Added 19/07/2022 ,extended version of the Ex.
+    @Transactional
+    @Override
+    public SavingsAccountTransaction handleDepositLiteEx1(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
+
+        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
+        return handleDepositLiteEx(savingsAccount ,transactionDate ,transactionAmount,noteText);
+
     }
 
     private SavingsAccountTransaction handleDeposit(final SavingsAccount account, final DateTimeFormatter fmt,

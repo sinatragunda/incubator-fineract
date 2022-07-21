@@ -10,36 +10,36 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsKeyRepository;
-import org.apache.fineract.portfolio.client.repo.EmailRecipientsRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsKeyRepository;
+import org.apache.fineract.portfolio.client.repo.MailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-public class EmailRecipientsHelper {
+public class MailRecipientsHelper {
 
-    public static Long createMailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , MailRecipientsKey mailRecipientsKey){
+    public static Long createMailRecipients(MailRecipientsKeyRepository mailRecipientsKeyRepository, MailRecipientsRepository mailRecipientsRepository, MailRecipientsKey mailRecipientsKey){
 
         int count = mailRecipientsKey.getMailRecipientsList().size();
         mailRecipientsKey.setCount(count);
-        emailRecipientsKeyRepository.saveAndFlush(mailRecipientsKey);
+        mailRecipientsKeyRepository.saveAndFlush(mailRecipientsKey);
 
         /// we need to do a whole lot of logics here
         List<MailRecipients> mailRecipientsList = mailRecipientsKey.getMailRecipientsList();
 
         for(MailRecipients mailRecipients : mailRecipientsList){
             mailRecipients.setMailRecipientsKey(mailRecipientsKey);
-            emailRecipientsRepository.save(mailRecipients);
+            mailRecipientsRepository.save(mailRecipients);
         }
 
         Long id = mailRecipientsKey.getId();
         return id ;
     }
 
-    public static Queue<MailRecipients> emailRecipients(EmailRecipientsKeyRepository emailRecipientsKeyRepository , EmailRecipientsRepository emailRecipientsRepository , ClientReadPlatformService clientReadPlatformService, Long keyId){
+    public static Queue<MailRecipients> emailRecipients(MailRecipientsKeyRepository mailRecipientsKeyRepository, MailRecipientsRepository mailRecipientsRepository, ClientReadPlatformService clientReadPlatformService, Long keyId){
 
-        MailRecipientsKey mailRecipientsKey = emailRecipientsKeyRepository.findOne(keyId);
+        MailRecipientsKey mailRecipientsKey = mailRecipientsKeyRepository.findOne(keyId);
 
         // if true then get office id and fill lists with recipients of clients
         boolean selectAllMode = mailRecipientsKey.getSelectAllMode();
@@ -99,7 +99,7 @@ public class EmailRecipientsHelper {
             return mailRecipientsQueue ;
         }
 
-        List<MailRecipients> mailRecipientsList = emailRecipientsRepository.findByEmailRecipientsKeyId(keyId);
+        List<MailRecipients> mailRecipientsList = mailRecipientsRepository.findByMailRecipientsKeyId(keyId);
         mailRecipientsList.stream().forEach((e)->{
             mailRecipientsQueue.add(e);
         });

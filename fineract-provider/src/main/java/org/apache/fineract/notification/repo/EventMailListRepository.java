@@ -7,13 +7,14 @@
 package org.apache.fineract.notification.repo;
 
 import org.apache.fineract.notification.domain.EventMailList;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface EventMailListRepository extends JpaRepository<EventMailList ,Long> ,JpaSpeficationExecutor<EventMailList>{
+public interface EventMailListRepository extends JpaRepository<EventMailList ,Long> ,JpaSpecificationExecutor<EventMailList>{
 
-    List<EventMailList> findWhereEventSubscriptionId(Long id);
+    List<EventMailList> findByEventSubscriptionId(Long id);
 
 }

@@ -97,6 +97,9 @@
  -->
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.campaigns.email.domain"/>
 	<jpa:repositories base-package="org.apache.fineract.portfolio.commissions.repo"/>
+	<jpa:repositories base-package="org.apache.fineract.notification.repo"/>
+
+
 
 
 

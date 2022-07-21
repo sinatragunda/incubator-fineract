@@ -8,6 +8,7 @@ package org.apache.fineract.notification.service;
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.notification.constants.EventSubscriptionConstants;
@@ -30,6 +31,24 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
+
 
 
 @Service
@@ -87,6 +106,8 @@ public class EventSubscriptionWritePlatformServiceImpl implements EventSubscript
         });
 
         /// at this point it should have an id
+        CommandProcessingResult result = new CommandProcessingResultBuilder().withEntityId(eventSubscription.getId()).build();
+        return result;
 
     }
 

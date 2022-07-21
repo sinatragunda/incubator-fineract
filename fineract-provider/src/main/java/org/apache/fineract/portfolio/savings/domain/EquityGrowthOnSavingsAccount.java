@@ -19,6 +19,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
@@ -26,7 +27,6 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name="m_equity_growth_savings_account")
 public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long>{
-
 
     @ManyToOne
     @JoinColumn(name ="equity_growth_dividends_id", nullable = false)
@@ -46,6 +46,10 @@ public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long
 
     @Column(name="note")
     private String note ;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="transfer_account_id" ,nullable=false)
+    private SavingsAccount transferAccount;
 
 
     @Transient
@@ -119,5 +123,13 @@ public class EquityGrowthOnSavingsAccount extends AbstractPersistableCustom<Long
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public SavingsAccount getTransferAccount() {
+        return this.transferAccount;
+    }
+
+    public void setTransferAccount(SavingsAccount transferAccount) {
+        this.transferAccount = transferAccount;
     }
 }

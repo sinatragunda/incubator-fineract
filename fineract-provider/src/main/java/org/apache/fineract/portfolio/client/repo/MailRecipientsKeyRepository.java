@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
-public interface EmailRecipientsKeyRepository extends JpaRepository<MailRecipientsKey,Long>  ,JpaSpecificationExecutor<MailRecipientsKey>{
+public interface MailRecipientsKeyRepository extends JpaRepository<MailRecipientsKey,Long>  ,JpaSpecificationExecutor<MailRecipientsKey>{
 
     List<MailRecipientsKey> findAll();
     MailRecipientsKey findOne(Long id);
