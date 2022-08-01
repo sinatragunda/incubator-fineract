@@ -824,9 +824,7 @@ public class SavingsAccountData {
     }
 
     public BigDecimal getAccountBalance(){
-        System.err.println("------------get some balance here------------");
         BigDecimal amount = summary.getAccountBalance();
-        System.err.println("---------------------amount is ----------------"+amount);
         return amount;
     }
 

@@ -266,6 +266,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             sqlBuilder.append("sa.withdraw as withdraw, ");
             sqlBuilder.append("sa.deposit as deposit, ");
             sqlBuilder.append("sa.start_date as startDate,");
+            sqlBuilder.append("sa.opening_balance as openingBalance, ");
             sqlBuilder.append("sa.savings_account_id as savingsId ");
 
             sqlBuilder.append("from m_savings_account_monthly_deposit sa where sa.savings_account_id = "+id);
@@ -285,8 +286,9 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
             final Date startDate = rs.getDate("startDate");
             final Long savingsId = rs.getLong("savingsId");
             final BigDecimal withdraw = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs ,"withdraw");
+            final BigDecimal openingBalance = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs ,"openingBalance");
 
-            return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,deposit ,withdraw);
+            return new SavingsAccountMonthlyDeposit(savingsId ,startDate ,deposit ,withdraw ,openingBalance);
         }
     }
 

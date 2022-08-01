@@ -78,6 +78,10 @@ public class SavingsAccountTransactionData {
     private BigDecimal equityBalance;
 
 
+    // Added 22/07/2022
+    private Long savingsProductId ;
+
+
     public static SavingsAccountTransactionData importInstance(BigDecimal transactionAmount,LocalDate transactionDate,
             Long paymentTypeId,String accountNumber, String checkNumber, String routingCode,
             String receiptNumber, String bankNumber,Long savingsAccountId,
@@ -278,5 +282,14 @@ public class SavingsAccountTransactionData {
 
     public String getNote(){
         return this.note ;
+    }
+
+
+    public void setSavingsProductId(Long id){
+        this.savingsProductId = id ;
+    }
+
+    public Long getSavingsProductId(){
+        return this.savingsProductId;
     }
 }

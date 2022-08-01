@@ -34,4 +34,7 @@ public interface SavingsProductReadPlatformService {
 
     SavingsProductData retrieveOne(Long productId);
 
+    // Added 22/07/2022
+    SavingsProductData retrieveOneByName(String productName);
+
 }

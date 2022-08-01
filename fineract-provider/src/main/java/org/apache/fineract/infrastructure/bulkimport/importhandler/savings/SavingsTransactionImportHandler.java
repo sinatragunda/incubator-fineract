@@ -41,6 +41,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthDividendsRepository;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
@@ -69,15 +70,20 @@ public class SavingsTransactionImportHandler implements ImportHandler {
     private final EquityGrowthDividendsRepository equityGrowthDividendsRepository;
     private final SavingsAccountAssembler savingsAccountAssembler;
 
+
+    // Added 22/07/2022
+    private final SavingsProductReadPlatformService savingsProductReadPlatformService;
+
     @Autowired
     public SavingsTransactionImportHandler(final PortfolioCommandSourceWritePlatformService
-        commandsSourceWritePlatformService , final ClientReadPlatformService clientReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService , final EquityGrowthDividendsRepository equityGrowthDividendsRepository , final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , final SavingsAccountAssembler savingsAccountAssembler) {
+        commandsSourceWritePlatformService , final ClientReadPlatformService clientReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService , final EquityGrowthDividendsRepository equityGrowthDividendsRepository , final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository , final SavingsAccountAssembler savingsAccountAssembler ,final SavingsProductReadPlatformService savingsProductReadPlatformService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.clientReadPlatformService = clientReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService ;
         this.equityGrowthDividendsRepository = equityGrowthDividendsRepository ;
         this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
         this.savingsAccountAssembler = savingsAccountAssembler;
+        this.savingsProductReadPlatformService = savingsProductReadPlatformService;
     }
 
     @Override
@@ -95,9 +101,12 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             return !isSavingsAccountNumberPresent;
         }).forEach(f ->{
             String clientExternalId = f.getClientExternalId();
-            SavingsAccountData savingsAccountData = SavingsAccountToClientLinkingHelper.linkBlindlySavingsAccount(clientReadPlatformService ,savingsAccountReadPlatformService ,clientExternalId);
+            Long productId = f.getSavingsProductId();
+            SavingsAccountData savingsAccountData = SavingsAccountToClientLinkingHelper.linkBlindlySavingsAccountEx(clientReadPlatformService ,savingsAccountReadPlatformService ,clientExternalId ,productId);
             Optional.ofNullable(savingsAccountData).ifPresent(acc->{
                 Long accountId = acc.id();
+                
+                System.err.println("-------------------ACCOUNT ID IS --------"+accountId);
                 f.setSavingsAccountId(accountId);
                 // so that it doesnt fail validations to do with parameter not supported
                 f.setClientExternalId(null);
@@ -144,6 +153,19 @@ public class SavingsTransactionImportHandler implements ImportHandler {
             }
         }
 
+        // added 22/07/2022 
+        // find product id using product name here 
+        String productName = ImportHandlerUtils.readAsString(TransactionConstants.PRODUCT_COL_EX ,row);
+        Long productId[] = {null};
+        // question is should it load every time ? 
+        Optional.ofNullable(productName).ifPresent(e->{
+
+            System.err.println("-------------------PRODUCT NAME IS -------"+productName);
+            // repurpose already null savings account id .At this instance both product name and id cant be present
+            productId[0] = savingsProductReadPlatformService.retrieveOneByName(productName).getId();
+
+        });
+
 
         String transactionType = ImportHandlerUtils.readAsString(TransactionConstants.TRANSACTION_TYPE_COL, row);
         SavingsAccountTransactionEnumData savingsAccountTransactionEnumData=new SavingsAccountTransactionEnumData(null,null,transactionType);
@@ -177,7 +199,6 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         Double equityBalance = ImportHandlerUtils.readAsDouble(TransactionConstants.EQUITY_BALANCE_ID_COL ,row);
 
 
-
         //added 08/12/2021
         String note = ImportHandlerUtils.readAsString(TransactionConstants.NOTE_COL ,row);
 
@@ -189,9 +210,10 @@ public class SavingsTransactionImportHandler implements ImportHandler {
         });
 
         Optional.ofNullable(equityBalance).ifPresent(e->{
-            System.err.println("---equity balance is -------------"+equityBalance.doubleValue());
             savingsAccountTransactionData.setEquityBalance(new BigDecimal(equityBalance));
         });
+
+        savingsAccountTransactionData.setSavingsProductId(productId[0]);
 
         // Added 08/12/2021
         addTransactionNote(savingsAccountTransactionData ,note);

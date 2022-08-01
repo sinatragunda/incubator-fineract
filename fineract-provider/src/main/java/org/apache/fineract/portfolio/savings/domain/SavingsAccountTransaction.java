@@ -404,6 +404,12 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
         return getTransactionLocalDate().isEqual(occursOnDate);
     }
 
+    public boolean isBefore(final LocalDate occursOnDate) {
+        return getTransactionLocalDate().isBefore(occursOnDate);
+    }
+    
+
+
     public void zeroBalanceFields() {
         this.runningBalance = null;
         this.cumulativeBalance = null;

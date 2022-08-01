@@ -20,6 +20,7 @@ import java.util.Optional;
 public class SavingsAccountToClientLinkingHelper {
 
     // single entity client importation ,assumes client has only one savings account and deposit whatever that account is
+    // function no longer works need to accomodate new functionality 
     public static SavingsAccountData linkBlindlySavingsAccount(ClientReadPlatformService clientReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService, String externalId){
 
         SavingsAccountData[] savingsAccountData = {null};
@@ -35,8 +36,34 @@ public class SavingsAccountToClientLinkingHelper {
 
                 List<SavingsAccountData> savingsAccountDataList = new ArrayList<>(clientAccounts);
                 if(!savingsAccountDataList.isEmpty()){
-                    savingsAccountData[0] = savingsAccountDataList.get(0);
+                    savingsAccountData[0] = savingsAccountDataList.stream().findFirst().orElse(null);
                 }
+            });
+        });
+
+        return savingsAccountData[0];
+    }
+
+
+    // added 22/07/2022 
+    // need to accomodate new functionality now clients have many account rather than the single 1
+    public static SavingsAccountData linkBlindlySavingsAccountEx(ClientReadPlatformService clientReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService,  String externalId ,Long productId){
+
+        SavingsAccountData[] savingsAccountData = {null};
+
+        Optional.ofNullable(externalId).ifPresent(e->{
+
+            ClientData clientData = clientReadPlatformService.retrieveOneByExternalId(externalId);
+
+            Optional.ofNullable(clientData).ifPresent(c->{
+
+                Long clientId = c.getId();
+
+                Collection<SavingsAccountData> clientAccounts = savingsAccountReadPlatformService.retrieveAllForClientUnderPortfolio(clientId ,productId);
+
+                List<SavingsAccountData> savingsAccountDataList = new ArrayList<>(clientAccounts);
+                
+                savingsAccountData[0] = savingsAccountDataList.stream().findFirst().orElse(null);
             });
         });
 

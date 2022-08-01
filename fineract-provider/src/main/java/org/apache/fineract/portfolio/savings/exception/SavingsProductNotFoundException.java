@@ -25,4 +25,9 @@ public class SavingsProductNotFoundException extends AbstractPlatformResourceNot
     public SavingsProductNotFoundException(final Long id) {
         super("error.msg.savingproduct.id.invalid", "Saving product with identifier " + id + " does not exist", id);
     }
+
+
+    public SavingsProductNotFoundException(final String name) {
+        super("error.msg.savingproduct.id.invalid", "Saving product with name " + name + " does not exist", 0L);
+    }
 }

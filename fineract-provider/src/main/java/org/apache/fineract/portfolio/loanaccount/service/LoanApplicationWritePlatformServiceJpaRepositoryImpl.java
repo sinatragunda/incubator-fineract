@@ -525,16 +525,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         if(!isPresent){
 
             String json[] = {command.json()};
-
-            System.err.println("-------system to collect loan product settings -----------");
             // get it from product settings now ..but need to validate it against null values as well
             LoanProductSettings loanProductSettings = loanProduct.loanProductSettings();
 
             Long settlementAccountId[] = {null};
 
             Optional.ofNullable(loanProductSettings).ifPresent(e->{
-
-                System.err.println("-------------------------loan product has settings --------------,with client id "+clientId);
 
                 settlementAccountId[0] = loanProductSettings.getSettlementAccountId();
 

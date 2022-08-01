@@ -218,6 +218,7 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
 
         // Added 09/12/2021
         worksheet.setColumnWidth(TransactionConstants.NOTE_COL, 3000);
+        worksheet.setColumnWidth(TransactionConstants.PRODUCT_COL_EX ,3000);
         
         worksheet.setColumnWidth(TransactionConstants.LOOKUP_CLIENT_NAME_COL, 5000);
         worksheet.setColumnWidth(TransactionConstants.LOOKUP_ACCOUNT_NO_COL, 3000);
@@ -255,6 +256,10 @@ public class SavingsTransactionsWorkbookPopulator extends AbstractWorkbookPopula
 
         // Added 09/12/2021
         writeString(TransactionConstants.NOTE_COL, rowHeader, "Transaction Note");
+
+
+        // Added 09/12/2021
+        writeString(TransactionConstants.PRODUCT_COL_EX, rowHeader, "Product Name (Non Formulae)");
 
 
     }

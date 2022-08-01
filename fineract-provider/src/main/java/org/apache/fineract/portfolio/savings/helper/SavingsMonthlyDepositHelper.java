@@ -86,8 +86,28 @@ public class SavingsMonthlyDepositHelper{
 			}
 		}
 		// create new value here
-		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount ,isDeposit);
+		// okay here we create new value ,we then add our opening balance 
+		// added 25/07/2022
+		// okay we need balance as it a specific date now son 
+		// at this rate a transaction been made already hard to get actual balance hence if its deposit we should substract amount from openingBalance to get actual balance
+
+		BigDecimal openingBalance = SavingsAccountTransactionHelper.openingBalanceAtSpecificDate(savingsAccount , startDate);
+
+		System.err.println("--------------------opening balance this month is ,before deductions-----------"+openingBalance);
+
+		// if(isDeposit){
+		// 	openingBalance = openingBalance.subtract(amount);
+		// }
+		// else{
+		// 	openingBalance = openingBalance.add(amount);
+		// }
+
+		System.err.println("--------------startDate in SavingsMonthlyDepositHelper is --------------"+startDate);
+
+		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount ,isDeposit ,openingBalance);
+		
 		repository.save(savingsAccountMonthlyDeposit);
+	
 	}
 
 	// added 18/04/2022
@@ -99,6 +119,12 @@ public class SavingsMonthlyDepositHelper{
 		Long epoch = TimeHelper.jodaLocalDateToEpoch(transactionDate);
 
 		Date startDate = TimeHelper.startDate(epoch);
+
+
+		BigDecimal openingBalance = SavingsAccountTransactionHelper.openingBalanceAtSpecificDate(savingsAccount , startDate);
+
+		System.err.println("------------------------opening balance in this month was ------"+startDate);
+
 		
 		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
 		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);
@@ -119,6 +145,7 @@ public class SavingsMonthlyDepositHelper{
 				BigDecimal amountUpdate = BigDecimal.ZERO;
 				if(!isDeposit){
 					/// 5000 -=1000
+					/// this is withdrawal 
 					amountUpdate = savingsAccountMonthlyDeposit.getWithdraw().subtract(amount).abs();
 					savingsAccountMonthlyDeposit.setWithdraw(amountUpdate);
 				}
@@ -128,6 +155,7 @@ public class SavingsMonthlyDepositHelper{
 				}
 
 				System.err.println("------------reverse this -----------------");
+				savingsAccountMonthlyDeposit.setOpeningBalance(openingBalance);
 				repository.save(savingsAccountMonthlyDeposit);
 				return ;
 			}

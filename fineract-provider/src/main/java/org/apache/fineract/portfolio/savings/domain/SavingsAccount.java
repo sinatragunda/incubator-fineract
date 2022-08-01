@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.savings.domain;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.allowOverdraftParamName;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.dueAsOfDateParamName;
@@ -34,18 +35,8 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withdraw
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -639,6 +630,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         SavingsAccountTransaction savingsTransaction = null;
         List<SavingsAccountTransaction> trans = getTransactions() ;
+
         for (final SavingsAccountTransaction transaction : trans) {
             if (transaction.isNotReversed() && transaction.occursOn(date)) {
                 savingsTransaction = transaction;
@@ -647,6 +639,69 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
 
         return savingsTransaction;
+    }
+
+
+    // added 25/07/2022    
+    protected SavingsAccountTransaction findLastTransactionEx(final LocalDate date) {
+
+        SavingsAccountTransaction savingsTransaction = null;
+
+        Predicate<SavingsAccountTransaction> isReversed = (e)->{
+            return e.isNotReversed();
+        };
+
+        System.err.println("-------------------before filter size --------"+getTransactions().size());
+
+        List<SavingsAccountTransaction> trans = getTransactions().stream().filter(isReversed).collect(toList()) ;
+
+
+        System.err.println("------------------after filter size ----------"+trans.size());
+
+        Comparator<SavingsAccountTransaction> accountTransactionComparator = (e ,e1)->{
+            Long now = e.getTransactionDate().getTime();
+            Long cmp = e1.getTransactionDate().getTime();
+            return now.compareTo(cmp);
+        };
+
+       trans.sort(accountTransactionComparator);
+
+       System.err.println("--------before sorting --------");
+       trans.stream().forEach(e->{
+           System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
+       });
+
+        // reverse it so that the first item which is last date becomes first etc so it breaks on the first before transaction
+       Collections.reverse(trans);
+
+       System.err.println("-----------after sorting ------");
+
+       trans.stream().forEach(e->{
+           System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
+       });
+
+        for (final SavingsAccountTransaction transaction : trans) {
+            if (transaction.isNotReversed() && transaction.isBefore(date)){
+                System.err.println("-------last transaction is -------"+transaction.getId()+"------------at date -----------"+transaction.getTransactionDate());
+                savingsTransaction = transaction;
+                break;
+            }
+        }
+        return savingsTransaction;
+    }
+
+    // added 25/07/2022
+    public BigDecimal findOpeningBalanceLastTransaction(final LocalDate date){
+
+        final MonetaryCurrency monetaryCurrency = getCurrency();
+
+        SavingsAccountTransaction savingsAccountTransaction = findLastTransactionEx(date);
+        BigDecimal openingBalance[] = {BigDecimal.ZERO} ;
+        Optional.ofNullable(savingsAccountTransaction).ifPresent(e->{
+            openingBalance[0] = savingsAccountTransaction.getRunningBalance(monetaryCurrency).getAmount();
+        });        
+
+        return openingBalance[0];
     }
 
     public List<LocalDate> getManualPostingDates() {

@@ -599,7 +599,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 				userIds
 		);
 		try {
-			System.err.println("----------------broadcast all notifications -----------");
+			//System.err.println("----------------broadcast all notifications -----------");
 			this.notificationEvent.broadcastNotification(queue, notificationData);
 			/// added 17/07/2022
 

@@ -120,6 +120,19 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         }
     }
 
+
+    @Override
+    public SavingsProductData retrieveOneByName(final String savingProductName) {
+        try {
+            this.context.authenticatedUser();
+            final String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.name = ? and sp.deposit_type_enum = ?";
+            return this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper, new Object[] { savingProductName,
+                    DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+        } catch (final EmptyResultDataAccessException e) {
+            throw new SavingsProductNotFoundException(savingProductName);
+        }
+    }
+
     private static final class SavingProductMapper implements RowMapper<SavingsProductData> {
 
         private final String schemaSql;

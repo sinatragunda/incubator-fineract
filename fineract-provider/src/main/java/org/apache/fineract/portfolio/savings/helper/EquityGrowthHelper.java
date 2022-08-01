@@ -62,6 +62,7 @@ public class EquityGrowthHelper {
         SavingsAccountDomainService savingsAccountDomainService = savingsAccountServiceWrapper.savingsAccountDomainService();
 
         Consumer<EquityGrowthOnSavingsAccount> consumer = (e)->{
+            
             Long accountId = e.getSavingsAccountId();
             BigDecimal amount = e.getAmount();
 
@@ -154,10 +155,12 @@ public class EquityGrowthHelper {
 
         int periodCount = TimeHelper.periodDuration(startDate ,endDate);
         BigDecimal total = BigDecimal.ZERO ;
+        //BigDecimal openingBalance = BigDecimal.ZERO;
 
         Function<SavingsAccountMonthlyDeposit ,BigDecimal> netDeposit = (e)->{
             BigDecimal net = e.getDeposit().subtract(e.getWithdraw());
-            return net;
+            BigDecimal openingBalance = e.getOpeningBalance();
+            return net.add(openingBalance);
         };
 
         switch (savingsTotalCalcCriteria){

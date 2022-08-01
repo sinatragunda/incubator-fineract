@@ -50,4 +50,7 @@ public class TransactionConstants {
 
     // Added 09/12/2021
     public static final int NOTE_COL = 22; 
+
+    // Added 22/07/2022
+    public static final int PRODUCT_COL_EX = 23;
 }

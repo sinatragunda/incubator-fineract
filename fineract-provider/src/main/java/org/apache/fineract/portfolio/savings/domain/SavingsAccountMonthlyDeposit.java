@@ -26,14 +26,18 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 	@Column(name="deposit" ,nullable = false)
 	private BigDecimal deposit = BigDecimal.ZERO;
 
-
 	@Column(name="withdraw" ,nullable =false)
 	private BigDecimal withdraw = BigDecimal.ZERO;
 
 
+	@Column(name="opening_balance" ,nullable =false)
+	private BigDecimal openingBalance = BigDecimal.ZERO;
+
+
+
 	protected SavingsAccountMonthlyDeposit(){}
 
-	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal amount ,boolean isDeposit){
+	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal amount ,boolean isDeposit ,BigDecimal openingBalance){
 		this.savingsAccountId = savingsAccountId ;
 		this.startDate = startDate ;
 		if(isDeposit){
@@ -42,13 +46,16 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 		else {
 			withdraw = amount;
 		}
+
+		this.openingBalance = openingBalance;
 	}
 
-	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal deposit ,BigDecimal withdraw){
+	public SavingsAccountMonthlyDeposit(Long savingsAccountId ,Date startDate ,BigDecimal deposit ,BigDecimal withdraw ,BigDecimal openingBalance){
 		this.savingsAccountId = savingsAccountId ;
 		this.startDate = startDate ;
 		this.deposit = deposit;
 		this.withdraw = withdraw;
+		this.openingBalance = openingBalance;
 	}
 
 	public Long getSavingsAccountId() {
@@ -82,6 +89,14 @@ public class SavingsAccountMonthlyDeposit extends AbstractPersistableCustom<Long
 
 	public Date getStartDate(){
 		return this.startDate;
+	}
+
+	public BigDecimal getOpeningBalance(){
+		return this.openingBalance;
+	}
+
+	public void setOpeningBalance(BigDecimal openingBalance){
+		this.openingBalance = openingBalance;
 	}
 
 

@@ -50,13 +50,15 @@ public class RevolvingLoanHelper{
 		if(cmp >= 0){
 			BigDecimal loanBalance = balance.subtract(principal);
 			throw new RevolvingAccountInsufficientPayoffException(loanBalance);
-		}
- 
+		} 
 	}
 
 	public static void revolvingLoansBalanceCheck(List<Loan> list ,SavingsAccount savingsAccount){
 
 		BigDecimal sum = list.stream().map(e -> e.getTotalOutstanding()).reduce(BigDecimal.ZERO ,BigDecimal::add);
+		
+		System.err.println("------------balance sum is --------------"+sum);
+
 		BigDecimal savingsAccountBalance = savingsAccount.accountBalance();
 		int cmp = sum.compareTo(savingsAccountBalance);
 		//if greater than 1 it means throw exception
@@ -81,14 +83,19 @@ public class RevolvingLoanHelper{
         	if(fromSavingsAccount.allowOverdraft()){
         		return revolveLoanBalance;
         	}
+
         	///check if it allows partial payments as well 
+        	
         	if(loanProduct.isSettlementPartialPayment()){
         		return savingsAccountBalance;
         	}
+
         	BigDecimal dueBalance = revolveLoanBalance.subtract(savingsAccountBalance);
         	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
 
         }
+
+        System.err.println("-------------------------revovleLoanBalancr ------------"+revolveLoanBalance);
 
         return revolveLoanBalance ;
 
