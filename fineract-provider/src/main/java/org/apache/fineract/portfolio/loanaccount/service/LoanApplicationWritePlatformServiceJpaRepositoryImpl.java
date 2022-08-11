@@ -83,6 +83,7 @@ import org.apache.fineract.portfolio.hirepurchase.helper.HirePurchaseCreateLoan;
 import org.apache.fineract.portfolio.hirepurchase.repo.HirePurchaseRepository;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.*;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateException;
@@ -322,23 +323,25 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                         loanProduct);
             }
             if (!dataValidationErrors.isEmpty()) { 
-                System.err.println("------------error is -------"+dataValidationErrors.get(0).getDeveloperMessage());
-                throw new PlatformApiDataValidationException(dataValidationErrors); 
+                throw new PlatformApiDataValidationException(dataValidationErrors);
             }
 
             final Loan newLoanApplication = this.loanAssembler.assembleFrom(command, currentUser);
 
-            /// added 25/05/2021
-            /// do the whole revolve loan thing here 
+            // added 25/05/2021
+            // do the whole revolve loan thing here
+            // modifying 02/08/2022
 
             final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
+
             if(revolvingAccountIds!=null){
 
                 StringTokenizer token = new StringTokenizer(revolvingAccountIds ,",");
-                List<Loan> list = new ArrayList<>();
+                List<LoanTransactionData> list = new ArrayList<>();
                 while(token.hasMoreTokens()){
                     Long id = new Long(token.nextToken());
-                    final Loan revolvingLoanAccount = this.loanAssembler.assembleFrom(id);
+                    LocalDate transactionDate = newLoanApplication.getSubmittedOnDate();
+                    final LoanTransactionData revolvingLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
                     list.add(revolvingLoanAccount);
                 }
 

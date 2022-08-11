@@ -23,14 +23,18 @@
 */
 package org.apache.fineract.portfolio.loanaccount.helper;
 
+import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.exception.RevolvingAccountInsufficientPayoffException;
 import com.google.gson.JsonElement;
 import java.math.BigDecimal ;
+
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan ;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
+import org.joda.time.LocalDate;
 
 /// Added 31/05/2021
 import java.util.ArrayList ;
@@ -40,9 +44,9 @@ public class RevolvingLoanHelper{
 
 	/// basically all it does it close an existing and pay of loan balance by using some disbursed amount from the new loan account 
 	
-	public static void validateApplication(List<Loan> revolveLoanAccounts ,Loan newLoanApplication){
+	public static void validateApplication(List<LoanTransactionData> revolveLoanAccounts ,Loan newLoanApplication){
 
-		BigDecimal balance = revolveLoanAccounts.stream().map(e -> e.getTotalOutstanding()).reduce(BigDecimal.ZERO ,BigDecimal::add);
+		BigDecimal balance = revolveLoanAccounts.stream().map(e -> e.outstandingLoanBalance()).reduce(BigDecimal.ZERO ,BigDecimal::add);
 		BigDecimal principal = newLoanApplication.getProposedPrincipal();
 
 		int cmp = balance.compareTo(principal);
@@ -53,21 +57,59 @@ public class RevolvingLoanHelper{
 		} 
 	}
 
-	public static void revolvingLoansBalanceCheck(List<Loan> list ,SavingsAccount savingsAccount){
+	// what is this for now ? 
+	public static void revolvingLoansBalanceCheck(List<LoanTransactionData> list ,SavingsAccount savingsAccount){
 
-		BigDecimal sum = list.stream().map(e -> e.getTotalOutstanding()).reduce(BigDecimal.ZERO ,BigDecimal::add);
+		BigDecimal sum = list.stream().map(e -> e.outstandingLoanBalance()).reduce(BigDecimal.ZERO ,BigDecimal::add);
 		
-		System.err.println("------------balance sum is --------------"+sum);
-
 		BigDecimal savingsAccountBalance = savingsAccount.accountBalance();
 		int cmp = sum.compareTo(savingsAccountBalance);
 		//if greater than 1 it means throw exception
 		if(cmp >= 0){
+
 			BigDecimal loanBalance = sum.subtract(savingsAccountBalance);
 			throw new RevolvingAccountInsufficientPayoffException(loanBalance);
 		}		
 	}
 
+
+	// what does this even do ?
+	// gets the amount being revolved like outstanding balance from previous loan
+	// added 02/08/2022 at 0505
+	public static BigDecimal revolvingLoanDTOAmountEx(Loan loan , SavingsAccount fromSavingsAccount , LoanReadPlatformService loanReadPlatformService, LocalDate transactionDate){
+
+ 	  	Long loanId = loan.getId();
+	    LoanTransactionData loanTransactionData = loanReadPlatformService.retrieveLoanForeclosureTemplate(loanId ,transactionDate);
+		
+		BigDecimal revolveLoanBalance =  loanTransactionData.outstandingLoanBalance();
+        BigDecimal savingsAccountBalance = fromSavingsAccount.accountBalance();
+
+        LoanProduct loanProduct = loan.loanProduct();
+
+        int cmp = revolveLoanBalance.compareTo(savingsAccountBalance);
+
+        // revolve amount greater than savings account balance
+        if(cmp > 0){
+        	if(fromSavingsAccount.allowOverdraft()){
+        		return revolveLoanBalance;
+        	}
+
+        	///check if it allows partial payments as well 
+
+        	if(loanProduct.isSettlementPartialPayment()){
+        		return savingsAccountBalance;
+        	}
+
+        	BigDecimal dueBalance = revolveLoanBalance.subtract(savingsAccountBalance);
+        	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
+
+        }
+        return revolveLoanBalance ;
+	}	
+
+
+
+	// what does this even do ? 
 	public static BigDecimal revolvingLoanDTOAmount(Loan revolveLoanAccount ,SavingsAccount fromSavingsAccount){
 		
 		BigDecimal revolveLoanBalance = revolveLoanAccount.getTotalOutstanding();
@@ -94,12 +136,11 @@ public class RevolvingLoanHelper{
         	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
 
         }
-
-        System.err.println("-------------------------revovleLoanBalancr ------------"+revolveLoanBalance);
-
         return revolveLoanBalance ;
 
 	}	
+
+
 	public static void closeLoan(Long loanId ,boolean payOffBalance){
 
 		ObjectNode objectNode = ObjectNodeHelper.objectNode();

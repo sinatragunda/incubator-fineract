@@ -27,9 +27,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.common.AccountingEnumerations;
+import org.apache.fineract.accounting.enumerations.ENTITY_TYPE;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccount;
 import org.apache.fineract.accounting.financialactivityaccount.domain.FinancialActivityAccountRepositoryWrapper;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
@@ -538,4 +540,45 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
             throw new JournalEntriesNotFoundException(entityId);
         }
     }
+
+
+    // added 10/08/2022
+    @Override
+    public Page<JournalEntryData> retrieveJournalEntriesByTransactionId(String transactionId, ENTITY_TYPE entityType){
+
+        StringBuilder stringBuilder = new StringBuilder(entityType.prefix());
+        stringBuilder.append(transactionId);
+
+        transactionId = stringBuilder.toString();
+
+        JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(true,
+                true);
+        try {
+            final GLJournalEntryMapper rm = new GLJournalEntryMapper(associationParametersData);
+            final String sql = "select " + rm.schema() + " where journalEntry.transaction_id LIKE '%"+transactionId+"'";
+            final String sqlCountRows = "SELECT FOUND_ROWS()";
+            Page<JournalEntryData> page = this.paginationHelper.fetchPage(this.jdbcTemplate, sqlCountRows, sql ,rm);
+
+            System.err.println("------------------initial page items is --------------"+page.getTotalFilteredRecords());
+
+            page = page.filterPage(filterDuplicateEntries(transactionId));
+
+            System.err.println("-------------------results filtered to -----------------"+page.getTotalFilteredRecords());
+            return page ;
+        } catch (final EmptyResultDataAccessException e) {
+            throw new JournalEntriesNotFoundException(transactionId);
+        }
+    }
+
+    // Like creates duplicate entries that need to be refiltered so to not have duplicate entries 
+    private Predicate<JournalEntryData> filterDuplicateEntries(String transactionId){
+
+        Predicate<JournalEntryData> predicate = (e)->{
+                System.err.printf("-------------comparing %s with id %s\n" ,e.getTransactionId() ,transactionId);
+             return e.getTransactionId().equalsIgnoreCase(transactionId);   
+        };
+        return predicate;
+    }
+
+
 }

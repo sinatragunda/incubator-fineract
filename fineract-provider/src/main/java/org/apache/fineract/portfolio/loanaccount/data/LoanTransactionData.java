@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.loanaccount.data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
@@ -347,5 +348,19 @@ public class LoanTransactionData {
     // added 25/08/2021
     public LoanTransactionEnumData getTransactionType(){
         return this.type;
+    }
+
+
+    // added 02/08/2022
+    public BigDecimal outstandingLoanBalance(){
+
+        BigDecimal penalty = Optional.ofNullable(penaltyChargesPortion).orElse(BigDecimal.ZERO);
+        BigDecimal interest = Optional.ofNullable(interestPortion).orElse(BigDecimal.ZERO);
+        BigDecimal principal = Optional.ofNullable(principalPortion).orElse(BigDecimal.ZERO);
+        BigDecimal fees = Optional.ofNullable(feeChargesPortion).orElse(BigDecimal.ZERO);
+
+        BigDecimal outstanding = interest.add(principal).add(fees).add(penalty);
+
+        return outstanding ;
     }
 }

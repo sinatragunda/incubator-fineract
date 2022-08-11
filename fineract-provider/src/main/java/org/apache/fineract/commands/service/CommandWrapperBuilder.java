@@ -3218,5 +3218,13 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    // added 10/08/2022
+     public CommandWrapperBuilder createPaymentVoucherEntry() {
+        this.actionName = "CREATE";
+        this.entityName = "PAYMENTVOUCHER";
+        this.href = "/paymentvoucher";
+        return this;
+    }
+
 
 }

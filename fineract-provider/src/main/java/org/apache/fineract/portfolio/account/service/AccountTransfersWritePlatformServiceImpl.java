@@ -395,16 +395,21 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     @Transactional
     public Long transferFunds(final AccountTransferDTO accountTransferDTO) {
 
-        System.err.println("----------------------time to transfer funds ?--------------------");
+        System.err.println("----------------------time to transfer funds ,and we aint event getting here ?--------------------");
 
         Long transferTransactionId = null;
         final boolean isAccountTransfer = true;
         final boolean isRegularTransaction = accountTransferDTO.isRegularTransaction();
         
+        System.err.println("--------------------is regular transaction ? ----------"+isRegularTransaction);
+
         AccountTransferDetails accountTransferDetails = accountTransferDTO.getAccountTransferDetails();
         
         if (isSavingsToLoanAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
             //
+
+            System.err.println("---------------------savings to loan transfer -------");
+
             SavingsAccount fromSavingsAccount = null;
             Loan toLoanAccount = null;
             if (accountTransferDetails == null) {
@@ -428,6 +433,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                 this.loanAccountAssembler.setHelpers(toLoanAccount);
             }
 
+
+            System.err.println("-----------------some shit initialized there --------");
+
             final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
                     isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), AccountTransferType.fromInt(
                             accountTransferDTO.getTransferType()).isInterestTransfer(), accountTransferDTO.isExceptionForBalanceCheck());
@@ -435,6 +443,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
                     accountTransferDTO.getPaymentDetail(), transactionBooleanValues);
+
+
+            System.err.println("-----------------handle withdrawal of funds now son ,done --------------");
 
             LoanTransaction loanTransaction = null;
 
@@ -453,10 +464,23 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                         accountTransferDTO.getPaymentDetail(), null, null, isRecoveryRepayment, isAccountTransfer,holidayDetailDto,isHolidayValidationDone);
             }
 
+            System.err.println("----------------------asselnmer transfer details -----------");
+
             accountTransferDetails = this.accountTransferAssembler.assembleSavingsToLoanTransfer(accountTransferDTO, fromSavingsAccount,
                     toLoanAccount, withdrawal, loanTransaction);
-            this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
+            
+            try{
+                this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+            System.err.println("--------------------try and flash transaction -------");
+
             transferTransactionId = accountTransferDetails.getId();
+
+            System.err.println("---------------------transferTransactionId found ");
         }
 
         // added 31/01/2022

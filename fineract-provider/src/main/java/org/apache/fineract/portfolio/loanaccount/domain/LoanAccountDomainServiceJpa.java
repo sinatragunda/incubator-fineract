@@ -19,15 +19,7 @@
 package org.apache.fineract.portfolio.loanaccount.domain;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
@@ -677,9 +669,9 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loan.updateInstallmentsPostDate(foreClosureDate);
 
         LoanTransaction payment = null;
-        
-         
-        if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()) {
+
+        if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()){
+            System.err.println("--------------------balance greater than 0 here ");
             final PaymentDetail paymentDetail = null;
             String externalId = null;            
             final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
@@ -690,8 +682,31 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             payment.updateLoan(loan);
             newTransactions.add(payment);
         }
+        else{
+            // zero balance payment meant to close off loan at current date if it has 0 amount on that specific date
+            System.err.println("--------------------balance less than 0 here---------------");
+            final PaymentDetail paymentDetail = null;
+            Money zero = Money.zero(loan.getCurrency());
+            String externalId = null;
+            final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
+            payment = LoanTransaction.repayment(loan.getOffice(), zero,
+                    paymentDetail, foreClosureDate, externalId, currentDateTime, appUser);
+            createdDate = createdDate.plusSeconds(1);
+            payment.updateCreatedDate(createdDate.toDate());
+            payment.updateLoan(loan);
+            newTransactions.add(payment);
+
+            System.err.println("----------------transaction to pay off here ----------------");
+
+        }
+
+
+        System.err.println("----------------------------payment information updated in that other loan here nothing has happened -----------"+ Optional.ofNullable(payment).isPresent());
 
         List<Long> transactionIds = new ArrayList<>();
+
+        System.err.println("-------------get transaction ids -------------");
+
         final ChangedTransactionDetail changedTransactionDetail = loan.handleForeClosureTransactions(payment,
                 defaultLoanLifecycleStateMachine(), scheduleGeneratorDTO, appUser);
 

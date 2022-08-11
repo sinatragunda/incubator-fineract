@@ -19,6 +19,8 @@
 package org.apache.fineract.infrastructure.core.service;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Page<E> {
 
@@ -36,5 +38,12 @@ public class Page<E> {
 
     public List<E> getPageItems() {
         return this.pageItems;
+    }
+
+
+    // added 11/08/2022 1125 to enable to filter some results mainly duplicate ones created by using LIKE select in mysql
+    public Page filterPage(Predicate<E> predicate){
+        List<E> pageItemsNew = pageItems.stream().filter(predicate).collect(Collectors.toList());
+        return new Page(pageItemsNew ,pageItemsNew.size()) ;
     }
 }

@@ -36,6 +36,11 @@ public class SavingsTransactionBooleanValues {
         this.isExceptionForBalanceCheck = isExceptionForBalanceCheck;
     }
 
+    public static SavingsTransactionBooleanValues liteInstance(){
+        return new SavingsTransactionBooleanValues(false ,true,false ,false ,true);
+    }
+
+
     public boolean isAccountTransfer() {
         return this.isAccountTransfer;
     }

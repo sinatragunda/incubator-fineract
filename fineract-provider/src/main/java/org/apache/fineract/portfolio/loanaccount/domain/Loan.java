@@ -21,20 +21,7 @@ package org.apache.fineract.portfolio.loanaccount.domain;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -3036,6 +3023,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanTransaction adjustedTransaction,
             final ScheduleGeneratorDTO scheduleGeneratorDTO, final AppUser currentUser) {
 
+
+        System.err.println("----what re we doing in here ");
+
         ChangedTransactionDetail changedTransactionDetail = null;
 
         LoanStatus statusEnum = null;
@@ -3102,6 +3092,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
                 throw new InvalidLoanStateTransitionException("transaction", "cannot.be.done.before.disbursement", errorMessage);
             }
         }
+
+
+        System.err.println("---------------------do we get out of here ? -------------");
 
         final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = this.transactionProcessorFactory
                 .determineProcessor(this.transactionProcessingStrategy);
@@ -4845,7 +4838,12 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateAccountStatus(final LoanEvent event) {
 
+        System.err.println("---------------loan event ---------"+event);
+
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+
+
+        System.err.println("------------where is the fucken error ? ");
 
         switch (event) {
             case LOAN_CREATED:
@@ -4980,6 +4978,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
                 }
             break;
             case LOAN_FORECLOSURE:
+
+                System.err.println("--------------fore close an opened loan "+isOpen());
+
                 if (!isOpen()) {
                     final String defaultUserMessage = "Loan foreclosure is not allowed. Loan Account is not active.";
                     final ApiParameterError error = ApiParameterError.generalError(
@@ -4991,7 +4992,13 @@ public class Loan extends AbstractPersistableCustom<Long> {
             break;
         }
 
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) { 
+            
+            dataValidationErrors.stream().forEach(e->{
+                System.err.println("-------------error message is -------"+e.getDeveloperMessage());
+            });
+            throw new PlatformApiDataValidationException(dataValidationErrors); 
+        }
 
     }
 
@@ -6370,13 +6377,25 @@ public class Loan extends AbstractPersistableCustom<Long> {
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final ScheduleGeneratorDTO scheduleGeneratorDTO,
             final AppUser appUser) {
 
+        System.err.println("---------------------start eventing ----------");
+
         LoanEvent event = LoanEvent.LOAN_FORECLOSURE;
+
+        System.err.println("----------------------foreclosure event -----------"+event);
+        
         validateAccountStatus(event);
+
+        System.err.println("-----------------------is repayment null ? "+ Optional.ofNullable(repaymentTransaction).isPresent());
+        
         validateForForeclosure(repaymentTransaction.getTransactionDate());
+
+        System.err.println("---------------------------validate failed ---------");
+
         this.loanSubStatus = LoanSubStatus.FORECLOSED.getValue();
         applyAccurals(appUser);
         return handleRepaymentOrRecoveryOrWaiverTransaction(repaymentTransaction, loanLifecycleStateMachine, null, scheduleGeneratorDTO,
                 appUser);
+
     }
 
     public Money retrieveAccruedAmountAfterDate(final LocalDate tillDate) {
@@ -6406,6 +6425,10 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateForForeclosure(final LocalDate transactionDate) {
 
+        System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
+
+        System.err.println("--------------validate class with trans date-----------"+transactionDate);
+
         if (isInterestRecalculationEnabledForProduct()) {
             final String defaultUserMessage = "The loan with interest recalculation enabled cannot be foreclosed.";
             throw new LoanForeclosureException("loan.with.interest.recalculation.enabled.cannot.be.foreclosured", defaultUserMessage,
@@ -6413,6 +6436,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         }
 
         LocalDate lastUserTransactionDate = getLastUserTransactionDate();
+
+        System.err.println("--------------with transaction date lets validate ---------"+lastUserTransactionDate);
 
         if (DateUtils.isDateInTheFuture(transactionDate)) {
             final String defaultUserMessage = "The transactionDate cannot be in the future.";
@@ -6424,6 +6449,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
             throw new LoanForeclosureException("loan.foreclosure.transaction.date.cannot.before.the.last.transaction.date",
                     defaultUserMessage, transactionDate);
         }
+
+
+        System.err.println("--------------out of that shit class now --------");
     }
 
     public void updateInstallmentsPostDate(LocalDate transactionDate) {

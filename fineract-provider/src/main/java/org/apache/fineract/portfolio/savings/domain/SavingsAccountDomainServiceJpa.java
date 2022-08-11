@@ -140,12 +140,11 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
 
         if(!isOverdraftAccount) {
-
-            //System.err.println("--------------if you see this and you in overdraft ?-----------");
             account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
                     depositAccountOnHoldTransactions);
 
         }
+
         saveTransactionToGenerateTransactionId(withdrawal);
         this.savingsAccountRepository.save(account);
 
@@ -157,6 +156,30 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
                 constructEntityMap(BUSINESS_ENTITY.SAVINGS_TRANSACTION, withdrawal));
         return withdrawal;
+    }
+
+
+    @Transactional
+    @Override
+    public SavingsAccountTransaction handleWithdrawalLite(final SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
+
+        AppUser user = getAppUserIfPresent();
+        PaymentDetail paymentDetail = null ;
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
+
+        SavingsTransactionBooleanValues savingsTransactionBooleanValues = SavingsTransactionBooleanValues.liteInstance();
+
+        SavingsAccountTransaction savingsAccountTransaction =  handleWithdrawal(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,savingsTransactionBooleanValues);
+
+        Optional.ofNullable(noteText).ifPresent(e->{  
+            System.err.println("-------------note is---------------- "+noteText);
+            final Note note = Note.savingsTransactionNote (savingsAccount, savingsAccountTransaction, noteText);
+            this.noteRepository.save(note);
+        });
+
+        return savingsAccountTransaction ;
+    
     }
 
     private AppUser getAppUserIfPresent() {

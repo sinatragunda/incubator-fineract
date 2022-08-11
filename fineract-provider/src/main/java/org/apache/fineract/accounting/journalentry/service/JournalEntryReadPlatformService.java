@@ -20,6 +20,7 @@ package org.apache.fineract.accounting.journalentry.service;
 
 import java.util.Date;
 
+import org.apache.fineract.accounting.enumerations.ENTITY_TYPE;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryAssociationParametersData;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.data.OfficeOpeningBalancesData;
@@ -36,4 +37,9 @@ public interface JournalEntryReadPlatformService {
     OfficeOpeningBalancesData retrieveOfficeOpeningBalances(Long officeId, String currencyCode);
 
     Page<JournalEntryData> retrieveJournalEntriesByEntityId(String transactionId, Long entityId, Integer entityType) ;
+
+    // added 10/08/2022
+    Page<JournalEntryData> retrieveJournalEntriesByTransactionId(String transactionId,ENTITY_TYPE entityType) ;
+
+
 }

@@ -115,6 +115,8 @@ import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
@@ -213,6 +215,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
     // added 07/01/2022
     private final CommissionsHelperService commissionsHelperService ;
+
+    // added 02/08/2022
+    private final SavingsAccountDomainService savingsAccountDomainService ;
     
 
     @Autowired
@@ -250,7 +255,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,
             final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer ,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final CommissionsHelperService commissionsHelperService
-    ) {
+    ,final SavingsAccountDomainService savingsAccountDomainService) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
         this.loanAssembler = loanAssembler;
@@ -300,6 +305,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         // added 07/01/2022
         this.commissionsHelperService = commissionsHelperService ;
+
+        // added 02/08/2022
+        this.savingsAccountDomainService = savingsAccountDomainService ;
     
     }
 
@@ -1790,12 +1798,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 "Loan Disbursement", locale, fmt, paymentDetail, LoanTransactionType.DISBURSEMENT.getValue(), null, null, null,
                 AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, txnExternalId, loan, null, fromSavingsAccount,
                 isRegularTransaction, isExceptionForBalanceCheck);
+
         this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
 
 
         // added 25/05/2021
         // if then we get savings account balance and pay off exising linked loan now
-        //RevolveAccountHelper.disburseTransfer()
+        // RevolveAccountHelper.disburseTransfer()
 
         String revolveAccountIds = loan.revolvingAccountId();
         BigDecimal totalRevolveAmount = BigDecimal.ZERO;
@@ -1804,39 +1813,53 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
             SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
             StringTokenizer token = new StringTokenizer(revolveAccountIds ,",");
-            List<Loan> revolveLoanAccountsList = new ArrayList<>();
+            List<LoanTransactionData> revolveLoanAccountsList = new ArrayList<>();
+            List<Loan> loansList = new ArrayList<>();
 
             while(token.hasMoreTokens()){
                 Long id = Long.decode(token.nextToken());
-                Loan revolveLoanAccount = this.loanAssembler.assembleFrom(id);
-                revolveLoanAccountsList.add(revolveLoanAccount);
+                LoanTransactionData revolveLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
+
+                Optional.ofNullable(revolveLoanAccount).ifPresent(e->{
+                    revolveLoanAccountsList.add(revolveLoanAccount);
+                    Loan loanTemp = loanAssembler.assembleFrom(id);
+                    loansList.add(loanTemp);
+                });
             }
 
             RevolvingLoanHelper.revolvingLoansBalanceCheck(revolveLoanAccountsList ,savingsAccount);
             
-            for(Loan revolveLoanAccount : revolveLoanAccountsList){
-                Long id = revolveLoanAccount.getId();
-                BigDecimal revolveDTOAmount = RevolvingLoanHelper.revolvingLoanDTOAmount(revolveLoanAccount ,savingsAccount);
+            for(Loan revolveLoanAccount : loansList){
+
+                // why is it suffixed DTO ?
+                BigDecimal revolveDTOAmount = RevolvingLoanHelper.revolvingLoanDTOAmountEx(revolveLoanAccount ,savingsAccount ,loanReadPlatformService ,transactionDate);
 
                 // added 02/07/2021 
                 // Added to make up for amount being auto settled 
                 totalRevolveAmount = totalRevolveAmount.add(revolveDTOAmount);
 
-                final AccountTransferDTO revolveAccountDTO = new AccountTransferDTO(transactionDate, revolveDTOAmount,
-                        PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, portfolioAccountData.accountId(), id,
-                        "Revolving Loan Payoff", locale, fmt, paymentDetail, LoanTransactionType.REPAYMENT.getValue(), null, null, null,
-                        AccountTransferType.LOAN_REPAYMENT.getValue(), null, null, txnExternalId, revolveLoanAccount, null, fromSavingsAccount,
-                        isRegularTransaction, isExceptionForBalanceCheck);
+                String description = String.format("Revolving loan pay off ,to loan with account number %s",revolveLoanAccount.getAccountNumber());
 
-                this.accountTransfersWritePlatformService.transferFunds(revolveAccountDTO);
-   
+                // do some withdrawal transaction here then pay off loan in next transaction
+                SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,revolveDTOAmount ,description);
+
+                boolean transactionSuccesss = Optional.ofNullable(transaction).isPresent();
+
+                if(!transactionSuccesss){
+                    ///
+                    System.err.println("'''''''''''''throw some failed to get loan exception here ");
+                    throw new FailedToPayoffRevolvingLoanException(loan.getId());
+                    // put null for params since params already specified inside
+
+                }
+
+                loanAccountDomainService.foreCloseLoan(revolveLoanAccount ,transactionDate ,description);   
             }
         }
 
-        /// added 02/07/2021 
-        /// after revolving accounts then comes auto settle and diburse 
-        ///
-
+        // added 02/07/2021 
+        // after revolving accounts then comes auto settle and diburse 
+        //
 
         boolean shouldCreateStandingInstructionAtDisbursement = loan.shouldCreateStandingInstructionAtDisbursement();
         boolean disburseLoanToSavingsAutoSettlement = loan.autoSettlementAtDisbursement();
@@ -1855,13 +1878,11 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 }
             }
 
+            // since charges would be deducted next ,its ideal to subtract charges from the money to deduct so at to not have insufficient balance when deducting charges
             BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
 
-            //200
             BigDecimal principal = amount.getAmount();
-            ///error there since money hasnt been yet disbursed ,or it has been ?
-            //5000
-
+            
             int cmp = principal.compareTo(balanceToDeduct);
 
             // if principal is greater than balance to deduct thats total of all charges etc 
@@ -1870,14 +1891,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 BigDecimal settleAmount = principal.subtract(balanceToDeduct);
 
                 /// now we have total amount to settle ,lets now settle 
-                /// we need a withdrawal here                         
                 ObjectNode node = ObjectNodeHelper.objectNode();
                 node.put("transactionAmount" ,settleAmount.doubleValue());
                 node.put("locale" ,"en");
                 node.put("dateFormat" ,"dd MMMM yyyy");
                 node.put("paymentTypeId",1);
                 node.put("transactionDate" ,transactionDate.toString(fmt));
-                node.put("note","Disbursement Settlement");
+                node.put("note","Auto Disbursement Settlement");
 
                 String apiRequestBodyAsJson = node.toString();
                 Long savingsAccountId = portfolioAccountData.accountId();
