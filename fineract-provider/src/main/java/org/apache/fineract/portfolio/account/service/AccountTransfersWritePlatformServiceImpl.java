@@ -54,10 +54,10 @@ import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.domain.*;
+import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TRANSACTION_TRIGGER_TYPE;
+import org.apache.fineract.portfolio.savings.helper.SavingsTransactionsTriggerHelper;
+import org.apache.fineract.portfolio.savings.repo.SavingsTransactionTriggerRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountAssembler;
@@ -88,6 +88,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     private final ShareAccountAssembler shareAccountAssembler ;
     private final ShareAccountDomainService shareAccountDomainService ;
 
+    // added 12/08/2022
+    private final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository ;
+
     @Autowired
     public AccountTransfersWritePlatformServiceImpl(final AccountTransfersDataValidator accountTransfersDataValidator,
             final AccountTransferAssembler accountTransferAssembler, final AccountTransferRepository accountTransferRepository,
@@ -95,7 +98,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final LoanAssembler loanAssembler, final LoanAccountDomainService loanAccountDomainService,
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService,
             final AccountTransferDetailRepository accountTransferDetailRepository,
-            final LoanReadPlatformService loanReadPlatformService ,final ShareAccountAssembler shareAccountAssembler ,final ShareAccountDomainService shareAccountDomainService) {
+            final LoanReadPlatformService loanReadPlatformService ,final ShareAccountAssembler shareAccountAssembler ,final ShareAccountDomainService shareAccountDomainService ,final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository) {
         this.accountTransfersDataValidator = accountTransfersDataValidator;
         this.accountTransferAssembler = accountTransferAssembler;
         this.accountTransferRepository = accountTransferRepository;
@@ -108,6 +111,9 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         this.loanReadPlatformService = loanReadPlatformService;
         this.shareAccountAssembler = shareAccountAssembler ;
         this.shareAccountDomainService = shareAccountDomainService ;
+
+        // added 11/08/2022
+        this.savingsTransactionTriggerRepository = savingsTransactionTriggerRepository ;
     }
 
     @Transactional
@@ -189,7 +195,10 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             transferDetailId = accountTransferDetails.getId();
 
         } else if (isSavingsToLoanAccountTransfer(fromAccountType, toAccountType)) {
-            //
+            // usually when we paying charges right ?
+
+            System.err.println("------------------------is this a charge repayment transaction ? ---------------");
+
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
             final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);
 
@@ -221,9 +230,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleSavingsToLoanTransfer(command,
                     fromSavingsAccount, toLoanAccount, withdrawal, loanRepaymentTransaction);
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
-
-
-            //System.err.println("--------------------------------what other id is -------"+accountTransferDetails.getId());
 
 
             transferDetailId = accountTransferDetails.getId();
@@ -401,14 +407,11 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final boolean isAccountTransfer = true;
         final boolean isRegularTransaction = accountTransferDTO.isRegularTransaction();
         
-        System.err.println("--------------------is regular transaction ? ----------"+isRegularTransaction);
-
         AccountTransferDetails accountTransferDetails = accountTransferDTO.getAccountTransferDetails();
         
         if (isSavingsToLoanAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
-            //
-
-            System.err.println("---------------------savings to loan transfer -------");
+        
+            System.err.println("---------------------savings to loan transfer ,usually where charges are-------");
 
             SavingsAccount fromSavingsAccount = null;
             Loan toLoanAccount = null;
@@ -469,10 +472,14 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             accountTransferDetails = this.accountTransferAssembler.assembleSavingsToLoanTransfer(accountTransferDTO, fromSavingsAccount,
                     toLoanAccount, withdrawal, loanTransaction);
             
-            try{
+            try {
                 this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
-            }
-            catch(Exception e){
+
+                // when done record entry 
+                SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(withdrawal, toLoanAccount.getId(), SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository, null, trigger);
+
+            }catch(Exception e){
                 e.printStackTrace();
             }
 
@@ -578,6 +585,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         } else if (isLoanToSavingsAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
 
+            System.err.println("-----------------create from loan transfer transfer dto ------");
             Loan fromLoanAccount = null;
             SavingsAccount toSavingsAccount = null;
             if (accountTransferDetails == null) {
@@ -613,6 +621,11 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     toSavingsAccount, deposit, loanTransaction);
             this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
             transferTransactionId = accountTransferDetails.getId();
+
+            //create trigger for transfer transaction
+            SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(deposit ,fromLoanAccount.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+            SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository ,null ,trigger);
+
         } else {
             throw new GeneralPlatformDomainRuleException("error.msg.accounttransfer.loan.to.loan.not.supported",
                     "Account transfer from loan to another loan is not supported");

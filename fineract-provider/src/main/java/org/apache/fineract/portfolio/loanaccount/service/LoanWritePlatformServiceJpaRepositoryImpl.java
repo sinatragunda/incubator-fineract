@@ -114,10 +114,11 @@ import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.paymentdetail.service.PaymentDetailWritePlatformService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
+import org.apache.fineract.portfolio.savings.domain.*;
+import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TRANSACTION_TRIGGER_TYPE;
 import org.apache.fineract.portfolio.savings.exception.InsufficientAccountBalanceException;
+import org.apache.fineract.portfolio.savings.helper.SavingsTransactionsTriggerHelper;
+import org.apache.fineract.portfolio.savings.repo.SavingsTransactionTriggerRepository;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -135,7 +136,6 @@ import com.google.gson.JsonElement;
 
 
 ///added 25/05/2021
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
 import org.apache.fineract.portfolio.loanaccount.helper.RevolvingLoanHelper;
 
 
@@ -218,7 +218,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
     // added 02/08/2022
     private final SavingsAccountDomainService savingsAccountDomainService ;
-    
+
+    // added 12/08/2022
+    private final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository;
 
     @Autowired
     public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -255,7 +257,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,
             final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer ,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final CommissionsHelperService commissionsHelperService
-    ,final SavingsAccountDomainService savingsAccountDomainService) {
+    ,final SavingsAccountDomainService savingsAccountDomainService ,final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
         this.loanAssembler = loanAssembler;
@@ -308,6 +310,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         // added 02/08/2022
         this.savingsAccountDomainService = savingsAccountDomainService ;
+
+        // added 12/08/2022
+        this.savingsTransactionTriggerRepository = savingsTransactionTriggerRepository ;
     
     }
 
@@ -414,7 +419,6 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 }
 
                 amountToDisburse = disburseAmount.minus(loanOutstanding);
-
                 disburseLoanToLoan(loan, command, loanOutstanding);
             }
 
@@ -1809,9 +1813,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         String revolveAccountIds = loan.revolvingAccountId();
         BigDecimal totalRevolveAmount = BigDecimal.ZERO;
 
+        SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
+
         if(revolveAccountIds != null){
 
-            SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
             StringTokenizer token = new StringTokenizer(revolveAccountIds ,",");
             List<LoanTransactionData> revolveLoanAccountsList = new ArrayList<>();
             List<Loan> loansList = new ArrayList<>();
@@ -1846,13 +1851,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 boolean transactionSuccesss = Optional.ofNullable(transaction).isPresent();
 
                 if(!transactionSuccesss){
-                    ///
-                    System.err.println("'''''''''''''throw some failed to get loan exception here ");
                     throw new FailedToPayoffRevolvingLoanException(loan.getId());
-                    // put null for params since params already specified inside
-
+                
                 }
 
+                // transaction successful hence its been triggered by this event 
+                SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(transaction ,loan.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository,null ,trigger);
                 loanAccountDomainService.foreCloseLoan(revolveLoanAccount ,transactionDate ,description);   
             }
         }
@@ -1891,21 +1896,34 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 BigDecimal settleAmount = principal.subtract(balanceToDeduct);
 
                 /// now we have total amount to settle ,lets now settle 
-                ObjectNode node = ObjectNodeHelper.objectNode();
-                node.put("transactionAmount" ,settleAmount.doubleValue());
-                node.put("locale" ,"en");
-                node.put("dateFormat" ,"dd MMMM yyyy");
-                node.put("paymentTypeId",1);
-                node.put("transactionDate" ,transactionDate.toString(fmt));
-                node.put("note","Auto Disbursement Settlement");
-
-                String apiRequestBodyAsJson = node.toString();
+//                ObjectNode node = ObjectNodeHelper.objectNode();
+//                node.put("transactionAmount" ,settleAmount.doubleValue());
+//                node.put("locale" ,"en");
+//                node.put("dateFormat" ,"dd MMMM yyyy");
+//                node.put("paymentTypeId",1);
+//                node.put("transactionDate" ,transactionDate.toString(fmt));
+//                node.put("note","Auto Disbursement Settlement");
+//
+//                String apiRequestBodyAsJson = node.toString();
+//
                 Long savingsAccountId = portfolioAccountData.accountId();
 
-                final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
-                final CommandWrapper commandRequest = builder.savingsAccountWithdrawal(savingsAccountId).build();
-                CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);                
-                toApiJsonSerializer.serialize(result);
+                //final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
+                //final CommandWrapper commandRequest = builder.savingsAccountWithdrawal(savingsAccountId).build();
+                //CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+                //toApiJsonSerializer.serialize(result);
+
+                String description = "Auto Disbursement Settlement";
+
+                SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,settleAmount ,description);
+
+                // lets get transaction id of that transaction and create reference to it
+                Long transactionId = transaction.getId();
+
+                System.err.println("-----------------------transactionid from command id is "+transactionId);
+
+                SavingsTransactionTrigger savingsTransactionTrigger = new SavingsTransactionTrigger(transaction,loan.getId() ,SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository ,null ,savingsTransactionTrigger);
             }
 
         }
@@ -1965,6 +1983,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
      */
     private void transferFeeCharge(final StringBuilder sb, final AccountTransferDTO accountTransferDTO) {
         try {
+
+            System.err.println("-------------transfer fee charges ------------");
+            
             this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
         } catch (final PlatformApiDataValidationException e) {
             sb.append("Validation exception while paying charge ").append(accountTransferDTO.getChargeId()).append(" for loan id:")

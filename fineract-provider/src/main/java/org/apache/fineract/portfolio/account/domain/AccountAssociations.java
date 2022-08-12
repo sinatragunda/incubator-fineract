@@ -28,6 +28,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
+
 @Entity
 @Table(name = "m_portfolio_account_associations")
 public class AccountAssociations extends AbstractPersistableCustom<Long> {
