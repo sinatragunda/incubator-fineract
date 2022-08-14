@@ -509,7 +509,6 @@ task migrateTenantListDB<<{
     flyway.url= "jdbc:mysql://localhost:3306/$tenantsDbName"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
-
     flywayMigrate.execute()
 }
 
@@ -566,4 +565,8 @@ springBoot {
 }
 bootRepackage {
     mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
+}
+
+migrateWarFile{
+    println :'Hello sinatra ,what are we doing here ? '
 }
