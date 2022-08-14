@@ -482,12 +482,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             }catch(Exception e){
                 e.printStackTrace();
             }
-
-            System.err.println("--------------------try and flash transaction -------");
-
             transferTransactionId = accountTransferDetails.getId();
-
-            System.err.println("---------------------transferTransactionId found ");
         }
 
         // added 31/01/2022
@@ -585,7 +580,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         } else if (isLoanToSavingsAccountTransfer(accountTransferDTO.getFromAccountType(), accountTransferDTO.getToAccountType())) {
 
-            System.err.println("-----------------create from loan transfer transfer dto ------");
             Loan fromLoanAccount = null;
             SavingsAccount toSavingsAccount = null;
             if (accountTransferDetails == null) {
@@ -736,10 +730,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         final CommandProcessingResultBuilder builder = new CommandProcessingResultBuilder().withEntityId(transferTransactionId);
 
-        // if (fromAccountType.isSavingsAccount()) {
-
         builder.withSavingsId(toSavingsAccountId);
-        // }
 
         return builder.build();
     }

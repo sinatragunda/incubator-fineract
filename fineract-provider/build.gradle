@@ -276,7 +276,7 @@ task deployPentahoReports() {
     }
 
     doLast {
-        println ':deployPentahoReports - moving pentaho reports under: ' + pentahoReportDir
+        println ':deployPentahoReports - moving pentaho reports to new directory under: ' + pentahoReportDir
     }
 }
 pmd {
@@ -309,6 +309,7 @@ war {
 		into "WEB-INF/" // no leading slash
 	}
     war.finalizedBy(bootRepackage)
+    deployPentahoReports.execute()
 }
 
 license {
