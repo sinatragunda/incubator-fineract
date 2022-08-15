@@ -567,6 +567,16 @@ bootRepackage {
     mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
 }
 
-migrateWarFile{
-    println :'Hello sinatra ,what are we doing here ? '
+
+task deploy (dependsOn: war){
+    doLast{
+        copy {
+            from "build/libs/fineract-provider.war"
+            into "C:/tomcat/webapps"
+            include "fineract-provider.war"
+        }
+
+        delete 'D:/Documents/Coding/incubator-fineract/build/libs/fineract-provider.war'
+        println 'Now lets delete file after copying '
+    }
 }
