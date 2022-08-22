@@ -292,6 +292,7 @@ findbugs {
 //    dependsOn rat
 //}
 
+
 war {
 	from('../licenses/binary/') { // notice the parens
 		into "WEB-INF/licenses/binary/" // no leading slash
@@ -563,20 +564,22 @@ def qualifyVersionIfNecessary(version) {
 springBoot {
     mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
 }
-bootRepackage {
-    mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
-}
-
 
 task deploy (dependsOn: war){
     doLast{
         copy {
-            from "build/libs/fineract-provider.war"
-            into "C:/tomcat/webapps"
-            include "fineract-provider.war"
+            from "D:/Documents/Coding/incubator-fineract/build/libs/fineract-provider.war"
+            into "C:/tomcat/webapps/"
         }
 
         delete 'D:/Documents/Coding/incubator-fineract/build/libs/fineract-provider.war'
         println 'Now lets delete file after copying '
+    }
+}
+
+bootRepackage {
+    mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
+    doLast{
+        deploy.execute()
     }
 }
