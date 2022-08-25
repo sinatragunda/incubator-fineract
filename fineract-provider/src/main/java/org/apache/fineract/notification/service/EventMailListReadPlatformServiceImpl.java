@@ -30,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -51,12 +52,18 @@ public class EventMailListReadPlatformServiceImpl implements EventMailListReadPl
 
         //this.context.authenticatedUser().validateHasPermissionTo(EventSubscriptionConstants.readPermission);
 
-        final String sql = String.format("select %s where es.business_event = ? and es.office_id = ?" ,this.eventMailListMapper.schema());
+        boolean isOfficeId = Optional.ofNullable(officeId).isPresent();
+
+        String sql = String.format("select %s where es.business_event = ?" ,this.eventMailListMapper.schema());
+
+        if(isOfficeId){
+            sql = String.format("select %s where es.business_event = ? and es.office_id = ?" ,this.eventMailListMapper.schema());
+        }
 
         System.err.println("================sql =============="+sql);
 
         return this.jdbcTemplate.query(sql, this.eventMailListMapper,
-                new Object[] { businessEvents ,officeId });
+                new Object[] { businessEvents.ordinal() ,officeId });
 
     }
 
@@ -89,6 +96,7 @@ public class EventMailListReadPlatformServiceImpl implements EventMailListReadPl
             sqlBuilder.append("es.message as message, ");
             sqlBuilder.append("es.id as eventSubscriptionId, ");
             sqlBuilder.append("eml.id as id, ");
+            sqlBuilder.append("rk.id as recipientKeyId, ");
             sqlBuilder.append("rk.name as recipientKeyName, ");
             sqlBuilder.append("rk.count as count, ");
             sqlBuilder.append("rk.select_all_mode as selectAllMode, ");
@@ -122,13 +130,14 @@ public class EventMailListReadPlatformServiceImpl implements EventMailListReadPl
             final Integer count = rs.getInt("count");
             final String officeName = rs.getString("officeName");
             final Boolean selectAllMode = rs.getBoolean("selectAllMode");
+            final Long recipientKeyId = rs.getLong("recipientKeyId");
 
             final Integer notificationBroadcastTypeInt = JdbcSupport.getInteger(rs ,"notificationType");
             final NOTIFICATION_BROADCAST_TYPE notificationBroadcastType = NOTIFICATION_BROADCAST_TYPE.fromInt(notificationBroadcastTypeInt);
 
             final EventSubscriptionData eventSubscriptionData = new EventSubscriptionData(eventSubscriptionId ,name ,businessEvents ,notificationBroadcastType , officeId ,message);
 
-            final MailRecipientsKeyData mailRecipientKeyData = new MailRecipientsKeyData(id ,recipientKey,officeId,officeName ,count ,selectAllMode);
+            final MailRecipientsKeyData mailRecipientKeyData = new MailRecipientsKeyData(recipientKeyId ,recipientKey,officeId,officeName ,count ,selectAllMode);
 
             return new EventMailListData(id ,eventSubscriptionData ,mailRecipientKeyData);
         }

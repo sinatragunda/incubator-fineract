@@ -4,7 +4,7 @@
     At 9:12 AM on 8/15/2021
 
 */
-package org.apache.fineract.portfolio.client.helper;
+package org.apache.fineract.notification.helper;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -39,11 +39,23 @@ public class MailRecipientsHelper {
 
     public static Queue<MailRecipients> emailRecipients(MailRecipientsKeyRepository mailRecipientsKeyRepository, MailRecipientsRepository mailRecipientsRepository, ClientReadPlatformService clientReadPlatformService, Long keyId){
 
+
+        System.err.println("---------------------key id is --------------------"+keyId);
+
         MailRecipientsKey mailRecipientsKey = mailRecipientsKeyRepository.findOne(keyId);
 
-        // if true then get office id and fill lists with recipients of clients
-        boolean selectAllMode = mailRecipientsKey.getSelectAllMode();
+        boolean isPresent = Optional.ofNullable(mailRecipientsKey).isPresent();
+
         Queue<MailRecipients> mailRecipientsQueue = new LinkedList<>();
+
+        if(!isPresent){
+            /**
+             * If MailRecipientsKey record is not present then just return with empty queue .Since it will be streamed if its blank function will skio
+             */
+            return mailRecipientsQueue;
+        }
+
+        boolean selectAllMode = mailRecipientsKey.getSelectAllMode();
 
         if(selectAllMode){
 
@@ -51,7 +63,7 @@ public class MailRecipientsHelper {
             
             // we need to implement new nullable stuff here
 
-            // some stupid glitch exists here
+            // Some stupid glitch exists here ,what was the glitch now ? .Am forgetting now 
             
             
             boolean officeIdPresent = Optional.ofNullable(officeId).isPresent();
@@ -59,12 +71,11 @@ public class MailRecipientsHelper {
             Consumer<MailRecipients> addNewToQueue = (e)-> mailRecipientsQueue.add(e);
                     
             if(!officeIdPresent){
-                //we taking all clients since no office has been specified
 
+                //We taking all clients since no office has been specified
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
                 Consumer<ClientData> mailRecipientsConsumer = (clientData) ->{
                     MailRecipients mailRecipients = createMailRecipientObject(clientData);
-                    //Consumer<MailRecipients> addNew = (e)-> mailRecipientsQueue.put(e);
                     Optional.ofNullable(mailRecipients).ifPresent(addNewToQueue);
                 };
 
@@ -80,9 +91,7 @@ public class MailRecipientsHelper {
                     Optional.ofNullable(mailRecipients).ifPresent(addNewToQueue);
 
                 };
-
                 clientDataList.stream().forEach(clientDataConsumer);
-
             }
 
             /// update email addressed here son

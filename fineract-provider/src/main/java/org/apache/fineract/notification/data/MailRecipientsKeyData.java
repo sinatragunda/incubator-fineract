@@ -25,4 +25,27 @@ public class MailRecipientsKeyData {
         this.selectAllMode = selectAllMode;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getOfficeId() {
+        return officeId;
+    }
+
+    public String getOfficeName() {
+        return officeName;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public boolean isSelectAllMode() {
+        return selectAllMode;
+    }
 }

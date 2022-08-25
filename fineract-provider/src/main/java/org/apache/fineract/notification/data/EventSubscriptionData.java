@@ -27,4 +27,28 @@ public class EventSubscriptionData {
         this.officeId = officeId;
         this.message = message;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BUSINESS_EVENTS getBusinessEvent() {
+        return businessEvent;
+    }
+
+    public NOTIFICATION_BROADCAST_TYPE getNotificationType() {
+        return notificationType;
+    }
+
+    public Long getOfficeId() {
+        return officeId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

@@ -17,6 +17,9 @@ public enum NOTIFICATION_BROADCAST_TYPE {
         this.code = code ;
     }
 
+    public String getCode() {
+        return code;
+    }
 
     public static NOTIFICATION_BROADCAST_TYPE fromInt(int arg){
 
@@ -26,7 +29,17 @@ public enum NOTIFICATION_BROADCAST_TYPE {
             }
         }
         return null ;
+    }
 
+
+    public static NOTIFICATION_BROADCAST_TYPE fromString(String arg){
+
+        for(NOTIFICATION_BROADCAST_TYPE n : values()){
+            if(n.getCode().equalsIgnoreCase(arg)){
+                return n;
+            }
+        }
+        return null ;
     }
 
 }

@@ -22,4 +22,16 @@ public class EventMailListData {
         this.eventSubscriptionData = eventSubscriptionData;
         this.mailRecipientsKeyData = mailRecipientsKeyData;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public EventSubscriptionData getEventSubscriptionData() {
+        return eventSubscriptionData;
+    }
+
+    public MailRecipientsKeyData getMailRecipientsKeyData() {
+        return mailRecipientsKeyData;
+    }
 }

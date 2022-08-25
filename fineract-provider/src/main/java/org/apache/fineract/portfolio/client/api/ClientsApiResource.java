@@ -57,7 +57,7 @@ import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPl
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.MailRecipients;
 import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
-import org.apache.fineract.portfolio.client.helper.MailRecipientsHelper;
+import org.apache.fineract.notification.helper.MailRecipientsHelper;
 import org.apache.fineract.portfolio.client.repo.MailRecipientsKeyRepository;
 import org.apache.fineract.portfolio.client.repo.MailRecipientsRepository;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;

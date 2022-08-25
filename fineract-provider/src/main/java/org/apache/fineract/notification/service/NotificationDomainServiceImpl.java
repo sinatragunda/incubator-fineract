@@ -64,13 +64,16 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 	private final TopicSubscriberReadPlatformService topicSubscriberReadPlatformService;
 	private final NotificationEventService notificationEvent;
 	private final SpringEventPublisher springEventPublisher;
+
+	// added 25/08/2022
+	private final NotificationEventServiceEx notificationEventServiceEx;
 	
 	@Autowired
 	public NotificationDomainServiceImpl(final BusinessEventNotifierService businessEventNotifierService,
 			final PlatformSecurityContext context, final RoleRepository roleRepository,
 			final TopicSubscriberReadPlatformService topicSubscriberReadPlatformService,
 			final OfficeRepository officeRepository, final NotificationEventService notificationEvent,
-			final SpringEventPublisher springEventPublisher) {
+			final SpringEventPublisher springEventPublisher ,final NotificationEventServiceEx notificationEventServiceEx) {
 		
 		this.businessEventNotifierService = businessEventNotifierService;
 		this.context = context;
@@ -79,6 +82,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 		this.officeRepository = officeRepository;
 		this.notificationEvent = notificationEvent;
 		this.springEventPublisher = springEventPublisher;
+		this.notificationEventServiceEx =notificationEventServiceEx ;
 	}
 	
 	@PostConstruct
@@ -147,7 +151,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New client created",
 						"created",
 						context.authenticatedUser().getId(),
-						client.getOffice().getId()
+						client.getOffice().getId(),
+						BUSINESS_EVENTS.CLIENTS_ACTIVATE
 				);
 			}
 		}	
@@ -168,7 +173,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New center created",
 						"created",
 						context.authenticatedUser().getId(),
-						commandProcessingResult.getOfficeId()
+						commandProcessingResult.getOfficeId(),
+						BUSINESS_EVENTS.CENTERS_CREATE
 				);
 			}
 		}
@@ -189,7 +195,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New group created",
 						"created",
 						context.authenticatedUser().getId(),
-						commandProcessingResult.getOfficeId()
+						commandProcessingResult.getOfficeId(),
+						BUSINESS_EVENTS.GROUPS_CREATE
 				);
 			}
 		}
@@ -210,7 +217,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Deposit made",
 						"depositMade",
 						context.authenticatedUser().getId(),
-						savingsAccountTransaction.getSavingsAccount().officeId()
+						savingsAccountTransaction.getSavingsAccount().officeId(),
+						BUSINESS_EVENTS.SAVINGS_DEPOSIT
 				);
 			}
 		}
@@ -231,7 +239,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Withdrawal made",
 						"withdrawalMade",
 						context.authenticatedUser().getId(),
-						savingsAccountTransaction.getSavingsAccount().officeId()
+						savingsAccountTransaction.getSavingsAccount().officeId(),
+						BUSINESS_EVENTS.SAVINGS_WITHDRAWAL
 				);
 			}
 		}
@@ -252,7 +261,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Dividend posted to account",
 						"dividendPosted",
 						context.authenticatedUser().getId(),
-						context.authenticatedUser().getOffice().getId()
+						context.authenticatedUser().getOffice().getId(),
+						BUSINESS_EVENTS.SHARE_PRODUCT_DIVIDENDS_CREATE
 				);
 			}
 		}
@@ -273,7 +283,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New fixed deposit account created",
 						"created",
 						context.authenticatedUser().getId(),
-						fixedDepositAccount.officeId()
+						fixedDepositAccount.officeId(),
+						BUSINESS_EVENTS.SAVINGS_CREATE
 				);
 			}
 		}
@@ -294,7 +305,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New recurring deposit account created",
 						"created",
 						context.authenticatedUser().getId(),
-						recurringDepositAccount.officeId()
+						recurringDepositAccount.officeId(),
+						BUSINESS_EVENTS.SAVINGS_CREATE
 				);
 			}
 		}
@@ -317,7 +329,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 							"Fixed deposit account approved",
 							"approved",
 							context.authenticatedUser().getId(),
-							savingsAccount.officeId()
+							savingsAccount.officeId(),
+							BUSINESS_EVENTS.SAVINGS_APPROVE
 					);					
 				} else if (savingsAccount.depositAccountType().equals(DepositAccountType.RECURRING_DEPOSIT)) {
 					
@@ -328,7 +341,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 							"Recurring deposit account approved",
 							"approved",
 							context.authenticatedUser().getId(),
-							savingsAccount.officeId()
+							savingsAccount.officeId(),
+							BUSINESS_EVENTS.SAVINGS_APPROVE
 					);
 				} else if (savingsAccount.depositAccountType().equals(DepositAccountType.SAVINGS_DEPOSIT)) {
 					
@@ -339,7 +353,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 							"Savings account approved",
 							"approved",
 							context.authenticatedUser().getId(),
-							savingsAccount.officeId()
+							savingsAccount.officeId(),
+							BUSINESS_EVENTS.SAVINGS_APPROVE
 					);
 				}
 			}
@@ -361,7 +376,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Interest posted to account",
 						"interestPosted",
 						context.authenticatedUser().getId(),
-						savingsAccount.officeId()
+						savingsAccount.officeId(),
+						BUSINESS_EVENTS.SAVINGS_POST_INTEREST
 				);
 			}
 		}
@@ -382,7 +398,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New loan created",
 						"created",
 						context.authenticatedUser().getId(),
-						loan.getOfficeId()
+						loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_CREATE
 				);
 			}
 			
@@ -404,7 +421,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New loan approved",
 						"approved",
 						context.authenticatedUser().getId(),
-						loan.getOfficeId()
+						loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_APPROVED
 				);
 			}
 		}
@@ -426,12 +444,14 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Loan closed",
 						"loanClosed",
 						context.authenticatedUser().getId(),
-						loan.getOfficeId()
+						loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_CLOSE
 				);
 			}
 		}
 	}
-		
+
+	// WRONG EVENT HERE
 	private class LoanCloseAsRescheduledListener extends NotificationBusinessEventAdapter {
 		
 		@Override
@@ -447,7 +467,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Loan has been rescheduled",
 						"loanRescheduled",
 						 context.authenticatedUser().getId(),
-						 loan.getOfficeId()
+						 loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_INTEREST_RECALCULATION
 				);
 			}
 		}
@@ -468,7 +489,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Repayment made",
 						"repaymentMade",
 						context.authenticatedUser().getId(),
-						loan.getOfficeId()
+						loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_MAKE_REPAYMENT
 				);
 			}
 		}
@@ -490,7 +512,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New loan product created",
 						"created",
 						context.authenticatedUser().getId(),
-						context.authenticatedUser().getOffice().getId()
+						context.authenticatedUser().getOffice().getId(),
+						BUSINESS_EVENTS.LOAN_PRODUCT_CREATE
 				);
 			}
 		}
@@ -511,7 +534,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New savings account created",
 						"created",
 						context.authenticatedUser().getId(),
-						savingsAccount.officeId()
+						savingsAccount.officeId(),
+						BUSINESS_EVENTS.SAVINGS_APPROVE
 				);
 			}
 		}
@@ -532,7 +556,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Savings has gone into dormant",
 						"closed",
 						context.authenticatedUser().getId(),
-						savingsAccount.officeId()
+						savingsAccount.officeId(),
+						BUSINESS_EVENTS.SAVINGS_CLOSE
 				);
 			}
 		}
@@ -553,7 +578,8 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"New share account created",
 						"created",
 						context.authenticatedUser().getId(),
-						shareAccount.getOfficeId()
+						shareAccount.getOfficeId(),
+						BUSINESS_EVENTS.SHARE_ACCOUNT_CREATE
 				);
 			}
 		}
@@ -574,14 +600,15 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 						"Share account approved",
 						"approved",
 						context.authenticatedUser().getId(),
-						shareAccount.getOfficeId()
+						shareAccount.getOfficeId(),
+						BUSINESS_EVENTS.SHARE_ACCOUNT_APPROVE
 				);
 			}
 		}
 	}
 	
 	private void buildNotification(String permission, String objectType, Long objectIdentifier, 
-			String notificationContent, String eventType,  Long appUserId, Long officeId) {
+			String notificationContent, String eventType,  Long appUserId, Long officeId ,BUSINESS_EVENTS businessEvents) {
 		
 		String tenantIdentifier = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
 		Queue queue = new ActiveMQQueue("NotificationQueue");
@@ -599,12 +626,20 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 				userIds
 		);
 		try {
-			//System.err.println("----------------broadcast all notifications -----------");
-			this.notificationEvent.broadcastNotification(queue, notificationData);
-			/// added 17/07/2022
+			System.err.println("----------------broadcast all notifications -----------"+businessEvents);
+			this.notificationEventServiceEx.trigger(businessEvents ,notificationData);
 
-		} catch(Exception e) {
+			this.notificationEvent.broadcastNotification(queue, notificationData ,businessEvents);
+			/// added 17/07/2022
+			System.err.println("--------------notification broadcasted ------------------");
+
+		} catch(Exception e){
+			System.err.println("-----------------------some exception caught here son "+e.getMessage());
+			e.printStackTrace();
 			this.springEventPublisher.broadcastNotification(notificationData);
+
+			System.err.println("-------------------this could be much error prone hence need to catch for exceptions");
+
 		}
 	}
 	

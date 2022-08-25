@@ -19,6 +19,8 @@
 package org.apache.fineract.notification.eventandlistener;
 
 import org.apache.fineract.notification.data.NotificationData;
+import org.apache.fineract.notification.service.NotificationEventServiceEx;
+import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -33,13 +35,19 @@ import javax.jms.Session;
 public class NotificationEventService {
 
     private final JmsTemplate jmsTemplate;
+    private final NotificationEventServiceEx notificationEventServiceEx;
+
 
     @Autowired
-    public NotificationEventService(JmsTemplate jmsTemplate) {
+    public NotificationEventService(JmsTemplate jmsTemplate, NotificationEventServiceEx notificationEventServiceEx) {
         this.jmsTemplate = jmsTemplate;
+        this.notificationEventServiceEx = notificationEventServiceEx;
     }
 
-    public void broadcastNotification(final Destination destination, final NotificationData notificationData) {
+
+
+    // edited 25/08/2022
+    public void broadcastNotification(final Destination destination, final NotificationData notificationData , final BUSINESS_EVENTS businessEvents) {
         this.jmsTemplate.send(destination, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
