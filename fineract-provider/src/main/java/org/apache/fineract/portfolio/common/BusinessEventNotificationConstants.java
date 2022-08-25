@@ -18,8 +18,14 @@
  */
 package org.apache.fineract.portfolio.common;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static org.apache.fineract.portfolio.charge.service.ChargeEnumerations.chargeCalculationType;
 
 public class BusinessEventNotificationConstants {
 
@@ -47,7 +53,7 @@ public class BusinessEventNotificationConstants {
         }
 
         public static BUSINESS_EVENTS fromInt(int arg){
-            for(BUSINESS_EVENTS b : values()){
+            for(BUSINESS_EVENTS b : BUSINESS_EVENTS.values()){
                 if(b.ordinal()==arg){
                     return b;
                 }
@@ -85,6 +91,18 @@ public class BusinessEventNotificationConstants {
         public String getValue() {
             return this.value;
         }
+    }
+
+    // added 24/024/2022
+    public static List<EnumOptionData> businessEventEnumOption(){
+        
+        List<EnumOptionData> enumList = new ArrayList();
+        for(BUSINESS_EVENTS e : BUSINESS_EVENTS.values()){
+            EnumOptionData enumOptionData = new EnumOptionData(new Long(e.ordinal()) ,e.getValue() ,e.getValue());
+            enumList.add(enumOptionData);
+        }
+
+        return enumList ;
     }
 
 }

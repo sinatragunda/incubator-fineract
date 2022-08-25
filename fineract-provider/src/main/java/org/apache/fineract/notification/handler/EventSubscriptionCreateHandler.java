@@ -11,8 +11,7 @@ import org.apache.fineract.commands.annotation.CommandType;
 import org.apache.fineract.commands.handler.NewCommandSourceHandler;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.notification.service.EventSubscriptionWritePlatformService;
-import org.apache.fineract.portfolio.group.service.GroupingTypesWritePlatformService;
+import org.apache.fineract.notification.service.EventMailListWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,17 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 @CommandType(entity = "EVENT_SUBSCRIPTION", action = "CREATE")
 public class EventSubscriptionCreateHandler implements NewCommandSourceHandler {
 
-    private EventSubscriptionWritePlatformService eventSubscriptionWritePlatformService;
+    private EventMailListWritePlatformService eventMailListWritePlatformService;
 
     @Autowired
-    public EventSubscriptionCreateHandler(final EventSubscriptionWritePlatformService eventSubscriptionWritePlatformService) {
-        this.eventSubscriptionWritePlatformService = eventSubscriptionWritePlatformService;
+    public EventSubscriptionCreateHandler(final EventMailListWritePlatformService eventMailListWritePlatformService) {
+        this.eventMailListWritePlatformService = eventMailListWritePlatformService;
     }
 
     @Transactional
     @Override
     public CommandProcessingResult processCommand(final JsonCommand command) {
 
-        return this.eventSubscriptionWritePlatformService.create(command);
+        return this.eventMailListWritePlatformService.create(command);
     }
 }

@@ -15,15 +15,6 @@
 -- KIND, either express or implied. See the License for the
 -- specific language governing permissions and limitations
 -- under the License.
+-- Created 25/08/2022 0410
 
--- Created 18/07/2022 11:59 am
-
-CREATE TABLE `m_event_mail_list` (
-	`event_subscription_id` BIGINT(20) NOT NULL COLLATE 'latin1_swedish_ci',
-	`mail_recipient_key_id` BIGINT(20) NOT NULL,
-	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-	PRIMARY KEY (`id`) USING BTREE
-)
-COLLATE='latin1_swedish_ci'
-ENGINE=InnoDB
-COMMENT="Table to map event subscriptions and their corresponding mailing list ";
+INSERT INTO `m_permission` (`grouping`, `code`, `entity_name`, `action_name`, `can_maker_checker`) VALUES ('portfolio', 'READ_EVENT_SUBSCRIPTION', 'EVENT_SUBSCRIPTION', 'READ', 0);

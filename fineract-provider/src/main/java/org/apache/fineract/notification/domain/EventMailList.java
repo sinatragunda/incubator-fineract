@@ -7,9 +7,6 @@
 package org.apache.fineract.notification.domain;
 
 
-import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
-
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +32,8 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.portfolio.client.domain.MailRecipientsKey;
 
 @Entity
 @Table(name="m_event_mail_list")
@@ -44,13 +43,17 @@ public class EventMailList extends AbstractPersistableCustom<Long>{
     @JoinColumn(name = "event_subscription_id",nullable = false)
     private EventSubscription eventSubscription;
 
-    @JoinColumn(name = "mail_recipient_id", nullable = false)
-    private List<MailRecipientsKey> mailRecipientsKey;
+    @ManyToOne
+    @JoinColumn(name = "mail_recipient_key_id", nullable = false)
+    private MailRecipientsKey mailRecipientsKey;
+
+    @Transient
+    private List<MailRecipientsKey> mailRecipientsKeyList ;
 
 
     public EventMailList(){}
 
-    public EventMailList(EventSubscription eventSubscription, List<MailRecipientsKey> mailRecipientsKey) {
+    public EventMailList(EventSubscription eventSubscription, MailRecipientsKey mailRecipientsKey) {
         this.eventSubscription = eventSubscription;
         this.mailRecipientsKey = mailRecipientsKey;
     }
@@ -63,11 +66,11 @@ public class EventMailList extends AbstractPersistableCustom<Long>{
         this.eventSubscription = eventSubscription;
     }
 
-    public List<MailRecipientsKey> getMailRecipientsKey() {
+    public MailRecipientsKey getMailRecipientsKey() {
         return mailRecipientsKey;
     }
 
-    public void setMailRecipientsKey(List<MailRecipientsKey> mailRecipientsKey) {
+    public void setMailRecipientsKey(MailRecipientsKey mailRecipientsKey) {
         this.mailRecipientsKey = mailRecipientsKey;
     }
 }
