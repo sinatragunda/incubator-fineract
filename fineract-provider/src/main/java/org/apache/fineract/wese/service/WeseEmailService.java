@@ -104,6 +104,7 @@ public class WeseEmailService{
             email.send();
         } catch (EmailException e){
             //throw new PlatformEmailSendException(e);
+            System.err.println("-----------------------error raised here ------------"+e.getMessage());
         }
     }
 

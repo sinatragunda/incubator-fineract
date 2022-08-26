@@ -165,12 +165,11 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
 
         SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = null;
 
-        sendMailMessageStatus = weseEmailService.send(emailDetail);
+        //sendMailMessageStatus = weseEmailService.send(emailDetail);
 
-        System.err.println("-------------------send mail status -----------------"+sendMailMessageStatus+"--------------to email "+emailDetail.getAddress());
+        //System.err.println("-------------------send mail status -----------------"+sendMailMessageStatus+"--------------to email "+emailDetail.getAddress());
 
         weseEmailService.sendDefinedEmail(emailDetail);
-
 
         return sendMailMessageStatus;
     }
