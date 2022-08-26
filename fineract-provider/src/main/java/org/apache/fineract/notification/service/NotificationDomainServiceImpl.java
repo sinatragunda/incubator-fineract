@@ -626,20 +626,11 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 				userIds
 		);
 		try {
-			System.err.println("----------------broadcast all notifications -----------"+businessEvents);
 			this.notificationEventServiceEx.trigger(businessEvents ,notificationData);
-
 			this.notificationEvent.broadcastNotification(queue, notificationData ,businessEvents);
-			/// added 17/07/2022
-			System.err.println("--------------notification broadcasted ------------------");
 
 		} catch(Exception e){
-			System.err.println("-----------------------some exception caught here son "+e.getMessage());
-			e.printStackTrace();
 			this.springEventPublisher.broadcastNotification(notificationData);
-
-			System.err.println("-------------------this could be much error prone hence need to catch for exceptions");
-
 		}
 	}
 	

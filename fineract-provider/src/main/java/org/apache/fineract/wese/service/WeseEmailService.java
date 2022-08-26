@@ -48,7 +48,7 @@ import java.util.Optional;
 public class WeseEmailService{
 	
 	private final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService;
-	
+    
 	@Autowired
 	public WeseEmailService(final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService){
 		this.externalServicesReadPlatformService = externalServicesReadPlatformService;
@@ -78,8 +78,8 @@ public class WeseEmailService{
     }
 
     public void sendDefinedEmail(EmailDetail emailDetails) {
-
-        Email email = new SimpleEmail();
+        
+        final Email email = new SimpleEmail();
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
         final String authuserName = smtpCredentialsData.getUsername();
 
@@ -87,7 +87,6 @@ public class WeseEmailService{
         final String authpwd = smtpCredentialsData.getPassword();
 
         // Very Important, Don't use email.setAuthentication()
-
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
         email.setDebug(true); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
@@ -103,10 +102,8 @@ public class WeseEmailService{
 
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
             email.send();
-
-        }
-        catch(Exception e){
-            System.err.println("---------exception ------------"+e.getMessage());
+        } catch (EmailException e){
+            //throw new PlatformEmailSendException(e);
         }
     }
 
@@ -115,6 +112,7 @@ public class WeseEmailService{
         
         MultiPartEmail email = new MultiPartEmail();
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
+        
         final String authuserName = smtpCredentialsData.getUsername();
 
         final String authuser = smtpCredentialsData.getUsername();
@@ -122,16 +120,17 @@ public class WeseEmailService{
 
         // Very Important, Don't use email.setAuthentication()
 
+        System.err.println("----------auth user is "+authuser+"------------and getPassword "+authpwd);
+
     
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-        email.setDebug(false); // true if you want to debug
+        email.setDebug(true); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
         try {
             if(smtpCredentialsData.isUseTLS()){
                 email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
             }
-
 
             email.setFrom(authuser, authuserName);
 
@@ -145,25 +144,31 @@ public class WeseEmailService{
                 email.attach(emailAttachment);
             }
 
-            if(emailDetails.getAddress()==null){
+            boolean hasAddress = Optional.ofNullable(emailDetails.getAddress()).isPresent();
+
+            if(!hasAddress){
                 return SEND_MAIL_MESSAGE_STATUS.INVALID_ADDRESS ;
             }
         
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
+            
             email.send();
 
             return SEND_MAIL_MESSAGE_STATUS.SUCCESS;
 
         }
 
-        catch (Exception e) {
+        catch (Exception e){
+
+            System.err.println("--------------mail error is -------"+e.getMessage());
+            e.printStackTrace();
 
             Throwable throwable = e.getCause();
-
             boolean smtError = throwable instanceof SMTPSendFailedException;
             boolean sendFailed = throwable instanceof SendFailedException ;
             boolean unkownHost = throwable instanceof UnknownHostException ;
         }
+
         return SEND_MAIL_MESSAGE_STATUS.ERROR ;
     }
 }

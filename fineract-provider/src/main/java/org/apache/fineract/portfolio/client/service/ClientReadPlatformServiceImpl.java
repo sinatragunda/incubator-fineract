@@ -319,6 +319,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
         if (StringUtils.isNotBlank(extraCriteria)) {
             sql += " and (" + extraCriteria + ")";
+
+            System.err.println("-----------------------full query is "+sql);
+
             this.columnValidator.validateSqlInjection(sql, extraCriteria);
         }        
         return this.jdbcTemplate.query(sql, this.lookupMapper, new Object[] {});

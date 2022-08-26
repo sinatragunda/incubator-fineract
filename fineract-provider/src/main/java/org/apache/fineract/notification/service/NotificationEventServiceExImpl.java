@@ -67,6 +67,9 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
         Long actorId = notificationData.getObjectIdentfier();
         Long officeId = notificationData.getOfficeId();
 
+
+        System.err.println("-----------------object identifier is ---------------------"+notificationData.getObjectIdentfier());
+
         // get client record from participant id ?
         // we need a way to get message templates now son
 
@@ -117,6 +120,8 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
         String email = clientData.getEmailAddress();
         String body = String.format("%s with record id %d created at %s",notificationData.getContent() ,notificationData.getObjectIdentfier() ,notificationData.getCreatedAt());
 
+        System.err.println("----------message body is -------"+body+"---------------email is "+email);
+
         return new EmailDetail(subject ,body ,email ,contact);
     }
 
@@ -127,6 +132,8 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
         String contact = mailRecipients.getName();
         String email = mailRecipients.getEmailAddress();
         String body = String.format("%s with record id %d created at %s",notificationData.getContent() ,notificationData.getObjectIdentfier() ,notificationData.getCreatedAt());
+
+        System.err.println("----------message body is -------"+body+"=================email is "+email);
 
         return new EmailDetail(subject ,body ,email ,contact);
     }
@@ -155,9 +162,15 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
     }
 
     private SEND_MAIL_MESSAGE_STATUS sendMessage(EmailDetail emailDetail){
+
         SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = null;
+
         sendMailMessageStatus = weseEmailService.send(emailDetail);
-        System.err.println("-------------------send mail status -----------------"+sendMailMessageStatus);
+
+        System.err.println("-------------------send mail status -----------------"+sendMailMessageStatus+"--------------to email "+emailDetail.getAddress());
+
+        weseEmailService.sendDefinedEmail(emailDetail);
+
 
         return sendMailMessageStatus;
     }

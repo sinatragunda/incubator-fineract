@@ -22,13 +22,12 @@ public class EventSubscriptionHelper {
 
 
 
-
-
     public static List<EventMailListData> getSubscribersForEvent(EventMailListReadPlatformService eventMailListReadPlatformService , BUSINESS_EVENTS businessEvents ,Long officeId){
 
         List<EventMailListData> eventMailListList =  eventMailListReadPlatformService.retrieveWhereEvent(officeId ,businessEvents);
 
         System.err.println("-----------------------output size is "+eventMailListList.size());
+
         return eventMailListList ;
 
     }

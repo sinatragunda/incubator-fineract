@@ -63,8 +63,9 @@ public class MailRecipientsHelper {
             
             // we need to implement new nullable stuff here
 
-            // Some stupid glitch exists here ,what was the glitch now ? .Am forgetting now 
-            
+            // Some stupid glitch exists here ,what was the glitch now ? .Am forgetting now
+
+            System.err.println("---------------------------office id is ----------------------"+officeId);
             
             boolean officeIdPresent = Optional.ofNullable(officeId).isPresent();
 
@@ -72,19 +73,24 @@ public class MailRecipientsHelper {
                     
             if(!officeIdPresent){
 
-                //We taking all clients since no office has been specified
+                // We taking all clients since no office has been specified
                 Page<ClientData> clientDataList =  clientReadPlatformService.retrieveAll(null);
                 Consumer<ClientData> mailRecipientsConsumer = (clientData) ->{
                     MailRecipients mailRecipients = createMailRecipientObject(clientData);
                     Optional.ofNullable(mailRecipients).ifPresent(addNewToQueue);
                 };
-
                 clientDataList.getPageItems().stream().forEach(mailRecipientsConsumer);
             }
             else{
 
-                String lookUpCriteria = String.format("office_id=%d",officeId);
-                Collection<ClientData> clientDataList = clientReadPlatformService.retrieveAllForLookup(lookUpCriteria);
+                //String lookUpCriteria = String.format("c.office_id=%d",officeId);
+                /**
+                 * Initial function retrieveAllForLookup with office criteria been changed after failing some sql injection validation
+                 * Probably malformed criteria string
+                 * Dated 25/08/2022
+                 */
+                Collection<ClientData> clientDataList = clientReadPlatformService.retrieveAllForLookupByOfficeId(officeId);
+
                 Consumer<ClientData> clientDataConsumer = (clientData)->{
 
                     MailRecipients mailRecipients = createMailRecipientObject(clientData);
