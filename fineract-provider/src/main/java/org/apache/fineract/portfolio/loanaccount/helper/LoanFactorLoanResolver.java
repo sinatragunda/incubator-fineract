@@ -28,11 +28,9 @@ public class LoanFactorLoanResolver {
 
 
     // function returns nothing since it throws errors if something is wrong
-    public static void loanFactor(LoanReadPlatformService loanReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanProductRepository loanProductRepository, FromJsonHelper fromJsonHelper , JsonCommand command, LoanProduct loanProduct, Client client) {
+    public static void loanFactor(LoanReadPlatformService loanReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanProductRepository loanProductRepository, FromJsonHelper fromJsonHelper , JsonCommand command, LoanProduct loanProduct, Client client ,List excludeLoansList) {
 
         LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
-
-        System.err.println("-----------------loan factor here is ---------------"+loanFactorSourceAccountType);
 
         LoanFactorSavingsAccountHelper loanFactorSavingsAccountHelper = new LoanFactorSavingsAccountHelper(loanProductRepository ,loanFactorSourceAccountType);
 
@@ -43,10 +41,10 @@ public class LoanFactorLoanResolver {
                 boolean hasCrossLink = loanFactorSavingsAccountHelper.hasCrossLink();
                 if(hasCrossLink){
                     doLoanFactor = true;
-                    System.err.println("-----------------system is cross linked - -------------------");
                 }
                 break;
-            ///none factored account then lets check if there is cross link product
+            
+            // none factored account then lets check if there is cross link product
             case SAVINGS:
                 doLoanFactor = true;
                 break;
@@ -62,17 +60,15 @@ public class LoanFactorLoanResolver {
 
             System.err.println("---------------- is loan product present ?-------"+ Optional.ofNullable(loanProduct).isPresent());
 
-            boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal);
-            //if successful just proceed with this loan and throw no errors
-            System.err.println("------------proceed with transaction -------------"+transact);
+            boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal ,excludeLoansList);
+            // if successful just proceed with this loan and throw no errors
+            // System.err.println("------------proceed with transaction -------------"+transact);
         }
     }
 
     public static void maxBalance(LoanProductRepository loanProductRepository ,Long productId){
 
-
         LoanProduct loanProduct = loanProductRepository.findOne(productId);
-
         Integer loanFactor = loanProduct.loanFactor();
 
         if(loanFactor > 0){
@@ -94,11 +90,5 @@ public class LoanFactorLoanResolver {
         loanFactor = crossLinkedProducts.stream().map(LoanProduct::loanFactor).max(max).orElse(0);
 
     }
-//
-//    private static LoanFactor setLoanFactor(BigDecimal totalLoanBalance ,BigDecimal savingsBalance ,int loanFactor){
-//
-//        LoanFactor loanFactor = new LoanFactor(totalLoanBalance);
-//
-//    }
 
 }

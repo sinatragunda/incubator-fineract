@@ -297,10 +297,34 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
             }
 
-            // modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
-            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client);
 
-            // inject account id into command ,just in case product has default settlement .Do this before validation
+            // Added 25/05/2021
+            // Do the whole revolve loan thing here
+            // Modifying 02/08/2022
+            /**
+                * Code modified to correct for error regarding loan revolving when it comes to loan factored account 
+                * This happens when you are revolving a loan ,initially it should be regarded as closed
+            */
+
+            final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
+
+            /**
+             * Added 29/08/2022
+             */
+            List<Long> excludeLoansList = new ArrayList();
+            boolean hasRevolvingAccounts = Optional.ofNullable(revolvingAccountIds).isPresent();
+
+            excludeTopUpLoansFromFactoring(excludeLoansList ,revolvingAccountIds ,hasRevolvingAccounts);
+
+            /**
+             *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
+            */
+
+            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList);
+
+            /**
+             * If loanProduct has a default settlement account ,inject into the application jsonCommand
+             */
             command = injectAccountId(command ,loanProduct ,clientId);
 
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
@@ -328,24 +352,21 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             final Loan newLoanApplication = this.loanAssembler.assembleFrom(command, currentUser);
 
-            // added 25/05/2021
-            // do the whole revolve loan thing here
-            // modifying 02/08/2022
-
-            final String revolvingAccountIds = this.fromJsonHelper.extractStringNamed("revolvingAccountId", command.parsedJson());
-
-            if(revolvingAccountIds!=null){
+            /**
+             * Code needs to be factored so that no duplicate codes exists and gets more clean
+             * Though no idea for loansTransactionDataList though ,what did l use it for ?
+             */
+            if(hasRevolvingAccounts){
 
                 StringTokenizer token = new StringTokenizer(revolvingAccountIds ,",");
-                List<LoanTransactionData> list = new ArrayList<>();
+                List<LoanTransactionData> loanTransactionsDataList = new ArrayList<>();
                 while(token.hasMoreTokens()){
                     Long id = new Long(token.nextToken());
                     LocalDate transactionDate = newLoanApplication.getSubmittedOnDate();
                     final LoanTransactionData revolvingLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
-                    list.add(revolvingLoanAccount);
+                    loanTransactionsDataList.add(revolvingLoanAccount);
                 }
-
-                RevolvingLoanHelper.validateApplication(list ,newLoanApplication);   
+                RevolvingLoanHelper.validateApplication(loanTransactionsDataList ,newLoanApplication);
             }
 
             validateSubmittedOnDate(newLoanApplication);
@@ -1545,19 +1566,40 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     }
 
     private void officeSpecificLoanProductValidation(final Long productId, final Long officeId) {
-                final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository
-                        .findOneByNameWithNotFoundDetection(
-                                FineractEntityAccessConstants.GLOBAL_CONFIG_FOR_OFFICE_SPECIFIC_PRODUCTS);
-                if (restrictToUserOfficeProperty.isEnabled()) {
-                    FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepository
-                                                           .findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.toStr());
-                    FineractEntityToEntityMapping officeToLoanProductMappingList = this.repository.findListByProductId(fineractEntityRelation, productId,
-                            officeId);
-                    if (officeToLoanProductMappingList == null) {
-                        throw new NotOfficeSpecificProductException(productId, officeId);
-                    }
-    
-                }
+        
+        final GlobalConfigurationProperty restrictToUserOfficeProperty = this.globalConfigurationRepository
+                .findOneByNameWithNotFoundDetection(
+                        FineractEntityAccessConstants.GLOBAL_CONFIG_FOR_OFFICE_SPECIFIC_PRODUCTS);
+        if (restrictToUserOfficeProperty.isEnabled()) {
+            FineractEntityRelation fineractEntityRelation = fineractEntityRelationRepository
+                                                   .findOneByCodeName(FineractEntityAccessType.OFFICE_ACCESS_TO_LOAN_PRODUCTS.toStr());
+            FineractEntityToEntityMapping officeToLoanProductMappingList = this.repository.findListByProductId(fineractEntityRelation, productId,
+                    officeId);
+            if (officeToLoanProductMappingList == null) {
+                throw new NotOfficeSpecificProductException(productId, officeId);
             }
+
+        }
+    }
+
+    /**
+     * Added 29/08/2022
+     * @param excludeLoansList
+     * @param revolvingAccountIds
+     * @param  hasRevolvingAccounts
+     * If loan factoring is enabled then loan is being created from revolving loans or top up
+     * Loans being revolved need to be excluded from being factored so as to get corrent balance
+     * To do : Refactor function so that it no duplucate code exist with other functionality to add loans to list for refactoring
+     */
+    private void excludeTopUpLoansFromFactoring(List excludeLoansList ,String revolvingAccountIds ,boolean hasRevolvingAccounts) {
+
+        if (hasRevolvingAccounts) {
+            StringTokenizer token = new StringTokenizer(revolvingAccountIds, ",");
+            while (token.hasMoreTokens()) {
+                Long id = new Long(token.nextToken());
+                excludeLoansList.add(id);
+            }
+        }
+    }
     
 }
