@@ -141,25 +141,22 @@ public class LoanFactorSavingsAccountHelper {
         SavingsAccountData savingsAccountData = savingsAccountReadPlatformService.retrieveOne(loanFactorAccountId);
         BigDecimal savingsAccountBalance = savingsAccountData.getAccountBalance();
 
-        /// assemble all clients loan accounts and get their total balance
+        // assemble all clients loan accounts and get their total balance
         Long clientId = client.getId();
         List<LoanAccountData> loanAccountDataList = new ArrayList<>();
 
-        //if cross link get all loans and their balances etc
+        // if cross link get all loans and their balances etc
         loanAccountDataList = loanReadPlatformService.retrieveAllForClient(clientId);
 
         // If its not cross link then only specific loans belonging to specific product should be used
         if(!isCrossLink){
         
-            // retrieve all where loan product id is equal to something
-            List<LoanAccountData> clientLoans = loanAccountDataList;
-
             Predicate<LoanAccountData> matchLoanProductFilter = (e)->{
                 boolean isEqual = e.loanProductId().equals(loanProductId);
                 return isEqual;
             };
 
-            loanAccountDataList = clientLoans.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
+            loanAccountDataList = loanAccountDataList.stream().filter(matchLoanProductFilter).collect(Collectors.toList());
         }
 
 
@@ -177,9 +174,7 @@ public class LoanFactorSavingsAccountHelper {
          * For loans to be excluded from loan refactoring balance calculation
          */
         Predicate<LoanAccountData> isNotExluded = (e)->{
-            boolean isNotExcluded = !isLoanExcluded(e.getId() ,excludeLoansList);
-            System.err.println("-----------is loan not excluded ? "+isNotExcluded);
-            return isNotExcluded;
+            return !isLoanExcluded(e.getId() ,excludeLoansList);
         };
 
         //System.err.println("-------loanAccountData size before filter isNotExcluded "+loanAccountDataList.size());

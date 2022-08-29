@@ -62,20 +62,13 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
     @Override
     public void trigger(BUSINESS_EVENTS businessEvents , NotificationData notificationData){
 
-        System.err.println("-------------------business event is "+businessEvents+"-----------participant id "+notificationData.getActor());
-
         Long actorId = notificationData.getObjectIdentfier();
         Long officeId = notificationData.getOfficeId();
-
-
-        System.err.println("-----------------object identifier is ---------------------"+notificationData.getObjectIdentfier());
 
         // get client record from participant id ?
         // we need a way to get message templates now son
 
         List<EventMailListData> eventMailListDataList = eventMailListReadPlatformService.retrieveWhereEvent(officeId ,businessEvents);
-
-        System.err.println("---------------event mail list is -------------"+eventMailListDataList.size());
 
         eventMailListDataList.stream().forEach(e->{
 
@@ -83,7 +76,7 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
             NOTIFICATION_BROADCAST_TYPE notificationBroadcastType = e.getEventSubscriptionData().getNotificationType();
             // if its topic then find if client is subscribed
 
-            System.err.println("---------------------broadcast type is ---------------"+notificationBroadcastType);
+            //System.err.println("---------------------broadcast type is ---------------"+notificationBroadcastType);
 
             switch (notificationBroadcastType){
 
@@ -99,7 +92,7 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
                     // send to all recipients
                     Long keyId = e.getMailRecipientsKeyData().getId();
 
-                    System.err.println("----------------------key id is ------------"+keyId);
+                    //System.err.println("----------------------key id is ------------"+keyId);
 
                     Queue<MailRecipients> mailRecipientsQueue = MailRecipientsHelper.emailRecipients(mailRecipientsKeyRepository ,mailRecipientsRepository ,clientReadPlatformService ,keyId);
 
@@ -140,7 +133,7 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
 
     private SEND_MAIL_MESSAGE_STATUS topicNotification(NotificationData notificationData , ClientData clientData, BUSINESS_EVENTS businessEvents, boolean isSubscribed){
 
-        System.err.println("-----------------------------send specific message to whoever this is son -------------");
+        //System.err.println("-----------------------------send specific message to whoever this is son -------------");
         // only send if client is subscribed
         if(isSubscribed){
             EmailDetail emailDetail = getMailDetails(notificationData ,clientData ,businessEvents);
@@ -153,7 +146,7 @@ public class NotificationEventServiceExImpl implements NotificationEventServiceE
 
     private SEND_MAIL_MESSAGE_STATUS broadcastNotification(NotificationData notificationData ,MailRecipients mailRecipients ,BUSINESS_EVENTS businessEvents){
 
-        System.err.println("------------------broadcast notification son -----------------------");
+        //System.err.println("------------------broadcast notification son -----------------------");
         // only send if client is subscribed
         EmailDetail emailDetail = getMailDetails(notificationData ,mailRecipients ,businessEvents);
 
