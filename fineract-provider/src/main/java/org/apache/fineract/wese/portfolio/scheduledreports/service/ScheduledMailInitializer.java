@@ -69,7 +69,7 @@ public class ScheduledMailInitializer {
         //mailRecipientsQueue poll and iterate ,if quota reached return item back to queue
         for(;;){
 
-            MailRecipients mailRecipients = mailRecipientsQueue.poll();
+            MailRecipients mailRecipients = mailRecipientsQueue.peek();
             // if no more items in queue then processing is done return
             boolean isPresent = Optional.ofNullable(mailRecipients).isPresent();
             if(!isPresent){
@@ -104,7 +104,7 @@ public class ScheduledMailInitializer {
             switch (sendMailMessageStatus){
                 case QOUTA_LIMIT:
                     // return last polled item to queue ,either back or front but we think its back due to implementation
-                    mailRecipientsQueue.add(mailRecipients);
+                    //mailRecipientsQueue.add(mailRecipients);
                     updateScheduledSessionStatus(scheduledSendableSession , ACTIVE_MAIL_SESSION_STATUS.QUOTA_REACHED);
                     Long sleepTime = attachedMailSender.sleepTime();
                     sleepThread(sleepTime);
@@ -113,6 +113,7 @@ public class ScheduledMailInitializer {
                 default:
                     EmailSendStatus emailSendStatus = new EmailSendStatus(emailDetail ,sendMailMessageStatus);
                     scheduledSendableSession.updateResults(emailSendStatus);
+                    mailRecipientsQueue.poll();
             }
 
         }
