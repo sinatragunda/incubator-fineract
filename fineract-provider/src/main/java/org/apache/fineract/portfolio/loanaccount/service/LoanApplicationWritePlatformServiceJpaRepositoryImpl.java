@@ -284,10 +284,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
                 client= this.clientRepository.findOneWithNotFoundDetection(clientId);
                 officeSpecificLoanProductValidation( productId,client.getOffice().getId());
-                
-                /// 24/05/2021
-                /// added new line here allow multiple instances 
-                AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId);
+
             }
 
             final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
@@ -314,7 +311,16 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             List<Long> excludeLoansList = new ArrayList();
             boolean hasRevolvingAccounts = Optional.ofNullable(revolvingAccountIds).isPresent();
 
-            excludeTopUpLoansFromFactoring(excludeLoansList ,revolvingAccountIds ,hasRevolvingAccounts);
+            specialExcludedLoans(excludeLoansList ,revolvingAccountIds ,hasRevolvingAccounts);
+
+            /**
+             *   Added 24/05/2021
+             *   Function to check for Multiple instance ,when deactivated client can only have one loan of a certain product
+             *   Modified 31/08/2022
+             *   Modified to allow to exclude special loans from the checking instance .
+             */
+            AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId ,excludeLoansList);
+
 
             /**
              *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
@@ -1590,8 +1596,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
      * If loan factoring is enabled then loan is being created from revolving loans or top up
      * Loans being revolved need to be excluded from being factored so as to get corrent balance
      * To do : Refactor function so that it no duplucate code exist with other functionality to add loans to list for refactoring
+     * Modified 31/08/2022
+     * function renamed from excludeLoansFromFactoring
      */
-    private void excludeTopUpLoansFromFactoring(List excludeLoansList ,String revolvingAccountIds ,boolean hasRevolvingAccounts) {
+    private void specialExcludedLoans(List excludeLoansList ,String revolvingAccountIds ,boolean hasRevolvingAccounts) {
 
         if (hasRevolvingAccounts) {
             StringTokenizer token = new StringTokenizer(revolvingAccountIds, ",");

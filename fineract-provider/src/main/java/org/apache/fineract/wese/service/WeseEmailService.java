@@ -70,6 +70,7 @@ public class WeseEmailService{
         EmailAttachment emailAttachment = new EmailAttachment();
         emailAttachment.setPath(path);
         emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
+        
 
         String description = emailDetail.getBody();
         emailAttachment.setDescription(description);

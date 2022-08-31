@@ -160,31 +160,19 @@ public class LoanFactorSavingsAccountHelper {
         }
 
 
-        //System.err.println("---------excludeLoansList size is "+excludeLoansList.size());
-
-        Predicate<LoanAccountData> activeLoansFilter = (e)->{
-            /**
-             * Modified 29/08/2022
-             */
-            return e.isActive();
-        };
+        /**
+         * Modified 29/08/2022
+         */
+        Predicate<LoanAccountData> activeLoansFilter = (e)-> e.isActive() ;
 
         /**
          * Added 29/08/2022
          * For loans to be excluded from loan refactoring balance calculation
+         * When called ,it should be negated so as to filter those not excluded
          */
-        Predicate<LoanAccountData> isNotExluded = (e)->{
-            return !isLoanExcluded(e.getId() ,excludeLoansList);
-        };
+        Predicate<LoanAccountData> isExluded = (e)-> isLoanExcluded(e.getId() ,excludeLoansList);
 
-        //System.err.println("-------loanAccountData size before filter isNotExcluded "+loanAccountDataList.size());
-
-        loanAccountDataList = loanAccountDataList.stream().filter(isNotExluded).collect(Collectors.toList());
-
-        //System.err.println("-------loanAccountData size after filter isNotExcluded "+loanAccountDataList.size());
-
-
-        /// get loan balances instead
+        loanAccountDataList = loanAccountDataList.stream().filter(isExluded.negate()).collect(Collectors.toList());
 
         BigDecimal accrualsBalance = BigDecimal.ZERO;
 
@@ -270,14 +258,10 @@ public class LoanFactorSavingsAccountHelper {
 
     private boolean isLoanExcluded(Long loanId ,List excludeLoansList){
 
-        Predicate isEqual = (e)->{
-            //System.err.println("--------------------comparing "+loanId+"------------- and "+e+"--------------the result is "+e.equals(loanId));
-            return e.equals(loanId);
-        };
-
+        Predicate isEqual = (e)-> e.equals(loanId);
         boolean isPresent = excludeLoansList.stream().filter(isEqual).findFirst().isPresent();
-        //System.err.println("-------------------------is excluded ? "+isPresent);
         return  isPresent;
+
     }
 
     public LoanProduct crossLinking(LoanProductRepository loanProductRepository){
@@ -286,9 +270,7 @@ public class LoanFactorSavingsAccountHelper {
 
         //System.err.println("----------------we have load all load products now "+loanProductDataCollection.size());
 
-        Predicate<LoanProduct> crossLinkPredicate = (e)->{
-            return e.isCrossLink();
-        };
+        Predicate<LoanProduct> crossLinkPredicate = (e)-> e.isCrossLink();
 
         Comparator<LoanProduct> comparator = Comparator.comparing(LoanProduct::loanFactor);
 
