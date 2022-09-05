@@ -1014,6 +1014,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public SavingsAccountTransaction withdraw(final SavingsAccountTransactionDTO transactionDTO, final boolean applyWithdrawFee) {
 
+        System.err.println("-------------------apply withdrawal fee now ? ---------");
+
         if (!isTransactionsAllowed()) {
 
             final String defaultUserMessage = "Transaction is not allowed. Account is not active.";
@@ -1074,8 +1076,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-
-            //System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
+            System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
         }
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
@@ -1087,14 +1088,15 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
 
-        //System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
-        //System.err.println("------------------why there arent any charges in this "+this.charges.size());
+        System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
+        System.err.println("------------------why there arent any charges in this "+this.charges.size());
 
         for (SavingsAccountCharge charge : this.charges()) {
-            //System.err.println("---------product apply charges ----------------");
+            System.err.println("---------product apply charges ----------------");
+            
             if (charge.isWithdrawalFee() && charge.isActive()) {
 
-                //System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
+                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
 
                 charge.updateWithdralFeeAmount(transactionAmoount);
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
