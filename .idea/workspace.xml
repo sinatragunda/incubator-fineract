@@ -7,15 +7,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b67edfa2-cc53-4f72-b77b-b5eeef9f87c0" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Journal Entry Report.prpt" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Journal Entry Report.prpt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/enumerations/MAIL_CONTENT_TYPE.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/enumerations/MAIL_CONTENT_TYPE.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailContentFactory.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailSenderQueueManager.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSender.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerState.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsTransactionBooleanValues.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsTransactionBooleanValues.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProduct.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProduct.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -86,16 +84,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MailServerSender.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="8" column="17" lean-forward="false" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="MailContentFactory.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -118,21 +106,116 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="SavingsAccount.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="492">
+              <caret line="2386" column="0" lean-forward="true" selection-start-line="2386" selection-start-column="0" selection-end-line="2386" selection-end-column="0" />
+              <folding>
+                <element signature="e#66954#66955#0" expanded="true" />
+                <element signature="e#67034#67035#0" expanded="true" />
+                <element signature="e#84223#84224#0" expanded="true" />
+                <element signature="e#84259#84260#0" expanded="true" />
+                <element signature="e#84304#84305#0" expanded="true" />
+                <element signature="e#84338#84339#0" expanded="true" />
+                <element signature="e#84578#84579#0" expanded="true" />
+                <element signature="e#84630#84631#0" expanded="true" />
+                <element signature="e#84861#84862#0" expanded="true" />
+                <element signature="e#84924#84925#0" expanded="true" />
+                <element signature="e#84955#84956#0" expanded="true" />
+                <element signature="e#84998#84999#0" expanded="true" />
+                <element signature="e#85044#85045#0" expanded="true" />
+                <element signature="e#85079#85080#0" expanded="true" />
+                <element signature="e#85885#85886#0" expanded="true" />
+                <element signature="e#85927#85928#0" expanded="true" />
+                <element signature="e#85971#85972#0" expanded="true" />
+                <element signature="e#86013#86014#0" expanded="true" />
+                <element signature="e#86079#86080#0" expanded="true" />
+                <element signature="e#86129#86130#0" expanded="true" />
+                <element signature="e#93519#93520#0" expanded="true" />
+                <element signature="e#93555#93556#0" expanded="true" />
+                <element signature="e#95830#95831#0" expanded="true" />
+                <element signature="e#95864#95865#0" expanded="true" />
+                <element signature="e#95920#95921#0" expanded="true" />
+                <element signature="e#95973#95974#0" expanded="true" />
+                <element signature="e#96038#96039#0" expanded="true" />
+                <element signature="e#96100#96101#0" expanded="true" />
+                <element signature="e#115976#115977#0" expanded="true" />
+                <element signature="e#116054#116055#0" expanded="true" />
+                <element signature="e#123675#123676#0" expanded="true" />
+                <element signature="e#123708#123709#0" expanded="true" />
+                <element signature="e#123769#123770#0" expanded="true" />
+                <element signature="e#123831#123832#0" expanded="true" />
+                <element signature="e#124290#124291#0" expanded="true" />
+                <element signature="e#124325#124326#0" expanded="true" />
+                <element signature="e#124389#124390#0" expanded="true" />
+                <element signature="e#124429#124430#0" expanded="true" />
+                <element signature="e#124508#124509#0" expanded="true" />
+                <element signature="e#124558#124559#0" expanded="true" />
+                <element signature="e#124613#124614#0" expanded="true" />
+                <element signature="e#124649#124650#0" expanded="true" />
+                <marker date="1662375454808" expanded="false" signature="144591:144602" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="144629:144635" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="144856:144867" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="144914:144920" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="144978:144989" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="145002:145008" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="147684:147695" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="147707:147713" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="147751:147762" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="147774:147780" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="147814:147825" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="147837:147843" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="147887:147898" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="147916:147922" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="147980:147991" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="148036:148042" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="149425:149436" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="149462:149468" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="149920:149931" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150000:150006" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="150057:150068" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150121:150127" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="150181:150192" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150250:150256" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="150516:150527" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150548:150554" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="150588:150599" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150623:150629" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="150682:150693" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="150724:150730" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="152551:152556" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="152621:152624" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="163340:163351" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="163374:163380" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="165135:165146" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="165208:165214" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="165264:165275" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="165342:165348" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="165387:165396" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="165418:165424" ph=" }" />
+                <marker date="1662375454808" expanded="false" signature="165464:165474" ph=" { " />
+                <marker date="1662375454808" expanded="false" signature="165501:165507" ph=" }" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="84">
+            <state relative-caret-position="91">
               <caret line="1598" column="26" lean-forward="true" selection-start-line="1598" selection-start-column="26" selection-end-line="1598" selection-end-column="26" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AccountSummaryCollectionData.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AccountSummaryCollectionData.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="385">
-              <caret line="81" column="122" lean-forward="false" selection-start-line="81" selection-start-column="122" selection-end-line="81" selection-end-column="122" />
+            <state relative-caret-position="368">
+              <caret line="80" column="61" lean-forward="true" selection-start-line="80" selection-start-column="61" selection-end-line="80" selection-end-column="61" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -187,9 +270,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>outstanding balance sum is</find>
-      <find>CONTEXT.XM</find>
-      <find>SavingsAccountTransaction.withdrawal</find>
       <find>SavingsAccountTransaction.deposit</find>
       <find>SavingsAccountTransaction.handleDeposit</find>
       <find>handleDeposit</find>
@@ -217,6 +297,9 @@
       <find>emailAttachment</find>
       <find>SqlInjectionE</find>
       <find>excludeloanslis</find>
+      <find>charges</find>
+      <find>product apply charges</find>
+      <find>payWithdrawalFee</find>
     </findStrings>
     <dirStrings>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache</dir>
@@ -451,7 +534,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/common/BusinessEventNotificationConstants.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/handler/EventSubscriptionCreateHandler.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/domain/EventSubscription.java" />
@@ -502,6 +584,7 @@
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/enumerations/MAIL_CONTENT_TYPE.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" />
       </list>
     </option>
   </component>
@@ -517,7 +600,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="10" />
     <option name="y" value="20" />
     <option name="width" value="1346" />
@@ -624,7 +707,7 @@
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
               <item name="portfolio" type="462c0819:PsiDirectoryNode" />
-              <item name="accountdetails" type="462c0819:PsiDirectoryNode" />
+              <item name="savings" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -636,8 +719,8 @@
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
               <item name="portfolio" type="462c0819:PsiDirectoryNode" />
-              <item name="accountdetails" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="savings" type="462c0819:PsiDirectoryNode" />
+              <item name="domain" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -985,12 +1068,12 @@
       <workItem from="1661600956848" duration="594000" />
       <workItem from="1661750100387" duration="12874000" />
       <workItem from="1661937315698" duration="4458000" />
-      <workItem from="1661987579596" duration="22333000" />
+      <workItem from="1661987579596" duration="32639000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1117182000" />
+    <option name="totallyTimeSpent" value="1127488000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1002,8 +1085,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="736" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="736" extended-state="6" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5030257" order="7" side_tool="true" content_ui="tabs" />
@@ -1022,9 +1104,9 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4610282" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.54892206" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20196672" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.11497731" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
@@ -1110,13 +1192,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/domain/AttachedCommissionCharges.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-138">
-          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/calendar/domain/Calendar.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-606">
@@ -1455,16 +1530,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/repo/MailServerSettingsWrapper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="416">
@@ -1511,20 +1576,123 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="368">
+          <caret line="80" column="61" lean-forward="true" selection-start-line="80" selection-start-column="61" selection-end-line="80" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
+        <state relative-caret-position="91">
           <caret line="1598" column="26" lean-forward="true" selection-start-line="1598" selection-start-column="26" selection-end-line="1598" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java">
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="81" column="122" lean-forward="false" selection-start-line="81" selection-start-column="122" selection-end-line="81" selection-end-column="122" />
+        <state relative-caret-position="492">
+          <caret line="2386" column="0" lean-forward="true" selection-start-line="2386" selection-start-column="0" selection-end-line="2386" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#66954#66955#0" expanded="true" />
+            <element signature="e#67034#67035#0" expanded="true" />
+            <element signature="e#84223#84224#0" expanded="true" />
+            <element signature="e#84259#84260#0" expanded="true" />
+            <element signature="e#84304#84305#0" expanded="true" />
+            <element signature="e#84338#84339#0" expanded="true" />
+            <element signature="e#84578#84579#0" expanded="true" />
+            <element signature="e#84630#84631#0" expanded="true" />
+            <element signature="e#84861#84862#0" expanded="true" />
+            <element signature="e#84924#84925#0" expanded="true" />
+            <element signature="e#84955#84956#0" expanded="true" />
+            <element signature="e#84998#84999#0" expanded="true" />
+            <element signature="e#85044#85045#0" expanded="true" />
+            <element signature="e#85079#85080#0" expanded="true" />
+            <element signature="e#85885#85886#0" expanded="true" />
+            <element signature="e#85927#85928#0" expanded="true" />
+            <element signature="e#85971#85972#0" expanded="true" />
+            <element signature="e#86013#86014#0" expanded="true" />
+            <element signature="e#86079#86080#0" expanded="true" />
+            <element signature="e#86129#86130#0" expanded="true" />
+            <element signature="e#93519#93520#0" expanded="true" />
+            <element signature="e#93555#93556#0" expanded="true" />
+            <element signature="e#95830#95831#0" expanded="true" />
+            <element signature="e#95864#95865#0" expanded="true" />
+            <element signature="e#95920#95921#0" expanded="true" />
+            <element signature="e#95973#95974#0" expanded="true" />
+            <element signature="e#96038#96039#0" expanded="true" />
+            <element signature="e#96100#96101#0" expanded="true" />
+            <element signature="e#115976#115977#0" expanded="true" />
+            <element signature="e#116054#116055#0" expanded="true" />
+            <element signature="e#123675#123676#0" expanded="true" />
+            <element signature="e#123708#123709#0" expanded="true" />
+            <element signature="e#123769#123770#0" expanded="true" />
+            <element signature="e#123831#123832#0" expanded="true" />
+            <element signature="e#124290#124291#0" expanded="true" />
+            <element signature="e#124325#124326#0" expanded="true" />
+            <element signature="e#124389#124390#0" expanded="true" />
+            <element signature="e#124429#124430#0" expanded="true" />
+            <element signature="e#124508#124509#0" expanded="true" />
+            <element signature="e#124558#124559#0" expanded="true" />
+            <element signature="e#124613#124614#0" expanded="true" />
+            <element signature="e#124649#124650#0" expanded="true" />
+            <marker date="1662375454808" expanded="false" signature="144591:144602" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="144629:144635" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="144856:144867" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="144914:144920" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="144978:144989" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="145002:145008" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="147684:147695" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="147707:147713" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="147751:147762" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="147774:147780" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="147814:147825" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="147837:147843" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="147887:147898" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="147916:147922" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="147980:147991" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="148036:148042" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="149425:149436" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="149462:149468" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="149920:149931" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150000:150006" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="150057:150068" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150121:150127" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="150181:150192" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150250:150256" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="150516:150527" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150548:150554" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="150588:150599" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150623:150629" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="150682:150693" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="150724:150730" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="152551:152556" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="152621:152624" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="163340:163351" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="163374:163380" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="165135:165146" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="165208:165214" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="165264:165275" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="165342:165348" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="165387:165396" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="165418:165424" ph=" }" />
+            <marker date="1662375454808" expanded="false" signature="165464:165474" ph=" { " />
+            <marker date="1662375454808" expanded="false" signature="165501:165507" ph=" }" />
           </folding>
         </state>
       </provider>

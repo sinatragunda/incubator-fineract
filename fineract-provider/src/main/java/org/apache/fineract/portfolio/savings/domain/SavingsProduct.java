@@ -757,11 +757,18 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 		return this.daysToEscheat;
 	}
 
-
-
 	// Added 18/12/2021
     public Product getProduct(){
         return this.product;
     }
+
+    /**
+     * Added 09/05/2022
+     * GetCharges
+     */
+
+     public Set<Charge> getCharges(){
+        return charges();
+     } 
 
 }

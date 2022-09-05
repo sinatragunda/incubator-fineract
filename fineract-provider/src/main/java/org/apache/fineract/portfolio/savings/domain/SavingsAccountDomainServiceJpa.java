@@ -132,8 +132,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
 
-        //System.out.println("-----------------validate negative thing here --------------");
-
         // added 28/03/2022
         // added so that products that allow overdrawing can actually transfer money out of this account
         SavingsProduct savingsProduct = account.savingsProduct();

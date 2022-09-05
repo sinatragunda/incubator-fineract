@@ -154,6 +154,17 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
                 feeOnMonthDay, feeInterval);
     }
 
+    /**
+     * Added 05/09/2022
+     * Added to cater for charges added to products and old accounts cant track back to this charge
+     * For example an account created yesterday cant deduct new charges added today .
+     * So this option allows the charge to be tracking 
+     */
+
+    public static SavingsAccountCharge trackingAccountCharges(final SavingsAccount savingsAccount, final Charge chargeDefinition,final LocalDate dueDate){
+        return new SavingsAccountCharge(savingsAccount ,chargeDefinition,null ,null ,null,dueDate,true,null,null);
+    }
+
     protected SavingsAccountCharge() {
         //
     }
@@ -216,7 +227,11 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
         }
 
         BigDecimal chargeAmount = chargeDefinition.getAmount();
-        if (amount != null) {
+        
+        System.err.println("--------------charge amount is "+chargeAmount);
+
+        if(amount != null) {
+            System.err.println("----------set charge amount of "+chargeAmount);
             chargeAmount = amount;
         }
 
@@ -228,6 +243,9 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
         		|| this.isSavingsNoActivity()) {
             this.amountOutstanding = BigDecimal.ZERO;
         }
+
+
+        System.err.println("-------------------exit this function now ");
 
         this.paid = determineIfFullyPaid();
         this.status = status;

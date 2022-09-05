@@ -36,6 +36,7 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withdraw
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
@@ -1076,7 +1077,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-            System.err.println("======================appply withdawal fee here "+applyWithdrawFee);
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
         }
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
@@ -1088,15 +1088,16 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
 
-        System.err.println("-----------------time to pay fee of ---------"+transactionAmoount.doubleValue());
+        System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
+
         System.err.println("------------------why there arent any charges in this "+this.charges.size());
 
-        for (SavingsAccountCharge charge : this.charges()) {
+        for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
+            
             System.err.println("---------product apply charges ----------------");
             
             if (charge.isWithdrawalFee() && charge.isActive()) {
-
-                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee());
+                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
 
                 charge.updateWithdralFeeAmount(transactionAmoount);
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
@@ -2562,6 +2563,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     private boolean isWithDrawalFeeExists() {
+        System.err.println("-----------checking if withdrawal fee exists here son ");
         for (SavingsAccountCharge charge : this.charges()) {
             if (charge.isWithdrawalFee()) return true;
         }
@@ -2579,7 +2581,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             final DateTimeFormatter formatter, final AppUser user) {
 
 
-        //System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
+        System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
@@ -2700,7 +2702,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         transaction.getSavingsAccountChargesPaid().add(chargePaidBy);
         this.transactions.add(transaction);
 
-        System.err.println("--------------------------charge added to transactions -----------------"+this.transactions.size());
+        //System.err.println("--------------------------charge added to transactions -----------------"+this.transactions.size());
     }
 
     private SavingsAccountCharge getCharge(final Long savingsAccountChargeId) {
@@ -2718,8 +2720,59 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     public Set<SavingsAccountCharge> charges() {
-        return (this.charges == null) ? new HashSet<SavingsAccountCharge>() : this.charges;
+        this.charges = Optional.ofNullable(this.charges).orElse(new HashSet<SavingsAccountCharge>());
+        return this.charges;
     }
+
+    /**
+     * Added 05/09/2022
+     * With option to get tracking charges .
+     * In future add option from savings product to track charges 
+     */     
+    public Set<SavingsAccountCharge> chargesWithTracking(LocalDate transactionDate) {
+
+        this.charges = charges();
+
+        Set<Charge> savingsProductCharges  = Optional.ofNullable(product.getCharges()).orElse(new HashSet<Charge>());
+
+        //System.err.println("--------------current account charges not tracking arre "+this.charges.size());
+
+        /**
+         * Added 05/09/2022 at 1046
+         * If charge is set to tracking either in product or in the charge itself then search for the charge in savings product
+         * When found charge add it to current list of charges
+         * The idea is motivated by the fact that current charges arent set to tracking
+         * Charge will only apply on new accounts ,old accounts wont have the charge optiopn
+         */
+
+        Consumer<Charge> addToChargesIfNew = (e)->{
+
+            Predicate<SavingsAccountCharge> chargeFilter = (x)->{
+                Charge c = x.getCharge();
+                return c.getId().equals(e.getId());
+            };
+
+            boolean chargeExist = charges.stream().filter(chargeFilter).findFirst().isPresent();
+            
+            //System.err.println("----------------is charge Exists ? ---------"+chargeExist);
+
+            if(!chargeExist){
+                
+                //System.err.println("---------charge doesnt exists lets add it -------");
+                
+                SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.trackingAccountCharges(this ,e,transactionDate);
+                
+                //System.err.println("------------------charge time is "+savingsAccountCharge.)
+
+                this.charges.add(savingsAccountCharge);
+            }
+        };
+
+        savingsProductCharges.stream().forEach(addToChargesIfNew);
+        //System.err.println("--------------current account charges tracking are "+this.charges.size());
+        return this.charges;
+    }
+
 
     public void validateAccountValuesWithProduct() {
 
