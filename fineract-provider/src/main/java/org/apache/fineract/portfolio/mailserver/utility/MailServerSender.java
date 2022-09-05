@@ -4,7 +4,7 @@
     At 8:21 AM on 9/1/2022
 
 */
-package org.apache.fineract.portfolio.mailserver.service;
+package org.apache.fineract.portfolio.mailserver.utility;
 
 public interface MailServerSender {
 

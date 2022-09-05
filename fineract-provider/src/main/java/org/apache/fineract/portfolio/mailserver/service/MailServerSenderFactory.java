@@ -10,14 +10,19 @@ import org.apache.fineract.portfolio.mailserver.domain.MailServerSettings;
 import org.apache.fineract.portfolio.mailserver.repo.MailServerSettingsWrapper;
 import org.apache.fineract.spm.repository.MailServerSettingsRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
 @Service
 public class MailServerSenderFactory {
 
     private final MailService mailService;
     private final MailServerSettingsWrapper mailServerSettingsWrapper ;
 
-
-    
-
-
+    @Autowired
+    public MailServerSenderFactory(MailService mailService, MailServerSettingsWrapper mailServerSettingsWrapper) {
+        this.mailService = mailService;
+        this.mailServerSettingsWrapper = mailServerSettingsWrapper;
+    }
 }

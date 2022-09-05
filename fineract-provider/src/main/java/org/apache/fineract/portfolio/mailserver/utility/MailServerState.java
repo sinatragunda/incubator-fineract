@@ -4,9 +4,8 @@
     At 2:06 AM on 9/1/2022
 
 */
-package org.apache.fineract.portfolio.mailserver.service;
+package org.apache.fineract.portfolio.mailserver.utility;
 
-import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.portfolio.mailserver.domain.MailServerSettings;
 import org.apache.fineract.portfolio.mailserver.helper.DurationHelper;
 import org.apache.fineract.wese.enumerations.DURATION_TYPE;

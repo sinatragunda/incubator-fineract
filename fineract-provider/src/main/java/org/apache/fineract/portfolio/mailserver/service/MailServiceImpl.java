@@ -22,7 +22,25 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
+import org.apache.commons.mail.*;
+import org.apache.fineract.infrastructure.core.service.PlatformEmailSendException;
 
+// added 27/08/2021
+import com.sun.mail.smtp.SMTPAddressFailedException;
+
+import javax.mail.SendFailedException;
+import com.sun.mail.smtp.SMTPSendFailedException ;
+
+import java.net.UnknownHostException;
+import java.util.Optional;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MailServiceImpl implements MailService {
@@ -31,7 +49,8 @@ public class MailServiceImpl implements MailService {
     private final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService;
 
     @Autowired
-    public MailServiceImpl(WeseEmailService weseEmailService, ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService) {
+    public
+    MailServiceImpl(WeseEmailService weseEmailService, ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService) {
         this.weseEmailService = weseEmailService;
         this.externalServicesReadPlatformService = externalServicesReadPlatformService;
     }
@@ -105,7 +124,7 @@ public class MailServiceImpl implements MailService {
         Email email = null ;
         switch (mailContentType){
             case PLAIN:
-                email = new SimpleMail();
+                email = new SimpleEmail();
                 break;
             case MEDIA:
                 email = new MultiPartEmail();
@@ -114,13 +133,13 @@ public class MailServiceImpl implements MailService {
         return email;
     }
 
-    private void setAttachments(Email email,MailContent mailContent){
+    private void setAttachments(Email email , MailContent mailContent){
         MAIL_CONTENT_TYPE mailContentType = mailContent.mailContentType();
         switch (mailContentType){
             case MEDIA:
-                List<File> attachments = mailContent.getAttachments();
+                List<File> attachments = mailContent.attachments();
                 attachments.stream().forEach(e->{
-                    email.attach(e);
+                    //email.attach(e);
                 });
                 break;
         }

@@ -8,5 +8,5 @@ package org.apache.fineract.portfolio.mailserver.enumerations;
 
 public enum MAIL_CONTENT_TYPE {
     MEDIA,
-    PLAIN
+    PLAIN;
 }

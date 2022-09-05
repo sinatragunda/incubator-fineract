@@ -18,7 +18,9 @@
  */
 package org.apache.fineract.portfolio.accountdetails.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Immutable data object representing a summary of various accounts.
@@ -77,7 +79,8 @@ public class AccountSummaryCollectionData {
     }
 
     public Collection<LoanAccountSummaryData> loanAccounts(){
-        return this.loanAccounts ;
+        System.err.println("-------------------are accounts present ? "+Optional.ofNullable(this.loanAccounts).isPresent());
+        return Optional.ofNullable(this.loanAccounts).orElse(new ArrayList<>()) ;
     }
 
 }

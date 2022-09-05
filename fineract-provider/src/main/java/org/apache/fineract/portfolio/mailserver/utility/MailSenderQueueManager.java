@@ -4,12 +4,11 @@
     At 8:48 AM on 9/1/2022
 
 */
-package org.apache.fineract.portfolio.mailserver.service;
+package org.apache.fineract.portfolio.mailserver.utility;
 
 import org.apache.fineract.portfolio.mailserver.domain.MailContent;
 
 import java.util.Optional;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
