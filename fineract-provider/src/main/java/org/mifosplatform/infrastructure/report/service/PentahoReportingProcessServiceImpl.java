@@ -77,22 +77,30 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     @Override
     public File processRequestEx(String reportName, final Map<String, String> queryParams) {
 
+        String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
+            
         try{
-            String tenant = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
             String reportCustomized = String.format("%s %s",reportName ,tenant);
             String reportType = this.readReportingService.getReportType(reportCustomized);
             reportName = reportCustomized;
+
+            System.err.println("-----------------------report customized now "+reportName);
             
         }
         catch(Exception e){
+
         }
 
-        final Map<String, String> reportParams = getReportParams(queryParams);
-        final String outputTypeParam = reportParams.get("output-type");
+        final String outputTypeParam = queryParams.get("output-type");
 
+        final Map<String, String> reportParams = getReportParams(queryParams);
+        
         final Locale locale = ApiParameterHelper.extractLocale(queryParams);
         String outputType = "HTML";
+
         if (StringUtils.isNotBlank(outputTypeParam)) {
+
+            System.err.println("-----------------------the output type now is -------------"+outputTypeParam);
             outputType = outputTypeParam;
         }
 
@@ -133,6 +141,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 return file ;
             }
         } catch (final ResourceException e) {
+            System.err.println("-----------------------reporting error ?");
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         }
         throw new PlatformDataIntegrityException("error.msg.invalid.outputType", "No matching Output Type: " + outputType);
@@ -292,7 +301,6 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
           
         } catch (final Exception e) {
             logger.error("error.msg.reporting.error:" + e.getMessage());
-            System.err.println("-------------------some integrity error but how come ? -----");
             e.printStackTrace();
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         }
@@ -300,6 +308,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
     private Map<String, String> getReportParams(final MultivaluedMap<String, String> queryParams) {
 
+        System.err.println("----------------------start with size of "+queryParams.size());    
         final Map<String, String> reportParams = new HashMap<>();
         final Set<String> keys = queryParams.keySet();
         String pKey;
@@ -311,6 +320,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 reportParams.put(pKey, pValue);
             }
         }
+        System.err.println("---------------then after its "+reportParams.size());
         return reportParams;
     }
 
@@ -325,6 +335,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             if (k.startsWith("R_")) {
                 pKey = k.substring(2);
                 pValue = queryParams.get(k);
+                System.err.println("------------------------put value of "+pKey+"----------- and value ---"+pValue);
                 reportParams.put(pKey, pValue);
             }
         }

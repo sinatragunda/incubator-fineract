@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.portfolio.products.service;
 
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 
@@ -13,5 +14,7 @@ public interface ProductWritePlatformService {
 
     Product disableEnableProduct(String productType ,Long productId);
     Product createProduct(String productType ,Long productId);
+    Product createProduct(JsonCommand jsonCommand, Long productId);
+
 
 }

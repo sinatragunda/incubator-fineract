@@ -16,9 +16,14 @@ public class EmailDetailEx extends EmailDetail implements MailContent  {
 
     private MAIL_CONTENT_TYPE mailContentType = MAIL_CONTENT_TYPE.PLAIN;
 
+    public EmailDetailEx(EmailDetail emailDetail){
+        super(emailDetail);
+    }
+
     public EmailDetailEx(String subject, String body, String address, String contactName) {
         super(subject, body, address, contactName);
     }
+
 
     @Override
     public EmailDetail emailDetails() {

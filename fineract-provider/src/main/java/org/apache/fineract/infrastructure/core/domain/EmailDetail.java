@@ -25,6 +25,13 @@ public class EmailDetail {
     private final String address;
     private final String contactName;
 
+    public EmailDetail(EmailDetail emailDetail){
+        this.subject = emailDetail.getSubject();
+        this.body = emailDetail.getBody();
+        this.address = emailDetail.getAddress();
+        this.contactName = emailDetail.getContactName();
+    }
+
     public EmailDetail(final String subject, final String body, final String address, final String contactName) {
         this.subject = subject;
         this.body = body;
@@ -46,5 +53,15 @@ public class EmailDetail {
 
     public String getAddress() {
         return this.address;
+    }
+
+    @Override
+    public String toString() {
+        return "EmailDetail{" +
+                "subject='" + subject + '\'' +
+                ", body='" + body + '\'' +
+                ", address='" + address + '\'' +
+                ", contactName='" + contactName + '\'' +
+                '}';
     }
 }

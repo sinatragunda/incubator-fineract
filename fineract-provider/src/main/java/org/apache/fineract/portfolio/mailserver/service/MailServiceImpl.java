@@ -49,8 +49,7 @@ public class MailServiceImpl implements MailService {
     private final ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService;
 
     @Autowired
-    public
-    MailServiceImpl(WeseEmailService weseEmailService, ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService) {
+    public MailServiceImpl(WeseEmailService weseEmailService, ExternalServicesPropertiesReadPlatformService externalServicesReadPlatformService) {
         this.weseEmailService = weseEmailService;
         this.externalServicesReadPlatformService = externalServicesReadPlatformService;
     }
@@ -69,6 +68,8 @@ public class MailServiceImpl implements MailService {
         MAIL_CONTENT_TYPE mailContentType = mailContent.mailContentType();
         Email email = emailObject(mailContentType) ;
 
+        System.err.println("-----------------now lets send message with detail---------------"+emailDetails);
+
         final SMTPCredentialsData smtpCredentialsData = this.externalServicesReadPlatformService.getSMTPCredentials();
 
         final String authuserName = smtpCredentialsData.getUsername();
@@ -78,7 +79,7 @@ public class MailServiceImpl implements MailService {
         // Very Important, Don't use email.setAuthentication()
 
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-        email.setDebug(true); // true if you want to debug
+        email.setDebug(false); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
         try {
@@ -111,8 +112,8 @@ public class MailServiceImpl implements MailService {
             e.printStackTrace();
             Throwable throwable = e.getCause();
             boolean smtError = throwable instanceof SMTPSendFailedException;
-            boolean sendFailed = throwable instanceof SendFailedException ;
-            boolean unkownHost = throwable instanceof UnknownHostException ;
+            boolean sendFailed = throwable instanceof SendFailedException;
+            boolean unkownHost = throwable instanceof UnknownHostException;
         }
 
         return SEND_MAIL_MESSAGE_STATUS.ERROR ;
@@ -135,14 +136,21 @@ public class MailServiceImpl implements MailService {
 
     private void setAttachments(Email email , MailContent mailContent){
         MAIL_CONTENT_TYPE mailContentType = mailContent.mailContentType();
+        MultiPartEmail multiPartEmail = new MultiPartEmail();
         switch (mailContentType){
             case MEDIA:
                 List<File> attachments = mailContent.attachments();
                 attachments.stream().forEach(e->{
-                    //email.attach(e);
+                    try{
+                        multiPartEmail.attach(e);
+                    }
+                    catch(EmailException n){
+                        n.printStackTrace();
+                    }
                 });
                 break;
         }
+        email = multiPartEmail;
     }
 
 }

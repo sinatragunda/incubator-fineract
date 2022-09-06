@@ -95,7 +95,7 @@ public class EventSubscriptionApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String template(@Context final UriInfo uriInfo) {
 
-        //this.context.authenticatedUser().validateHasReadPermission(EventSubscriptionConstants.resourceNameForPermissions);
+        this.context.authenticatedUser().validateHasReadPermission(EventSubscriptionConstants.resourceNameForPermissions);
 
         final List<EnumOptionData> businessEvents = BusinessEventNotificationConstants.businessEventEnumOption();
 
@@ -108,10 +108,9 @@ public class EventSubscriptionApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@Context final UriInfo uriInfo) {
 
-        //this.context.authenticatedUser().validateHasReadPermission(EventSubscriptionConstants.resourceNameForPermissions);
+        this.context.authenticatedUser().validateHasReadPermission(EventSubscriptionConstants.resourceNameForPermissions);
 
         final List<EventMailListData> eventMailListList = eventMailListReadPlatformService.retrieveAll();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.eventMailListSerializer.serialize(settings, eventMailListList, EventSubscriptionConstants.DATA_PARAMETERS);
     }

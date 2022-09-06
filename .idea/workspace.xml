@@ -7,13 +7,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b67edfa2-cc53-4f72-b77b-b5eeef9f87c0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Journal Entry Report.prpt" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Journal Entry Report.prpt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailReportApiResource.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailServiceApiResource.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/helper/MailReportHelper.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MeteredMailSender.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/NonMeteredMailSender.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Client Saving Transactions.prpt" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Client Saving Transactions.prpt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsTransactionBooleanValues.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsTransactionBooleanValues.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProduct.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProduct.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/domain/EmailDetail.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/domain/EmailDetail.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/EmailDetailEx.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/EmailDetailEx.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/EmailDetailWithAttachment.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/EmailDetailWithAttachment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/constants/ProductConstants.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/constants/ProductConstants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/ProductRepository.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/ProductRepository.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformService.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/mifosplatform/infrastructure/report/service/PentahoReportingProcessServiceImpl.java" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/mifosplatform/infrastructure/report/service/PentahoReportingProcessServiceImpl.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -62,21 +81,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MailServerSenderFactory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java">
+      <file leaf-file-name="EventMailListWritePlatformServiceImpl.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="13" selection-end-column="46" />
+            <state relative-caret-position="51">
+              <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MailService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailService.java">
+      <file leaf-file-name="MailServiceApiResource.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailServiceApiResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
+            <state relative-caret-position="-86">
+              <caret line="69" column="39" lean-forward="true" selection-start-line="69" selection-start-column="39" selection-end-line="69" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -84,139 +103,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MailContentFactory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java">
+      <file leaf-file-name="MailReportApiResource.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailReportApiResource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="10" column="13" lean-forward="false" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MailSenderQueueManager.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            <state relative-caret-position="518">
+              <caret line="150" column="0" lean-forward="true" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
               <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SavingsAccount.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
-              <caret line="2386" column="0" lean-forward="true" selection-start-line="2386" selection-start-column="0" selection-end-line="2386" selection-end-column="0" />
-              <folding>
-                <element signature="e#66954#66955#0" expanded="true" />
-                <element signature="e#67034#67035#0" expanded="true" />
-                <element signature="e#84223#84224#0" expanded="true" />
-                <element signature="e#84259#84260#0" expanded="true" />
-                <element signature="e#84304#84305#0" expanded="true" />
-                <element signature="e#84338#84339#0" expanded="true" />
-                <element signature="e#84578#84579#0" expanded="true" />
-                <element signature="e#84630#84631#0" expanded="true" />
-                <element signature="e#84861#84862#0" expanded="true" />
-                <element signature="e#84924#84925#0" expanded="true" />
-                <element signature="e#84955#84956#0" expanded="true" />
-                <element signature="e#84998#84999#0" expanded="true" />
-                <element signature="e#85044#85045#0" expanded="true" />
-                <element signature="e#85079#85080#0" expanded="true" />
-                <element signature="e#85885#85886#0" expanded="true" />
-                <element signature="e#85927#85928#0" expanded="true" />
-                <element signature="e#85971#85972#0" expanded="true" />
-                <element signature="e#86013#86014#0" expanded="true" />
-                <element signature="e#86079#86080#0" expanded="true" />
-                <element signature="e#86129#86130#0" expanded="true" />
-                <element signature="e#93519#93520#0" expanded="true" />
-                <element signature="e#93555#93556#0" expanded="true" />
-                <element signature="e#95830#95831#0" expanded="true" />
-                <element signature="e#95864#95865#0" expanded="true" />
-                <element signature="e#95920#95921#0" expanded="true" />
-                <element signature="e#95973#95974#0" expanded="true" />
-                <element signature="e#96038#96039#0" expanded="true" />
-                <element signature="e#96100#96101#0" expanded="true" />
-                <element signature="e#115976#115977#0" expanded="true" />
-                <element signature="e#116054#116055#0" expanded="true" />
-                <element signature="e#123675#123676#0" expanded="true" />
-                <element signature="e#123708#123709#0" expanded="true" />
-                <element signature="e#123769#123770#0" expanded="true" />
-                <element signature="e#123831#123832#0" expanded="true" />
-                <element signature="e#124290#124291#0" expanded="true" />
-                <element signature="e#124325#124326#0" expanded="true" />
-                <element signature="e#124389#124390#0" expanded="true" />
-                <element signature="e#124429#124430#0" expanded="true" />
-                <element signature="e#124508#124509#0" expanded="true" />
-                <element signature="e#124558#124559#0" expanded="true" />
-                <element signature="e#124613#124614#0" expanded="true" />
-                <element signature="e#124649#124650#0" expanded="true" />
-                <marker date="1662375454808" expanded="false" signature="144591:144602" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="144629:144635" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="144856:144867" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="144914:144920" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="144978:144989" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="145002:145008" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="147684:147695" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="147707:147713" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="147751:147762" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="147774:147780" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="147814:147825" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="147837:147843" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="147887:147898" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="147916:147922" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="147980:147991" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="148036:148042" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="149425:149436" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="149462:149468" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="149920:149931" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150000:150006" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="150057:150068" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150121:150127" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="150181:150192" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150250:150256" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="150516:150527" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150548:150554" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="150588:150599" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150623:150629" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="150682:150693" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="150724:150730" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="152551:152556" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="152621:152624" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="163340:163351" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="163374:163380" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="165135:165146" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="165208:165214" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="165264:165275" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="165342:165348" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="165387:165396" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="165418:165424" ph=" }" />
-                <marker date="1662375454808" expanded="false" signature="165464:165474" ph=" { " />
-                <marker date="1662375454808" expanded="false" signature="165501:165507" ph=" }" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="1598" column="26" lean-forward="true" selection-start-line="1598" selection-start-column="26" selection-end-line="1598" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AccountSummaryCollectionData.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="368">
-              <caret line="80" column="61" lean-forward="true" selection-start-line="80" selection-start-column="61" selection-end-line="80" selection-end-column="61" />
-              <folding>
+                <element signature="e#0#10905#0" expanded="true" />
                 <element signature="imports" expanded="true" />
               </folding>
             </state>
@@ -226,8 +119,8 @@
       <file leaf-file-name="MailServiceImpl.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="49">
-              <caret line="132" column="21" lean-forward="true" selection-start-line="132" selection-start-column="21" selection-end-line="132" selection-end-column="21" />
+            <state relative-caret-position="518">
+              <caret line="78" column="62" lean-forward="true" selection-start-line="78" selection-start-column="62" selection-end-line="78" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -235,23 +128,71 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MAIL_CONTENT_TYPE.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/enumerations/MAIL_CONTENT_TYPE.java">
+      <file leaf-file-name="NonMeteredMailSender.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/NonMeteredMailSender.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="9" column="10" lean-forward="false" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+            <state relative-caret-position="340">
+              <caret line="25" column="67" lean-forward="false" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MeteredMailSender.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MeteredMailSender.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="280">
+              <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MailServerState.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="83" column="49" lean-forward="true" selection-start-line="83" selection-start-column="49" selection-end-line="83" selection-end-column="49" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MailServerSettingsWrapper.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/repo/MailServerSettingsWrapper.java">
+      <file leaf-file-name="EmailDetail.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/domain/EmailDetail.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="33" column="14" lean-forward="false" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
+            <state relative-caret-position="312">
+              <caret line="58" column="18" lean-forward="false" selection-start-line="58" selection-start-column="18" selection-end-line="58" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MailReportHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/helper/MailReportHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="22" column="89" lean-forward="true" selection-start-line="22" selection-start-column="89" selection-end-line="22" selection-end-column="89" />
               <folding>
                 <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MailSenderQueueManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="178">
+              <caret line="26" column="72" lean-forward="false" selection-start-line="26" selection-start-column="72" selection-end-line="26" selection-end-column="72" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#759#760#0" expanded="true" />
+                <element signature="e#805#806#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -270,10 +211,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>SavingsAccountTransaction.deposit</find>
-      <find>SavingsAccountTransaction.handleDeposit</find>
-      <find>handleDeposit</find>
-      <find>toSaving</find>
       <find>print</find>
       <find>build</find>
       <find>bootRepackage</find>
@@ -300,6 +237,10 @@
       <find>charges</find>
       <find>product apply charges</find>
       <find>payWithdrawalFee</find>
+      <find>createProduct</find>
+      <find>isBla</find>
+      <find>attach</find>
+      <find>send message</find>
     </findStrings>
     <dirStrings>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache</dir>
@@ -311,13 +252,13 @@
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\accounting</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\loanaccount</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\notification\service</dir>
-      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio</dir>
-      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src</dir>
       <dir>D:\Documents\Coding\incubator-fineract</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org</dir>
+      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider</dir>
+      <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -534,27 +475,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/handler/EventSubscriptionCreateHandler.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/domain/EventSubscription.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/domain/EventMailList.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/constants/EventSubscriptionConstants.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListReadPlatformService.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/EventMailListData.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/MailRecipientsKeyData.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventNotificationService.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventNotificationServiceImpl.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationEventServiceEx.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/EventSubscriptionData.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/enumerations/NOTIFICATION_BROADCAST_TYPE.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/eventandlistener/NotificationEventService.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListReadPlatformServiceImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/repo/MailRecipientsRepositoryWrapper.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationDomainServiceImpl.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/helper/LoanFactorLoanResolver.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationEventServiceExImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" />
@@ -576,15 +502,30 @@
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/MailContent.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/EmailDetailEx.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/repo/MailServerSettingsWrapper.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/enumerations/MAIL_CONTENT_TYPE.java" />
-        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/accountdetails/data/AccountSummaryCollectionData.java" />
         <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/ProductRepository.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformService.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MeteredMailSender.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailServerApiResource.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailServiceApiResource.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/helper/MailReportHelper.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/domain/EmailDetail.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailReportApiResource.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/NonMeteredMailSender.java" />
+        <option value="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java" />
       </list>
     </option>
   </component>
@@ -600,7 +541,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="10" />
     <option name="y" value="20" />
     <option name="width" value="1346" />
@@ -624,7 +565,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -695,7 +635,7 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -706,8 +646,8 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
-              <item name="savings" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -718,8 +658,8 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
-              <item name="savings" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
+              <item name="core" type="462c0819:PsiDirectoryNode" />
               <item name="domain" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -731,7 +671,7 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -742,8 +682,8 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
-              <item name="api" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="mailserver" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="incubator-fineract" type="b2602c69:ProjectViewProjectNode" />
@@ -754,16 +694,18 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="org" type="462c0819:PsiDirectoryNode" />
               <item name="fineract" type="462c0819:PsiDirectoryNode" />
-              <item name="wese" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="portfolio" type="462c0819:PsiDirectoryNode" />
+              <item name="mailserver" type="462c0819:PsiDirectoryNode" />
+              <item name="utility" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scratches" />
       <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1068,12 +1010,13 @@
       <workItem from="1661600956848" duration="594000" />
       <workItem from="1661750100387" duration="12874000" />
       <workItem from="1661937315698" duration="4458000" />
-      <workItem from="1661987579596" duration="32639000" />
+      <workItem from="1661987579596" duration="37132000" />
+      <workItem from="1662415280769" duration="27820000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1127488000" />
+    <option name="totallyTimeSpent" value="1159801000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1085,7 +1028,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="736" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="736" extended-state="7" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5030257" order="7" side_tool="true" content_ui="tabs" />
@@ -1102,11 +1045,11 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.54892206" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38142622" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.11497731" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22314675" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
@@ -1142,11 +1085,11 @@
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3217247" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2526475" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2344932" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1192,168 +1135,10 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/calendar/domain/Calendar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-606">
-          <caret line="62" column="13" lean-forward="false" selection-start-line="62" selection-start-column="13" selection-end-line="62" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/ChargeAppliesTo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="20" column="12" lean-forward="false" selection-start-line="20" selection-start-column="12" selection-end-line="20" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/domain/Loan.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/domain/EventMailList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/constants/EventSubscriptionConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/mix/api/MixTaxonomyApiResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="46" column="13" lean-forward="false" selection-start-line="46" selection-start-column="13" selection-end-line="46" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/mix/api/MixReportApiResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="38" column="13" lean-forward="false" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListReadPlatformService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="48" column="6" lean-forward="false" selection-start-line="48" selection-start-column="6" selection-end-line="48" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/MailRecipientsKeyData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="27" column="25" lean-forward="false" selection-start-line="27" selection-start-column="25" selection-end-line="27" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationDomainService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="20" column="17" lean-forward="false" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/EventSubscriptionData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="30" column="25" lean-forward="false" selection-start-line="30" selection-start-column="25" selection-end-line="30" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/portfolio/scheduledreports/service/AttachedMailSenderNonMetered.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationEventServiceEx.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="13" column="90" lean-forward="false" selection-start-line="13" selection-start-column="90" selection-end-line="13" selection-end-column="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="105" column="0" lean-forward="true" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/enumerations/NOTIFICATION_BROADCAST_TYPE.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="39" column="8" lean-forward="true" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListReadPlatformServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1253">
-          <caret line="131" column="49" lean-forward="false" selection-start-line="131" selection-start-column="49" selection-end-line="131" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/eventandlistener/NotificationEventService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/data/EventMailListData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/NotificationDomainServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="615" column="33" lean-forward="true" selection-start-line="615" selection-start-column="33" selection-end-line="615" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
-          <caret line="61" column="1" lean-forward="false" selection-start-line="61" selection-start-column="1" selection-end-line="61" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/repo/MailRecipientsRepositoryWrapper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="28" column="35" lean-forward="false" selection-start-line="28" selection-start-column="35" selection-end-line="28" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="51" column="9" lean-forward="false" selection-start-line="51" selection-start-column="9" selection-end-line="51" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1361,7 +1146,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="16" column="5" lean-forward="false" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1379,7 +1163,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="61" column="0" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1387,7 +1170,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="51" column="14" lean-forward="false" selection-start-line="51" selection-start-column="14" selection-end-line="51" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1395,7 +1177,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4692">
           <caret line="311" column="30" lean-forward="false" selection-start-line="311" selection-start-column="30" selection-end-line="311" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1403,7 +1184,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1419,7 +1199,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="15" column="13" lean-forward="false" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1431,22 +1210,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerStatee.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/MailQueue.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerStatee.java" />
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/domain/MailQueue.java" />
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/helper/DurationHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
@@ -1462,13 +1227,7 @@
         <state relative-caret-position="476">
           <caret line="36" column="1" lean-forward="true" selection-start-line="36" selection-start-column="1" selection-end-line="36" selection-end-column="1" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#666#667#0" expanded="true" />
-            <element signature="e#693#694#0" expanded="true" />
-            <element signature="e#757#758#0" expanded="true" />
-            <element signature="e#795#796#0" expanded="true" />
-            <element signature="e#848#849#0" expanded="true" />
-            <element signature="e#875#876#0" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1478,9 +1237,7 @@
         <state relative-caret-position="340">
           <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#944#945#0" expanded="true" />
-            <element signature="e#971#972#0" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1500,33 +1257,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="17" column="6" lean-forward="false" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="21" column="13" lean-forward="false" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="8" column="17" lean-forward="false" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="10" column="13" lean-forward="false" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1534,27 +1264,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="416">
           <caret line="33" column="14" lean-forward="false" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="13" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1562,17 +1271,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="9" column="10" lean-forward="false" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="49">
-          <caret line="132" column="21" lean-forward="true" selection-start-line="132" selection-start-column="21" selection-end-line="132" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1580,19 +1278,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="368">
           <caret line="80" column="61" lean-forward="true" selection-start-line="80" selection-start-column="61" selection-end-line="80" selection-end-column="61" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1606,94 +1291,272 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="2386" column="0" lean-forward="true" selection-start-line="2386" selection-start-column="0" selection-end-line="2386" selection-end-column="0" />
+        <state relative-caret-position="254">
+          <caret line="2372" column="0" lean-forward="true" selection-start-line="2372" selection-start-column="0" selection-end-line="2372" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/enumerations/PRODUCT_TYPE.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="8" column="12" lean-forward="false" selection-start-line="8" selection-start-column="12" selection-end-line="8" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductCommandsService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="22" column="17" lean-forward="false" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductExReadPlatformService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="8" column="17" lean-forward="false" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductReadPlatformService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="26" column="17" lean-forward="false" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsProductReadPlatformServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="85" column="58" lean-forward="false" selection-start-line="85" selection-start-column="58" selection-end-line="85" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="76" column="19" lean-forward="false" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="19" />
           <folding>
-            <element signature="e#66954#66955#0" expanded="true" />
-            <element signature="e#67034#67035#0" expanded="true" />
-            <element signature="e#84223#84224#0" expanded="true" />
-            <element signature="e#84259#84260#0" expanded="true" />
-            <element signature="e#84304#84305#0" expanded="true" />
-            <element signature="e#84338#84339#0" expanded="true" />
-            <element signature="e#84578#84579#0" expanded="true" />
-            <element signature="e#84630#84631#0" expanded="true" />
-            <element signature="e#84861#84862#0" expanded="true" />
-            <element signature="e#84924#84925#0" expanded="true" />
-            <element signature="e#84955#84956#0" expanded="true" />
-            <element signature="e#84998#84999#0" expanded="true" />
-            <element signature="e#85044#85045#0" expanded="true" />
-            <element signature="e#85079#85080#0" expanded="true" />
-            <element signature="e#85885#85886#0" expanded="true" />
-            <element signature="e#85927#85928#0" expanded="true" />
-            <element signature="e#85971#85972#0" expanded="true" />
-            <element signature="e#86013#86014#0" expanded="true" />
-            <element signature="e#86079#86080#0" expanded="true" />
-            <element signature="e#86129#86130#0" expanded="true" />
-            <element signature="e#93519#93520#0" expanded="true" />
-            <element signature="e#93555#93556#0" expanded="true" />
-            <element signature="e#95830#95831#0" expanded="true" />
-            <element signature="e#95864#95865#0" expanded="true" />
-            <element signature="e#95920#95921#0" expanded="true" />
-            <element signature="e#95973#95974#0" expanded="true" />
-            <element signature="e#96038#96039#0" expanded="true" />
-            <element signature="e#96100#96101#0" expanded="true" />
-            <element signature="e#115976#115977#0" expanded="true" />
-            <element signature="e#116054#116055#0" expanded="true" />
-            <element signature="e#123675#123676#0" expanded="true" />
-            <element signature="e#123708#123709#0" expanded="true" />
-            <element signature="e#123769#123770#0" expanded="true" />
-            <element signature="e#123831#123832#0" expanded="true" />
-            <element signature="e#124290#124291#0" expanded="true" />
-            <element signature="e#124325#124326#0" expanded="true" />
-            <element signature="e#124389#124390#0" expanded="true" />
-            <element signature="e#124429#124430#0" expanded="true" />
-            <element signature="e#124508#124509#0" expanded="true" />
-            <element signature="e#124558#124559#0" expanded="true" />
-            <element signature="e#124613#124614#0" expanded="true" />
-            <element signature="e#124649#124650#0" expanded="true" />
-            <marker date="1662375454808" expanded="false" signature="144591:144602" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="144629:144635" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="144856:144867" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="144914:144920" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="144978:144989" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="145002:145008" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="147684:147695" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="147707:147713" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="147751:147762" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="147774:147780" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="147814:147825" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="147837:147843" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="147887:147898" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="147916:147922" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="147980:147991" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="148036:148042" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="149425:149436" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="149462:149468" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="149920:149931" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150000:150006" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="150057:150068" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150121:150127" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="150181:150192" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150250:150256" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="150516:150527" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150548:150554" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="150588:150599" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150623:150629" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="150682:150693" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="150724:150730" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="152551:152556" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="152621:152624" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="163340:163351" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="163374:163380" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="165135:165146" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="165208:165214" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="165264:165275" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="165342:165348" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="165387:165396" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="165418:165424" ph=" }" />
-            <marker date="1662375454808" expanded="false" signature="165464:165474" ph=" { " />
-            <marker date="1662375454808" expanded="false" signature="165501:165507" ph=" }" />
+            <element signature="e#3975#3976#0" expanded="false" />
+            <element signature="e#4009#4010#0" expanded="false" />
+            <element signature="e#4448#4449#0" expanded="false" />
+            <element signature="e#4477#4478#0" expanded="false" />
+            <element signature="e#4527#4528#0" expanded="false" />
+            <element signature="e#4572#4573#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/ProductRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="16" column="49" lean-forward="false" selection-start-line="16" selection-start-column="49" selection-end-line="16" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/accounting/financialactivityaccount/serialization/FinancialActivityAccountDataValidator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/MailRecipientsHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="518">
+          <caret line="122" column="0" lean-forward="true" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerSender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="365">
+          <caret line="82" column="23" lean-forward="true" selection-start-line="82" selection-start-column="23" selection-end-line="82" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/NotificationApiResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-255">
+          <caret line="41" column="13" lean-forward="false" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailContentFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="42" column="59" lean-forward="false" selection-start-line="42" selection-start-column="59" selection-end-line="42" selection-end-column="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/handler/EventSubscriptionCreateHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="29" column="15" lean-forward="true" selection-start-line="29" selection-start-column="15" selection-end-line="29" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/api/EventSubscriptionApiResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-237">
+          <caret line="48" column="8" lean-forward="true" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServerSenderFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="518">
+          <caret line="58" column="0" lean-forward="true" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/helper/MailReportHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="22" column="89" lean-forward="true" selection-start-line="22" selection-start-column="89" selection-end-line="22" selection-end-column="89" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/helper/EventSubscriptionHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/notification/service/EventMailListWritePlatformServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/domain/EmailDetail.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="58" column="18" lean-forward="false" selection-start-line="58" selection-start-column="18" selection-end-line="58" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailServiceApiResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-86">
+          <caret line="69" column="39" lean-forward="true" selection-start-line="69" selection-start-column="39" selection-end-line="69" selection-end-column="39" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/api/MailReportApiResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="518">
+          <caret line="150" column="0" lean-forward="true" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#10905#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/service/MailServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="518">
+          <caret line="78" column="62" lean-forward="true" selection-start-line="78" selection-start-column="62" selection-end-line="78" selection-end-column="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailSenderQueueManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="26" column="72" lean-forward="false" selection-start-line="26" selection-start-column="72" selection-end-line="26" selection-end-column="72" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#759#760#0" expanded="true" />
+            <element signature="e#805#806#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/NonMeteredMailSender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="25" column="67" lean-forward="false" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MeteredMailSender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/mailserver/utility/MailServerState.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="83" column="49" lean-forward="true" selection-start-line="83" selection-start-column="49" selection-end-line="83" selection-end-column="49" />
+          <folding />
         </state>
       </provider>
     </entry>

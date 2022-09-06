@@ -107,7 +107,6 @@ public class EventMailListWritePlatformServiceImpl implements EventMailListWrite
         while(jsonElementIterator.hasNext()){
 
             JsonElement json = jsonElementIterator.next();
-            System.err.println("--------------------single object data is in json element ------------"+json);
             Long id = fromJsonHelper.extractLongNamed("id",json);
             // to change function here to wrraper
             MailRecipientsKey mailRecipientsKey = mailRecipientsKeyRepository.findOne(id);

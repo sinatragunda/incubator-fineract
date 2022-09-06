@@ -6,6 +6,8 @@
 */
 package org.apache.fineract.portfolio.products.service;
 
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
+import org.apache.fineract.portfolio.products.constants.ProductConstants;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.domain.ProductRepository;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Optional;
 
@@ -54,7 +57,31 @@ public class ProductWritePlatformServiceImpl implements ProductWritePlatformServ
         // Only create new entry if value not present
         if(!isPresent){
             System.err.println("-------------------create new only if record doesnt exist ---------------"+productId);
-            product = new Product(productType1.ordinal() ,productId ,true);
+            product = new Product(productType1 ,productId ,true,true);
+            productRepository.saveAndFlush(product);
+        }
+
+        return product ;
+    }
+
+
+    @Override
+    public Product createProduct(JsonCommand jsonCommand, Long productId){
+
+        // just create new ones if nothing found
+
+        String productTypeArg = jsonCommand.stringValueOfParameterNamed(ProductConstants.productType);
+        PRODUCT_TYPE productType = PRODUCT_TYPE.fromString(productTypeArg);
+
+        Product product = productRepository.findOneByProductTypeAndProductId(productType.ordinal() ,productId);
+
+        Boolean deductChargesOnBalance = jsonCommand.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
+
+        boolean isPresent = Optional.ofNullable(product).isPresent();
+
+        // Only create new entry if value not present
+        if(!isPresent){
+            product = new Product(productType ,productId ,true,deductChargesOnBalance);
             productRepository.saveAndFlush(product);
         }
 

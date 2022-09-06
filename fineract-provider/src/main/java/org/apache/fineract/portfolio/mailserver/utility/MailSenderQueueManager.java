@@ -32,14 +32,14 @@ public class MailSenderQueueManager {
         mailDataQueue.add(mailContent);
     }
 
-    public MailContent peekOrPoll(boolean poll){
-        if(poll){
-            return mailDataQueue.poll();
+    public MailContent peekOrPoll(boolean peek){
+        if(peek){
+            return mailDataQueue.peek();
         }
-        return mailDataQueue.peek();
+        return mailDataQueue.poll();
     }
 
-    public boolean queueIsEmpty(){
+    public boolean isQueueEmpty(){
         return mailDataQueue.isEmpty();
     }
 }

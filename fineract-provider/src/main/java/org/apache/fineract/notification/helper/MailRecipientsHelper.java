@@ -39,13 +39,8 @@ public class MailRecipientsHelper {
 
     public static Queue<MailRecipients> emailRecipients(MailRecipientsKeyRepository mailRecipientsKeyRepository, MailRecipientsRepository mailRecipientsRepository, ClientReadPlatformService clientReadPlatformService, Long keyId){
 
-
-        System.err.println("---------------------key id is --------------------"+keyId);
-
         MailRecipientsKey mailRecipientsKey = mailRecipientsKeyRepository.findOne(keyId);
-
         boolean isPresent = Optional.ofNullable(mailRecipientsKey).isPresent();
-
         Queue<MailRecipients> mailRecipientsQueue = new LinkedList<>();
 
         if(!isPresent){
@@ -56,19 +51,15 @@ public class MailRecipientsHelper {
         }
 
         boolean selectAllMode = mailRecipientsKey.getSelectAllMode();
+        /**
+         * Select All Mode means you selecting all client records 
+         */
 
         if(selectAllMode){
-
+            
             Long officeId = mailRecipientsKey.getOfficeId();
-            
-            // we need to implement new nullable stuff here
-
-            // Some stupid glitch exists here ,what was the glitch now ? .Am forgetting now
-
-            System.err.println("---------------------------office id is ----------------------"+officeId);
-            
+        
             boolean officeIdPresent = Optional.ofNullable(officeId).isPresent();
-
             Consumer<MailRecipients> addNewToQueue = (e)-> mailRecipientsQueue.add(e);
                     
             if(!officeIdPresent){
@@ -100,17 +91,15 @@ public class MailRecipientsHelper {
                 clientDataList.stream().forEach(clientDataConsumer);
             }
 
-            /// update email addressed here son
-
+            /**
+             *Update client emails addressed here son
+            */
             Consumer<MailRecipients> updateEmails = (e)->{
                 Long clientId = e.getClientId();
                 ClientData clientData = clientReadPlatformService.retrieveOne(clientId);
                 String emailCurrent = clientData.getEmailAddress();
                 e.setEmailAddress(emailCurrent);
             };
-
-            // is it necessary since we taking data from client readplarform on retrieving already ?
-            // mailRecipientsQueue.stream().forEach(updateEmails);
             return mailRecipientsQueue ;
         }
 

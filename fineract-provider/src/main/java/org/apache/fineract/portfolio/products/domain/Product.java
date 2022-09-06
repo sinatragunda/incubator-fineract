@@ -48,12 +48,17 @@ import javax.persistence.UniqueConstraint;
 import org.joda.time.LocalDate;
 import com.google.gson.JsonArray;
 
+/**
+ * Modified 05/09/2022
+ * All additional product settings would be inserted here to avoid cluttering the product account
+ */
+
 @Entity
 @Table(name = "m_product")
 public class Product extends AbstractPersistableCustom<Long> {
 
     @Column(name = "product_type", nullable = false)
-    protected Integer productType;
+    protected PRODUCT_TYPE productType;
 
     @Column(name = "product_id",nullable=false)
     private Long productId;
@@ -61,13 +66,25 @@ public class Product extends AbstractPersistableCustom<Long> {
     @Column(name = "active" ,nullable =false)
     private Boolean active;
 
+
+
+    /**
+     * Added 05/09/2022
+     * Enables charges to be deducted on transaction amount instead of savings account balance 
+     * If false charges are deducted on transaction amount 
+     */
+    @Column(name = "deduct_charges_on_balance" ,nullable =false)
+    private Boolean deductChargesOnBalance;
+
+
     protected Product(){}
 
 
-    public Product(Integer productType, Long productId, Boolean active) {
+    public Product(PRODUCT_TYPE productType, Long productId, Boolean active ,Boolean deductChargesOnBalance) {
         this.productType = productType;
         this.productId = productId;
         this.active = active;
+        this.deductChargesOnBalance = deductChargesOnBalance;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -76,20 +93,26 @@ public class Product extends AbstractPersistableCustom<Long> {
 
         final String localeAsInput = command.locale();
 
-        if (command.isChangeInBooleanParameterNamed(ProductConstants.active, this.active)) {
+        if(command.isChangeInBooleanParameterNamed(ProductConstants.active, this.active)) {
             final boolean newValue = command.booleanObjectValueOfParameterNamed(ProductConstants.active);
             actualChanges.put(ProductConstants.active, newValue);
             this.active = newValue;
         }
 
+        if (command.isChangeInBooleanParameterNamed(ProductConstants.deductChargesOnBalance, this.deductChargesOnBalance)) {
+            final boolean newValue = command.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
+            actualChanges.put(ProductConstants.deductChargesOnBalance, newValue);
+            this.deductChargesOnBalance = newValue;
+        }
+
         return actualChanges;
     }
 
-    public Integer getProductType() {
+    public PRODUCT_TYPE getProductType() {
         return productType;
     }
 
-    public void setProductType(Integer productType) {
+    public void setProductType(PRODUCT_TYPE productType) {
         this.productType = productType;
     }
 
@@ -107,5 +130,13 @@ public class Product extends AbstractPersistableCustom<Long> {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public Boolean getDeductChargesOnBalance() {
+        return deductChargesOnBalance;
     }
 }

@@ -19,7 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     public static final String FIND_BY_PRODUCT_TYPE_AND_PRODUCT_ID = "select p from Product p where p.productType = :productType and "
             + "p.productId = :productId";
 
-
     @Query(FIND_BY_PRODUCT_TYPE_AND_PRODUCT_ID)
     public Product findOneByProductTypeAndProductId(@Param("productType")Integer productType, @Param("productId") Long productId);
 

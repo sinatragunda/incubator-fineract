@@ -6,9 +6,9 @@
 */
 package org.apache.fineract.portfolio.mailserver.utility;
 
+import org.apache.fineract.portfolio.mailserver.service.MailService;
+
 public interface MailServerSender {
 
-    default void send(){
-        //MailSenderQueueManager.getInstance().add();
-    }
+    void send(MailService mailService);
 }

@@ -6,8 +6,10 @@
 */
 package org.apache.fineract.portfolio.mailserver.utility;
 
+import org.apache.fineract.portfolio.mailserver.domain.MailContent;
 import org.apache.fineract.portfolio.mailserver.domain.MailServerSettings;
 import org.apache.fineract.portfolio.mailserver.helper.DurationHelper;
+import org.apache.fineract.portfolio.mailserver.service.MailService;
 import org.apache.fineract.wese.enumerations.DURATION_TYPE;
 
 import java.time.Duration;
@@ -26,6 +28,7 @@ public class MailServerState {
     private static MailServerState instance ;
     private Instant lastSentMailTime ;
     private volatile Boolean isThreadSleeping = false;
+    private MailSenderQueueManager mailSenderQueueManager ;
 
     private MailServerState(MailServerSettings mailServerSettings){
         this.mailServerSettings = mailServerSettings;
@@ -33,7 +36,6 @@ public class MailServerState {
     }
 
     public static MailServerState getInstance(MailServerSettings mailServerSettings) {
-
         instance = Optional.ofNullable(instance).orElse(new MailServerState(mailServerSettings));
         return instance;
     }
@@ -42,32 +44,35 @@ public class MailServerState {
 
         int maxPermit = mailServerSettings.getLimit();
         semaphore = new Semaphore(maxPermit);
-
     }
 
-    public synchronized void trySend(){
+    public synchronized void trySend(MailService mailService){
 
         boolean acquirePermit = semaphore.tryAcquire();
         if(acquirePermit){
-            permitGranted();
+            permitGranted(mailService);
             return;
         }
-
-        permitNotGranted();
+        permitNotGranted(mailService);
     }
 
-    private void permitGranted(){
+    private void permitGranted(MailService mailService){
 
-        // send message here
+        MailContent mailContent = MailSenderQueueManager.getInstance().peekOrPoll(false);
+        mailService.send(mailContent);
+
         int availablePermits = semaphore.availablePermits();
 
-        // no permits available now take note of current time so as to aid in synchronization of durations
-        if(availablePermits == 0){
+        /**
+         *No permits available now take note of current time so as to aid in synchronization of durations
+         */
+
+         if(availablePermits == 0){
             lastSentMailTime = Instant.now();
         }
     }
 
-    private void permitNotGranted(){
+    private void permitNotGranted(MailService mailService){
 
         /**
          * if thread is not sleeping then lets do some checking to sleep it based on duration of last sent message
@@ -102,7 +107,7 @@ public class MailServerState {
             sleepThread(sleepTime);
 
             System.err.println("-------------------------waking up thread lets send again ");
-
+            trySend(mailService);
         }
     }
 
