@@ -1,6 +1,8 @@
 
 INSERT INTO `stretchy_report` VALUES (null ,'Loans Applied Today', 'Table', '', 'Loan', '
-SELECT ml.account_no AS "Account Number",
+SELECT
+ml.id as "ID", 
+ml.account_no AS "Account Number",
 mc.display_name AS "Client Name",
 DATE_FORMAT(ml.submittedon_date,"%d %M %Y" )AS "Applied Date",
 IFNULL(ml.principal_amount,0) as Principal,

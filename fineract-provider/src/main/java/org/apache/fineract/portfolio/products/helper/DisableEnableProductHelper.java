@@ -25,7 +25,7 @@ public class DisableEnableProductHelper {
 
              Integer type1 = new Integer(productType1.ordinal());
 
-             product[0] = productRepository.findOneByProductTypeAndProductId(type1 ,productId);
+             product[0] = productRepository.findOneByProductTypeAndProductId(productType ,productId);
 
              // if product is null create it in that class there then create one since this is a late addition function
 

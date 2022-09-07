@@ -50,7 +50,7 @@ public class ProductWritePlatformServiceImpl implements ProductWritePlatformServ
 
         // just create new ones if nothing found
         PRODUCT_TYPE productType1 = PRODUCT_TYPE.fromString(productType);
-        Product product = productRepository.findOneByProductTypeAndProductId(productType1.ordinal() ,productId);
+        Product product = productRepository.findOneByProductTypeAndProductId(productType1 ,productId);
 
         boolean isPresent = Optional.ofNullable(product).isPresent();
 
@@ -73,7 +73,7 @@ public class ProductWritePlatformServiceImpl implements ProductWritePlatformServ
         String productTypeArg = jsonCommand.stringValueOfParameterNamed(ProductConstants.productType);
         PRODUCT_TYPE productType = PRODUCT_TYPE.fromString(productTypeArg);
 
-        Product product = productRepository.findOneByProductTypeAndProductId(productType.ordinal() ,productId);
+        Product product = productRepository.findOneByProductTypeAndProductId(productType,productId);
 
         Boolean deductChargesOnBalance = jsonCommand.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
 

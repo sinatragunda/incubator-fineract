@@ -44,6 +44,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import org.joda.time.LocalDate;
 import com.google.gson.JsonArray;
@@ -57,6 +58,8 @@ import com.google.gson.JsonArray;
 @Table(name = "m_product")
 public class Product extends AbstractPersistableCustom<Long> {
 
+    
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "product_type", nullable = false)
     protected PRODUCT_TYPE productType;
 

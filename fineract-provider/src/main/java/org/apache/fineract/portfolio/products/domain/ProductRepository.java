@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             + "p.productId = :productId";
 
     @Query(FIND_BY_PRODUCT_TYPE_AND_PRODUCT_ID)
-    public Product findOneByProductTypeAndProductId(@Param("productType")Integer productType, @Param("productId") Long productId);
+    public Product findOneByProductTypeAndProductId(@Param("productType")PRODUCT_TYPE productType, @Param("productId") Long productId);
 
 
 

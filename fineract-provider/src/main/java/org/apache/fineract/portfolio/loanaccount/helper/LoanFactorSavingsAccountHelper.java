@@ -103,7 +103,7 @@ public class LoanFactorSavingsAccountHelper {
     public boolean savingsAccountBasedLoanFactoring(SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanReadPlatformService loanReadPlatformService ,LoanProductRepository loanProductRepository , LoanProduct loanProduct , Client client ,Long loanFactorAccountId , BigDecimal principal ,List excludeLoansList){
 
         if(loanFactorAccountId==null){
-            String message = "Non attached savings account to verify loan factoring process .Please select one ";
+            String message = "Please attach a base account to verify loan factoring process .Please select one ";
             throw new NonAttachedLoanFactorAccountException(message,message ,"Standard Error");
         }
 
