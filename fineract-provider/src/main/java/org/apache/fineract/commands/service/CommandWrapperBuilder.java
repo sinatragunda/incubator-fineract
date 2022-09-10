@@ -3226,5 +3226,15 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 07/09/2022 ar 1318
+     */ 
+    public CommandWrapperBuilder createTransactionCode() {
+        this.actionName = "CREATE";
+        this.entityName = "TRANSACTION_CODE";
+        this.href = "/transactioncodes";
+        return this;
+    }
+
 
 }

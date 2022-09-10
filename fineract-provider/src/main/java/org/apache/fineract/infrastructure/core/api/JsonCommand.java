@@ -159,7 +159,6 @@ public final class JsonCommand {
         return this.jsonCommand;
     }
 
-
     public JsonElement parsedJson() {
         return this.parsedCommand;
     }
@@ -620,6 +619,11 @@ public final class JsonCommand {
 
     public void checkForUnsupportedParameters(final Type typeOfMap, final String json, final Set<String> requestDataParameters) {
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, requestDataParameters);
+    }
+
+    @Override
+    public String toString(){
+        return json();
     }
 
 }
