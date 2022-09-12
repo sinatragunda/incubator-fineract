@@ -6,7 +6,6 @@
 */
 package org.apache.fineract.components.api;
 
-import com.google.common.base.Optional;
 import com.wese.component.defaults.constants.FieldConstants;
 import com.wese.component.defaults.data.FieldValidationData;
 import com.wese.component.defaults.enumerations.CLASS_LOADER;
@@ -26,6 +25,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.sql.Struct;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Path("/component")
 @Component
@@ -42,7 +43,6 @@ public class ComponentApiResource {
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.fieldValidationDataToApiJsonSerializer = fieldValidationDataToApiJsonSerializer;
 
-        System.err.println("--------------------are we initialized here ? -------------");
     }
 
     /**
@@ -52,9 +52,9 @@ public class ComponentApiResource {
      * @return
      */
     @GET
-    @Path("field")
+    @Path("field/{class}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveTemplate(@Context final UriInfo uriInfo, @QueryParam("class") final String className) {
+    public String retrieveTemplate(@Context final UriInfo uriInfo, @PathParam("class") final String className) {
 
         this.context.authenticatedUser();
 
@@ -63,16 +63,18 @@ public class ComponentApiResource {
         CLASS_LOADER classLoader = CLASS_LOADER.fromString(className);
 
         String url = classLoader.getUrl();
+        Class cl = null ;
 
-        Class cl = ClassLoader.getSystemResource(url).getClass();
+        try {
+            cl = Class.forName(url);;
+        }
+        catch (ClassNotFoundException c){
+            c.printStackTrace();
+        }
 
-        System.err.println("-----------classloader found value ? "+ Optional.ofNullable(cl).isPresent());
-        String ret = FieldReflectionHelper.getClassAttributes(cl).toString();
+        System.err.println("---------------------------------cl is null ? ------------------------"+Optional.ofNullable(cl).isPresent());
 
-
-        System.err.println("--------------return value is ------------"+ret);
-
-        List<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl);
+        Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationDataList, FieldConstants.allowedParams);
