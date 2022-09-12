@@ -18,7 +18,6 @@ public class TransactionCodeData {
     private String debitAccountName;
     private String creditAccountName;
 
-
     public TransactionCodeData(){}
 
     public TransactionCodeData(Long id, Long code, String name, Long debitAccountId, Long creditAccountId, String debitAccountName, String creditAccountName) {
@@ -29,6 +28,10 @@ public class TransactionCodeData {
         this.creditAccountId = creditAccountId;
         this.debitAccountName = debitAccountName;
         this.creditAccountName = creditAccountName;
+    }
+
+    public static TransactionCodeData looup(Long id ,Long code ,String codeName){
+        return new TransactionCodeData(id ,code ,codeName,null ,null ,null ,null);
     }
 
     public Long getId() {

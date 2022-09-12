@@ -19,10 +19,7 @@
 package org.apache.fineract.portfolio.charge.domain;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,6 +33,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.journalentry.data.TransactionCodeData;
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -114,7 +113,17 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "tax_group_id")
     private TaxGroup taxGroup;
 
-    public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup) {
+    /**
+     * Added 10/09/2022 ar 0425
+     * Intention is to have some charges have optional transaction codes ie account to debit and credit 
+     */
+
+    @ManyToOne
+    @JoinColumn(name = "transaction_code_id")
+    private TransactionCode transactionCode;
+
+
+    public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup,final TransactionCode transactionCode) {
 
         final String name = command.stringValueOfParameterNamed("name");
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount");
@@ -137,7 +146,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         final Integer feeFrequency = command.integerValueOfParameterNamed("feeFrequency");
 
         return new Charge(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculationType, penalty, active, paymentMode,
-                feeOnMonthDay, feeInterval, minCap, maxCap, feeFrequency, account, taxGroup);
+                feeOnMonthDay, feeInterval, minCap, maxCap, feeFrequency, account, taxGroup ,transactionCode);
     }
 
     protected Charge() {
@@ -147,7 +156,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo,
             final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty,
             final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval,
-            final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final GLAccount account, final TaxGroup taxGroup) {
+            final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final GLAccount account, final TaxGroup taxGroup ,final TransactionCode transactionCode) {
         this.name = name;
         this.amount = amount;
         this.currencyCode = currencyCode;
@@ -159,6 +168,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         this.account = account;
         this.taxGroup = taxGroup;
         this.chargePaymentMode = paymentMode == null ? null : paymentMode.getValue();
+        this.transactionCode = transactionCode;
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("charges");
@@ -306,6 +316,10 @@ public class Charge extends AbstractPersistableCustom<Long> {
 
     public BigDecimal getMaxCap() {
         return this.maxCap;
+    }
+
+    public TransactionCode getTransactionCode(){
+        return this.transactionCode;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -511,6 +525,15 @@ public class Charge extends AbstractPersistableCustom<Long> {
             }
         }
 
+
+        if (command.isChangeInLongParameterNamed(ChargesApiConstants.transactionCodeIdParamName, getTransactionCode().getId())){
+            final Long newValue = command.longValueOfParameterNamed(ChargesApiConstants.transactionCodeIdParamName);
+            actualChanges.put(ChargesApiConstants.transactionCodeIdParamName, newValue);
+            if(transactionCode != null){
+                baseDataValidator.reset().parameter(ChargesApiConstants.transactionCodeIdParamName).failWithCode("modification.not.supported");
+            }
+        }
+
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
 
         return actualChanges;
@@ -543,10 +566,15 @@ public class Charge extends AbstractPersistableCustom<Long> {
             taxGroupData = TaxGroupData.lookup(taxGroup.getId(), taxGroup.getName());
         }
 
+        TransactionCodeData transactionCodeData[] = {null};
+        Optional.ofNullable(this.transactionCode).ifPresent(e->{
+            transactionCodeData[0] = TransactionCodeData.looup(transactionCode.getId() ,transactionCode.getCode() ,transactionCode.getName());
+        });
+
         final CurrencyData currency = new CurrencyData(this.currencyCode, null, 0, 0, null, null);
         return ChargeData.instance(getId(), this.name, this.amount, currency, chargeTimeType, chargeAppliesTo, chargeCalculationType,
                 chargePaymentmode, getFeeOnMonthDay(), this.feeInterval, this.penalty, this.active, this.minCap, this.maxCap,
-                feeFrequencyType, accountData, taxGroupData);
+                feeFrequencyType, accountData, taxGroupData ,transactionCodeData[0]);
     }
 
     public Integer getChargePaymentMode() {

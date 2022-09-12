@@ -34,6 +34,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.FIELD_TYPE;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
@@ -59,9 +61,11 @@ import org.joda.time.format.DateTimeFormatter;
         @UniqueConstraint(columnNames = { "mobile_no" }, name = "mobile_no_UNIQUE") })
 public final class Client extends AbstractPersistableCustom<Long> {
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Account Number")
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Office")
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -92,12 +96,17 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Temporal(TemporalType.DATE)
     private Date officeJoiningDate;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Firstname")
     @Column(name = "firstname", length = 50, nullable = true)
     private String firstname;
 
+
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Middle Name")
     @Column(name = "middlename", length = 50, nullable = true)
     private String middlename;
 
+
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Lastname")
     @Column(name = "lastname", length = 50, nullable = true)
     private String lastname;
 
@@ -107,9 +116,12 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "display_name", length = 100, nullable = false)
     private String displayName;
 
+
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Mobile Number")
     @Column(name = "mobile_no", length = 50, nullable = false, unique = true)
     private String mobileNo;
-	
+
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Email Address")
 	@Column(name = "email_address", length = 50, unique = true)
     private String emailAddress;
 

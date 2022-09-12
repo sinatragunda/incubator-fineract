@@ -21,13 +21,12 @@ package org.apache.fineract.portfolio.charge.service;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
+import org.apache.fineract.accounting.journalentry.data.TransactionCodeData;
+import org.apache.fineract.accounting.journalentry.service.TransactionCodeReadPlatformService;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
@@ -67,13 +66,14 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final TaxReadPlatformService taxReadPlatformService;
+    private static TransactionCodeReadPlatformService transactionCodeReadPlatformService;
 
     @Autowired
     public ChargeReadPlatformServiceImpl(final CurrencyReadPlatformService currencyReadPlatformService,
             final ChargeDropdownReadPlatformService chargeDropdownReadPlatformService, final RoutingDataSource dataSource,
             final DropdownReadPlatformService dropdownReadPlatformService, final FineractEntityAccessUtil fineractEntityAccessUtil,
             final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService,
-            final TaxReadPlatformService taxReadPlatformService) {
+            final TaxReadPlatformService taxReadPlatformService,final TransactionCodeReadPlatformService transactionCodeReadPlatformService) {
         this.chargeDropdownReadPlatformService = chargeDropdownReadPlatformService;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.currencyReadPlatformService = currencyReadPlatformService;
@@ -82,6 +82,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         this.accountingDropdownReadPlatformService = accountingDropdownReadPlatformService;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.taxReadPlatformService = taxReadPlatformService;
+        this.transactionCodeReadPlatformService = transactionCodeReadPlatformService;
     }
 
     @Override
@@ -277,6 +278,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             return "c.id as id, c.name as name, c.amount as amount, c.currency_code as currencyCode, "
                     + "c.charge_applies_to_enum as chargeAppliesTo, c.charge_time_enum as chargeTime, "
                     + "c.charge_payment_mode_enum as chargePaymentMode, "
+                    + "tc.code as transactionCode ,"
+                    + "tc.name as transactionCodeName ,"
+                    +" tc.id as transactionCodeId ,"
                     + "c.charge_calculation_enum as chargeCalculation, c.is_penalty as penalty, "
                     + "c.is_active as active, oc.name as currencyName, oc.decimal_places as currencyDecimalPlaces, "
                     + "oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, "
@@ -286,6 +290,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                     + "tg.id as taxGroupId, tg.name as taxGroupName " + "from m_charge c "
                     + "join m_organisation_currency oc on c.currency_code = oc.code "
                     + " LEFT JOIN acc_gl_account acc on acc.id = c.income_or_liability_account_id "
+                    + " LEFT JOIN m_transaction_code tc on tc.id = c.transaction_code_id "
                     + " LEFT JOIN m_tax_group tg on tg.id = c.tax_group_id ";
         }
 
@@ -363,9 +368,15 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 taxGroupData = TaxGroupData.lookup(taxGroupId, taxGroupName);
             }
 
+            final Long transactionCodeId = JdbcSupport.getLong(rs ,"transactionCodeId");
+            TransactionCodeData transactionCodeData[] = {null};
+            Optional.ofNullable(transactionCodeId).ifPresent(e->{
+                transactionCodeData[0] = transactionCodeReadPlatformService.retrieveOne(transactionCodeId);
+            });
+
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
                     chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, glAccountData,
-                    taxGroupData);
+                    taxGroupData ,transactionCodeData[0]);
         }
     }
 

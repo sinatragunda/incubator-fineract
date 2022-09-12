@@ -4,7 +4,7 @@
     At 5:36 AM on 5/2/2022
 
 */
-package org.apache.fineract.components.validation.api;
+package org.apache.fineract.components.api;
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file

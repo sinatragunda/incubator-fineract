@@ -63,7 +63,9 @@
 										  org.mifosplatform.infrastructure.report.service,
 										  org.apache.fineract.portfolio.commissions.*,
 										  org.apache.fineract.portfolio.ssbpayments.*,
-										  org.apache.fineract.portfolio.products.*">
+										  org.apache.fineract.portfolio.products.*,
+										  org.apache.fineract.components.*,
+										  com.wese.component.defaults.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
 			type="annotation" />
