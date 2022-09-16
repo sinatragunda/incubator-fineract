@@ -4838,12 +4838,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateAccountStatus(final LoanEvent event) {
 
-        System.err.println("---------------loan event ---------"+event);
-
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-
-
-        System.err.println("------------where is the fucken error ? ");
 
         switch (event) {
             case LOAN_CREATED:

@@ -36,7 +36,7 @@ public class ClientApiCollectionConstants extends ClientApiConstants{
 
     protected static final Set<String> CLIENT_NON_PERSON_CREATE_REQUEST_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList(familyMembers,address,localeParamName, dateFormatParamName, incorpNumberParamName, remarksParamName, incorpValidityTillParamName,
-                    constitutionIdParamName, mainBusinessLineIdParamName, datatables));
+                    constitutionIdParamName, mainBusinessLineIdParamName, datatables ,tagParam));
 
     protected static final Set<String> CLIENT_UPDATE_REQUEST_DATA_PARAMETERS = new HashSet<>(Arrays.asList(localeParamName,
             dateFormatParamName, accountNoParamName, externalIdParamName, mobileNoParamName, emailAddressParamName, firstnameParamName, middlenameParamName,
@@ -46,7 +46,7 @@ public class ClientApiCollectionConstants extends ClientApiConstants{
 
     protected static final Set<String> CLIENT_NON_PERSON_UPDATE_REQUEST_DATA_PARAMETERS = new HashSet<>(Arrays.asList(localeParamName,
             dateFormatParamName, incorpNumberParamName, remarksParamName, incorpValidityTillParamName,
-            constitutionIdParamName, mainBusinessLineIdParamName));
+            constitutionIdParamName, mainBusinessLineIdParamName ,tagParam));
 
 
     /**

@@ -1015,7 +1015,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public SavingsAccountTransaction withdraw(final SavingsAccountTransactionDTO transactionDTO, final boolean applyWithdrawFee) {
 
-        System.err.println("-------------------apply withdrawal fee now ? ---------");
+        //System.err.println("-------------------apply withdrawal fee now ? ---------");
 
         if (!isTransactionsAllowed()) {
 
@@ -2579,9 +2579,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public void payCharge(final SavingsAccountCharge savingsAccountCharge, final BigDecimal amountPaid, final LocalDate transactionDate,
             final DateTimeFormatter formatter, final AppUser user) {
-
-
-        System.err.println("-------------------time to pay charge ------------------- ,we dont even come here son ");
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)

@@ -32,9 +32,6 @@ public class DefaultLoanLifecycleStateMachine implements LoanLifecycleStateMachi
     public LoanStatus transition(final LoanEvent loanEvent, final LoanStatus from) {
 
         LoanStatus newState = from;
-
-        System.err.println("--------------status from -----------"+from+"-----------to new statue "+newState);
-
         switch (loanEvent) {
             case LOAN_CREATED:
                 if (from == null) {

@@ -58,8 +58,6 @@ public class ComponentApiResource {
 
         this.context.authenticatedUser();
 
-        System.err.println("-------------------------class name is "+className);
-
         CLASS_LOADER classLoader = CLASS_LOADER.fromString(className);
 
         String url = classLoader.getUrl();
@@ -71,8 +69,6 @@ public class ComponentApiResource {
         catch (ClassNotFoundException c){
             c.printStackTrace();
         }
-
-        System.err.println("---------------------------------cl is null ? ------------------------"+Optional.ofNullable(cl).isPresent());
 
         Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl);
 

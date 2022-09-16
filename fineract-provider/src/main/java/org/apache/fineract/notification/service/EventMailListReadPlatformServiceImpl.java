@@ -60,8 +60,6 @@ public class EventMailListReadPlatformServiceImpl implements EventMailListReadPl
             sql = String.format("select %s where es.business_event = ? and es.office_id = ?" ,this.eventMailListMapper.schema());
         }
 
-        System.err.println("================sql =============="+sql);
-
         return this.jdbcTemplate.query(sql, this.eventMailListMapper,
                 new Object[] { businessEvents.ordinal() ,officeId });
 
@@ -74,9 +72,6 @@ public class EventMailListReadPlatformServiceImpl implements EventMailListReadPl
 
         String table ="m_event_mail_list";
         final String sql = String.format("select %s " ,this.eventMailListMapper.schema());
-
-        System.err.println("================sql =============="+sql);
-
         return this.jdbcTemplate.query(sql, this.eventMailListMapper);
 
     }
