@@ -117,10 +117,7 @@ public class MailReportApiResource {
 
         String primaryRecipient = jsonCommand.stringValueOfParameterNamed("emailAddress");
 
-        System.err.println("-----------primary recipient ? "+includePrimaryRecipient);
-
         Optional.ofNullable(primaryRecipient).ifPresent(e->{
-
             if(includePrimaryRecipient) {
                 emailAddressList.add(primaryRecipient);
             }
@@ -128,13 +125,10 @@ public class MailReportApiResource {
 
         String reportName = jsonCommand.stringValueOfParameterNamed("reportName");
 
-        System.err.println("--------------------report Name is "+reportName+"=============");
-
         String subject ="Core Banking Report Mail";
         String body = String.format("%s mailing",reportName);
 
         JsonArray externalRecipientsJsonArray = fromJsonHelper.extractJsonArrayNamed("externalRecipients",jsonElement);
-
         JsonArray mailRecipientsJsonArray = fromJsonHelper.extractJsonArrayNamed("mailRecipients" ,jsonElement);
 
         Iterator<JsonElement> externalRecipientIterator = externalRecipientsJsonArray.iterator();
@@ -143,7 +137,6 @@ public class MailReportApiResource {
 
             JsonElement jsonElement1 = externalRecipientIterator.next();
             String emailAddress  = jsonElement1.getAsString();
-            System.err.println("-------------email address is ----------------------"+emailAddress);
             emailAddressList.add(emailAddress);
         }
 
@@ -151,7 +144,6 @@ public class MailReportApiResource {
 
         emailAddressList.stream().forEach(e->{
             String emailAddress = e ;
-            System.err.println("-----------------lets attach this email ------------"+emailAddress);
             EmailDetail emailDetail = new EmailDetail(subject,body ,emailAddress ,"Client");
             emailDetailList.add(emailDetail);
         });
