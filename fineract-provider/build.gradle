@@ -54,9 +54,9 @@ apply plugin: 'pmd'
 apply plugin: 'findbugs'
 
 /* define the valid syntax level for source files */
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = 1.8
 /* define binary compatibility version */
-targetCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = 1.8
 
 project.ext.springBootVersion = '1.1.6.RELEASE'
 project.ext.springVersion = '4.0.7.RELEASE'
@@ -64,9 +64,10 @@ project.ext.springOauthVersion = '2.0.4.RELEASE'
 project.ext.jerseyVersion = '1.19'
 project.ext.springDataJpaVersion = '1.7.0.RELEASE' // also change spring-boot-gradle-plugin version above
 
-project.ext.mysqlUser='root'
-project.ext.mysqlPassword='mysql'
-
+project.ext.mysqlHost = System.getenv("RDS_HOSTNAME") ?: "localhost"
+project.ext.mysqlPort = System.getenv("RDS_PORT") ?: "3306"
+project.ext.mysqlUser = System.getenv("RDS_USERNAME") ?: "root"
+project.ext.mysqlPassword = System.getenv("RDS_PASSWORD") ?: "mysql"
 
 group = 'org.apache.fineract'
 buildDir = new File(rootProject.projectDir, "../build")
@@ -309,6 +310,7 @@ war {
 	from('../DISCLAIMER') { // notice the parens
 		into "WEB-INF/" // no leading slash
 	}
+
     war.finalizedBy(bootRepackage)
     deployPentahoReports.execute()
 }
@@ -401,8 +403,8 @@ configurations {
     driver
 }
 dependencies {
-    driver 'mysql:mysql-connector-java:5.1.16'
-    compile(files('jars\\pentaho-reporting-engine-classic-core-3.9.1-GA.jar','jars\\Component.jar'))
+    // driver 'mysql:mysql-connector-java:5.1.6'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 test {
@@ -429,17 +431,17 @@ task fatJar(type: Jar) {
 
 task createDB<<{
     description= "Creates the Database. Needs database name to be passed (like: -PdbName=someDBname)"
-    sql = Sql.newInstance( 'jdbc:mysql://localhost:3306/', mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
+    sql = Sql.newInstance( "jdbc:mysql://${mysqlHost}:${mysqlPort}/", mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
     sql.execute( 'create database '+"`$dbName`" )
 }
 
 task dropDB<<{
     description= "Drops the specified database. The database name has to be passed (like: -PdbName=someDBname)"
-    sql = Sql.newInstance( 'jdbc:mysql://localhost:3306/', mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
+    sql = Sql.newInstance( "jdbc:mysql://${mysqlHost}:${mysqlPort}/", mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
     sql.execute( 'DROP DATABASE '+"`$dbName`")
 }
 task setBlankPassword<<{
-    sql = Sql.newInstance( 'jdbc:mysql://localhost:3306/', mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
+    sql = Sql.newInstance( "jdbc:mysql://${mysqlHost}:${mysqlPort}/", mysqlUser, mysqlPassword, 'com.mysql.jdbc.Driver' )
     sql.execute('USE `mifosplatform-tenants`')
     sql.execute('UPDATE mifosplatform-tenants.tenants SET schema_server = \'localhost\', schema_server_port = \'3306\', schema_username = \'mifos\', schema_password = \'mysql\' WHERE id=1;')
 }
@@ -459,7 +461,7 @@ buildscript {
 
 
 flyway {
-    url = "jdbc:mysql://localhost:3306/mifostenant-default"
+    url = "jdbc:mysql://${mysqlHost}:${mysqlPort}/mifostenant-default"
 	driver = "com.mysql.jdbc.Driver"
     user = mysqlUser
     password = mysqlPassword
@@ -474,7 +476,7 @@ task migrateTenantDB<<{
 		tenantDbName = rootProject.getProperty("dbName")
 	}
 	
-    flyway.url= "jdbc:mysql://localhost:3306/$tenantDbName"
+    flyway.url= "jdbc:mysql://${mysqlHost}:${mysqlPort}/$tenantDbName"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
     /**We use ${ as the prefix for strecthy reporting, do not want them to be interpreted by Flyway**/
@@ -491,7 +493,7 @@ task showTenantDBInfo<<{
 		tenantDbName = rootProject.getProperty("dbName")
 	}
 	
-    flyway.url= "jdbc:mysql://localhost:3306/$tenantDbName"
+    flyway.url= "jdbc:mysql://${mysqlHost}:${mysqlPort}/$tenantDbName"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
     flywayInfo.execute()
@@ -507,7 +509,7 @@ task migrateTenantListDB<<{
 		tenantsDbName = rootProject.getProperty("dbName")
 	}
 	
-    flyway.url= "jdbc:mysql://localhost:3306/$tenantsDbName"
+    flyway.url= "jdbc:mysql://${mysqlHost}:${mysqlPort}/${tenantsDbName}"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
     flywayMigrate.execute()
@@ -522,7 +524,7 @@ task showTenantListDBInfo<<{
 		tenantsDbName = rootProject.getProperty("dbName")
 	}
     
-    flyway.url= "jdbc:mysql://localhost:3306/$tenantsDbName"
+    flyway.url= "jdbc:mysql://${mysqlHost}:${mysqlPort}/${tenantsDbName}"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
     flywayInfo.execute()
@@ -537,7 +539,7 @@ task repairTenantDB<<{
         tenantsDbName = rootProject.getProperty("dbName")
     }
     
-    flyway.url= "jdbc:mysql://localhost:3306/$tenantsDbName"
+    flyway.url= "jdbc:mysql://${mysqlHost}:${mysqlPort}/${tenantsDbName}"
 	flyway.driver = "com.mysql.jdbc.Driver"
     flyway.locations= [filePath]
     flywayRepair.execute()
@@ -566,14 +568,22 @@ springBoot {
 }
 
 task deploy (dependsOn: war){
+    def CATALINA_HOME = System.env.CATALINA_HOME
     doLast{
-        copy {
-            from "D:/Documents/Coding/incubator-fineract/build/libs/fineract-provider.war"
-            into "C:/tomcat/webapps/"
+        println "Deploying war to tomcat."
+        println "Deleting old war file.."
+        try {
+            delete "${CATALINA_HOME}/webapps/fineract-provider.war"
+            delete "${CATALINA_HOME}/webapps/fineract-provider"
+        } catch (Exception e){
+            println "Exception: ${e}"
         }
-
-        delete 'D:/Documents/Coding/incubator-fineract/build/libs/fineract-provider.war'
-        println 'Now lets delete file after copying '
+        println "Copy new war file.."
+        copy {
+            from "${buildDir}/libs/fineract-provider.war"
+            into "${CATALINA_HOME}/webapps"
+        }
+        println "Deploy complete!"
     }
 }
 
