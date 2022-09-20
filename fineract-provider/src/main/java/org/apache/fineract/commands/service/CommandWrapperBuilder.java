@@ -296,6 +296,21 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 20/09/2022
+     * Intention is to correct untrackable loan repayments from reversed transactions
+     * If loan has reversed repayments its hard to track all repayments even current ones not reversed 
+     * At times repayment transaction fail to post 
+     */ 
+    public CommandWrapperBuilder errorCorrection(final Long loanId) {
+        this.actionName = "ERROR_CORRECTION";
+        this.entityName = "LOAN";
+        this.entityId = loanId;
+        this.loanId = loanId;
+        this.href = "/loans/" + loanId + "?command=errorCorrection";
+        return this;
+    }
+
     public CommandWrapperBuilder updateGuarantor(final Long loanId, final Long guarantorId) {
         this.actionName = "UPDATE";
         this.entityName = "GUARANTOR";

@@ -208,8 +208,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         if (StringUtils.isNotBlank(noteText)) {
             final Note note = Note.loanTransactionNote(loan, newRepaymentTransaction, noteText);
             this.noteRepository.save(note);
-
-
         }
 
         postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer, isLoanToLoanTransfer);
@@ -452,13 +450,13 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Override
     public void reverseTransfer(final LoanTransaction loanTransaction) {
 
-        System.err.println("-----------------reverse transfer here son -----------------");
         loanTransaction.reverse();
-
-        System.err.println("----------------save loan with data violation checks -----------------");
         saveLoanTransactionWithDataIntegrityViolationChecks(loanTransaction);
 
-        System.err.println("------------------done the checkign here son ------------------");
+        System.err.println("------------------recalculate accruals here son  ------------------");
+
+        Loan loan = loanTransaction.getLoan();
+        recalculateAccruals(loan);
     }
 
     /*
