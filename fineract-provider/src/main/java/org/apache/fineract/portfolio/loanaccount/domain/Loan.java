@@ -1228,10 +1228,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
                     fee = fee.plus(loanTransaction.getFeeChargesPortion(getCurrency()));
                     penality = penality.plus(loanTransaction.getPenaltyChargesPortion(getCurrency()));
 
-
-                    System.err.println("------interest is ------"+interest);
-
-                    System.err.println("------fee is ------"+fee);
+                    //System.err.println("------interest is ------"+interest);
+                    //System.err.println("------fee is ------"+fee);
                     
                     try{
                         if (installment.getFeeChargesCharged(getCurrency()).isLessThan(fee)

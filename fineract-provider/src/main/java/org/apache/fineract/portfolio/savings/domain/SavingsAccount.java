@@ -113,6 +113,8 @@ import org.springframework.util.CollectionUtils;
 
 import com.google.gson.JsonArray;
 
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
+
 @Entity
 @Table(name = "m_savings_account", uniqueConstraints = { @UniqueConstraint(columnNames = { "account_no" }, name = "sa_account_no_UNIQUE"),
         @UniqueConstraint(columnNames = { "external_id" }, name = "sa_external_id_UNIQUE") })
@@ -652,12 +654,12 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             return e.isNotReversed();
         };
 
-        System.err.println("-------------------before filter size --------"+getTransactions().size());
+        //System.err.println("-------------------before filter size --------"+getTransactions().size());
 
         List<SavingsAccountTransaction> trans = getTransactions().stream().filter(isReversed).collect(toList()) ;
 
 
-        System.err.println("------------------after filter size ----------"+trans.size());
+        //System.err.println("------------------after filter size ----------"+trans.size());
 
         Comparator<SavingsAccountTransaction> accountTransactionComparator = (e ,e1)->{
             Long now = e.getTransactionDate().getTime();
@@ -667,23 +669,23 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
        trans.sort(accountTransactionComparator);
 
-       System.err.println("--------before sorting --------");
+       //System.err.println("--------before sorting --------");
        trans.stream().forEach(e->{
-           System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
+         //  System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
        });
 
         // reverse it so that the first item which is last date becomes first etc so it breaks on the first before transaction
        Collections.reverse(trans);
 
-       System.err.println("-----------after sorting ------");
+       //System.err.println("-----------after sorting ------");
 
        trans.stream().forEach(e->{
-           System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
+           //System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
        });
 
         for (final SavingsAccountTransaction transaction : trans) {
             if (transaction.isNotReversed() && transaction.isBefore(date)){
-                System.err.println("-------last transaction is -------"+transaction.getId()+"------------at date -----------"+transaction.getTransactionDate());
+                //System.err.println("-------last transaction is -------"+transaction.getId()+"------------at date -----------"+transaction.getTransactionDate());
                 savingsTransaction = transaction;
                 break;
             }
@@ -1523,7 +1525,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     public Map<String, Object> deriveAccountingBridgeData(final CurrencyData currencyData, final Set<Long> existingTransactionIds,
-            final Set<Long> existingReversedTransactionIds, boolean isAccountTransfer) {
+            final Set<Long> existingReversedTransactionIds, boolean isAccountTransfer ,TransactionCode transactionCode) {
 
         final Map<String, Object> accountingBridgeData = new LinkedHashMap<>();
         accountingBridgeData.put("savingsId", getId());
@@ -1533,6 +1535,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         accountingBridgeData.put("cashBasedAccountingEnabled", isCashBasedAccountingEnabledOnSavingsProduct());
         accountingBridgeData.put("accrualBasedAccountingEnabled", isAccrualBasedAccountingEnabledOnSavingsProduct());
         accountingBridgeData.put("isAccountTransfer", isAccountTransfer);
+        accountingBridgeData.put("transactionCode",transactionCode);
 
         final List<Map<String, Object>> newSavingsTransactions = new ArrayList<>();
         List<SavingsAccountTransaction> trans = getTransactions() ;

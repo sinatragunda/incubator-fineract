@@ -46,6 +46,7 @@ import org.apache.fineract.accounting.journalentry.data.TaxPaymentDTO;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepository;
 import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException;
 import org.apache.fineract.accounting.journalentry.exception.JournalEntryInvalidException.GL_JOURNAL_ENTRY_INVALID_REASON;
 import org.apache.fineract.accounting.producttoaccountmapping.domain.PortfolioProductType;
@@ -182,12 +183,14 @@ public class AccountingProcessorHelper {
 
     public SavingsDTO populateSavingsDtoFromMap(final Map<String, Object> accountingBridgeData, final boolean cashBasedAccountingEnabled,
             final boolean accrualBasedAccountingEnabled) {
+
         final Long loanId = (Long) accountingBridgeData.get("savingsId");
         final Long loanProductId = (Long) accountingBridgeData.get("savingsProductId");
         final Long officeId = (Long) accountingBridgeData.get("officeId");
         final CurrencyData currencyData = (CurrencyData) accountingBridgeData.get("currency");
         final List<SavingsTransactionDTO> newSavingsTransactions = new ArrayList<>();
         boolean isAccountTransfer = (Boolean) accountingBridgeData.get("isAccountTransfer");
+        final TransactionCode transactionCode = (TransactionCode) accountingBridgeData.get("transactionCode");
 
         @SuppressWarnings("unchecked")
         final List<Map<String, Object>> newTransactionsMap = (List<Map<String, Object>>) accountingBridgeData.get("newSavingsTransactions");
@@ -247,7 +250,7 @@ public class AccountingProcessorHelper {
         }
 
         return new SavingsDTO(loanId, loanProductId, officeId, currencyData.code(), cashBasedAccountingEnabled,
-                accrualBasedAccountingEnabled, newSavingsTransactions);
+                accrualBasedAccountingEnabled, newSavingsTransactions,transactionCode);
     }
 
     public SharesDTO populateSharesDtoFromMap(final Map<String, Object> accountingBridgeData, final boolean cashBasedAccountingEnabled,
@@ -458,7 +461,7 @@ public class AccountingProcessorHelper {
     public void createCashBasedJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode,
             final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long savingsProductId,
             final Long paymentTypeId, final Long loanId, final String transactionId, final Date transactionDate, final BigDecimal amount,
-            final Boolean isReversal) {
+            final Boolean isReversal,final TransactionCode transactionCode) {
         int accountTypeToDebitId = accountTypeToBeDebited;
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
@@ -471,7 +474,7 @@ public class AccountingProcessorHelper {
         //System.err.println("---------------------create entries ---------"+accountTypeToDebitId+"----------------credit ------"+accountTypeToCreditId);
 
         createJournalEntriesForSavings(office, currencyCode, accountTypeToDebitId, accountTypeToCreditId, savingsProductId, paymentTypeId,
-                loanId, transactionId, transactionDate, amount);
+                loanId, transactionId, transactionDate, amount,transactionCode);
     }
 
     /**
@@ -576,11 +579,39 @@ public class AccountingProcessorHelper {
 
     private void createJournalEntriesForSavings(final Office office, final String currencyCode, final int accountTypeToDebitId,
             final int accountTypeToCreditId, final Long savingsProductId, final Long paymentTypeId, final Long savingsId,
-            final String transactionId, final Date transactionDate, final BigDecimal amount) {
-        final GLAccount debitAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);
-        final GLAccount creditAccount = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToCreditId, paymentTypeId);
-        createDebitJournalEntryForSavings(office, currencyCode, debitAccount, savingsId, transactionId, transactionDate, amount);
-        createCreditJournalEntryForSavings(office, currencyCode, creditAccount, savingsId, transactionId, transactionDate, amount);
+            final String transactionId, final Date transactionDate, final BigDecimal amount ,final TransactionCode transactionCode) {
+        /**
+         * Edited 24/09/2022 0102 
+         * Need to add functionality for transaction code 
+         */
+
+        System.err.println("---------------------creating journal entries for savings now son ,possibly last function now  -----------");
+
+        GLAccount debitAccount[]= {null};
+        GLAccount creditAccount[] = {null};
+
+        boolean isTransactionCodePresent = Optional.ofNullable(transactionCode).isPresent();
+        /**
+         * If transaction code is present it means client has inserted optional T Accounts 
+         * However as it is seems to function is feeding data to this function 
+         */
+        if(isTransactionCodePresent){
+
+            System.err.println("----------------------transactioncodes being used are custom -----------");
+
+            debitAccount[0] = transactionCode.getDebitAccount();
+            creditAccount[0]= transactionCode.getCreditAccount();
+
+            System.err.println("---------------debit account is "+debitAccount[0].getName());
+            System.err.println("--------------credit account is "+creditAccount[0].getName());
+        }
+        else{
+            debitAccount[0] = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);
+            creditAccount[0] = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToCreditId, paymentTypeId);
+        }
+
+        createDebitJournalEntryForSavings(office, currencyCode, debitAccount[0], savingsId, transactionId, transactionDate, amount);
+        createCreditJournalEntryForSavings(office, currencyCode, creditAccount[0], savingsId, transactionId, transactionDate, amount);
     }
 
     /**

@@ -109,4 +109,10 @@ public interface LoanWritePlatformService {
 
     CommandProcessingResult forecloseLoan(final Long loanId, JsonCommand command);
 
+
+    /**
+     * Added 20/09/2022 ar 2145
+     */
+    CommandProcessingResult errorCorrection(final Long loanId);  
+
 }

@@ -19,6 +19,7 @@
 package org.apache.fineract.accounting.journalentry.data;
 
 import java.util.List;
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 
 public class SavingsDTO {
 
@@ -30,9 +31,16 @@ public class SavingsDTO {
     private boolean accrualBasedAccountingEnabled;
     private List<SavingsTransactionDTO> newSavingsTransactions;
 
+    /**
+     * Added 27/09/2022 at 0449
+     * Transaction Codes are custom GL accounts inserted into transactions to bypass normal GL Processing
+     */ 
+
+    private TransactionCode transactionCode;
+
     public SavingsDTO(final Long savingsId, final Long savingsProductId, final Long officeId, final String currencyCode,
             final boolean cashBasedAccountingEnabled, final boolean accrualBasedAccountingEnabled,
-            final List<SavingsTransactionDTO> newSavingsTransactions) {
+            final List<SavingsTransactionDTO> newSavingsTransactions,final TransactionCode transactionCode) {
         this.savingsId = savingsId;
         this.savingsProductId = savingsProductId;
         this.officeId = officeId;
@@ -40,6 +48,7 @@ public class SavingsDTO {
         this.accrualBasedAccountingEnabled = accrualBasedAccountingEnabled;
         this.newSavingsTransactions = newSavingsTransactions;
         this.currencyCode = currencyCode;
+        this.transactionCode = transactionCode;
     }
 
     public Long getSavingsId() {
@@ -96,6 +105,11 @@ public class SavingsDTO {
 
     public void setCurrencyCode(final String currencyCode) {
         this.currencyCode = currencyCode;
+    }
+
+
+    public TransactionCode getTransactionCode(){
+        return this.transactionCode;
     }
 
 }

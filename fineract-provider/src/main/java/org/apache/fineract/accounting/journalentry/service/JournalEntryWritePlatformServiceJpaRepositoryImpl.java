@@ -514,7 +514,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
 
         final boolean cashBasedAccountingEnabled = (Boolean) accountingBridgeData.get("cashBasedAccountingEnabled");
         final boolean accrualBasedAccountingEnabled = (Boolean) accountingBridgeData.get("accrualBasedAccountingEnabled");
-
+        
         if (cashBasedAccountingEnabled || accrualBasedAccountingEnabled) {
             final SavingsDTO savingsDTO = this.helper.populateSavingsDtoFromMap(accountingBridgeData, cashBasedAccountingEnabled,
                     accrualBasedAccountingEnabled);

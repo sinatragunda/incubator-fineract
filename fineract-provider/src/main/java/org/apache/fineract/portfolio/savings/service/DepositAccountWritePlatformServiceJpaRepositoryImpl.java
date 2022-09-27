@@ -117,6 +117,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
+
 @Service
 public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements DepositAccountWritePlatformService {
 
@@ -1370,8 +1372,9 @@ public class DepositAccountWritePlatformServiceJpaRepositoryImpl implements Depo
         final MonetaryCurrency currency = savingsAccount.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(currency);
         boolean isAccountTransfer = false;
+        final TransactionCode transactionCode =null ;
         final Map<String, Object> accountingBridgeData = savingsAccount.deriveAccountingBridgeData(applicationCurrency.toData(),
-                existingTransactionIds, existingReversedTransactionIds, isAccountTransfer);
+                existingTransactionIds, existingReversedTransactionIds, isAccountTransfer,transactionCode);
         this.journalEntryWritePlatformService.createJournalEntriesForSavings(accountingBridgeData);
     }
     

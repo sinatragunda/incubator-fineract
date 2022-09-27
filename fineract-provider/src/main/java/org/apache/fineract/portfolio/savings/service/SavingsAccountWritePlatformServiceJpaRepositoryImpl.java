@@ -25,7 +25,10 @@ import java.math.MathContext;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
+import org.apache.fineract.accounting.journalentry.repo.TransactionCodeRepository;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.infrastructure.bulkimport.constants.SavingsConstants;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -135,6 +138,11 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     // added 18/04/2022
     private final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ;
 
+    /**
+     * Added 24/09/2022 at 0131
+     */
+    private final TransactionCodeRepository transactionCodeRepository;
+
 
     @Autowired
     public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -156,7 +164,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository,
-            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository) {
+            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final TransactionCodeRepository transactionCodeRepository) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -191,6 +199,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         // added 18/04/2022
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
+        this.transactionCodeRepository = transactionCodeRepository;
 
     }
 
@@ -220,7 +229,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             this.savingAccountRepositoryWrapper.saveAndFlush(account);
         }
 
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+        TransactionCode transactionCode =null ;
+
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_ACTIVATE,
                 constructEntityMap(BUSINESS_ENTITY.SAVING, account));
 
@@ -278,7 +289,18 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("transactionDate");
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed("transactionAmount");
 
+
+        /**
+         * Added 24/09/2022 at 0032
+         * Added for custom transaction Codes
+         */
+        
         boolean isZero = ComparatorUtility.isBigDecimalZero(transactionAmount);
+        
+
+        TransactionCode transactionCode = transactionCode(command);
+
+        System.err.println("-----------depositing with transaction code now ? "+Optional.ofNullable(transactionCode).isPresent());
 
         if(isZero){
             return null ;
@@ -288,8 +310,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         final PaymentDetail paymentDetail = this.paymentDetailWritePlatformService.createAndPersistPaymentDetail(command, changes);
         boolean isAccountTransfer = false;
         boolean isRegularTransaction = true;
+
         final SavingsAccountTransaction deposit = this.savingsAccountDomainService.handleDeposit(account, fmt, transactionDate,
-                transactionAmount, paymentDetail, isAccountTransfer, isRegularTransaction);
+                transactionAmount, paymentDetail, isAccountTransfer, isRegularTransaction,transactionCode);
 
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
@@ -306,6 +329,18 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 .with(changes) //
                 .build();
        
+    }
+
+    private TransactionCode transactionCode(final JsonCommand command){
+
+        final Long transactionCodeId = command.longValueOfParameterNamed(SavingsApiConstants.transactionCodeIdParam);
+
+        TransactionCode transactionCode[] = {null}; 
+        Optional.ofNullable(transactionCodeId).ifPresent(e->{
+            transactionCode[0] = transactionCodeRepository.findOne(transactionCodeId);            
+        });
+        
+        return transactionCode[0];
     }
 
     private Long saveTransactionToGenerateTransactionId(final SavingsAccountTransaction transaction) {
@@ -336,10 +371,16 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         final boolean isApplyWithdrawFee = true;
         final boolean isInterestTransfer = false;
         final boolean isWithdrawBalance = false;
+
+        /**
+         * Added 27/09/2022 at 0705
+         */
+        final TransactionCode transactionCode = transactionCode(command);
+
         final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
                 isRegularTransaction, isApplyWithdrawFee, isInterestTransfer, isWithdrawBalance);
         final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(account, fmt, transactionDate,
-                transactionAmount, paymentDetail, transactionBooleanValues);
+                transactionAmount, paymentDetail, transactionBooleanValues,transactionCode);
 
         final String noteText = command.stringValueOfParameterNamed("note");
         if (StringUtils.isNotBlank(noteText)) {
@@ -476,9 +517,11 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 }
             }
 
+            final TransactionCode transactionCode = null;
+
             this.savingAccountRepositoryWrapper.saveAndFlush(account);
 
-            postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+            postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
         }
     }
 
@@ -552,7 +595,10 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         account.validateAccountBalanceDoesNotBecomeNegative(SavingsApiConstants.undoTransactionAction, depositAccountOnHoldTransactions);
         account.activateAccountBasedOnBalance();
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+
+        TransactionCode transactionCode = null;
+
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
 
         return new CommandProcessingResultBuilder() //
                 .withEntityId(savingsId) //
@@ -645,7 +691,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         account.validateAccountBalanceDoesNotBecomeNegative(SavingsApiConstants.adjustTransactionAction, depositAccountOnHoldTransactions);
         account.activateAccountBasedOnBalance();
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+
+        TransactionCode transactionCode = null ;
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
         return new CommandProcessingResultBuilder() //
                 .withEntityId(newtransactionId) //
                 .withOfficeId(account.officeId()) //
@@ -693,6 +741,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             throw new SavingsAccountClosingNotAllowedException("linked", defaultUserMessage, savingsId);
         }
 
+        TransactionCode transactionCode = null ;
+
         entityDatatableChecksWritePlatformService.runTheCheckForProduct(savingsId, EntityTables.SAVING.getName(),
                 StatusEnum.CLOSE.getCode().longValue(), EntityTables.SAVING.getForeignKeyColumnNameOnDatatable(), account.productId());
 
@@ -732,7 +782,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                     isRegularTransaction, isApplyWithdrawFee, isInterestTransfer, isWithdrawBalance);
 
             this.savingsAccountDomainService.handleWithdrawal(account, fmt, closedDate, transactionAmount, paymentDetail,
-                    transactionBooleanValues);
+                    transactionBooleanValues ,transactionCode);
 
         }
 
@@ -768,6 +818,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         AppUser user = getAppUserIfPresent();
 
+        System.err.println("-----------------transfer account savings --------------");
+
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService
                 .isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
@@ -789,7 +841,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         this.savingsAccountTransactionRepository.save(newTransferTransaction);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
 
-        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds);
+        TransactionCode transactionCode = null ;
+
+        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds,transactionCode);
 
         return newTransferTransaction;
     }
@@ -798,6 +852,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     public SavingsAccountTransaction withdrawSavingsTransfer(final SavingsAccount savingsAccount, final LocalDate transferDate) {
 
         AppUser user = getAppUserIfPresent();
+
+        System.err.println("--------------withdrawal savings transfer ---------");
 
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService
                 .isSavingsInterestPostingAtCurrentPeriodEnd();
@@ -820,7 +876,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         this.savingsAccountTransactionRepository.save(withdrawtransferTransaction);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
 
-        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds);
+        TransactionCode transactionCode = null ;
+
+        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
 
         return withdrawtransferTransaction;
     }
@@ -862,7 +920,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         this.savingsAccountTransactionRepository.save(acceptTransferTransaction);
         this.savingAccountRepositoryWrapper.saveAndFlush(savingsAccount);
 
-        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds);
+        final TransactionCode transactionCode = null ;
+
+        postJournalEntries(savingsAccount, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
 
         return acceptTransferTransaction;
     }
@@ -1027,7 +1087,10 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
 
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+        TransactionCode transactionCode= null;
+
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
+
         return new CommandProcessingResultBuilder() //
                 .withEntityId(savingsAccountChargeId) //
                 .withOfficeId(account.officeId()) //
@@ -1160,7 +1223,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
 
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+        TransactionCode transactionCode = null;
+
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
     }
 
     private void updateExistingTransactionsDetails(SavingsAccount account, Set<Long> existingTransactionIds,
@@ -1170,13 +1235,21 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     }
 
     private void postJournalEntries(final SavingsAccount savingsAccount, final Set<Long> existingTransactionIds,
-            final Set<Long> existingReversedTransactionIds) {
+            final Set<Long> existingReversedTransactionIds ,TransactionCode transactionCode) {
+
+
+        System.err.println("-------------------post journal entries without transactionCode --------");
 
         final MonetaryCurrency currency = savingsAccount.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(currency);
         boolean isAccountTransfer = false;
+
+        /**
+         * Added 27/09/2022 at 0505
+         * Functionality to be implemented later
+         */
         final Map<String, Object> accountingBridgeData = savingsAccount.deriveAccountingBridgeData(applicationCurrency.toData(),
-                existingTransactionIds, existingReversedTransactionIds, isAccountTransfer);
+                existingTransactionIds, existingReversedTransactionIds, isAccountTransfer,transactionCode);
         this.journalEntryWritePlatformService.createJournalEntriesForSavings(accountingBridgeData);
     }
 
@@ -1350,7 +1423,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         updateExistingTransactionsDetails(account, existingTransactionIds, existingReversedTransactionIds);
         account.setSubStatusInactive(appuserRepository.fetchSystemUser());
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+
+        TransactionCode transactionCode =null;
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds,transactionCode);
     }
 
     @Override
@@ -1370,7 +1445,10 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         updateExistingTransactionsDetails(account, existingTransactionIds, existingReversedTransactionIds);
         account.escheat(appuserRepository.fetchSystemUser());
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
-        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds);
+
+        TransactionCode transactionCode =null;
+
+        postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds,transactionCode);
     }
 
     private AppUser getAppUserIfPresent() {

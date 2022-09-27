@@ -21,6 +21,7 @@ package org.apache.fineract.portfolio.savings.domain;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.joda.time.LocalDate;
@@ -29,7 +30,7 @@ import org.joda.time.format.DateTimeFormatter;
 public interface SavingsAccountDomainService {
 
     SavingsAccountTransaction handleWithdrawal(SavingsAccount account, DateTimeFormatter fmt, LocalDate transactionDate,
-            BigDecimal transactionAmount, PaymentDetail paymentDetail, SavingsTransactionBooleanValues transactionBooleanValues);
+            BigDecimal transactionAmount, PaymentDetail paymentDetail, SavingsTransactionBooleanValues transactionBooleanValues,TransactionCode transactionCode);
 
     SavingsAccountTransaction handleDeposit(SavingsAccount account, DateTimeFormatter fmt, LocalDate transactionDate,
             BigDecimal transactionAmount, PaymentDetail paymentDetail, boolean isAccountTransfer, boolean isRegularTransaction);
@@ -38,7 +39,6 @@ public interface SavingsAccountDomainService {
     // Added 22/07/2021
     SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount);
    
-
     void postJournalEntries(SavingsAccount savingsAccount, Set<Long> existingTransactionIds, Set<Long> existingReversedTransactionIds);
 
     SavingsAccountTransaction handleDividendPayout(SavingsAccount account, LocalDate transactionDate, BigDecimal transactionAmount);
@@ -52,6 +52,12 @@ public interface SavingsAccountDomainService {
 
      // Added 02/08/2021
     SavingsAccountTransaction handleWithdrawalLite(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+
+    /**
+     * Added 24/09/2022 at 0037
+     */ 
+    SavingsAccountTransaction handleDeposit(SavingsAccount account, DateTimeFormatter fmt, LocalDate transactionDate,
+            BigDecimal transactionAmount, PaymentDetail paymentDetail, boolean isAccountTransfer, boolean isRegularTransaction ,TransactionCode transactionCode);
 
    
    

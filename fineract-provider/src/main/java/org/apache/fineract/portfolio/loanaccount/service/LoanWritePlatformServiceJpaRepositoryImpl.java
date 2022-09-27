@@ -2979,6 +2979,43 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         return new CommandProcessingResultBuilder().withLoanId(loanId).build();
     }
 
+
+    /**
+     * Added 20/09/2022 at 2147
+     */ 
+    @Override
+    public CommandProcessingResult errorCorrection(final Long loanId){
+
+        final Loan loan = this.loanAssembler.assembleFrom(loanId);
+        final AppUser currentUser = getAppUserIfPresent();
+
+        List existingTransactionIds = new ArrayList(loan.findExistingTransactionIds());
+        List existingReversedTransactionIds = new ArrayList(loan.findExistingReversedTransactionIds());
+
+        LocalDate recalculateFrom = null;
+        
+        final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom);
+
+        System.err.println("----------------recalculate loan accruals now --------");
+        ChangedTransactionDetail changedTransactionDetail = loan.recalculateScheduleFromLastTransaction(scheduleGeneratorDTO,
+                existingTransactionIds, existingReversedTransactionIds, currentUser);
+
+        int count = 0 ;
+        if (changedTransactionDetail != null) {
+            for (final Map.Entry<Long, LoanTransaction> mapEntry : changedTransactionDetail.getNewTransactionMappings().entrySet()) {
+                System.err.println("-----------------------------count is "+count);
+                this.loanTransactionRepository.save(mapEntry.getValue());
+                this.accountTransfersWritePlatformService.updateLoanTransaction(mapEntry.getKey(), mapEntry.getValue());
+                ++count ;
+            }
+        }
+
+        this.loanAccountDomainService.recalculateAccruals(loan);
+        return new CommandProcessingResultBuilder().withLoanId(loanId).build();
+    }
+
+
+
     private void updateLoanTransaction(final Long loanTransactionId, final LoanTransaction newLoanTransaction) {
         final AccountTransferTransaction transferTransaction = this.accountTransferRepository.findByToLoanTransactionId(loanTransactionId);
         if (transferTransaction != null) {

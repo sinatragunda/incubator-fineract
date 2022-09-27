@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -154,6 +155,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         Long transactionId = null ;
         Long subEntityId = null ;
         Long shareAccountTransactionId = null ;
+        final TransactionCode transactionCode = null ;
 
         if (isSavingsToSavingsAccountTransfer(fromAccountType, toAccountType)) {
 
@@ -170,7 +172,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
 
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
-                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
+                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues ,transactionCode);
 
             //System.err.println("-------------withdrawal id us  ------------------"+withdrawal.getId());
 
@@ -205,7 +207,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
                     isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
-                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
+                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues,transactionCode);
 
             // how do we set it now
 
@@ -268,7 +270,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                     isRegularTransaction, fromSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
 
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount, fmt,
-                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues);
+                    transactionDate, transactionAmount, paymentDetail, transactionBooleanValues ,transactionCode);
 
             Note savingsNote = Note.savingsTransactionNote(fromSavingsAccount ,withdrawal ,note);
 
@@ -293,9 +295,6 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             subEntityId = withdrawal.getId();
 
             //System.err.println("------------savings account id ----"+fromSavingsAccountId+"--savings transaction id is -------------"+subEntityId);
-
-            // get some
-
         }
 
         final CommandProcessingResultBuilder builder = new CommandProcessingResultBuilder().withEntityId(transferDetailId);
@@ -406,6 +405,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         Long transferTransactionId = null;
         final boolean isAccountTransfer = true;
         final boolean isRegularTransaction = accountTransferDTO.isRegularTransaction();
+        final TransactionCode transactionCode = null ;
         
         AccountTransferDetails accountTransferDetails = accountTransferDTO.getAccountTransferDetails();
         
@@ -445,7 +445,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues);
+                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues ,transactionCode);
 
 
             System.err.println("-----------------handle withdrawal of funds now son ,done --------------");
@@ -518,7 +518,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues);
+                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues ,transactionCode);
 
             ShareAccountTransaction shareAccountTransaction = null;
 
@@ -567,7 +567,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
             final SavingsAccountTransaction withdrawal = this.savingsAccountDomainService.handleWithdrawal(fromSavingsAccount,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),
-                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues);
+                    accountTransferDTO.getPaymentDetail(), transactionBooleanValues ,transactionCode);
 
             final SavingsAccountTransaction deposit = this.savingsAccountDomainService.handleDeposit(toSavingsAccount,
                     accountTransferDTO.getFmt(), accountTransferDTO.getTransactionDate(), accountTransferDTO.getTransactionAmount(),

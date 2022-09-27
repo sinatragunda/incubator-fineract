@@ -200,5 +200,12 @@ public class SavingsApiConstants {
     public static final String paymentTypeIdParam ="paymentTypeId";
 
 
+    /**
+     * Added 24/09/2022 at 0029
+     */
+    public static final String transactionCodeIdParam ="transactionCodeId";
+
+
+
 
 }

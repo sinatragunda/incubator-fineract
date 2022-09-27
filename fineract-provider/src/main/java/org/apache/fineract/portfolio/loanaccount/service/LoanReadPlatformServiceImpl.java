@@ -1691,8 +1691,6 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         paramMap.put("type", AccountingRuleType.ACCRUAL_PERIODIC.getValue());
         paramMap.put("organisationstartdate", formatter.print(new LocalDate(organisationStartDate)));
 
-        System.err.println("-------------------organisation date -----------------"+formatter.print(new LocalDate(organisationStartDate)));
-        
         return this.namedParameterJdbcTemplate.query(sqlBuilder.toString(), paramMap, mapper);       
     }
 

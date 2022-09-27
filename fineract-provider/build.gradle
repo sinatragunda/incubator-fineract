@@ -36,6 +36,8 @@ buildscript {
      classpath 'org.apache.openjpa:openjpa-all:2.4.1'
      classpath 'at.schmutterer.oss.gradle:gradle-openjpa:0.2.0'
      classpath 'gradle.plugin.org.nosphere.apache:creadur-rat-gradle:0.2.2'
+     classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+  
   }
 }
 
@@ -567,11 +569,13 @@ springBoot {
     mainClass = 'org.apache.fineract.ServerWithMariaDB4jApplication'
 }
 
+
 task deploy (dependsOn: war){
     def CATALINA_HOME = System.env.CATALINA_HOME
     doLast{
         println "Deploying war to tomcat."
         println "Deleting old war file.."
+        println CATALINA_HOME
         try {
             delete "${CATALINA_HOME}/webapps/fineract-provider.war"
             delete "${CATALINA_HOME}/webapps/fineract-provider"

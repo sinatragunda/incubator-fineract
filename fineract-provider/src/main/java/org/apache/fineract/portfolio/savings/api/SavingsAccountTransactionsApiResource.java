@@ -125,9 +125,7 @@ public class SavingsAccountTransactionsApiResource {
         
         // if savingsId is null or 0 then lets look for its corresponding account 
         boolean isSavingsIdSpecified = ComparatorUtility.areObjectsEqual(0L ,savingsId);
-
-        System.err.println("-------------------------------is savings account specified ----------"+isSavingsIdSpecified);
-
+        
         if(!isSavingsIdSpecified){
             SavingsAccountTransaction savingsAccountTransaction = savingsAccountTransactionRepository.findOne(transactionId);
             savingsId = savingsAccountTransaction.getSavingsAccount().getId();

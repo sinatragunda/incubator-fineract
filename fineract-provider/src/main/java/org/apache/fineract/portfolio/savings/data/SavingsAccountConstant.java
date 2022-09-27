@@ -42,7 +42,7 @@ public class SavingsAccountConstant extends SavingsApiConstants {
 			withdrawalFeeForTransfersParamName, feeAmountParamName, feeOnMonthDayParamName, chargesParamName,
 			allowOverdraftParamName, overdraftLimitParamName, minRequiredBalanceParamName,
 			enforceMinRequiredBalanceParamName, nominalAnnualInterestRateOverdraftParamName,
-			minOverdraftForInterestCalculationParamName, withHoldTaxParamName, datatables));
+			minOverdraftForInterestCalculationParamName, withHoldTaxParamName, datatables ,transactionCodeIdParam));
 
 	/**
 	 * These parameters will match the class level parameters of
@@ -53,7 +53,7 @@ public class SavingsAccountConstant extends SavingsApiConstants {
 	protected static final Set<String> SAVINGS_ACCOUNT_TRANSACTION_REQUEST_DATA_PARAMETERS = new HashSet<>(
 			Arrays.asList(localeParamName, dateFormatParamName, transactionDateParamName, transactionAmountParamName,
 					paymentTypeIdParamName, transactionAccountNumberParamName, checkNumberParamName,
-					routingCodeParamName, receiptNumberParamName, bankNumberParamName, noteParamName ,clientExternalIdParam ,idParamName ,"accountNoId" ,"equityBalance" ,"savingsProductId"));
+					routingCodeParamName, receiptNumberParamName, bankNumberParamName, noteParamName ,clientExternalIdParam ,idParamName ,"accountNoId" ,"equityBalance" ,"savingsProductId" ,transactionCodeIdParam));
 
 	protected static final Set<String> SAVINGS_ACCOUNT_TRANSACTION_RESPONSE_DATA_PARAMETERS = new HashSet<>(
 			Arrays.asList(idParamName, accountNoParamName));
