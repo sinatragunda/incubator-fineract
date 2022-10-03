@@ -71,7 +71,7 @@ public class CommissionChargeApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(CommissionChargeApiConstants.resourceNameForPermissions);
 
-        System.err.println("------------------template for commmissions----------------");
+        //System.err.println("------------------template for commmissions----------------");
 
         final CommissionChargeData commissionChargeData = this.readPlatformService.retrieveNewCommissionChargeTemplate();
 
@@ -85,9 +85,6 @@ public class CommissionChargeApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createCommissionCharge(final String apiRequestBodyAsJson) {
 
-        System.err.println("------------------some authentication should be valid here ------------------");
-
-        System.err.println("--------------------create commission charge here now ---------------------"+apiRequestBodyAsJson);
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createCommissionCharge().withJson(apiRequestBodyAsJson).build();
 

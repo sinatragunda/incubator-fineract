@@ -114,7 +114,7 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         String payload = JsonHelper.serializeMapToJson(jsonMap);
 
-        System.err.println("-------------------------------payload is -------------------"+payload);
+        //System.err.println("-------------------------------payload is -------------------"+payload);
 
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
 

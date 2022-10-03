@@ -124,15 +124,15 @@ public class EventMailListWritePlatformServiceImpl implements EventMailListWrite
 
         final NOTIFICATION_BROADCAST_TYPE notificationBroadcastType = NOTIFICATION_BROADCAST_TYPE.fromInt(notificationBroadcastTypeInt);
 
-        System.err.println("-------------------------------------notificationBroadcast type is -------------"+notificationBroadcastType);
+        //System.err.println("-------------------------------------notificationBroadcast type is -------------"+notificationBroadcastType);
 
-        System.err.println("------------------is office there "+Optional.ofNullable(office[0]).isPresent());
+        //System.err.println("------------------is office there "+Optional.ofNullable(office[0]).isPresent());
 
-        System.err.println("------------------is name there "+Optional.ofNullable(name).isPresent());
+        //System.err.println("------------------is name there "+Optional.ofNullable(name).isPresent());
 
-        System.err.println("------------------is businessEvent there "+Optional.ofNullable(businessEvents).isPresent());
+        //System.err.println("------------------is businessEvent there "+Optional.ofNullable(businessEvents).isPresent());
 
-        System.err.println("------------------is message there  "+Optional.ofNullable(message).isPresent());
+        //System.err.println("------------------is message there  "+Optional.ofNullable(message).isPresent());
 
         final EventSubscription eventSubscription = new EventSubscription(name, businessEvents, notificationBroadcastType, office[0], message);
 

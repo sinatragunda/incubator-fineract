@@ -469,7 +469,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds);
 
             // added 07/01/2022 ,apply commission charging here .Since we have dibursed amount here why not use it ?
-            System.err.println("---------------------disbursement time commission charge -------------------");
+            //System.err.println("---------------------disbursement time commission charge -------------------");
             CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan , ChargeTimeType.DISBURSEMENT);
 
         }

@@ -46,7 +46,7 @@ public class CashBasedAccountingProcessorForSavings implements AccountingProcess
     @Override
     public void createJournalEntriesForSavings(final SavingsDTO savingsDTO) {
 
-        System.err.println("--------------------accounting processor for savings class -----");
+        //System.err.println("--------------------accounting processor for savings class -----");
 
         final GLClosure latestGLClosure = this.helper.getLatestClosureByBranch(savingsDTO.getOfficeId());
         final Long savingsProductId = savingsDTO.getSavingsProductId();

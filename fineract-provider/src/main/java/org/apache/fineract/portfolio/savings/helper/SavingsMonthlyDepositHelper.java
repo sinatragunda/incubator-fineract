@@ -93,7 +93,7 @@ public class SavingsMonthlyDepositHelper{
 
 		BigDecimal openingBalance = SavingsAccountTransactionHelper.openingBalanceAtSpecificDate(savingsAccount , startDate);
 
-		System.err.println("--------------------opening balance this month is ,before deductions-----------"+openingBalance);
+		//System.err.println("--------------------opening balance this month is ,before deductions-----------"+openingBalance);
 
 		// if(isDeposit){
 		// 	openingBalance = openingBalance.subtract(amount);
@@ -102,7 +102,7 @@ public class SavingsMonthlyDepositHelper{
 		// 	openingBalance = openingBalance.add(amount);
 		// }
 
-		System.err.println("--------------startDate in SavingsMonthlyDepositHelper is --------------"+startDate);
+		//System.err.println("--------------startDate in SavingsMonthlyDepositHelper is --------------"+startDate);
 
 		savingsAccountMonthlyDeposit = new SavingsAccountMonthlyDeposit(id ,startDate ,amount ,isDeposit ,openingBalance);
 		

@@ -757,10 +757,20 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 		return this.daysToEscheat;
 	}
 
-	// Added 18/12/2021
+	/**
+     *  Added 18/12/2021
+     */ 
     public Product getProduct(){
         return this.product;
     }
+
+    /**
+     * Added 03/10/2022 at 0850 
+     * Added so that it becomes self explanatory that we intend to get an object that has product settings
+     */
+    public Product productSettings(){
+        return this.product ;
+    }  
 
     /**
      * Added 09/05/2022

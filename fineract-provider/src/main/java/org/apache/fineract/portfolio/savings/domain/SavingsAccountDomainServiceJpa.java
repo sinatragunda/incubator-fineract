@@ -201,7 +201,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction) {
         
-        System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
+        //System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
 
         final TransactionCode transactionCode = null;
         final SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
@@ -291,7 +291,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType,final TransactionCode transactionCode) {
         
-        System.err.println("---------private function to handle deposit----------------");
+        //System.err.println("---------private function to handle deposit----------------");
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -336,7 +336,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,true);
 
-        System.err.println("--------------transaction code is not inserted anywhere ---------"+Optional.ofNullable(transactionCode).isPresent());
+        //System.err.println("--------------transaction code is not inserted anywhere ---------"+Optional.ofNullable(transactionCode).isPresent());
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer ,transactionCode);
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_DEPOSIT,
@@ -380,7 +380,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 existingTransactionIds, existingReversedTransactionIds, isAccountTransfer,transactionCode
                 );
 
-        System.err.println("---------------data with account bridge --------------------");
+        //System.err.println("---------------data with account bridge --------------------");
         this.journalEntryWritePlatformService.createJournalEntriesForSavings(accountingBridgeData);
     }
 

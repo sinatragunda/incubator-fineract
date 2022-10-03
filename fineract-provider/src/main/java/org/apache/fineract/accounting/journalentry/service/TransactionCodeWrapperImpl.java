@@ -7,6 +7,7 @@
 package org.apache.fineract.accounting.journalentry.service;
 
 import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
+import org.apache.fineract.accounting.journalentry.exception.TransactionCodeDuplicateException;
 import org.apache.fineract.accounting.journalentry.exception.TransactionCodeNotFoundException;
 import org.apache.fineract.accounting.journalentry.repo.TransactionCodeRepository;
 
@@ -38,8 +39,16 @@ public class TransactionCodeWrapperImpl implements TransactionCodeWrapper {
 
     @Override
     public Long save(TransactionCode transactionCode){
-        transactionCodeRepository.save(transactionCode);
-        Long id = transactionCode.getId();
+
+        Long id = null ;
+        try{
+            transactionCodeRepository.save(transactionCode);
+            id = transactionCode.getId();
+        }
+        catch (RuntimeException r){
+            Long code = transactionCode.getCode();
+            throw new TransactionCodeDuplicateException(code);
+        }
         return id ;
     }
 }

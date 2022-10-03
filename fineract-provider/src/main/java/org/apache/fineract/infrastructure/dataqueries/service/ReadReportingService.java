@@ -77,4 +77,10 @@ public interface ReadReportingService {
 
     ReportData retrieveReport(final String reportName);
 
+    /**
+     * Added 01/10/2022 at 0718
+     */
+    GenericResultsetData retrieveGenericResultset(String sql);
+ 
+
 }

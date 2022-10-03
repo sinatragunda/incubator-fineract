@@ -585,7 +585,7 @@ public class AccountingProcessorHelper {
          * Need to add functionality for transaction code 
          */
 
-        System.err.println("---------------------creating journal entries for savings now son ,possibly last function now  -----------");
+        //System.err.println("---------------------creating journal entries for savings now son ,possibly last function now  -----------");
 
         GLAccount debitAccount[]= {null};
         GLAccount creditAccount[] = {null};
@@ -597,13 +597,13 @@ public class AccountingProcessorHelper {
          */
         if(isTransactionCodePresent){
 
-            System.err.println("----------------------transactioncodes being used are custom -----------");
+            //System.err.println("----------------------transactioncodes being used are custom -----------");
 
             debitAccount[0] = transactionCode.getDebitAccount();
             creditAccount[0]= transactionCode.getCreditAccount();
 
-            System.err.println("---------------debit account is "+debitAccount[0].getName());
-            System.err.println("--------------credit account is "+creditAccount[0].getName());
+            //System.err.println("---------------debit account is "+debitAccount[0].getName());
+            //System.err.println("--------------credit account is "+creditAccount[0].getName());
         }
         else{
             debitAccount[0] = getLinkedGLAccountForSavingsProduct(savingsProductId, accountTypeToDebitId, paymentTypeId);

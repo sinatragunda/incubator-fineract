@@ -300,7 +300,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         TransactionCode transactionCode = transactionCode(command);
 
-        System.err.println("-----------depositing with transaction code now ? "+Optional.ofNullable(transactionCode).isPresent());
+        //System.err.println("-----------depositing with transaction code now ? "+Optional.ofNullable(transactionCode).isPresent());
 
         if(isZero){
             return null ;

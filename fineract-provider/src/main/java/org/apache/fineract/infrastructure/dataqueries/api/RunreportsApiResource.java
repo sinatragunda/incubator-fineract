@@ -241,6 +241,7 @@ public class RunreportsApiResource {
             }
 
             return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
+
         }
 
         // CSV Export

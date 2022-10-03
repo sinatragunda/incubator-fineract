@@ -81,6 +81,7 @@ import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFou
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
@@ -1071,7 +1072,17 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         validateActivityNotBeforeClientOrGroupTransferDate(SavingsEvent.SAVINGS_WITHDRAWAL, transactionDTO.getTransactionDate());
 
-        final Money transactionAmountMoney = Money.of(this.currency, transactionDTO.getTransactionAmount());
+        /**
+         * Added 03/10/2022 at 0817
+         * To get savings product then check setting deduct on balance .
+         * If set to true the charge amount will be deducted on account balance else will be deducted on transaction amount 
+         * Charge is not paid yet at this point but only recognised 
+         */ 
+        
+        BigDecimal transactionAmount = chargesDeductionCriteria(transactionDTO ,applyWithdrawFee);
+        
+        final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
+        
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
                 transactionDTO.getCreatedDate(), transactionDTO.getAppUser());
@@ -1079,7 +1090,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
+            payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser(),false);
         }
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
         		|| this.sub_status.equals(SavingsAccountSubStatusEnum.DORMANT.getValue())){
@@ -1087,12 +1098,69 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
         return transaction;
     }
+    /**
+     * Added 03/10/2022 at 0822 
+     * Get total charge amount and deduct it on transaction amount only if deductOnBalance is set to false in product settings 
+     */
+     private BigDecimal chargesDeductionCriteria(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean applyWithdrawFee){
+        
+        Product productSettings = product.productSettings();
+        boolean deductOnAccountBalance = productSettings.isDeductChargesOnAccountBalance();
 
-    private void payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
+        /**
+         * If false means charges to be deducted on transaction amount ,hence we calculate them from the charge amount 
+         * Then deduct in advance (only hold ) but not pay 
+         */ 
+        BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
+
+        System.err.println("--------------initial amount is ------------"+transactionAmount);
+
+        boolean gate = !deductOnAccountBalance && applyWithdrawFee;
+
+        System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
+
+         /**
+          * Gate of !deductOnAccountBalance and applyWithdrawFee
+          *
+          */
+         if(!deductOnAccountBalance && applyWithdrawFee ){
+            BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
+            transactionAmount = transactionAmount.subtract(totalCharges);
+
+            System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
+        } 
+
+        return transactionAmount;
+     } 
+
+     /**
+      * Added 03/10/2022 at 0829 
+      * Modified overloaded version of paywithdrawal feel that just takes two params
+      */
+
+     private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
+           final BigDecimal transactionAmount = savingsTransactionsDTO.getTransactionAmount();
+           final LocalDate transactionDate = savingsTransactionDTO.getTransactionDate(); 
+           final AppUser appUser = savingsTransactionDTO.getAppUser();
+
+           return payWithdrawalFee(transactionAmount ,transactionDate ,appUser,withholdPayingCharges);
+     }  
+
+
+    /**
+     * Modified 03/10/2022 at 0811 
+     * Added bool setting witholdPaying 
+     * This option makes it possible for the function to only calculate amount payable on charges only instead of then paying it 
+     * Like a Loan Calculator but for charges 
+     */ 
+
+    private BigDecimal payWithdrawalFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user ,boolean withholdPayingCharges) {
 
         System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
 
         System.err.println("------------------why there arent any charges in this "+this.charges.size());
+
+        BigDecimal totalCharges = BigDecimal.ZERO ;
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
             
@@ -1101,10 +1169,18 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             if (charge.isWithdrawalFee() && charge.isActive()) {
                 System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
 
-                charge.updateWithdralFeeAmount(transactionAmoount);
+                BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
+
+                if(withholdPayingCharges){
+                    totalCharges =  totalCharges.add(chargeAmount);
+                    continue;
+                }
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
+        System.err.println("----------------------total charges amount is -----"+totalCharges);
+
+        return totalCharges;
     }
 
     public boolean isBeforeLastPostingPeriod(final LocalDate transactionDate) {
@@ -2734,8 +2810,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         this.charges = charges();
 
         Set<Charge> savingsProductCharges  = Optional.ofNullable(product.getCharges()).orElse(new HashSet<Charge>());
-
-        //System.err.println("--------------current account charges not tracking arre "+this.charges.size());
 
         /**
          * Added 05/09/2022 at 1046

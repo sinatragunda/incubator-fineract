@@ -559,7 +559,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
     private void postJournalEntries(final Loan loan, final List<Long> existingTransactionIds,
             final List<Long> existingReversedTransactionIds) {
 
-        System.err.println("----------------post journal entry--------------------");
+        //System.err.println("----------------post journal entry--------------------");
 
         final MonetaryCurrency currency = loan.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepository.findOneWithNotFoundDetection(currency);

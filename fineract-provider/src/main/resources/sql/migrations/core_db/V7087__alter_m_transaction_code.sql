@@ -16,10 +16,8 @@
 -- specific language governing permissions and limitations
 -- under the License.
 
--- Created 07/09/2022 at 0210 
--- should be altered to deduct charges on account balance so that is it self explanatory
+-- Created 27/09/2022 at 1148
 
-ALTER TABLE `m_product` ADD COLUMN `deduct_charges_on_balance` SMALLINT(5) null default '1' ;
-
+ALTER TABLE `m_transaction_code` ADD CONSTRAINT UNIQUE(`name`,`code`);
 
 

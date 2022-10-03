@@ -199,7 +199,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         } else if (isSavingsToLoanAccountTransfer(fromAccountType, toAccountType)) {
             // usually when we paying charges right ?
 
-            System.err.println("------------------------is this a charge repayment transaction ? ---------------");
+            //System.err.println("------------------------is this a charge repayment transaction ? ---------------");
 
             fromSavingsAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
             final SavingsAccount fromSavingsAccount = this.savingsAccountAssembler.assembleFrom(fromSavingsAccountId);

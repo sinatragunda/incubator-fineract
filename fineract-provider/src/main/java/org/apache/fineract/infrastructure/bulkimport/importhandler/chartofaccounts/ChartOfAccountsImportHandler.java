@@ -135,11 +135,11 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
 
                 Optional.ofNullable(glAccount).ifPresent(e->{
 
-                    System.err.println("-------------gl account data to string ---------------"+glAccount);
+                    //System.err.println("-------------gl account data to string ---------------"+glAccount);
 
                     String payload = gsonBuilder.create().toJson(glAccount);
 
-                    System.err.println("---------------------payload is -------------------"+payload);
+                    //System.err.println("---------------------payload is -------------------"+payload);
 
 
                     final CommandWrapper commandRequest = new CommandWrapperBuilder() //

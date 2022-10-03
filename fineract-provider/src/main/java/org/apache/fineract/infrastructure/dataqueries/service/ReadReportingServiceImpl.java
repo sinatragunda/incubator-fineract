@@ -208,6 +208,22 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         return writer;
     }
 
+    /**
+     * Added 01/10/2022 at 0716
+     */
+
+    @Override
+    public GenericResultsetData retrieveGenericResultset(final String sql) {
+
+        final long startTime = System.currentTimeMillis();
+        final GenericResultsetData result = this.genericDataService.fillGenericResultSet(sql);
+
+        final long elapsed = System.currentTimeMillis() - startTime;
+        logger.info("Finishing query");
+        return result;
+    }
+  
+
     @Override
     public GenericResultsetData retrieveGenericResultset(final String name, final String type, final Map<String, String> queryParams) {
 

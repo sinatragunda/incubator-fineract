@@ -77,7 +77,7 @@ public class Product extends AbstractPersistableCustom<Long> {
      * If false charges are deducted on transaction amount 
      */
     @Column(name = "deduct_charges_on_balance" ,nullable =false)
-    private Boolean deductChargesOnBalance;
+    private Boolean deductChargesOnAccountBalance;
 
 
     protected Product(){}
@@ -87,7 +87,7 @@ public class Product extends AbstractPersistableCustom<Long> {
         this.productType = productType;
         this.productId = productId;
         this.active = active;
-        this.deductChargesOnBalance = deductChargesOnBalance;
+        this.deductChargesOnAccountBalance = deductChargesOnBalance;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -105,7 +105,7 @@ public class Product extends AbstractPersistableCustom<Long> {
         if (command.isChangeInBooleanParameterNamed(ProductConstants.deductChargesOnBalance, this.deductChargesOnBalance)) {
             final boolean newValue = command.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
             actualChanges.put(ProductConstants.deductChargesOnBalance, newValue);
-            this.deductChargesOnBalance = newValue;
+            this.deductChargesOnAccountBalance = newValue;
         }
 
         return actualChanges;
@@ -139,7 +139,7 @@ public class Product extends AbstractPersistableCustom<Long> {
         return active;
     }
 
-    public Boolean getDeductChargesOnBalance() {
-        return deductChargesOnBalance;
+    public Boolean isDeductChargesOnAccountBalance() {
+        return deductChargesOnAccountBalance;
     }
 }

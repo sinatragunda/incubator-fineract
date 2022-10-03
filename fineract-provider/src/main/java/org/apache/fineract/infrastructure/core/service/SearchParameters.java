@@ -194,6 +194,24 @@ public final class SearchParameters {
                 staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser);
     }
 
+    /**
+     * Added 29/09/2022 at 0814 
+     */
+    public static SearchParameters forShares(final String sqlSearch, final String externalId, final Integer offset, final Integer limit,
+            final String orderBy, final String sortOrder) {
+
+        final Integer maxLimitAllowed = getCheckedLimit(limit);
+        final Long staffId = null;
+        final String accountNo = null;
+        final Long loanId = null;
+        final Long shareId = null;
+        final Boolean orphansOnly = false;
+        final boolean isSelfUser = false;
+
+        return new SearchParameters(sqlSearch, null, externalId, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,
+                staffId, accountNo, loanId, shareId, orphansOnly, isSelfUser);
+    }  
+
     public static SearchParameters forAccountTransfer(final String sqlSearch, final String externalId, final Integer offset,
             final Integer limit, final String orderBy, final String sortOrder) {
 
