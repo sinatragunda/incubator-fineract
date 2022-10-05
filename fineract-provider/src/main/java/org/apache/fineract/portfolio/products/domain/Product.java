@@ -102,7 +102,7 @@ public class Product extends AbstractPersistableCustom<Long> {
             this.active = newValue;
         }
 
-        if (command.isChangeInBooleanParameterNamed(ProductConstants.deductChargesOnBalance, this.deductChargesOnBalance)) {
+        if (command.isChangeInBooleanParameterNamed(ProductConstants.deductChargesOnBalance, this.deductChargesOnAccountBalance)) {
             final boolean newValue = command.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
             actualChanges.put(ProductConstants.deductChargesOnBalance, newValue);
             this.deductChargesOnAccountBalance = newValue;

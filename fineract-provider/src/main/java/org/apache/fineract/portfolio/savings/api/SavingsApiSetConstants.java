@@ -51,7 +51,7 @@ public class SavingsApiSetConstants extends SavingsApiConstants {
 			"interestCalculationDaysInYearTypeOptions", "lockinPeriodFrequencyTypeOptions", "withdrawalFeeTypeOptions",
 			nominalAnnualInterestRateOverdraftParamName, minOverdraftForInterestCalculationParamName,
 			withHoldTaxParamName, taxGroupIdParamName, isDormancyTrackingActiveParamName, daysToInactiveParamName,
-			daysToDormancyParamName, daysToInactiveParamName ,portfolioBalanceParam));
+			daysToDormancyParamName, daysToInactiveParamName ,portfolioBalanceParam ,"productDataSettings"));
 
 	/**
 	 * These parameters will match the class level parameters of

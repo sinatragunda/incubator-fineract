@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.portfolio.products.data.ProductDataSettings;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.products.helper.ProductHelper;
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
@@ -80,7 +81,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             sql += " and sp.id in ( " + inClause + " ) ";
         }
 
-        Collection<SavingsProductData> savingsProductDataCollection = this.jdbcTemplate.query(sql, this.savingsProductRowMapper, new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+        Collection<SavingsProductData> savingsProductDataCollection = this.jdbcTemplate.query(sql, this.savingsProductRowMapper, new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue()});
 
         // Added 18/12/2021 execute it here
         savingsProductDataCollection.stream().forEach(e->{
@@ -94,7 +95,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     @Override
     public Collection<SavingsProductData> retrieveAllForLookup() {
 
-        String sql = "select " + this.savingsProductLookupsRowMapper.schema() + " where sp.deposit_type_enum = ? ";
+        String sql = "select " + this.savingsProductLookupsRowMapper.schema() + " where sp.deposit_type_enum = ?";
 
         // Check if branch specific products are enabled. If yes, fetch only
         // products mapped to current user's office
@@ -105,7 +106,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         }
 
         return this.jdbcTemplate.query(sql, this.savingsProductLookupsRowMapper,
-                new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+                new Object[] { DepositAccountType.SAVINGS_DEPOSIT.getValue()});
     }
 
     @Override
@@ -114,7 +115,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             this.context.authenticatedUser();
             final String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.id = ? and sp.deposit_type_enum = ?";
             return this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper, new Object[] { savingProductId,
-                    DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+                    DepositAccountType.SAVINGS_DEPOSIT.getValue()});
         } catch (final EmptyResultDataAccessException e) {
             throw new SavingsProductNotFoundException(savingProductId);
         }
@@ -127,7 +128,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             this.context.authenticatedUser();
             final String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.name = ? and sp.deposit_type_enum = ?";
             return this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper, new Object[] { savingProductName,
-                    DepositAccountType.SAVINGS_DEPOSIT.getValue() });
+                    DepositAccountType.SAVINGS_DEPOSIT.getValue()});
         } catch (final EmptyResultDataAccessException e) {
             throw new SavingsProductNotFoundException(savingProductName);
         }
@@ -162,6 +163,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             sqlBuilder.append("sp.min_balance_for_interest_calculation as minBalanceForInterestCalculation,");
             sqlBuilder.append("sp.accounting_type as accountingType, ");
             sqlBuilder.append("sp.withhold_tax as withHoldTax,");
+            sqlBuilder.append("mp.deduct_charges_on_balance as deductChargesOnBalance,");
+            
             sqlBuilder.append("tg.id as taxGroupId, tg.name as taxGroupName, ");
             sqlBuilder.append("sp.is_dormancy_tracking_active as isDormancyTrackingActive,");
             sqlBuilder.append("sp.days_to_inactive as daysToInactive,");
@@ -170,6 +173,17 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             sqlBuilder.append("from m_savings_product sp ");
             sqlBuilder.append("join m_currency curr on curr.code = sp.currency_code ");
             sqlBuilder.append("left join m_tax_group tg on tg.id = sp.tax_group_id  ");
+            /**
+             * Added 03/10/2022 at 0942 
+             */
+            sqlBuilder.append("left join m_product mp on mp.product_id = sp.id  "); 
+
+            /**
+             * Added 05/10/2022 at 1248
+             * Solving the problem of blank values for products created before m_product
+             * They have no records in this table ,will only begin to when updated etc
+             */
+             sqlBuilder.append("LEFT JOIN m_product mp1 ON mp1.product_type = 1 ");  
 
             this.schemaSql = sqlBuilder.toString();
         }
@@ -218,6 +232,10 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
 
             final BigDecimal minRequiredOpeningBalance = rs.getBigDecimal("minRequiredOpeningBalance");
 
+            final Boolean deductChargesOnBalance = rs.getBoolean("deductChargesOnBalance");
+
+            final ProductDataSettings productDataSettings = new ProductDataSettings(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance);
+
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockinPeriodFrequency");
             EnumOptionData lockinPeriodFrequencyType = null;
             final Integer lockinPeriodFrequencyTypeValue = JdbcSupport.getInteger(rs, "lockinPeriodFrequencyType");
@@ -253,7 +271,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
                     minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers,
                     accountingRuleType, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                     minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat);
+                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,productDataSettings);
         }
     }
 

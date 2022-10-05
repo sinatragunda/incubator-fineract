@@ -1018,7 +1018,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public SavingsAccountTransaction withdraw(final SavingsAccountTransactionDTO transactionDTO, final boolean applyWithdrawFee) {
 
-        //System.err.println("-------------------apply withdrawal fee now ? ---------");
+        System.err.println("-------------------apply withdrawal fee now ? ---------"+applyWithdrawFee);
 
         if (!isTransactionsAllowed()) {
 
@@ -1082,6 +1082,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         BigDecimal transactionAmount = chargesDeductionCriteria(transactionDTO ,applyWithdrawFee);
         
         final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
+
+        System.err.println("------------transaction amount is -----------"+transactionAmount);
         
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
@@ -1117,6 +1119,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         boolean gate = !deductOnAccountBalance && applyWithdrawFee;
 
+        System.err.println("----------------------deduct on chatrges ---------"+deductOnAccountBalance);
+
         System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
 
          /**
@@ -1139,7 +1143,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
       */
 
      private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
-           final BigDecimal transactionAmount = savingsTransactionsDTO.getTransactionAmount();
+           final BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
            final LocalDate transactionDate = savingsTransactionDTO.getTransactionDate(); 
            final AppUser appUser = savingsTransactionDTO.getAppUser();
 
