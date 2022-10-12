@@ -21,6 +21,9 @@ package org.apache.fineract.portfolio.charge.domain;
 import java.math.BigDecimal;
 import java.util.*;
 
+
+
+import javax.persistence.Transient;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -121,6 +124,12 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "transaction_code_id")
     private TransactionCode transactionCode;
+
+    /**
+     * Added 12/10/2022 at 1407
+     */
+    @Transient
+    private List<ChargeTier> chargeTierList;   
 
 
     public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup,final TransactionCode transactionCode) {
@@ -648,5 +657,14 @@ public class Charge extends AbstractPersistableCustom<Long> {
 
     public void setTaxGroup(TaxGroup taxGroup) {
         this.taxGroup = taxGroup;
+    }
+
+
+    public List<ChargeTier> getChargeTier(){
+        return this.chargeTierList;
+    }
+
+    public void setChargeTier(List<ChargeTier> chargeTierList){
+        this.chargeTierList = chargeTierList;
     }
 }

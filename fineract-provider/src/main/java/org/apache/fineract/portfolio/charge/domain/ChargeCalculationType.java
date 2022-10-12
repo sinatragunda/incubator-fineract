@@ -28,7 +28,13 @@ public enum ChargeCalculationType {
     PERCENT_OF_DISBURSEMENT_AMOUNT(5,"chargeCalculationType.percent.of.disbursement.amount"),
 
     // Added 04/01/2021
-    FLEXIBLE_AMOUNT(6,"Flexible");
+    FLEXIBLE_AMOUNT(6,"Flexible"),
+
+    /**
+     * Added 12/10/20220 aat 1403
+     */
+    BANDING("Banding"),
+    LEVEL("Levels");  
 
     private final Integer value;
     private final String code;

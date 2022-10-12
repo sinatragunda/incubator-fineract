@@ -88,6 +88,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     @Override
     @Cacheable(value = "charges", key = "T(org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil).getTenant().getTenantIdentifier().concat('ch')")
     public Collection<ChargeData> retrieveAllCharges() {
+        
         final ChargeMapper rm = new ChargeMapper();
 
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false ";
@@ -96,7 +97,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         sql += " order by c.name ";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] {});
+        Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {});
+
+        return attachChargeTierStream(charges);
     }
 
     @Override
@@ -109,7 +112,10 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         sql += " order by c.name ";
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] {currencyCode});
+        Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {currencyCode});
+        
+        return attachChargeTierStream(charges);
+
     }
 
     @Override
@@ -122,7 +128,13 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
             sql = sql + " ;" ;
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { chargeId });
+            
+            ChargeData chargeData = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { chargeId });
+            
+            attachChargeTierData(chargeData);
+
+            return chargeData;
+
         } catch (final EmptyResultDataAccessException e) {
             throw new ChargeNotFoundException(chargeId);
         }
@@ -168,7 +180,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId });
+        Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId });
+
+        return attachChargeTierStream(charges);
     }
 
     @Override
@@ -180,7 +194,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 + " where c.is_deleted=false and c.is_active=true and plc.product_loan_id=? and c.charge_time_enum=? ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
-        return this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId, chargeTime.getValue() });
+        Collection<ChargeData> charges= this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId, chargeTime.getValue() });
+
+        return attachChargeTierStream(charges);
     }
 
     @Override
@@ -192,7 +208,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
 
-        return this.jdbcTemplate.query(sql, rm, params);
+        Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, params);
+
+        return attachChargeTierStream(charges);
     }
 
     @Override
@@ -207,8 +225,42 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 + " and c.is_deleted=false and c.is_active=true and c.charge_applies_to_enum=:chargeAppliesTo" + excludeClause + " ";
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
         sql += " order by c.name ";
-        return this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
+
+        Collection<ChargeData> charges = this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
+
+        return attachChargeTierStream(charges);
     }
+
+    /**
+     * Aded 12/10/2022 at 1440
+     * Link charge tier to Charge record
+     */
+
+    private Collection<ChargeData> attacheChargeTierStream(Collection<ChargeData> collection){
+
+        Consumer<ChargeData> attacheChargeTierConsumer = (e)-> attachChargeTierData(e); 
+        collection.stream().forEach(attachChargeTierConsumer);
+
+    }
+
+    private void attachChargeTierData(ChargeData chargeData){
+
+            Long chargeId = chargeData.getId();
+
+            ChargeTierMapper mapper = new ChargeTierMapper();
+
+            String sql = mapper.getChargeTierSchema();
+
+            Object param = new Object[]{chargeId};
+            
+            try{
+                ChargeTierData chargeTierData =  this.jdbcTemplate.query(sql ,mapper ,param);
+                chargeData.setChargeTierData(new Array.asList(chargeTierData));
+            }
+            catch(EmptyResultDataAccessException n){
+
+            }
+     }
 
     /**
      * @param excludeChargeTimes
@@ -272,6 +324,32 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         return sql;
     }
 
+    /**
+     * Added 12/10/2022 at 1432
+     * Retrieve all tier charges linked to a charge id 
+     */
+
+    private static final class ChargeTierMapper implements RowMapper<ChargeData> {
+
+
+        public String chargeTierSchema() {
+            return " ct.id as id, c.amount as amount, c.upper_limit as limit , c.id as chargeId "
+                    + " from m_charge_tier ct ";
+                    + " left join m_charge c on c.id = ct.charge_id where c.id = ?"                  
+        }
+
+        @Override
+        public ChargeTierData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+            final Long id = rs.getLong("id");
+            final BigDecimal limit = rs.getString("limit");
+            final BigDecimal amount = rs.getBigDecimal("amount");
+            final Long chargeId = rs.getLong("chargeId");
+
+            return new ChargeTierData(chargeId ,id ,amount ,limit);
+        }
+    }
+
+         
     private static final class ChargeMapper implements RowMapper<ChargeData> {
 
         public String chargeSchema() {
@@ -280,7 +358,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                     + "c.charge_payment_mode_enum as chargePaymentMode, "
                     + "tc.code as transactionCode ,"
                     + "tc.name as transactionCodeName ,"
-                    +" tc.id as transactionCodeId ,"
+                    + " tc.id as transactionCodeId ,"
                     + "c.charge_calculation_enum as chargeCalculation, c.is_penalty as penalty, "
                     + "c.is_active as active, oc.name as currencyName, oc.decimal_places as currencyDecimalPlaces, "
                     + "oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, "
@@ -373,6 +451,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             Optional.ofNullable(transactionCodeId).ifPresent(e->{
                 transactionCodeData[0] = transactionCodeReadPlatformService.retrieveOne(transactionCodeId);
             });
+
 
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
                     chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, glAccountData,
