@@ -2,6 +2,10 @@
  * Added 12/10/2022 at 1414
  */ 
 
+package org.apache.fineract.portfolio.charge.domain;
+
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.portfolio.charge.domain.Charge;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -19,8 +23,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name ="m_charge_tier")
-public class ChargeTier extends AbstractCustomPersistence<Long>{
-
+public class ChargeTier extends AbstractPersistableCustom<Long> {
 
 	@Column(name="amount")
 	private BigDecimal amount ;
@@ -42,6 +45,28 @@ public class ChargeTier extends AbstractCustomPersistence<Long>{
 		this.upperLimit = upperLimit;
 	}
 
+	public BigDecimal getAmount() {
+		return amount;
+	}
 
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	public BigDecimal getUpperLimit() {
+		return upperLimit;
+	}
+
+	public void setUpperLimit(BigDecimal upperLimit) {
+		this.upperLimit = upperLimit;
+	}
+
+	public Charge getCharge() {
+		return charge;
+	}
+
+	public void setCharge(Charge charge) {
+		this.charge = charge;
+	}
 }
 

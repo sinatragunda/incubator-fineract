@@ -19,9 +19,11 @@
 package org.apache.fineract.portfolio.charge.service;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Consumer;
 
 import org.apache.fineract.accounting.common.AccountingDropdownReadPlatformService;
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
@@ -35,6 +37,7 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
@@ -236,9 +239,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
      * Link charge tier to Charge record
      */
 
-    private Collection<ChargeData> attacheChargeTierStream(Collection<ChargeData> collection){
+    private Collection<ChargeData> attachChargeTierStream(Collection<ChargeData> collection){
 
-        Consumer<ChargeData> attacheChargeTierConsumer = (e)-> attachChargeTierData(e); 
+        Consumer<ChargeData> attachChargeTierConsumer = (e)-> attachChargeTierData(e);
         collection.stream().forEach(attachChargeTierConsumer);
 
     }
@@ -249,16 +252,15 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
             ChargeTierMapper mapper = new ChargeTierMapper();
 
-            String sql = mapper.getChargeTierSchema();
+            String sql = mapper.chargeTierSchema();
 
             Object param = new Object[]{chargeId};
             
             try{
                 ChargeTierData chargeTierData =  this.jdbcTemplate.query(sql ,mapper ,param);
-                chargeData.setChargeTierData(new Array.asList(chargeTierData));
+                chargeData.setChargeTierData(Arrays.asList(chargeTierData));
             }
             catch(EmptyResultDataAccessException n){
-
             }
      }
 
@@ -334,14 +336,14 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         public String chargeTierSchema() {
             return " ct.id as id, c.amount as amount, c.upper_limit as limit , c.id as chargeId "
-                    + " from m_charge_tier ct ";
-                    + " left join m_charge c on c.id = ct.charge_id where c.id = ?"                  
+                    + " from m_charge_tier ct "
+                    + " left join m_charge c on c.id = ct.charge_id where c.id = ?";
         }
 
         @Override
         public ChargeTierData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final Long id = rs.getLong("id");
-            final BigDecimal limit = rs.getString("limit");
+            final BigDecimal limit = rs.getBigDecimal("limit");
             final BigDecimal amount = rs.getBigDecimal("amount");
             final Long chargeId = rs.getLong("chargeId");
 
@@ -452,10 +454,11 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 transactionCodeData[0] = transactionCodeReadPlatformService.retrieveOne(transactionCodeId);
             });
 
+            List<ChargeTierData> chargeTierDataList = null ;
 
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
                     chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, glAccountData,
-                    taxGroupData ,transactionCodeData[0]);
+                    taxGroupData ,transactionCodeData[0] ,chargeTierDataList);
         }
     }
 

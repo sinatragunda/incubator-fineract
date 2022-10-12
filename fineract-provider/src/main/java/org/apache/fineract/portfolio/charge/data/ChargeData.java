@@ -81,7 +81,6 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
 
     private final TransactionCodeData transactionCodeData ;
 
-
     private final List<ChargeTierData> chargeTierDataList ;
 
     public static ChargeData template(final Collection<CurrencyData> currencyOptions,
