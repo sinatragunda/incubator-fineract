@@ -289,9 +289,16 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
             
+            /**
+             * Added 31/10/2022 at 1441 
+             * Problem arising with the need to have group loans ,null pointer when it comes to LoanFactorResolving
+             * Solution for now is to by pass them 
+             */
+            final Boolean isGroupLoan = false;  
             if(groupId != null){
                 Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
                 officeSpecificLoanProductValidation( productId,group.getOffice().getId());
+                isGroupLoan=true;
             }
 
 
@@ -326,7 +333,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             */
 
-            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList);
+            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList ,isGroupLoan);
 
             /**
              * If loanProduct has a default settlement account ,inject into the application jsonCommand
