@@ -24,7 +24,6 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name ="m_charge_tier")
 public class ChargeTier extends AbstractPersistableCustom<Long> {
-
 	@Column(name="amount")
 	private BigDecimal amount ;
 
@@ -34,7 +33,6 @@ public class ChargeTier extends AbstractPersistableCustom<Long> {
  	@ManyToOne
     @JoinColumn(name = "charge_id")
 	private Charge charge ;
-
 
 	protected ChargeTier(){}
 

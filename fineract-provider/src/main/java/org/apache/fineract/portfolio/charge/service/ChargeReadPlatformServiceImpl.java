@@ -243,7 +243,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         Consumer<ChargeData> attachChargeTierConsumer = (e)-> attachChargeTierData(e);
         collection.stream().forEach(attachChargeTierConsumer);
-
+        return collection;
     }
 
     private void attachChargeTierData(ChargeData chargeData){
@@ -257,7 +257,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             Object param = new Object[]{chargeId};
             
             try{
-                ChargeTierData chargeTierData =  this.jdbcTemplate.query(sql ,mapper ,param);
+                ChargeTierData chargeTierData =  this.jdbcTemplate.queryForObject(sql ,mapper ,param);
                 chargeData.setChargeTierData(Arrays.asList(chargeTierData));
             }
             catch(EmptyResultDataAccessException n){
@@ -331,8 +331,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
      * Retrieve all tier charges linked to a charge id 
      */
 
-    private static final class ChargeTierMapper implements RowMapper<ChargeData> {
-
+    private static final class ChargeTierMapper implements RowMapper<ChargeTierData> {
 
         public String chargeTierSchema() {
             return " ct.id as id, c.amount as amount, c.upper_limit as limit , c.id as chargeId "

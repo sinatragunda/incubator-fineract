@@ -50,13 +50,14 @@ public class AllowMultipleInstancesHelper{
 		*/ 
 
 		Predicate<LoanAccountSummaryData> isExcluded = (e)->{
-			System.err.println("------------------loan id is -------------"+e.id());
+
+			//System.err.println("------------------loan id is -------------"+e.id());
 
 			Predicate sameLoanId = loanId-> loanId.equals(e.id());
 
 			boolean isPresent = excludeLoansList.stream().filter(sameLoanId).findFirst().isPresent();
 
-			System.err.println("------------------is present ? "+isPresent+" then negate it to "+!isPresent);
+			//System.err.println("------------------is present ? "+isPresent+" then negate it to "+!isPresent);
 
 			return isPresent;
 		};

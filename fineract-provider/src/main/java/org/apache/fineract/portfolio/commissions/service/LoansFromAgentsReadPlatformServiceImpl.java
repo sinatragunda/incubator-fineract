@@ -104,13 +104,11 @@ public class LoansFromAgentsReadPlatformServiceImpl implements LoansFromAgentsRe
 
         loansFromAgentsData.stream().forEach(e->{
             Long loanId = e.getLoanId();
-            System.err.println("--------------------loan id is ---------------------"+loanId);
+            //System.err.println("--------------------loan id is ---------------------"+loanId);
             LoanAccountData loanAccountData = this.loanReadPlatformService.retrieveOne(loanId);
             loanList.add(loanAccountData);
         });
-
-        System.err.println("----------------loans list is ---------------"+loanList.size());
-
+        //System.err.println("----------------loans list is ---------------"+loanList.size());
         return loanList;
 
     }

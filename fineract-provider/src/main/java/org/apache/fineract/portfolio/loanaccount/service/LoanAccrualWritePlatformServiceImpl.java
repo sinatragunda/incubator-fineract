@@ -83,8 +83,7 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
         Collection<LoanSchedulePeriodData> loanWaiverScheduleData = new ArrayList<>(1);
         Collection<LoanTransactionData> loanWaiverTansactionData = new ArrayList<>(1);
 
-
-        System.err.println("-----------------------loan id is -----------------------"+loanId);
+        //System.err.println("-----------------------loan id is -----------------------"+loanId);
 
         LoanAccountData loanAccountData = this.loanReadPlatformService.retrieveOne(loanId);
 
@@ -92,10 +91,10 @@ public class LoanAccrualWritePlatformServiceImpl implements LoanAccrualWritePlat
 
         boolean isNpa = loanAccountData.isNpa();
 
-        System.err.println("---------------isnap ? -----------------------------"+isNpa);
+        //System.err.println("---------------isnap ? -----------------------------"+isNpa);
 
         if(isNpa){
-            System.err.println("------------------------------non perfoming accrual should take this step here ---------------");
+            //System.err.println("------------------------------non perfoming accrual should take this step here ---------------");
             nonPerfomingLoanAccrual(loanScheduleAccrualDatas ,chargeData ,loanWaiverScheduleData ,loanWaiverTansactionData);
             return;
         }
