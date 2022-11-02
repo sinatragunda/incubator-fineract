@@ -28,7 +28,15 @@ public class LoanFactorLoanResolver {
 
 
     // function returns nothing since it throws errors if something is wrong
-    public static void loanFactor(LoanReadPlatformService loanReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanProductRepository loanProductRepository, FromJsonHelper fromJsonHelper , JsonCommand command, LoanProduct loanProduct, Client client ,List excludeLoansList) {
+    public static void loanFactor(LoanReadPlatformService loanReadPlatformService , SavingsAccountReadPlatformService savingsAccountReadPlatformService, LoanProductRepository loanProductRepository, FromJsonHelper fromJsonHelper , JsonCommand command, LoanProduct loanProduct, Client client ,List excludeLoansList ,boolean isGroupLoan) {
+
+        /**
+         * Added 31/10/2022 at 1444
+         * Since no validation exists now for Group loans ,will bypass this functionality for now 
+         */ 
+        if(isGroupLoan){
+            return;
+        }
 
         LOAN_FACTOR_SOURCE_ACCOUNT_TYPE loanFactorSourceAccountType = loanProduct.getLoanFactorSourceAccountType();
 

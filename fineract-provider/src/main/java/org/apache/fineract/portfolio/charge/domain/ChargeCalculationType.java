@@ -19,7 +19,6 @@
 package org.apache.fineract.portfolio.charge.domain;
 
 public enum ChargeCalculationType {
-
     INVALID(0, "chargeCalculationType.invalid"), //
     FLAT(1, "chargeCalculationType.flat"), //
     PERCENT_OF_AMOUNT(2, "chargeCalculationType.percent.of.amount"), //
@@ -28,7 +27,14 @@ public enum ChargeCalculationType {
     PERCENT_OF_DISBURSEMENT_AMOUNT(5,"chargeCalculationType.percent.of.disbursement.amount"),
 
     // Added 04/01/2021
-    FLEXIBLE_AMOUNT(6,"Flexible");
+    FLEXIBLE_AMOUNT(6,"Flexible"),
+
+    /**
+     * Added 12/10/20220 aat 1403
+     * Modified 01/11/2022 at 0726 ,failing to compile cause of missing param value
+     */
+    BANDING(7 ,"Banding"),
+    LEVEL(8,"Levels");
 
     private final Integer value;
     private final String code;

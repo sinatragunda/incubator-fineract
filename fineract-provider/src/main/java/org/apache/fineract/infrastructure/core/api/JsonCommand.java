@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.domain.BasicPasswordEncodablePlatformUser;
 import org.apache.fineract.infrastructure.security.domain.PlatformUser;
 import org.apache.fineract.infrastructure.security.service.PlatformPasswordEncoder;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.MonthDay;
@@ -162,6 +163,23 @@ public final class JsonCommand {
     public JsonElement parsedJson() {
         return this.parsedCommand;
     }
+
+    /**
+     * Added 01/11/2022 at 0902 
+     * Remove element 
+     */
+    public JsonCommand removeElement(String key){
+
+        boolean hasParameter = parameterExists(key);
+
+        if(!hasParameter){
+            return this ;
+        }
+        JsonElement jsonElement = parsedJson();
+        jsonElement = jsonElement.getAsJsonObject().remove(key);
+        JsonCommand jsonCommand = JsonCommandHelper.fromJsonElement(fromApiJsonHelper ,jsonElement);
+        return jsonCommand;    
+    }  
 
 
     public JsonElement jsonElement(final String paramName) {

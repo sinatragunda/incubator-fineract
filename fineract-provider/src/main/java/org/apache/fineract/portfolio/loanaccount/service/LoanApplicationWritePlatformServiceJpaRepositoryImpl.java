@@ -86,6 +86,7 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanChargeData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
 import org.apache.fineract.portfolio.loanaccount.domain.*;
+import org.apache.fineract.portfolio.loanaccount.enumerations.LOAN_TYPE;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
@@ -277,27 +278,47 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             if (loanProduct == null) { throw new LoanProductNotFoundException(productId); }
 
+            final String loanTypeStr = this.fromJsonHelper.extractStringNamed(LoanApiConstants.loanTypeParameterName ,command.parsedJson());
+
             final Long clientId = this.fromJsonHelper.extractLongNamed("clientId", command.parsedJson());
+            final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
 
             Client client =null ;
-            if(clientId !=null){
 
-                client= this.clientRepository.findOneWithNotFoundDetection(clientId);
-                officeSpecificLoanProductValidation( productId,client.getOffice().getId());
+            final LOAN_TYPE loanType = LOAN_TYPE.fromString(loanTypeStr);
+            Boolean isGroupLoan = false;
 
+
+            System.err.println("--------------loanType ---------------"+loanType);
+
+            switch (loanType){
+                case GROUP:
+                    /**
+                     * Added 31/10/2022 at 1441
+                     * Problem arising with the need to have group loans ,null pointer when it comes to LoanFactorResolving
+                     * Solution for now is to by pass them
+                     */
+                    if(groupId != null){
+                        Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
+                        officeSpecificLoanProductValidation( productId,group.getOffice().getId());
+                        //command = groupLoanValidation(command);
+                        isGroupLoan = true;
+                    }
+                    break;
+                case INDIVIDUAL:
+                    System.err.println("-----------------why does it come here ? ");
+                    if(clientId !=null) {
+                        client = this.clientRepository.findOneWithNotFoundDetection(clientId);
+                        officeSpecificLoanProductValidation(productId, client.getOffice().getId());
+                    }
             }
 
-            final Long groupId = this.fromJsonHelper.extractLongNamed("groupId", command.parsedJson());
-            
-            if(groupId != null){
-                Group group= this.groupRepository.findOneWithNotFoundDetection(groupId);
-                officeSpecificLoanProductValidation( productId,group.getOffice().getId());
-            }
+            /**
+             * Added 25/05/2021
+             * Do the whole revolve loan thing here
+             * Modifying 02/08/2022
+             */
 
-
-            // Added 25/05/2021
-            // Do the whole revolve loan thing here
-            // Modifying 02/08/2022
             /**
                 * Code modified to correct for error regarding loan revolving when it comes to loan factored account 
                 * This happens when you are revolving a loan ,initially it should be regarded as closed
@@ -319,21 +340,30 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              *   Modified 31/08/2022
              *   Modified to allow to exclude special loans from the checking instance .
              */
-            AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId ,excludeLoansList);
+            AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId ,excludeLoansList ,isGroupLoan ,groupId);
 
-
+            System.err.println("----------------multiple instance stuff should excape when its group ");
             /**
              *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             */
 
-            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList);
+            LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList ,isGroupLoan);
 
             /**
              * If loanProduct has a default settlement account ,inject into the application jsonCommand
+             * Modified 01/11/2022 at 1253
+             * Skip function if isGroupLoan ,function will later be modified
              */
-            command = injectAccountId(command ,loanProduct ,clientId);
+
+            if(!isGroupLoan) {
+                command = injectAccountId(command, loanProduct, clientId);
+            }
+
+            System.err.println("--------validate for loans ------");
 
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
+
+            System.err.println("-----------failed ------------");
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
@@ -545,6 +575,16 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         }
     }
 
+    /**
+     * Added 01/11/2022 at 0913
+     * Intent is to delete clientId since group loans are coming with clientId
+     * 
+     */
+    private JsonCommand groupLoanValidation(JsonCommand jsonCommand){
+        jsonCommand = jsonCommand.removeElement("clientId");
+        return jsonCommand;
+    }  
+
     // private function to inject account id into the json payload if its not present ,by using settings
     private JsonCommand injectAccountId(JsonCommand command ,LoanProduct loanProduct ,Long clientId){
 
@@ -567,7 +607,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 System.err.println("----------------settlement product id is -------------"+settlementAccountId[0]);
 
                 List<SavingsAccountData> savingsAccounts =  savingsAccountReadPlatformService.retrieveAllForClientUnderPortfolio(clientId ,settlementAccountId[0]);
-                
+
                 System.err.println("------------savingsaccounts ----------"+savingsAccounts.size());
 
                 boolean hasAccount = savingsAccounts.stream().findFirst().isPresent();
@@ -579,15 +619,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     SavingsAccountData savingsAccountData = savingsAccounts.stream().findFirst().get();
                     
                     Long savingsAccountId = savingsAccountData.getId();
-
                     System.err.println("--------------account id is is -------------"+savingsAccountId);
-
                     json[0] = JsonHelper.update(json[0] ,"linkAccountId",savingsAccountId);
                 }
             });
-
             System.err.println("--------------------------new json -------------------------"+json[0]);
-
             command = JsonCommandHelper.jsonCommand(fromJsonHelper ,json[0]);
         }
 

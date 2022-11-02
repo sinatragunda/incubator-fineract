@@ -21,6 +21,9 @@ package org.apache.fineract.portfolio.charge.domain;
 import java.math.BigDecimal;
 import java.util.*;
 
+
+
+import javax.persistence.Transient;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,6 +46,7 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.api.ChargesApiConstants;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.exception.ChargeDueAtDisbursementCannotBePenaltyException;
 import org.apache.fineract.portfolio.charge.exception.ChargeMustBePenaltyException;
 import org.apache.fineract.portfolio.charge.exception.ChargeParameterUpdateNotSupportedException;
@@ -121,6 +125,12 @@ public class Charge extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "transaction_code_id")
     private TransactionCode transactionCode;
+
+    /**
+     * Added 12/10/2022 at 1407
+     */
+    @Transient
+    private List<ChargeTier> chargeTierList;   
 
 
     public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup,final TransactionCode transactionCode) {
@@ -571,10 +581,16 @@ public class Charge extends AbstractPersistableCustom<Long> {
             transactionCodeData[0] = TransactionCodeData.looup(transactionCode.getId() ,transactionCode.getCode() ,transactionCode.getName());
         });
 
+        /**
+         * Added 01/11/2022 at 0728
+         * Class still under construction ,need to just edit this line of code to make it compile
+         */
+        List<ChargeTierData> chargeTierDataList = new ArrayList<>();
+
         final CurrencyData currency = new CurrencyData(this.currencyCode, null, 0, 0, null, null);
         return ChargeData.instance(getId(), this.name, this.amount, currency, chargeTimeType, chargeAppliesTo, chargeCalculationType,
                 chargePaymentmode, getFeeOnMonthDay(), this.feeInterval, this.penalty, this.active, this.minCap, this.maxCap,
-                feeFrequencyType, accountData, taxGroupData ,transactionCodeData[0]);
+                feeFrequencyType, accountData, taxGroupData ,transactionCodeData[0] ,chargeTierDataList);
     }
 
     public Integer getChargePaymentMode() {
@@ -648,5 +664,14 @@ public class Charge extends AbstractPersistableCustom<Long> {
 
     public void setTaxGroup(TaxGroup taxGroup) {
         this.taxGroup = taxGroup;
+    }
+
+
+    public List<ChargeTier> getChargeTier(){
+        return this.chargeTierList;
+    }
+
+    public void setChargeTier(List<ChargeTier> chargeTierList){
+        this.chargeTierList = chargeTierList;
     }
 }

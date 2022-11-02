@@ -38,7 +38,12 @@ import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPl
 
 public class AllowMultipleInstancesHelper{
 
-	public static void status(LoanProduct loanProduct ,AccountDetailsReadPlatformService accountDetailsReadPlatformService ,Long productId, Long clientId ,List<Long> excludeLoansList){
+	/**
+	 * Modified 01/11/2022 at 1245 
+	 * Modified to include group loans from filtering 
+	 * Should clientId be equal to groupId
+	 */ 
+	public static void status(LoanProduct loanProduct ,AccountDetailsReadPlatformService accountDetailsReadPlatformService ,Long productId, Long clientId ,List<Long> excludeLoansList ,boolean isGroupLoan ,Long groupId){
 
 		boolean allow = loanProduct.allowMultipleInstances();
 
@@ -50,21 +55,30 @@ public class AllowMultipleInstancesHelper{
 		*/ 
 
 		Predicate<LoanAccountSummaryData> isExcluded = (e)->{
-			System.err.println("------------------loan id is -------------"+e.id());
+
+			//System.err.println("------------------loan id is -------------"+e.id());
 
 			Predicate sameLoanId = loanId-> loanId.equals(e.id());
 
 			boolean isPresent = excludeLoansList.stream().filter(sameLoanId).findFirst().isPresent();
 
-			System.err.println("------------------is present ? "+isPresent+" then negate it to "+!isPresent);
+			//System.err.println("------------------is present ? "+isPresent+" then negate it to "+!isPresent);
 
 			return isPresent;
 		};
 
 		if(!allow){
 
-        	AccountSummaryCollectionData clientAccount = accountDetailsReadPlatformService.retrieveClientAccountDetails(clientId);
-			/// lets iterate through loans now get data we want son 
+        	AccountSummaryCollectionData clientAccount = null ;
+
+        	if(isGroupLoan){
+        		clientAccount = accountDetailsReadPlatformService.retrieveGroupAccountDetails(groupId);
+        	}
+        	else{
+        		clientAccount = accountDetailsReadPlatformService.retrieveClientAccountDetails(clientId);
+        	}
+
+        	/// lets iterate through loans now get data we want son 
 
 			Collection<LoanAccountSummaryData> loanAccounts = clientAccount.loanAccounts().stream().filter(isExcluded.negate()).collect(Collectors.toList());
 
