@@ -25,4 +25,13 @@ public class JsonCommandHelper {
         return jsonCommand;
 
     }
+
+    /**
+     * Added 01/11/2022 at 0911
+     */
+    public static JsonCommand fromJsonElement(FromJsonHelper fromJsonHelper ,JsonElement jsonElement){
+        JsonCommand jsonCommand = JsonCommand.fromJsonElement(0L ,jsonElement ,fromJsonHelper);
+        return jsonCommand;
+        
+    } 
 }
