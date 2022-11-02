@@ -655,40 +655,17 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             return e.isNotReversed();
         };
 
-<<<<<<< HEAD
-        //System.err.println("-------------------before filter size --------"+getTransactions().size());
-
         List<SavingsAccountTransaction> trans = getTransactions().stream().filter(isReversed).collect(toList()) ;
 
-
-        //System.err.println("------------------after filter size ----------"+trans.size());
-
-=======
-        List<SavingsAccountTransaction> trans = getTransactions().stream().filter(isReversed).collect(toList()) ;
-
->>>>>>> loan-factor-accomodate-group-accounts
         Comparator<SavingsAccountTransaction> accountTransactionComparator = (e ,e1)->{
             Long now = e.getTransactionDate().getTime();
             Long cmp = e1.getTransactionDate().getTime();
             return now.compareTo(cmp);
         };
 
-<<<<<<< HEAD
-       trans.sort(accountTransactionComparator);
-
-       //System.err.println("--------before sorting --------");
-       trans.stream().forEach(e->{
-         //  System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
-       });
-=======
         trans.sort(accountTransactionComparator);
->>>>>>> loan-factor-accomodate-group-accounts
-
         // reverse it so that the first item which is last date becomes first etc so it breaks on the first before transaction
         Collections.reverse(trans);
-
-<<<<<<< HEAD
-       //System.err.println("-----------after sorting ------");
 
        trans.stream().forEach(e->{
            //System.err.println("----------------we have reversed dates  to start "+e.getTransactionDate()+"-------and transs id "+e.getId());
@@ -697,10 +674,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         for (final SavingsAccountTransaction transaction : trans) {
             if (transaction.isNotReversed() && transaction.isBefore(date)){
                 //System.err.println("-------last transaction is -------"+transaction.getId()+"------------at date -----------"+transaction.getTransactionDate());
-=======
-        for(final SavingsAccountTransaction transaction : trans) {
-            if (transaction.isNotReversed() && transaction.isBefore(date)){
->>>>>>> loan-factor-accomodate-group-accounts
                 savingsTransaction = transaction;
                 break;
             }
