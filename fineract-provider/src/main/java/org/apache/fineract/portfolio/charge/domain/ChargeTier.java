@@ -27,7 +27,7 @@ public class ChargeTier extends AbstractPersistableCustom<Long> {
 	@Column(name="amount")
 	private BigDecimal amount ;
 
-	@Column(name="upperLimit")
+	@Column(name="upper_limit")
 	private BigDecimal upperLimit ;
 
  	@ManyToOne

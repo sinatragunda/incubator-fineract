@@ -252,15 +252,19 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
             ChargeTierMapper mapper = new ChargeTierMapper();
 
-            String sql = mapper.chargeTierSchema();
+            String sql = "select "+mapper.chargeTierSchema();
+
+            System.err.println("--------------------sql is "+sql);
 
             Object param = new Object[]{chargeId};
             
             try{
                 ChargeTierData chargeTierData =  this.jdbcTemplate.queryForObject(sql ,mapper ,param);
-                chargeData.setChargeTierData(Arrays.asList(chargeTierData));
+                List chargesList = new ArrayList<>(Arrays.asList(chargeTierData));
+                chargeData.setChargeTierData(chargesList);
             }
             catch(EmptyResultDataAccessException n){
+
             }
      }
 
@@ -334,7 +338,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private static final class ChargeTierMapper implements RowMapper<ChargeTierData> {
 
         public String chargeTierSchema() {
-            return " ct.id as id, c.amount as amount, c.upper_limit as limit , c.id as chargeId "
+            return " ct.id as id, ct.amount as amount, ct.upper_limit as uLimit , c.id as chargeId "
                     + " from m_charge_tier ct "
                     + " left join m_charge c on c.id = ct.charge_id where c.id = ?";
         }
@@ -342,7 +346,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         @Override
         public ChargeTierData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final Long id = rs.getLong("id");
-            final BigDecimal limit = rs.getBigDecimal("limit");
+            final BigDecimal limit = rs.getBigDecimal("uLimit");
             final BigDecimal amount = rs.getBigDecimal("amount");
             final Long chargeId = rs.getLong("chargeId");
 
