@@ -253,8 +253,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
             ChargeTierMapper mapper = new ChargeTierMapper();
 
             String sql = "select "+mapper.chargeTierSchema();
-
-            System.err.println("--------------------sql is "+sql);
+            
+            //System.err.println("--------------------sql is "+sql);
 
             Object param = new Object[]{chargeId};
             
