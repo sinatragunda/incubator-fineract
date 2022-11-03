@@ -10,8 +10,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c54cc16b-bf11-4a48-b5b6-246cacf48b86" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/api/RxApiResource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/constants/RxApiConstants.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/data/RxData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/Remitter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxReceive.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxSend.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/IDENTIFICATION_TYPE.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/REMITTANCE_TRANSACTION_STATE.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/RX_PROVIDER.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDataReadPlatformServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxReadPlatformService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/enumerations/ACCOUNT_PROTOTYPE.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsApiConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsApiConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/FixedDepositAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/FixedDepositAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/RecurringDepositAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/RecurringDepositAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountAssembler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountAssembler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,8 +79,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Enum" />
         <option value="Interface" />
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
@@ -643,18 +665,19 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "last_opened_file_path": "C:/Users/HP/Documents/GitHub/Java/weseaddons"
+    "last_opened_file_path": "C:/Users/HP/Documents/GitHub/Java/incubator-fineract/fineract-provider/src/main/java/org/apache/fineract/portfolio"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\HP\Documents\GitHub\Java\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio" />
+      <recent name="D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\shareaccounts\api" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="org.apache.fineract.spm.repository" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="org.apache.fineract.portfolio.commissions.exceptions" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\shareaccounts\api" />
     </key>
   </component>
   <component name="RunManager" selected="Application.Run Embeded Server">

@@ -205,6 +205,10 @@ public class SavingsApiConstants {
      */
     public static final String transactionCodeIdParam ="transactionCodeId";
 
+    /**
+     * Added 03/11/2022 at 1401
+     */
+    public static final String accountPrototypeParam = "accountPrototype";  
 
 
 
