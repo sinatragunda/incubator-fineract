@@ -18,9 +18,7 @@
  */
 package org.apache.fineract.organisation.teller.service;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
@@ -36,6 +34,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -43,7 +42,9 @@ import org.apache.fineract.organisation.office.domain.OfficeRepositoryWrapper;
 import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
+import org.apache.fineract.organisation.teller.data.CashierData;
 import org.apache.fineract.organisation.teller.data.CashierTransactionDataValidator;
+import org.apache.fineract.organisation.teller.data.TellerData;
 import org.apache.fineract.organisation.teller.domain.Cashier;
 import org.apache.fineract.organisation.teller.domain.CashierRepository;
 import org.apache.fineract.organisation.teller.domain.CashierTransaction;
@@ -55,7 +56,11 @@ import org.apache.fineract.organisation.teller.exception.CashierExistForTellerEx
 import org.apache.fineract.organisation.teller.exception.CashierNotFoundException;
 import org.apache.fineract.organisation.teller.serialization.TellerCommandFromApiJsonDeserializer;
 import org.apache.fineract.portfolio.client.domain.ClientTransaction;
+import org.apache.fineract.organisation.teller.domain.CashTransaction;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.useradministration.domain.AppUserRepositoryWrapper;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
+import org.apache.fineract.wese.helper.JsonHelper;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +84,13 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
     private final JournalEntryRepository glJournalEntryRepository;
     private final FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper;
     private final CashierTransactionDataValidator cashierTransactionDataValidator;
+    private final TellerManagementReadPlatformService tellerManagementReadPlatformService;
+    private final FromJsonHelper fromJsonHelper;
+
+    /**
+     * Added 06/11/2022 at 1838
+     */
+    private final AppUserRepositoryWrapper appUserRepositoryWrapper ;
 
     @Autowired
     public TellerWritePlatformServiceJpaImpl(final PlatformSecurityContext context,
@@ -87,7 +99,7 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final StaffRepository staffRepository, CashierRepository cashierRepository, CashierTransactionRepository cashierTxnRepository,
             JournalEntryRepository glJournalEntryRepository,
             FinancialActivityAccountRepositoryWrapper financialActivityAccountRepositoryWrapper,
-            final CashierTransactionDataValidator cashierTransactionDataValidator) {
+            final CashierTransactionDataValidator cashierTransactionDataValidator ,final TellerManagementReadPlatformService tellerManagementReadPlatformService ,final  FromJsonHelper fromJsonHelper ,final  AppUserRepositoryWrapper appUserRepositoryWrapper) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.tellerRepositoryWrapper = tellerRepositoryWrapper;
@@ -98,22 +110,38 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
         this.glJournalEntryRepository = glJournalEntryRepository;
         this.financialActivityAccountRepositoryWrapper = financialActivityAccountRepositoryWrapper;
         this.cashierTransactionDataValidator = cashierTransactionDataValidator;
+
+        /**
+         * Added 05/11/2022 at 1739
+         */
+        this.tellerManagementReadPlatformService = tellerManagementReadPlatformService;
+        this.fromJsonHelper = fromJsonHelper;
+        this.appUserRepositoryWrapper = appUserRepositoryWrapper;
     }
 
     @Override
     @Transactional
     public CommandProcessingResult createTeller(JsonCommand command) {
         try {
-            this.context.authenticatedUser();
+            AppUser appUser = this.context.authenticatedUser();
 
             final Long officeId = command.longValueOfParameterNamed("officeId");
 
             this.fromApiJsonDeserializer.validateForCreateAndUpdateTeller(command.json());
 
+            /**
+             * Added 06/11/2022 at 1836
+             * Added to get user data ,so that users can be linked directly to tellers and cashiers
+             * Too much clicking process so this save the user from having to click too many buttons to associate cashier to user
+             *
+             */
+            final Long userId = command.longValueOfParameterNamed("userId");
+            final AppUser tellerAppUser = appUserRepositoryWrapper.findOneWithNotFoundDetection(userId);
+
             // final Office parent =
             // validateUserPriviledgeOnOfficeAndRetrieve(currentUser, officeId);
             final Office tellerOffice = this.officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
-            final Teller teller = Teller.fromJson(tellerOffice, command);
+            final Teller teller = Teller.fromJson(tellerOffice,tellerAppUser,command);
 
             // pre save to generate id for use in office hierarchy
             this.tellerRepositoryWrapper.save(teller);
@@ -376,6 +404,44 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
                                                                                    // cashier
     }
 
+    /**
+     *
+     * @param tellerId
+     * @param txnType
+     * @param command
+     * @return
+     */
+    public CommandProcessingResult cashierTransaction(Long userId , final CashTransaction cashTransaction){
+
+        TellerData tellerData = tellerManagementReadPlatformService.findTellerForUser(userId);
+        CommandProcessingResult commandProcessingResult[] = {null} ;
+        Optional.ofNullable(tellerData).ifPresent(e->{
+            Long tellerId = tellerData.getId();
+            Collection<CashierData> cashierDataList = tellerManagementReadPlatformService.getTellerCashiers(tellerId ,null);
+            CashierData cashierData = cashierDataList.stream().findFirst().get();
+            Long cashierId = cashierData.getId();
+            CashierTxnType cashierTxnType = cashTransaction.getCashierTxnType();
+
+            Map<String ,Object> map = new HashMap<>();
+            map.put("entityType","savings account");
+            //final Integer txnType = command("txnType");
+            map.put("txnAmount" ,cashTransaction.getAmount());
+            map.put("txnDate",cashTransaction.getTransactionDate());
+            map.put("txnNote" ,cashTransaction.getNote());
+            map.put("entityId" ,cashTransaction.getEntityId());
+            map.put("currencyCode" ,cashTransaction.getCurrencyCode());
+            map.put("staffId",1L);
+
+            System.err.println("---------------what type of this transaction now son ?");
+
+            JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,map);
+            commandProcessingResult[0] = doTransactionForCashier(cashierId ,cashierTxnType ,jsonCommand);
+        });
+
+        return commandProcessingResult[0] ;
+
+    }
+
     private CommandProcessingResult doTransactionForCashier(final Long cashierId, final CashierTxnType txnType, JsonCommand command) {
         try {
             final AppUser currentUser = this.context.authenticatedUser();
@@ -383,7 +449,11 @@ public class TellerWritePlatformServiceJpaImpl implements TellerWritePlatformSer
             final Cashier cashier = this.cashierRepository.findOne(cashierId);
             if (cashier == null) { throw new CashierNotFoundException(cashierId); }
 
+            System.err.println("-------------validate for cash txn ");
             this.fromApiJsonDeserializer.validateForCashTxnForCashier(command.json());
+
+
+            System.err.println("------------done validating for cash txn");
 
             final String entityType = command.stringValueOfParameterNamed("entityType");
             final Long entityId = command.longValueOfParameterNamed("entityId");

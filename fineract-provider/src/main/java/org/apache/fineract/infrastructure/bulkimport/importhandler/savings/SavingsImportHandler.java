@@ -365,7 +365,7 @@ public class SavingsImportHandler implements ImportHandler {
 
             //System.err.println("--------------balance is not zero ");
             //accountDomainService.handleDepositLite(savingsAccountId ,openingBalance ,null);
-            savingsAccountDomainService.handleDepositLite(savingsAccountId , TimeHelper.jodaLocalDateNow(),openingBalance);
+            savingsAccountDomainService.handleDepositLite(savingsAccountId , TimeHelper.jodaLocalDateNow(),openingBalance,null);
         }
 
     }

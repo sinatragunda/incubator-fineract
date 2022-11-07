@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
@@ -79,12 +80,21 @@ public class Teller extends AbstractPersistableCustom<Long> {
     @OneToMany(mappedBy = "teller", fetch = FetchType.LAZY)
     private Set<Cashier> cashiers;
 
+    /**
+     * Added 05/11/2022 at 1349
+     * Added to map users directly to teller accounts 
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser appUser;
+
+
     public Teller() {
         super();
     }
     
     private Teller (final Office staffOffice, final String name, final String description, final LocalDate startDate, 
-    		final LocalDate endDate, final TellerStatus status) {
+    		final LocalDate endDate, final TellerStatus status ,final AppUser appUser) {
     	
     	this.name = StringUtils.defaultIfEmpty(name, null);
     	this.description = StringUtils.defaultIfEmpty(description, null);
@@ -98,6 +108,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
     		this.status = status.getValue();
     	}
     	this.office = staffOffice;
+        this.appUser = appUser ;
     	
     	/*
         if (StringUtils.isNotBlank(name)) {
@@ -115,7 +126,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
     }
 
     
-    public static Teller fromJson(final Office tellerOffice, final JsonCommand command) {
+    public static Teller fromJson(final Office tellerOffice,final AppUser appUser , final JsonCommand command) {
         final String name = command.stringValueOfParameterNamed("name");
         final String description = command.stringValueOfParameterNamed("description");
         final LocalDate startDate = command.localDateValueOfParameterNamed("startDate");
@@ -123,7 +134,7 @@ public class Teller extends AbstractPersistableCustom<Long> {
         final Integer tellerStatusInt = command.integerValueOfParameterNamed("status");
         final TellerStatus status = TellerStatus.fromInt(tellerStatusInt);
 
-        return new Teller (tellerOffice, name, description, startDate, endDate, status);
+        return new Teller (tellerOffice, name, description, startDate, endDate, status ,appUser);
     }
     
     public Map<String, Object> update(Office tellerOffice, final JsonCommand command) {
@@ -139,6 +150,15 @@ public class Teller extends AbstractPersistableCustom<Long> {
             actualChanges.put(officeIdParamName, newValue);
             this.office = tellerOffice;
         }
+
+
+        final String userIdParamName = "userId";
+        if (command.isChangeInLongParameterNamed(userIdParamName, this.userId())) {
+            final long newValue = command.longValueOfParameterNamed(userIdParamName);
+            actualChanges.put(userIdParamName, newValue);
+            //this.office = tellerOffice;
+        }
+
 
         final String nameParamName = "name";
         if (command.isChangeInStringParameterNamed(nameParamName, this.name)) {
@@ -188,6 +208,11 @@ public class Teller extends AbstractPersistableCustom<Long> {
         }
 
         return actualChanges;
+    }
+
+
+    public AppUser getAppUser(){
+        return this.appUser;
     }
 
 
@@ -274,6 +299,10 @@ public class Teller extends AbstractPersistableCustom<Long> {
     
     public Long officeId() {
         return this.office.getId();
+    }
+
+    public Long userId(){
+        return this.appUser.getId();
     }
 
     public Set<Cashier> getCashiers() {

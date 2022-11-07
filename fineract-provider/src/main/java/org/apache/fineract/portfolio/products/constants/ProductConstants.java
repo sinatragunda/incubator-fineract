@@ -12,6 +12,8 @@ public class ProductConstants {
     public final static String productType = "productType";
     public final static String command = "command";
     public final static String active = "active";
-    public final static String deductChargesOnBalance = "deductChargesOnBalance";    
+    public final static String deductChargesOnBalance = "deductChargesOnBalance";
+
+    public final static String accountTypeParam = "accountType";
 
 }

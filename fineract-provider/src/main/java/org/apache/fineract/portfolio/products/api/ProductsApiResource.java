@@ -120,7 +120,6 @@ public class ProductsApiResource {
     public String retrieveAllProducts(@PathParam("type") final String productType, @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
             @Context final UriInfo uriInfo) {
         try {
-
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
             Page<ProductData> data = service.retrieveAllProducts(offset, limit);

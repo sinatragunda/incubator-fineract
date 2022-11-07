@@ -26,6 +26,8 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
+import org.apache.fineract.organisation.teller.helper.CashTransactionLoggingHelper;
+import org.apache.fineract.organisation.teller.service.TellerWritePlatformService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
@@ -69,6 +71,11 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     private final SavingsAccountAssembler savingsAccountAssembler ;
     private final NoteRepository noteRepository ;
 
+    /**
+     * Added 06/11/2022 at 2052
+     */
+    private final TellerWritePlatformService tellerWritePlatformService;
+
 
     @Autowired
     public SavingsAccountDomainServiceJpa(final SavingsAccountRepositoryWrapper savingsAccountRepository,
@@ -78,7 +85,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
             final BusinessEventNotifierService businessEventNotifierService ,
-            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository) {
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository ,final TellerWritePlatformService tellerWritePlatformService) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -90,6 +97,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
         this.savingsAccountAssembler = savingsAccountAssembler ;
         this.noteRepository = noteRepository;
+        this.tellerWritePlatformService = tellerWritePlatformService;
     }
 
     @Transactional
@@ -147,8 +155,20 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         saveTransactionToGenerateTransactionId(withdrawal);
         this.savingsAccountRepository.save(account);
 
-        /// added 26/07/2021
-        /// here we add new value to save this transaction to monthly withdrawals 
+        /**
+         * Added 06/11/2022 at 2053
+         * Handle all withdrawals for cashing with cashier helper
+         * Function post settlements to till
+         */
+        //CashTransactionLoggingHelper.savingsAccountTransaction(tellerWritePlatformService , withdrawal);
+
+
+        /**
+         * Added 26/07/2021
+         * Here we add new value to save this transaction to monthly withdrawals
+         * To do (06/11/2022 at 2055): Ideal solution is to rely on running balance ,which are accurate but functionality would have to be written on a free day
+         *
+         */
         SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,false);
 
         /**
@@ -222,10 +242,12 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 savingsAccountTransactionType ,transactionCode);
     }
 
-
+    /**
+     * Modified 05/11/2022 at 0448 
+     */ 
     @Transactional
     @Override
-    public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount){
+    public SavingsAccountTransaction handleDepositLite(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
 
         AppUser user = getAppUserIfPresent();
         Integer accountType = null;
@@ -243,29 +265,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                 paymentDetail, new Date(), user, accountType);
 
         SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
-        return handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType ,transactionCode);
-    }
+        SavingsAccountTransaction savingsAccountTransaction = handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType ,transactionCode);
 
-
-
-    // Added 02/01/2021 ,with notes .
-    @Transactional
-    @Override
-    public SavingsAccountTransaction handleDepositLiteEx(final SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
-
-        AppUser user = getAppUserIfPresent();
-        Integer accountType = null;
-        PaymentDetail paymentDetail = null ;
-
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
-
-        final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
-                paymentDetail, new Date(), user, accountType);
-
-
-        SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
-        TransactionCode transactionCode = null ;
-        SavingsAccountTransaction savingsAccountTransaction = handleDeposit(savingsAccount ,fmt ,transactionDate ,transactionAmount ,paymentDetail ,false ,true ,savingsAccountTransactionType,transactionCode);
 
         Optional.ofNullable(noteText).ifPresent(e->{           
             final Note note = Note.savingsTransactionNote (savingsAccount, savingsAccountTransaction, noteText);
@@ -273,25 +274,28 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         });
 
         return savingsAccountTransaction;
+
     }
 
 
-    // Added 19/07/2022 ,extended version of the Ex.
+
+    // Added 02/01/2021 ,with notes .
     @Transactional
     @Override
-    public SavingsAccountTransaction handleDepositLiteEx1(final Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
+    public SavingsAccountTransaction handleDepositLite(final SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
 
-        SavingsAccount savingsAccount = savingsAccountAssembler.assembleFrom(savingsAccountId);
-        return handleDepositLiteEx(savingsAccount ,transactionDate ,transactionAmount,noteText);
-
+        Long savingsAccountId = savingsAccount.getId();
+        return handleDepositLite(savingsAccountId ,transactionDate ,transactionAmount ,noteText);
+    
     }
+
 
     private SavingsAccountTransaction handleDeposit(final SavingsAccount account, final DateTimeFormatter fmt,
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType,final TransactionCode transactionCode) {
         
-        //System.err.println("---------private function to handle deposit----------------");
+        System.err.println("---------private function to handle deposit----------------"+isAccountTransfer);
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -307,9 +311,20 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final Set<Long> existingReversedTransactionIds = new HashSet<>();
         updateExistingTransactionsDetails(account, existingTransactionIds, existingReversedTransactionIds);
         Integer accountType = null;
+
         final SavingsAccountTransactionDTO transactionDTO = new SavingsAccountTransactionDTO(fmt, transactionDate, transactionAmount,
                 paymentDetail, new Date(), user, accountType);
+
+        //System.err.println("--------------payment detail values ? "+Optional.ofNullable(paymentDetail).isPresent());
+
+
+        //System.err.println("--------------is cash payment now son  ? "+Optional.ofNullable(paymentDetail.getPaymentType()).isPresent());
+
+
+        //System.err.println("--------------is cash payment ? "+paymentDetail.getPaymentType().isCashPayment());
+
         final SavingsAccountTransaction deposit = account.deposit(transactionDTO, savingsAccountTransactionType);
+
         final LocalDate postInterestOnDate = null;
         final MathContext mc = MathContext.DECIMAL64;
         if (account.isBeforeLastPostingPeriod(transactionDate)) {
@@ -322,10 +337,20 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                     financialYearBeginningMonth, postInterestOnDate);
         }
 
+        System.err.println("-----------------does this function always handle deposits all the time son ?");
+
 
         saveTransactionToGenerateTransactionId(deposit);
 
         this.savingsAccountRepository.saveAndFlush(account);
+        /**
+         * Added 06/11/2022 at 2020
+         * We intend to login all cash transactions from here on
+         * Assuming there arent handled anywhere else in the system
+         */
+        if(!isAccountTransfer) {
+            //CashTransactionLoggingHelper.savingsAccountTransaction(tellerWritePlatformService, deposit);
+        }
 
         /**
          * Added 20/07/2021
@@ -333,7 +358,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
          * Modified 28/12/2021 error with start dates 
          * Backdated transactions adding to current month transactions instead of creating own record added transaction date field
          * */
-
         SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,true);
 
         //System.err.println("--------------transaction code is not inserted anywhere ---------"+Optional.ofNullable(transactionCode).isPresent());

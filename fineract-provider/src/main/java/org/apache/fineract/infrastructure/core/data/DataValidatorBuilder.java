@@ -662,6 +662,34 @@ public class DataValidatorBuilder {
         return this;
     }
 
+    /**
+     * Added 05/11/2022 at 0059
+     */
+    public DataValidatorBuilder mustBeFalseParameterProvidedIs(final String parameterName, final Boolean parameterValue) {
+        
+        if (!parameterValue) { return this; }
+
+        // if (this.value){
+        //     return this;
+        // }
+
+        if(!parameterValue) { 
+            return this; 
+        }
+
+        final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
+                .append(this.parameter).append(".cannot.also.be.provided.when.").append(parameterName).append(".is.")
+                .append(parameterValue);
+
+        final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
+                .append(" cannot also be provided when ").append(parameterName).append(" is ").append(parameterValue);
+        final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(), defaultEnglishMessage.toString(),
+                this.parameter, this.value, parameterName, parameterValue);
+        this.dataValidationErrors.add(error);
+        return this;
+    }
+  
+
     public DataValidatorBuilder mustBeBlankWhenParameterProvidedIs(final String parameterName, final Object parameterValue) {
         if (this.value == null && this.ignoreNullValue) { return this; }
 

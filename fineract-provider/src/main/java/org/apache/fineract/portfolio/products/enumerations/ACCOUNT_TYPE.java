@@ -1,27 +1,26 @@
-package org.apache.fineract.portfolio.savings.enumerations;
+package org.apache.fineract.portfolio.products.enumerations;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
-import org.apache.fineract.portfolio.remittance.enumerations.RX_PROVIDER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public enum ACCOUNT_PROTOTYPE {
-
+public enum ACCOUNT_TYPE {
+    
     CHECKING("Checking"),
     SETTLEMENT("Settlement"),
     FUND("Fund");
 
     private String code ;
-    ACCOUNT_PROTOTYPE(String code){
+    ACCOUNT_TYPE(String code){
         this.code = code;
     }
 
-    public static ACCOUNT_PROTOTYPE fromInt(Integer arg){
+    public static ACCOUNT_TYPE fromInt(Integer arg){
 
-        for(ACCOUNT_PROTOTYPE t : values()){
+        for(ACCOUNT_TYPE t : values()){
             if(arg.equals(t.ordinal())  ){
                 return t ;
             }

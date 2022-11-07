@@ -37,7 +37,14 @@ public interface SavingsAccountDomainService {
 
     
     // Added 22/07/2021
-    SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount);
+    /**
+     * Modified 05/11/2022 
+     * Modified to include noteText 
+     * Next version should be able to deduct charges ,thus from the main account 
+     */ 
+    SavingsAccountTransaction handleDepositLite(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String note);
+    SavingsAccountTransaction handleDepositLite(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount,String note);
+   
    
     void postJournalEntries(SavingsAccount savingsAccount, Set<Long> existingTransactionIds, Set<Long> existingReversedTransactionIds);
 
@@ -45,10 +52,18 @@ public interface SavingsAccountDomainService {
 
 
     // Added 02/01/2021
-    SavingsAccountTransaction handleDepositLiteEx(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+    /**
+     * Removed 05/11/2022 at 0446 
+     * Redundant Function
+     */ 
+    //SavingsAccountTransaction handleDepositLiteEx(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
 
     // Added 19/07/2022
-    SavingsAccountTransaction handleDepositLiteEx1(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
+    /**
+     * Removed 05/11/2022 at 0446 
+     * Redundant function
+     */ 
+    //SavingsAccountTransaction handleDepositLiteEx1(Long savingsAccountId ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);
 
      // Added 02/08/2021
     SavingsAccountTransaction handleWithdrawalLite(SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText);

@@ -20,6 +20,7 @@ package org.apache.fineract.organisation.teller.service;
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.organisation.teller.domain.CashTransaction;
 
 /**
  * Provides the local service for adding, modifying and deleting tellers.
@@ -85,4 +86,10 @@ public interface TellerWritePlatformService {
 
 	CommandProcessingResult settleCashFromCashier(Long cashierId,
 			JsonCommand command);
+
+    /**
+     * Added 05/11/2022 at 0825
+     * Post all cash transactions directly to cashier
+     */
+    CommandProcessingResult cashierTransaction(Long cashierId , CashTransaction cashTransaction);
 }

@@ -80,7 +80,7 @@ public class CommissionsHelperService {
             String depositNote = String.format("Commission charge deposit from loan %s at %s",loan.getAccountNumber() ,chargeTimeType.getCode());
 
             LocalDate transactionDate = CommissionsHelper.getTransactionDate(loan ,chargeTimeType);
-            savingsAccountDomainService.handleDepositLiteEx(savingsAccount ,transactionDate ,commissionAmount ,depositNote);
+            savingsAccountDomainService.handleDepositLite(savingsAccount ,transactionDate ,commissionAmount ,depositNote);
 
             // update is deposited here
             AttachedCommissionCharges attachedCommissionCharges = attachedCommissionChargesRepository.findOne(attachedCommissionChargeId);

@@ -93,9 +93,11 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
 
             sqlBuilder.append("t.id as id,t.office_id as office_id, t.name as teller_name, t.description as description, ");
             sqlBuilder.append("t.valid_from as start_date, t.valid_to as end_date, t.state as status, o.name as office_name, ");
-            sqlBuilder.append("t.debit_account_id as debit_account_id, t.credit_account_id as credit_account_id ");
+            sqlBuilder.append("t.debit_account_id as debit_account_id, t.credit_account_id as credit_account_id, ");
+            sqlBuilder.append("t.user_id as userId ");
             sqlBuilder.append("from m_tellers t ");
             sqlBuilder.append("join m_office o on o.id = t.office_id ");
+            sqlBuilder.append("left join m_appuser u on u.id = t.user_id ");
 
             return sqlBuilder.toString();
         }
@@ -119,8 +121,10 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
             final LocalDate startDate = JdbcSupport.getLocalDate(rs, "start_date");
             final LocalDate endDate = JdbcSupport.getLocalDate(rs, "end_date");
 
+            final Long userId = rs.getLong("userId");
+
             return TellerData.instance(id, officeId, debitAccountId, creditAccountId, tellerName, description, startDate, endDate,
-                    tellerStatus, officeName, null, null);
+                    tellerStatus, officeName, null, null ,userId);
         }
     }
 
@@ -161,8 +165,10 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
             final LocalDate startDate = JdbcSupport.getLocalDate(rs, "start_date");
             final LocalDate endDate = JdbcSupport.getLocalDate(rs, "end_date");
 
+            final Long userId = rs.getLong("userId");
+
             return TellerData.instance(id, officeId, debitAccountId, creditAccountId, tellerName, description, startDate, endDate,
-                    tellerStatus, officeName, null, null);
+                    tellerStatus, officeName, null, null ,userId);
 
         }
     }
@@ -223,6 +229,23 @@ public class TellerManagementReadPlatformServiceImpl implements TellerManagement
             throw new StaffNotFoundException(tellerId);
         }
     }
+
+    /**
+     * Added 05/11/2022 at 1341
+     */
+
+    @Override
+    public TellerData findTellerForUser(final Long userId) {
+
+        try {
+            final TellerMapper tm = new TellerMapper();
+            final String sql = "select " + tm.schema() + " where t.user_id = ?";
+
+            return this.jdbcTemplate.queryForObject(sql, tm, new Object[] { userId });
+        } catch (final EmptyResultDataAccessException e) {
+            throw new StaffNotFoundException(userId);
+        }
+    }  
 
     @Override
     public Collection<TellerData> retrieveAllTellers(final String sqlSearch, final Long officeId, final String status) {

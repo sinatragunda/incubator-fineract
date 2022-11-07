@@ -34,8 +34,21 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.apache.commons.lang.ObjectUtils;
 
 public class DateUtils {
+
+    /**
+     * Added 05/11/2022 at 1924
+     * Created to solve problem of invalid LocalDate hwne being stored in database
+     */
+    public static Date fromLocalDate(LocalDate localDate){
+        return localDate.toDateTimeAtStartOfDay().toDate();
+    }
+
+    public static LocalDate toLocalDate(Date date){
+        return (LocalDate) ObjectUtils.defaultIfNull(new LocalDate(date), null);
+    }  
 
     public static DateTimeZone getDateTimeZoneOfTenant() {
         final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();

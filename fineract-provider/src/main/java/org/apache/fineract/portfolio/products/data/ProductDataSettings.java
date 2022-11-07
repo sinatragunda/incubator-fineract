@@ -6,6 +6,7 @@
 */
 package org.apache.fineract.portfolio.products.data;
 
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 
 /**
@@ -16,11 +17,27 @@ public class ProductDataSettings {
     private PRODUCT_TYPE productType ;
     private Long productId;
     private Boolean deductChargesOnAccountBalance;
+    private ACCOUNT_TYPE accountType;
+    private boolean active ;
 
-    public ProductDataSettings(PRODUCT_TYPE productType, Long productId, Boolean deductChargesOnAccountBalance) {
+    public ProductDataSettings(PRODUCT_TYPE productType, Long productId, Boolean deductChargesOnAccountBalance ,ACCOUNT_TYPE accountType ,boolean isActive) {
         this.productType = productType;
         this.productId = productId;
         this.deductChargesOnAccountBalance = deductChargesOnAccountBalance;
+        this.accountType =accountType;
+        this.active = isActive;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public ACCOUNT_TYPE getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(ACCOUNT_TYPE accountType) {
+        this.accountType = accountType;
     }
 
     public PRODUCT_TYPE getProductType() {

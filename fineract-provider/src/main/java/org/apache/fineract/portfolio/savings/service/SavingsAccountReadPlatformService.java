@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
@@ -68,4 +69,9 @@ public interface SavingsAccountReadPlatformService {
 
     // Added 16/12/2021
     List<SavingsAccountData> retrieveAllForClientUnderPortfolio(Long clientId ,Long savingsProductId);
+
+    /**
+     * Added 04/11/2022 at 0215
+     */
+    Collection<SavingsAccountData> retrieveAllByAccountType(ACCOUNT_TYPE accountType);
 }

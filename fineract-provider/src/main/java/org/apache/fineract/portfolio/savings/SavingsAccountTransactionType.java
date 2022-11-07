@@ -43,7 +43,9 @@ public enum SavingsAccountTransactionType {
     WITHHOLD_TAX(18, "savingsAccountTransactionType.withholdTax"),
     ESCHEAT(19, "savingsAccountTransactionType.escheat"),
     AMOUNT_HOLD(20, "savingsAccountTransactionType.onHold"),
-    AMOUNT_RELEASE(21, "savingsAccountTransactionType.release");
+    AMOUNT_RELEASE(21, "savingsAccountTransactionType.release"),
+
+    DEPOSIT_FEE(22 ,"Deposit Fee");
 
     private final Integer value;
     private final String code;

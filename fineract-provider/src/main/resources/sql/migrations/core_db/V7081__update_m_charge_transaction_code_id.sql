@@ -18,7 +18,7 @@
 
 -- Created 10/09/2022 at 0542 
 
-ALTER TABLE `m_charge` ADD COLUMN `transaction_code_id` BIGINT(5) null ;
+ALTER TABLE `m_charge` ADD COLUMN `transaction_code_id` BIGINT(20) null ;
 
 
 

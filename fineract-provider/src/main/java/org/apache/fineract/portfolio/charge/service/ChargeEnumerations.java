@@ -108,6 +108,14 @@ public class ChargeEnumerations {
                         "Loan Closed");
             break;
 
+            /**
+             * Added 05/11/2022 at 1515
+             */
+            case DEPOSIT:
+                optionData = new EnumOptionData(ChargeTimeType.DEPOSIT.getValue().longValue(), ChargeTimeType.DEPOSIT.getCode(), 
+                        "Deposit Fee");
+            break;  
+
 
             default:
                 optionData = new EnumOptionData(ChargeTimeType.INVALID.getValue().longValue(), ChargeTimeType.INVALID.getCode(), "Invalid");

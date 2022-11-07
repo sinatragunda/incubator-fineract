@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map ;
 import java.util.Optional;
 
-public class ClientCreateHelper {
+public class CreateClientHelper {
 
     private static String AGENT = "AGENT";
 
@@ -56,4 +56,18 @@ public class ClientCreateHelper {
             }
         });
     }
+
+    /**
+     * Added 05/11/2022 at 0137
+     */
+
+    public static Long createClient(PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService , Map map){
+
+        String jsonRequest = JsonHelper.serializeMapToJson(map);
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createClient().withJson(jsonRequest).build();
+        final CommandProcessingResult result = portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+        Long id = result.resourceId();
+        return id ;
+            
+    }  
 }

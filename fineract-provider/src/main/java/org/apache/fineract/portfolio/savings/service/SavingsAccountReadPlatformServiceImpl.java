@@ -52,6 +52,8 @@ import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
+import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYearType;
@@ -159,6 +161,20 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
         final Object[] queryParameters = new Object[] { clientId, depositAccountType.getValue() };
         return this.jdbcTemplate.query(sqlBuilder.toString(), this.savingAccountMapper, queryParameters);
+    }
+
+    @Override
+    public Collection<SavingsAccountData> retrieveAllByAccountType(final ACCOUNT_TYPE accountType) {
+
+        final StringBuilder sqlBuilder = new StringBuilder("select "+this.savingAccountMapper.schema());
+        sqlBuilder.append(" left join m_product pro on pro.product_id = sa.product_id ");
+        sqlBuilder.append(" where sa.status_enum = 300 and pro.product_type = ? and pro.account_type = ?");
+
+        System.err.println("----------final sql is "+sqlBuilder);
+
+        final Object[] queryParameters = new Object[] {PRODUCT_TYPE.SAVINGS.ordinal(), accountType.ordinal() };
+        return this.jdbcTemplate.query(sqlBuilder.toString(), this.savingAccountMapper, queryParameters);
+
     }
 
     @Override

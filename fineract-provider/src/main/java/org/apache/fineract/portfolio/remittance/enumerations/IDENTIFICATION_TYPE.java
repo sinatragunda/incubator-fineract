@@ -9,6 +9,7 @@ import java.util.List;
 
 public enum IDENTIFICATION_TYPE {
 
+    NONE("None"),
     ID("Id"),
     PASSPORT("Passport");
 
@@ -29,5 +30,14 @@ public enum IDENTIFICATION_TYPE {
             enumOptionDataList.add(enumOptionData);
         });
         return  enumOptionDataList;
+    }
+
+    public static IDENTIFICATION_TYPE fromInt(final Integer val){
+        for(IDENTIFICATION_TYPE t : values()){
+            if(t.ordinal()==val){
+                return t ;
+            }
+        }
+        return ID ;
     }
 }

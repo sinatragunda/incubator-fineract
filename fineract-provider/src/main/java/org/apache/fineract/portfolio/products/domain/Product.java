@@ -16,6 +16,7 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.products.constants.ProductConstants;
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.*;
 import org.apache.fineract.portfolio.tax.domain.TaxGroup;
@@ -58,7 +59,6 @@ import com.google.gson.JsonArray;
 @Table(name = "m_product")
 public class Product extends AbstractPersistableCustom<Long> {
 
-    
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "product_type", nullable = false)
     protected PRODUCT_TYPE productType;
@@ -79,15 +79,19 @@ public class Product extends AbstractPersistableCustom<Long> {
     @Column(name = "deduct_charges_on_balance" ,nullable =false)
     private Boolean deductChargesOnAccountBalance;
 
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "account_type", nullable = false)
+    protected ACCOUNT_TYPE accountType;
 
     protected Product(){}
 
 
-    public Product(PRODUCT_TYPE productType, Long productId, Boolean active ,Boolean deductChargesOnBalance) {
+    public Product(PRODUCT_TYPE productType, Long productId, Boolean active ,Boolean deductChargesOnBalance ,ACCOUNT_TYPE accountType) {
         this.productType = productType;
         this.productId = productId;
         this.active = active;
         this.deductChargesOnAccountBalance = deductChargesOnBalance;
+        this.accountType = accountType;
     }
 
     public Map<String, Object> update(final JsonCommand command) {
@@ -107,6 +111,13 @@ public class Product extends AbstractPersistableCustom<Long> {
             actualChanges.put(ProductConstants.deductChargesOnBalance, newValue);
             this.deductChargesOnAccountBalance = newValue;
         }
+
+        if (command.isChangeInIntegerParameterNamed(ProductConstants.accountTypeParam, this.accountType.ordinal())) {
+            final Integer newValue = command.integerValueOfParameterNamed(ProductConstants.accountTypeParam);
+            actualChanges.put(ProductConstants.accountTypeParam, newValue);
+            this.accountType = ACCOUNT_TYPE.fromInt(newValue);
+        }
+
 
         return actualChanges;
     }

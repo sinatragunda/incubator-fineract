@@ -10,30 +10,84 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c54cc16b-bf11-4a48-b5b6-246cacf48b86" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/api/RxApiResource.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/constants/RxApiConstants.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/data/RxData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/Remitter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxReceive.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxSend.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/IDENTIFICATION_TYPE.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/REMITTANCE_TRANSACTION_STATE.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/RX_PROVIDER.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDataReadPlatformServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxReadPlatformService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/enumerations/ACCOUNT_PROTOTYPE.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/domain/CashTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/helper/CashTransactionLoggingHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/common/helper/EntityMap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/data/RxDealData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/data/RxDealTransactionData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/data/RxDealValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxDealAsembler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxDealReceive.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxDealTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/RX_DEAL_STATUS.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/exceptions/RxDealNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/handler/CreateRxDealHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/helper/RxDealDataHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/helper/RxDealKeyHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/repo/RxDealReceiveRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/repo/RxDealRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/repo/RxDealRepositoryWrapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/repo/RxDealTransactionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDealTransactionReadPlatformService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDealWritePlatformService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDealWritePlatformServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MIFOS-CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/MIFOS-CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-docs/apiLive.htm" beforeDir="false" afterPath="$PROJECT_DIR$/api-docs/apiLive.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/system-architecture/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/system-architecture/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/savings/SavingsImportHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeReadPlatformServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsApiConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsApiConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/DataValidatorBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/DataValidatorBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/DateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/DateUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/data/TellerData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/data/TellerData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/domain/Teller.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/domain/Teller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/serialization/TellerCommandFromApiJsonDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/serialization/TellerCommandFromApiJsonDeserializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerManagementReadPlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerManagementReadPlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerManagementReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerManagementReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerWritePlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerWritePlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerWritePlatformServiceJpaImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/organisation/teller/service/TellerWritePlatformServiceJpaImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/Charge.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/Charge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/ChargeTimeType.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/domain/ChargeTimeType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeDropdownReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeDropdownReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeEnumerations.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/charge/service/ChargeEnumerations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/helper/ClientCreateHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/helper/CreateClientHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/CommissionsHelperService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/commissions/helper/CommissionsHelperService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/common/BusinessEventNotificationConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/common/BusinessEventNotificationConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/api/ProductsApiResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/api/ProductsApiResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/constants/ProductConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/constants/ProductConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/data/ProductDataSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/data/ProductDataSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/domain/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductReadPlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductReadPlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/service/ProductWritePlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/api/RxApiResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/api/RxApiResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/constants/RxApiConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/constants/RxDealConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/Remitter.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxDeal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxReceive.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/domain/RxSend.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/IDENTIFICATION_TYPE.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/enumerations/IDENTIFICATION_TYPE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDataReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDealReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxReadPlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/remittance/service/RxDealReadPlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsAccountTransactionType.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/SavingsAccountTransactionType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/FixedDepositAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/FixedDepositAccount.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/RecurringDepositAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/RecurringDepositAccount.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccount.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountAssembler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountAssembler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountCharge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProductAssembler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsProductAssembler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/enumerations/ACCOUNT_PROTOTYPE.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/products/enumerations/ACCOUNT_TYPE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/EquityGrowthHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/EquityGrowthHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountReadPlatformServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsAccountWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsProductReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/service/SavingsProductReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/domain/AppUserRepositoryWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/useradministration/domain/AppUserRepositoryWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/wese/helper/JsonCommandHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Summary(Pentaho).prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Summary(Pentaho).prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/resources/META-INF/spring/appContext.xml" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/resources/META-INF/spring/appContext.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/resources/sql/migrations/core_db/V7081__update_m_charge_transaction_code_id.sql" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/resources/sql/migrations/core_db/V7081__update_m_charge_transaction_code_id.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,8 +133,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Enum" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -394,6 +448,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="MavenProjectNavigator">
     <treeState>
       <expand />
@@ -406,6 +463,7 @@
     <option name="width" value="1346" />
     <option name="height" value="698" />
   </component>
+  <component name="ProjectId" id="2H6Ib0DyBTmKkP5jElRnlavrh9e" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
@@ -665,7 +723,10 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "last_opened_file_path": "C:/Users/HP/Documents/GitHub/Java/incubator-fineract/fineract-provider/src/main/java/org/apache/fineract/portfolio"
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/HP/Documents/GitHub/Java/incubator-fineract/fineract-provider/src/main/java/org/apache/fineract",
+    "settings.editor.selected.configurable": "fileTemplates"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -674,6 +735,7 @@
       <recent name="D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\portfolio\shareaccounts\api" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="org.apache.fineract.portfolio.products.enumerations" />
       <recent name="org.apache.fineract.spm.repository" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -777,7 +839,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b67edfa2-cc53-4f72-b77b-b5eeef9f87c0" name="Default" comment="" />
+      <changelist id="c54cc16b-bf11-4a48-b5b6-246cacf48b86" name="Changes" comment="" />
       <created>1625245413184</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />

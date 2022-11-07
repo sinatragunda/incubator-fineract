@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.charge.domain;
 
 public enum ChargeTimeType {
+
     INVALID(0, "chargeTimeType.invalid"), //
     DISBURSEMENT(1, "chargeTimeType.disbursement"), // only for loan charges
     SPECIFIED_DUE_DATE(2, "chargeTimeType.specifiedDueDate"), // for loan and
@@ -41,7 +42,12 @@ public enum ChargeTimeType {
 
     // Added 04/01/2022
     LOAN_APPROVED(17 ,"Loan Approved"),
-    LOAN_CLOSED(18 ,"Loan Closed");
+    LOAN_CLOSED(18 ,"Loan Closed"),
+
+    /**
+     * Added 05/11/2022 at 0018
+     */
+    DEPOSIT(19 ,"Deposit");  
 
     private final Integer value;
     private final String code;
@@ -74,7 +80,7 @@ public enum ChargeTimeType {
         return new Integer[] { ChargeTimeType.SPECIFIED_DUE_DATE.getValue(), ChargeTimeType.SAVINGS_ACTIVATION.getValue(),
                 ChargeTimeType.SAVINGS_CLOSURE.getValue(), ChargeTimeType.WITHDRAWAL_FEE.getValue(), ChargeTimeType.ANNUAL_FEE.getValue(),
                 ChargeTimeType.MONTHLY_FEE.getValue(), ChargeTimeType.OVERDRAFT_FEE.getValue(), ChargeTimeType.WEEKLY_FEE.getValue(),
-                ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getValue()};
+                ChargeTimeType.SAVINGS_NOACTIVITY_FEE.getValue(),ChargeTimeType.DEPOSIT.getValue()};
     }
 
     public static Object[] validClientValues() {
@@ -86,69 +92,81 @@ public enum ChargeTimeType {
     }
 
     public static ChargeTimeType fromInt(final Integer chargeTime) {
-        ChargeTimeType chargeTimeType = ChargeTimeType.INVALID;
-        if (chargeTime != null) {
-            switch (chargeTime) {
-                case 1:
-                    chargeTimeType = DISBURSEMENT;
-                break;
-                case 2:
-                    chargeTimeType = SPECIFIED_DUE_DATE;
-                break;
-                case 3:
-                    chargeTimeType = SAVINGS_ACTIVATION;
-                break;
-                case 4:
-                    chargeTimeType = SAVINGS_CLOSURE;
-                break;
-                case 5:
-                    chargeTimeType = WITHDRAWAL_FEE;
-                break;
-                case 6:
-                    chargeTimeType = ANNUAL_FEE;
-                break;
-                case 7:
-                    chargeTimeType = MONTHLY_FEE;
-                break;
-                case 8:
-                    chargeTimeType = INSTALMENT_FEE;
-                break;
-                case 9:
-                    chargeTimeType = OVERDUE_INSTALLMENT;
-                break;
-                case 10:
-                    chargeTimeType = OVERDRAFT_FEE;
-                break;
-                case 11:
-                    chargeTimeType = WEEKLY_FEE;
-                break;
-                case 12:
-                    chargeTimeType = TRANCHE_DISBURSEMENT;
-                break;
-                case 13:
-                    chargeTimeType = SHAREACCOUNT_ACTIVATION;
-                break;
-                case 14:
-                    chargeTimeType = SHARE_PURCHASE;
-                break;
-                case 15:
-                    chargeTimeType = SHARE_REDEEM;
-                break;
-                case 16:
-                	chargeTimeType = SAVINGS_NOACTIVITY_FEE;
-                break;
-                case 17:
-                    chargeTimeType = LOAN_APPROVED ;
-                    break;
-                case 18:
-                    chargeTimeType = LOAN_CLOSED;
-                    break;
-                default:
-                    chargeTimeType = INVALID;
-                break;
+
+        for(ChargeTimeType t : values()){
+            if(t.ordinal() == chargeTime){
+                return t ;
             }
         }
-        return chargeTimeType;
+
+        return ChargeTimeType.INVALID;
+
+        // ChargeTimeType chargeTimeType = ChargeTimeType.INVALID;
+        // if (chargeTime != null) {
+        //     switch (chargeTime) {
+        //         case 1:
+        //             chargeTimeType = DISBURSEMENT;
+        //         break;
+        //         case 2:
+        //             chargeTimeType = SPECIFIED_DUE_DATE;
+        //         break;
+        //         case 3:
+        //             chargeTimeType = SAVINGS_ACTIVATION;
+        //         break;
+        //         case 4:
+        //             chargeTimeType = SAVINGS_CLOSURE;
+        //         break;
+        //         case 5:
+        //             chargeTimeType = WITHDRAWAL_FEE;
+        //         break;
+        //         case 6:
+        //             chargeTimeType = ANNUAL_FEE;
+        //         break;
+        //         case 7:
+        //             chargeTimeType = MONTHLY_FEE;
+        //         break;
+        //         case 8:
+        //             chargeTimeType = INSTALMENT_FEE;
+        //         break;
+        //         case 9:
+        //             chargeTimeType = OVERDUE_INSTALLMENT;
+        //         break;
+        //         case 10:
+        //             chargeTimeType = OVERDRAFT_FEE;
+        //         break;
+        //         case 11:
+        //             chargeTimeType = WEEKLY_FEE;
+        //         break;
+        //         case 12:
+        //             chargeTimeType = TRANCHE_DISBURSEMENT;
+        //         break;
+        //         case 13:
+        //             chargeTimeType = SHAREACCOUNT_ACTIVATION;
+        //         break;
+        //         case 14:
+        //             chargeTimeType = SHARE_PURCHASE;
+        //         break;
+        //         case 15:
+        //             chargeTimeType = SHARE_REDEEM;
+        //         break;
+        //         case 16:
+        //         	chargeTimeType = SAVINGS_NOACTIVITY_FEE;
+        //         break;
+        //         case 17:
+        //             chargeTimeType = LOAN_APPROVED ;
+        //             break;
+        //         case 18:
+        //             chargeTimeType = LOAN_CLOSED;
+        //             break;
+        //         case 19:
+        //             chargeTimeType = DEPOSIT;
+        //             break;
+        //         default:
+        //             chargeTimeType = INVALID;
+        //         break;
+        //     }
+        // }
+        // return chargeTimeType;
     }
 
     public boolean isTimeOfDisbursement() {
@@ -205,7 +223,7 @@ public enum ChargeTimeType {
 
     public boolean isAllowedSavingsChargeTime() {
         return isOnSpecifiedDueDate() || isSavingsActivation() || isSavingsClosure() || isWithdrawalFee() || isAnnualFee()
-                || isMonthlyFee() || isWeeklyFee() || isOverdraftFee() || isSavingsNoActivityFee();
+                || isMonthlyFee() || isWeeklyFee() || isOverdraftFee() || isSavingsNoActivityFee() || isDepositFee();
     }
 
     public boolean isOverdraftFee() {
@@ -227,4 +245,12 @@ public enum ChargeTimeType {
     public boolean isSharesRedeem() {
         return this.value.equals(ChargeTimeType.SHARE_REDEEM.getValue());
     }
+
+    /**
+     * Added 05/11/2022 at 0020
+     */
+
+    public boolean isDepositFee() {
+        return this.value.equals(ChargeTimeType.DEPOSIT.getValue());
+    } 
 }

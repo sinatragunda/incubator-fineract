@@ -3251,5 +3251,25 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 04/11/2022 at 0252
+     */ 
+    public CommandWrapperBuilder createRxDeal() {
+        this.actionName = "CREATE";
+        this.entityName = "RXDEAL";
+        this.href = "/rx";
+        return this;
+    }
+
+    /**
+     * Added 06/11/2022 at 0407
+     */ 
+    public CommandWrapperBuilder receiveRxDeal() {
+        this.actionName = "UPDATE";
+        this.entityName = "RXDEAL";
+        this.href = "/rx/?command = receive";
+        return this;
+    }
+
 
 }

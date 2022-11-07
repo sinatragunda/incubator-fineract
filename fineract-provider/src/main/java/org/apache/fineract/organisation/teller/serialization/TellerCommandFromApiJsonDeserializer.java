@@ -53,7 +53,7 @@ public final class TellerCommandFromApiJsonDeserializer {
      */
     private final Set<String> supportedParameters = new HashSet<>(Arrays.asList("officeId", "name", "description", "startDate", "endDate",
             "status", "dateFormat", "locale", "isFullDay", "staffId", "hourStartTime", "minStartTime", "hourEndTime", "minEndTime",
-            "txnAmount", "txnDate", "txnNote", "entityType", "entityId", "currencyCode"));
+            "txnAmount", "txnDate", "txnNote", "entityType", "entityId", "currencyCode","userId"));
 
     private final FromJsonHelper fromApiJsonHelper;
 
@@ -90,6 +90,13 @@ public final class TellerCommandFromApiJsonDeserializer {
 
         final String status = this.fromApiJsonHelper.extractStringNamed("status", element);
         baseDataValidator.reset().parameter("status").value(status).notBlank().notExceedingLengthOf(50);
+
+        /**
+         * Added 06/11/2022 at 1827
+         */
+
+        final Long userId = this.fromApiJsonHelper.extractLongNamed("userId", element);
+        baseDataValidator.reset().parameter("userId").value(userId).notNull().integerGreaterThanZero();
 
         if (endDate != null) {
             if (endDate.isBefore(startDate)) { throw new InvalidDateInputException(startDate.toString(), endDate.toString()); }

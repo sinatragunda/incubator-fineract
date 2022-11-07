@@ -65,7 +65,8 @@
 										  org.apache.fineract.portfolio.ssbpayments.*,
 										  org.apache.fineract.portfolio.products.*,
 										  org.apache.fineract.components.*,
-										  com.wese.component.defaults.*">
+										  com.wese.component.defaults.*,
+										  org.apache.fineract.portfolio.remittance.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
 			type="annotation" />
@@ -102,7 +103,8 @@
 	<jpa:repositories base-package="org.apache.fineract.notification.repo"/>
 	<jpa:repositories base-package="org.apache.fineract.accounting.journalentry.repo"/>
 
-
+	<!-- Added 04/11/2022 at 0326 -->
+	<jpa:repositories base-package="org.apache.fineract.portfolio.remittance.repo"/>
 
 
 

@@ -45,4 +45,16 @@ public class AppUserRepositoryWrapper {
         AppUser appUser = this.appUserRepository.findAppUserByEmail(emailAddress);
         return appUser ;
     }
+
+    /**
+     * Added 06/11/2022 at 1841
+     */
+
+    public AppUser findOneWithNotFoundDetection(Long userId) {
+        AppUser user = this.appUserRepository.findOne(userId);
+        if(user == null) {
+            throw new UserNotFoundException(userId) ;
+        }
+        return user ;
+    }
 }

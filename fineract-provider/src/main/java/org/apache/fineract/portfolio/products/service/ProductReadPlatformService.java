@@ -35,4 +35,5 @@ public interface ProductReadPlatformService {
     public Set<String> getResponseDataParams();
     
     public Collection<ProductData> retrieveAllForLookup() ;
+
 }

@@ -80,7 +80,7 @@ public class EquityGrowthHelper {
                 }
             }
 
-            savingsAccountDomainService.handleDepositLiteEx1(savingsAccount.getId() ,new LocalDate(),amount,"Equity Dividends Sharing");
+            savingsAccountDomainService.handleDepositLite(savingsAccount.getId() ,new LocalDate(),amount,"Equity Dividends Sharing");
 
             // update equity growth source account here
             e.setTransferAccount(savingsAccount);

@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.products.data.ProductDataSettings;
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.products.helper.ProductHelper;
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
@@ -164,6 +165,9 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             sqlBuilder.append("sp.accounting_type as accountingType, ");
             sqlBuilder.append("sp.withhold_tax as withHoldTax,");
             sqlBuilder.append("mp.deduct_charges_on_balance as deductChargesOnBalance,");
+            sqlBuilder.append("mp.account_type as accountType, ");
+            sqlBuilder.append("mp.id as productSettingsId, ");
+            sqlBuilder.append("mp.active as isProductActive, ");
             
             sqlBuilder.append("tg.id as taxGroupId, tg.name as taxGroupName, ");
             sqlBuilder.append("sp.is_dormancy_tracking_active as isDormancyTrackingActive,");
@@ -233,8 +237,10 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             final BigDecimal minRequiredOpeningBalance = rs.getBigDecimal("minRequiredOpeningBalance");
 
             final Boolean deductChargesOnBalance = rs.getBoolean("deductChargesOnBalance");
+            final ACCOUNT_TYPE accountType = ACCOUNT_TYPE.fromInt(rs.getInt("accountType"));
+            final Boolean isActive = rs.getBoolean("isProductActive");
 
-            final ProductDataSettings productDataSettings = new ProductDataSettings(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance);
+            final ProductDataSettings productDataSettings = new ProductDataSettings(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance ,accountType ,isActive);
 
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockinPeriodFrequency");
             EnumOptionData lockinPeriodFrequencyType = null;

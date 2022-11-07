@@ -696,7 +696,7 @@
 							<tr>
 								<td></td>
 								<td>savingsaccounts/{accountId}/transactions/{transactionId}?command=undo</td>
-								<td><a href="#savingsaccounts_undotransaction">Undo transaction</a></td>
+								<td><a href="#savingsaccounts_undotransaction">Undo cashTransaction</a></td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -704,7 +704,7 @@
 							<tr>
 								<td></td>
 								<td>savingsaccounts/{accountId}/transactions/{transactionId}?command=modify</td>
-								<td><a href="#savingsaccounts_adjusttransaction">Adjust transaction</a></td>
+								<td><a href="#savingsaccounts_adjusttransaction">Adjust cashTransaction</a></td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -729,7 +729,7 @@
 								<td></td>
 								<td>savingsaccounts/{accountId}/transactions/template</td>
 								<td></td>
-								<td><a href="#savingsaccounts_transactions_template">Retrieve savings account transaction template</a></td>
+								<td><a href="#savingsaccounts_transactions_template">Retrieve savings account cashTransaction template</a></td>
 								<td></td>
 								<td></td>
 							</tr>
@@ -737,7 +737,7 @@
 								<td></td>
 								<td>savingsaccounts/{accountId}/transactions/{transactionId}</td>
 								<td></td>
-								<td><a href="#savingsaccounts_transaction">Retrieve savings account transaction</a></td>
+								<td><a href="#savingsaccounts_transaction">Retrieve savings account cashTransaction</a></td>
 								<td></td>
 								<td></td>
 							</tr>
@@ -1000,7 +1000,7 @@
 							<tr>
 								<td></td>
 								<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}?command=undo</td>
-								<td><a href="#recurringdepositaccounts_undotransaction">Undo transaction</a></td>
+								<td><a href="#recurringdepositaccounts_undotransaction">Undo cashTransaction</a></td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -1008,7 +1008,7 @@
 							<tr>
 								<td></td>
 								<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}?command=modify</td>
-								<td><a href="#recurringdepositaccounts_adjusttransaction">Adjust transaction</a></td>
+								<td><a href="#recurringdepositaccounts_adjusttransaction">Adjust cashTransaction</a></td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -1017,7 +1017,7 @@
 								<td></td>
 								<td>recurringdepositaccounts/{accountId}/transactions/template</td>
 								<td></td>
-								<td><a href="#recurringdepositaccounts_transactions_template">Retrieve Deposit account transaction template</a></td>
+								<td><a href="#recurringdepositaccounts_transactions_template">Retrieve Deposit account cashTransaction template</a></td>
 								<td></td>
 								<td></td>
 							</tr>
@@ -1025,7 +1025,7 @@
 								<td></td>
 								<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}</td>
 								<td></td>
-								<td><a href="#recurringdepositaccounts_transaction">Retrieve Deposit account transaction</a></td>
+								<td><a href="#recurringdepositaccounts_transaction">Retrieve Deposit account cashTransaction</a></td>
 								<td></td>
 								<td></td>
 							</tr>
@@ -1355,7 +1355,7 @@
                             <tr>
                                 <td></td>
                                 <td>loans/{loanId}/transactions?command=undowriteoff</td>
-                                <td><a href="#loans_transaction_undo_write-off_loan">Undo Loan Write-off transaction</a></td>
+                                <td><a href="#loans_transaction_undo_write-off_loan">Undo Loan Write-off cashTransaction</a></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -1363,7 +1363,7 @@
 							 <tr>
                                 <td></td>
                                 <td>loans/{loanId}/transactions?command=prepayLoan</td>
-                                <td><a href="#loans_transaction_pre_close_loan">Loan Pre-Closure transaction template</a></td>
+                                <td><a href="#loans_transaction_pre_close_loan">Loan Pre-Closure cashTransaction template</a></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -3357,7 +3357,7 @@
 							</tr>
 							<tr>
 								<td>savingsaccounts/{accountId}/transactions/template</td>
-								<td><a href="#savingsaccounts_transactions_template">Retrieve savings account transaction template</a></td>
+								<td><a href="#savingsaccounts_transactions_template">Retrieve savings account cashTransaction template</a></td>
 							</tr>
                             <tr>
                                 <td>standinginstructions/template</td>
@@ -4454,14 +4454,14 @@ Content-Type: application/json Request Body:
 			<a class="old-syle-anchor">&nbsp;</a>
 			<div class="method-section">
 				<div class="method-description">
-					<h4>Batch requests in a single transaction</h4>
+					<h4>Batch requests in a single cashTransaction</h4>
 
 					<p>
-						The Apache Fineract Batch API is also capable of executing all the requests in a single transaction, by setting a Query Parameter, "enclosingTransaction=true". So, if one or more of the requests in a batch returns an erroneous response all of the Data base transactions made by other successful requests will be rolled back.
+						The Apache Fineract Batch API is also capable of executing all the requests in a single cashTransaction, by setting a Query Parameter, "enclosingTransaction=true". So, if one or more of the requests in a batch returns an erroneous response all of the Data base transactions made by other successful requests will be rolled back.
 					</p>
 
 					<p>
-						If there has been a rollback in a transaction then a single response will be provided, with a '400' status code and a body consisting of the error details of the first failed request.
+						If there has been a rollback in a cashTransaction then a single response will be provided, with a '400' status code and a body consisting of the error details of the first failed request.
 					</p>
 
 				</div>
@@ -4520,7 +4520,7 @@ Content-Type: application/json Request Body:
 ]
 					</code>
 					<code class="method-response">
-Successful transaction response:
+Successful cashTransaction response:
 [
   {
     "requestId":1,
@@ -8030,13 +8030,13 @@ GET https://DomainName/fineract-provider/api/v1/centers?paged=true
 							<td>calendarId</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>The identifier of the calendar to which the transaction is linked with.</td>
+							<td class=fielddesc>The identifier of the calendar to which the cashTransaction is linked with.</td>
 						</tr>
 						<tr class=alt>
 							<td>transactionDate</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>The date on which the transaction took place.</td>
+							<td class=fielddesc>The date on which the cashTransaction took place.</td>
 						</tr>
                         <tr class=alt>
 							<td>role</td>
@@ -9608,7 +9608,7 @@ GET https://DomainName/fineract-provider/api/v1/groups?paged=true
 </tr>
 <tr>
 	<td class=fielddesc>
-An enumeration that indicates the type of transaction processing strategy to be used. This relates to functionality that is also known as <b>Payment Application Logic</b>.
+An enumeration that indicates the type of cashTransaction processing strategy to be used. This relates to functionality that is also known as <b>Payment Application Logic</b>.
 
 <p>A number of out of the box approaches exist, some are custom to specific MFIs, some are more general and indicate the order in which payments are processed.</p>
 
@@ -11480,7 +11480,7 @@ No Request Body:
 			<div class="method-section">
 				<div class="method-description">
 					<h3>Loan Transactions</h3>
-					<p>Capabilities include loan repayment's, interest waivers and the ability to 'adjust' an existing transaction. An 'adjustment' of a transaction is really a 'reversal' of existing transaction followed by creation of a new transaction with the provided details.</p>
+					<p>Capabilities include loan repayment's, interest waivers and the ability to 'adjust' an existing cashTransaction. An 'adjustment' of a cashTransaction is really a 'reversal' of existing cashTransaction followed by creation of a new cashTransaction with the provided details.</p>
 					<table class=matrixHeading>
 						<tr class="matrixHeadingBG">
 							<td><div class="fineractHeading2">Field Descriptions</div></td>
@@ -11489,13 +11489,13 @@ No Request Body:
 							<td>transactionAmount</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>The amount of the transaction.</td>
+							<td class=fielddesc>The amount of the cashTransaction.</td>
 						</tr>
 						<tr class=alt>
 							<td>transactionDate</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>The date of the transaction.</td>
+							<td class=fielddesc>The date of the cashTransaction.</td>
 						</tr>
 					</table>
 				</div>
@@ -11538,8 +11538,8 @@ No Request Body:
 							to the total amount paid in advance.
 						</dd>
 						<dd>
-							<b>'foreclosure'</b><br> "transaction date" is set to the current date by default<br>
-							"transaction amount" is set
+							<b>'foreclosure'</b><br> "cashTransaction date" is set to the current date by default<br>
+							"cashTransaction amount" is set
 							to the sum of total loan outstanding principal
 							and total Interest/ Fee/ Charges / Penalties
 							till foreclosure date.
@@ -11986,7 +11986,7 @@ Request Body:
     "dateFormat": "dd MMMM yyyy",
     "transactionDate": "25 May 2012",
     "transactionAmount": "50,000.00",
-    "note": "An optional note about why your adjusting or changing the transaction."
+    "note": "An optional note about why your adjusting or changing the cashTransaction."
 }
 					</code>
 					<code class="method-response">
@@ -14553,7 +14553,7 @@ Request Body:
 </tr>
 <tr>
 	<td class=fielddesc>
-An enumeration that indicates the type of transaction processing strategy to be used. This relates to functionality that is also known as <b>Payment Application Logic</b>.
+An enumeration that indicates the type of cashTransaction processing strategy to be used. This relates to functionality that is also known as <b>Payment Application Logic</b>.
 
 <p>A number of out of the box approaches exist, some are custom to specific MFIs, some are more general and indicate the order in which payments are processed.</p>
 
@@ -18890,7 +18890,7 @@ No Request Body:
 					<h3>Maker Checker (or 4-eye) functionality</h3>
                                         <p>Apache Fineract Maker Checker functionality allows an MFI to define transactions
                                         as having a maker and a checker phase.  One user enters, deletes or changes data.
-                                        Then, another user that has "Checker" rights for that transaction, can inspect
+                                        Then, another user that has "Checker" rights for that cashTransaction, can inspect
                                         and approve the data.
                                         </p>
 
@@ -18900,9 +18900,9 @@ No Request Body:
                                         </p>
 
                                         <p>
-                                        Additionally, Maker Checker functionality for each transaction (permission) is disabled by default.
+                                        Additionally, Maker Checker functionality for each cashTransaction (permission) is disabled by default.
                                         see <a href="#permissions_update">Enable/Disable Permissions for Maker Checker</a> to enable/disable
-                                        Maker Checker functionality at a transaction (permission) level.
+                                        Maker Checker functionality at a cashTransaction (permission) level.
                                         </p>
 
                                         <p>
@@ -20717,7 +20717,7 @@ Content-Type: application/json
 						It is typical scenario in MFI's that non accountants pass journal entries on a regular basis.
 						For Ex: A branch office might deposit their entire cash at hand to their Bank account at the end of a
 						working day. The branch office users might not understand enough of accounting to figure out which
-						account needs to get credited and which account needs to be debited to represent this transaction.
+						account needs to get credited and which account needs to be debited to represent this cashTransaction.
 					</p>
 					<p>Enter accounting rules, an abstraction on top of manual Journal entires for enabling
 					 simpler data entry.
@@ -24916,7 +24916,7 @@ Request Body:
 	<div class="method-section">
 	    <div class="method-description">
 	        <h2>Approve additional shares request on a share account</h2>
-	         <p><i>requestedShares</i> is Share purchase transaction ids</p>
+	         <p><i>requestedShares</i> is Share purchase cashTransaction ids</p>
 
             <table class=matrixHeading>
                 <tr class="matrixHeadingBG">
@@ -24954,7 +24954,7 @@ Request Body:
 	<div class="method-section">
 	    <div class="method-description">
 	        <h2>Reject additional shares request on a share account</h2>
-	         <p><i>requestedShares</i> is Share purchase transaction ids</p>
+	         <p><i>requestedShares</i> is Share purchase cashTransaction ids</p>
 
             <table class=matrixHeading>
                 <tr class="matrixHeadingBG">
@@ -25581,7 +25581,7 @@ No Request Body:
 	            <tr><td class=fielddesc>The period at which interest rate is compounded. 1=Daily, 4=Monthly (at end of month)</td></tr>
 
 	            <tr class=alt><td>interestPostingPeriodType</td></tr>
-	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to savings account. The actual crediting or posting transaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
+	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to savings account. The actual crediting or posting cashTransaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
 
 	            <tr class=alt><td>interestCalculationType</td></tr>
 	            <tr><td class=fielddesc>The interest calculation method used: 1=Daily Balance or 2=Average Daily Balance</td></tr>
@@ -26390,7 +26390,7 @@ Request Body:
 	        <h2>Close a savings account</h2>
 	        <p>Results in an Activated savings application being converted into an 'closed' savings account.</p>
             <p><i>closedOnDate</i> is closure date of savings account</p>
-            <p><i>withdrawBalance</i> is a boolean value, true value of this field performs a withdrawal transaction with account's running balance.</p>
+            <p><i>withdrawBalance</i> is a boolean value, true value of this field performs a withdrawal cashTransaction with account's running balance.</p>
             <table class=matrixHeading>
                 <tr class="matrixHeadingBG">
                     <td><div class="fineractHeading2">Mandatory Fields</div></td>
@@ -27062,10 +27062,10 @@ No Request Body:
 	            <tr class="matrixHeadingBG"><td><div class="fineractHeading2">Field Descriptions</div></td></tr>
 
 				<tr class=alt><td>transactionDate</td></tr>
-				<tr><td class=fielddesc>The date of the transaction.</td></tr>
+				<tr><td class=fielddesc>The date of the cashTransaction.</td></tr>
 
 				<tr class=alt><td>transactionAmount</td></tr>
-				<tr><td class=fielddesc>The amount of the transaction.</td></tr>
+				<tr><td class=fielddesc>The amount of the cashTransaction.</td></tr>
 	        </table>
 	    </div>
 	</div>
@@ -27272,7 +27272,7 @@ No Request Body:
 	<div class="method-section">
 	    <div class="method-description">
 	        <h2>Adjust Transaction</h2>
-	        <p>This command modifies the given transaction.</p>
+	        <p>This command modifies the given cashTransaction.</p>
 	    </div>
 	    <div class="method-example">
 	        <code class="method-declaration">POST https://Domain Name/api/v1/savingsaccounts/{accountsId}/transactions/{transactionId}?command=modify</code>
@@ -27314,8 +27314,8 @@ No Request Body:
 	<a id="savingsaccounts_undotransaction" name="savingsaccounts_undotransaction" class="old-syle-anchor">&nbsp;</a>
 	<div class="method-section">
 	    <div class="method-description">
-	        <h2>Undo transaction</h2>
-	        <p>This command reverses the given transaction.</p>
+	        <h2>Undo cashTransaction</h2>
+	        <p>This command reverses the given cashTransaction.</p>
 	    </div>
 	    <div class="method-example">
 	        <code class="method-declaration">POST https://Domain Name/api/v1/savingsaccounts/{accountsId}/transactions/{transactionId}?command=undo</code>
@@ -28098,7 +28098,7 @@ No Request Body:
 	            <tr><td class=fielddesc>The period at which interest rate is compounded. 1=Daily, 4=Monthly (at end of month)</td></tr>
 
 	            <tr class=alt><td>interestPostingPeriodType</td></tr>
-	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to fixed deposit account. The actual crediting or posting transaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
+	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to fixed deposit account. The actual crediting or posting cashTransaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
 
 	            <tr class=alt><td>interestCalculationType</td></tr>
 	            <tr><td class=fielddesc>The interest calculation method used: 1=Daily Balance or 2=Average Daily Balance</td></tr>
@@ -29554,7 +29554,7 @@ No Request Body:
 	            <tr><td class=fielddesc>The period at which interest rate is compounded. 1=Daily, 4=Monthly (at end of month)</td></tr>
 
 	            <tr class=alt><td>interestPostingPeriodType</td></tr>
-	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to recurring deposit account. The actual crediting or posting transaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
+	            <tr><td class=fielddesc>The period at which interest rate is posted or credited to recurring deposit account. The actual crediting or posting cashTransaction is date as occurring on the day after the end of the period.  4=Monthly (at end of month), 5=Quarterly (at end of quarter, 31st Mar, 30th Jun, 30th Sep, 31st Dec), 7=Annually (at end of calendar year 31st Dec)</td></tr>
 
 	            <tr class=alt><td>interestCalculationType</td></tr>
 	            <tr><td class=fielddesc>The interest calculation method used: 1=Daily Balance or 2=Average Daily Balance</td></tr>
@@ -31112,10 +31112,10 @@ No Request Body:
 	            <tr class="matrixHeadingBG"><td><div class="fineractHeading2">Field Descriptions</div></td></tr>
 
 				<tr class=alt><td>transactionDate</td></tr>
-				<tr><td class=fielddesc>The date of the transaction.</td></tr>
+				<tr><td class=fielddesc>The date of the cashTransaction.</td></tr>
 
 				<tr class=alt><td>transactionAmount</td></tr>
-				<tr><td class=fielddesc>The amount of the transaction.</td></tr>
+				<tr><td class=fielddesc>The amount of the cashTransaction.</td></tr>
 	        </table>
 	    </div>
 	</div>
@@ -31326,7 +31326,7 @@ No Request Body:
 	<div class="method-section">
 	    <div class="method-description">
 	        <h2>Adjust Transaction</h2>
-	        <p>This command modifies the given transaction.</p>
+	        <p>This command modifies the given cashTransaction.</p>
 	    </div>
 	    <div class="method-example">
 	        <code class="method-declaration">POST https://Domain Name/api/v1/recurringdepositaccounts/{accountsId}/transactions/{transactionId}?command=modify</code>
@@ -31367,8 +31367,8 @@ No Request Body:
 	<a id="recurringdepositaccounts_undotransaction" name="recurringdepositaccounts_undotransaction" class="old-syle-anchor">&nbsp;</a>
 	<div class="method-section">
 	    <div class="method-description">
-	        <h2>Undo transaction</h2>
-	        <p>This command reverses the given transaction.</p>
+	        <h2>Undo cashTransaction</h2>
+	        <p>This command reverses the given cashTransaction.</p>
 	    </div>
 	    <div class="method-example">
 	        <code class="method-declaration">POST https://Domain Name/api/v1/recurringdepositaccounts/{accountsId}/transactions/{transactionId}?command=undo</code>
@@ -33866,19 +33866,19 @@ No Request Body:
                 <dd>
                     Integer <span>optional</span>
                 </dd>
-                <dd>Use fromAccountId of standing instruction transaction to restrict results. fromAccountId is id of <i>fromAccountType</i>.</dd>
+                <dd>Use fromAccountId of standing instruction cashTransaction to restrict results. fromAccountId is id of <i>fromAccountType</i>.</dd>
 
                 <dt>fromAccountType</dt>
                 <dd>
                     Integer <span>optional</span>
                 </dd>
-                <dd>Use fromAccountType of standing instruction transaction to restrict results. fromAccountType is enum value entity type Ex:Loan Account:1, Savings Account:2</dd>
+                <dd>Use fromAccountType of standing instruction cashTransaction to restrict results. fromAccountType is enum value entity type Ex:Loan Account:1, Savings Account:2</dd>
 
                 <dt>transferType</dt>
                 <dd>
                     Integer <span>optional</span>
                 </dd>
-                <dd>Use transferType of standing instruction transaction to restrict results. transferType is enum value transfer type Ex:Loan Repayment:2, Account Transfer:1</dd>
+                <dd>Use transferType of standing instruction cashTransaction to restrict results. transferType is enum value transfer type Ex:Loan Repayment:2, Account Transfer:1</dd>
 
                 <dt>fromDate</dt>
                 <dd>
@@ -37664,7 +37664,7 @@ Request body:
                                             enabled for Maker Check functionality.
                                             </p>
                                             <p>
-                                            Note: Each Apache Fineract transaction is associated with a permission.
+                                            Note: Each Apache Fineract cashTransaction is associated with a permission.
                                             </p>
                                             </dd>
                                         </dl>
@@ -38803,7 +38803,7 @@ No Request Body:
                             <td>transactionDetails</td>
                         </tr>
                         <tr>
-                            <td class=fielddesc>Additional details of transaction like payment details and notes .
+                            <td class=fielddesc>Additional details of cashTransaction like payment details and notes .
                         	</td>
                         </tr>
                         <tr class=alt>
@@ -43439,7 +43439,7 @@ Request Body:
 			<div class="method-section">
 				<div class="method-description">
 					<h3>Client Transaction</h3>
-					<p>Client Transactions refer to transactions made directly againt a Client's internal account. Currently, these transactions are only created as a result of charge payments/waivers. You are allowed to undo a transaction, however you cannot explicitly create one.
+					<p>Client Transactions refer to transactions made directly againt a Client's internal account. Currently, these transactions are only created as a result of charge payments/waivers. You are allowed to undo a cashTransaction, however you cannot explicitly create one.
 					</p>
 					<table class=matrixHeading>
 						<tr class="matrixHeadingBG">
@@ -43456,13 +43456,13 @@ Request Body:
 							<td>officeId</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>Identifier of the office in which the transaction was made</td>
+							<td class=fielddesc>Identifier of the office in which the cashTransaction was made</td>
 						</tr>
 						<tr class=alt>
 							<td>reversed</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>Boolean Flag that indicates if this transaction is reversed.
+							<td class=fielddesc>Boolean Flag that indicates if this cashTransaction is reversed.
 							</td>
 						</tr>
 						<tr class=alt>
@@ -43477,13 +43477,13 @@ Request Body:
 						</tr>
 						<tr>
 							<td class=fielddesc>Details of the currency involved with the Transaction. Currently defaults
-							to the currency of the Client Charge this transaction pays </td>
+							to the currency of the Client Charge this cashTransaction pays </td>
 						</tr>
 						<tr class=alt>
 							<td>date</td>
 						</tr>
 						<tr>
-							<td class=fielddesc>Effective date of the transaction</td>
+							<td class=fielddesc>Effective date of the cashTransaction</td>
 						</tr>
 
 					</table>
@@ -43493,7 +43493,7 @@ Request Body:
 			<div class="method-section">
 				<div class="method-description">
 					<h4>List Client Transactions</h4>
-					<p>The <i>list</i> capability of client transaction can support <b>pagination</b>.</p>
+					<p>The <i>list</i> capability of client cashTransaction can support <b>pagination</b>.</p>
 					<h5>Mandatory Arguments</h5>
 					<dl class="argument-list">
 						<dt>offset</dt>
@@ -43574,7 +43574,7 @@ No Request Body:
 				</div>
 				<div class="method-example">
 					<code class="method-declaration">
-GET https://DomainName/api/v1/clients/{clientId}/transaction/{transactionId}
+GET https://DomainName/api/v1/clients/{clientId}/cashTransaction/{transactionId}
 					</code>
 					<code class="method-response">
 {
@@ -45405,7 +45405,7 @@ GET https://DomainName/api/v1/self/clients/{clientId}/charges/{clientChargeId}
 			<div class="method-section">
 				<div class="method-description">
 					<h4>List Client Transactions</h4>
-					<p>The <i>list</i> capability of client transaction can support <b>pagination</b>.</p>
+					<p>The <i>list</i> capability of client cashTransaction can support <b>pagination</b>.</p>
 					<h5>Mandatory Arguments</h5>
 					<dl class="argument-list">
 						<dt>offset</dt>
@@ -45486,7 +45486,7 @@ No Request Body:
 				</div>
 				<div class="method-example">
 					<code class="method-declaration">
-GET https://DomainName/api/v1/self/clients/{clientId}/transaction/{transactionId}
+GET https://DomainName/api/v1/self/clients/{clientId}/cashTransaction/{transactionId}
 					</code>
 					<code class="method-response">
 {
@@ -49030,7 +49030,7 @@ No Request Body:
 				<tr>
 					<td></td>
 					<td>savingsaccounts/{accountId}/transactions/{transactionId}?command=undo</td>
-					<td><a href="#savingsaccounts_undotransaction">Undo transaction</a></td>
+					<td><a href="#savingsaccounts_undotransaction">Undo cashTransaction</a></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -49038,7 +49038,7 @@ No Request Body:
 				<tr>
 					<td></td>
 					<td>savingsaccounts/{accountId}/transactions/{transactionId}?command=modify</td>
-					<td><a href="#savingsaccounts_adjusttransaction">Adjust transaction</a></td>
+					<td><a href="#savingsaccounts_adjusttransaction">Adjust cashTransaction</a></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -49063,7 +49063,7 @@ No Request Body:
 					<td></td>
 					<td>savingsaccounts/{accountId}/transactions/template</td>
 					<td></td>
-					<td><a href="#savingsaccounts_transactions_template">Retrieve savings account transaction template</a></td>
+					<td><a href="#savingsaccounts_transactions_template">Retrieve savings account cashTransaction template</a></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -49071,7 +49071,7 @@ No Request Body:
 					<td></td>
 					<td>savingsaccounts/{accountId}/transactions/{transactionId}</td>
 					<td></td>
-					<td><a href="#savingsaccounts_transaction">Retrieve savings account transaction</a></td>
+					<td><a href="#savingsaccounts_transaction">Retrieve savings account cashTransaction</a></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -49358,7 +49358,7 @@ No Request Body:
 				<tr>
 					<td></td>
 					<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}?command=undo</td>
-					<td><a href="#recurringdepositaccounts_undotransaction">Undo transaction</a></td>
+					<td><a href="#recurringdepositaccounts_undotransaction">Undo cashTransaction</a></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -49366,7 +49366,7 @@ No Request Body:
 				<tr>
 					<td></td>
 					<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}?command=modify</td>
-					<td><a href="#recurringdepositaccounts_adjusttransaction">Adjust transaction</a></td>
+					<td><a href="#recurringdepositaccounts_adjusttransaction">Adjust cashTransaction</a></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -49375,7 +49375,7 @@ No Request Body:
 					<td></td>
 					<td>recurringdepositaccounts/{accountId}/transactions/template</td>
 					<td></td>
-					<td><a href="#recurringdepositaccounts_transactions_template">Retrieve Deposit account transaction template</a></td>
+					<td><a href="#recurringdepositaccounts_transactions_template">Retrieve Deposit account cashTransaction template</a></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -49383,7 +49383,7 @@ No Request Body:
 					<td></td>
 					<td>recurringdepositaccounts/{accountId}/transactions/{transactionId}</td>
 					<td></td>
-					<td><a href="#recurringdepositaccounts_transaction">Retrieve Deposit account transaction</a></td>
+					<td><a href="#recurringdepositaccounts_transaction">Retrieve Deposit account cashTransaction</a></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -49481,9 +49481,9 @@ No Request Body:
 <div class="fullMatrixOuter">
 	<h3>Payment Application Logic / Transaction Processing Strategy</h3>
 
-<p>The way payments (transactions) are handled and the effect they have on the loan is an area that can differ widely from MFI to MFI. Mifos allows for <strong>transaction processing strategies</strong> to be developed that are associated with a loan product. Several approaches are provided out-of-the-box. If these approaches dont meet exactly your needs a custom approach can be developed and released with the platform.</p>
+<p>The way payments (transactions) are handled and the effect they have on the loan is an area that can differ widely from MFI to MFI. Mifos allows for <strong>cashTransaction processing strategies</strong> to be developed that are associated with a loan product. Several approaches are provided out-of-the-box. If these approaches dont meet exactly your needs a custom approach can be developed and released with the platform.</p>
 
-<p>In general the the following areas are handled by any given <strong>transaction processing strategy</strong>:
+<p>In general the the following areas are handled by any given <strong>cashTransaction processing strategy</strong>:
 	<ul>
 		<li><strong>Payment order</strong>: What component of a loan installment should be paid of frist interest, principal, fees, penalties?</li>
 		<li><strong>Early payment</strong>: What qualifies a payment as an early payment and what impact should this have on the loan schedule?</li>

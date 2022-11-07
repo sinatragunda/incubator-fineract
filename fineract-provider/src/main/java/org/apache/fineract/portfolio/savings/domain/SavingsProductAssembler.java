@@ -62,6 +62,7 @@ import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeAppliedToExc
 import org.apache.fineract.portfolio.loanproduct.exception.InvalidCurrencyException;
 import org.apache.fineract.portfolio.products.constants.ProductConstants;
 import org.apache.fineract.portfolio.products.domain.Product;
+import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.SavingsCompoundingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.SavingsInterestCalculationDaysInYearType;
@@ -179,7 +180,17 @@ public class SavingsProductAssembler {
             deductChargesOnAccountBalance = command.booleanPrimitiveValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
         }
 
-        Product productSettings = new Product(PRODUCT_TYPE.SAVINGS ,null ,false ,deductChargesOnAccountBalance);
+        /**
+         * Added 04/11/2022 at 0241
+         */
+        //final boolean isProductActive = true ;
+        ACCOUNT_TYPE accountType = null ;
+        if(command.parameterExists(ProductConstants.accountTypeParam)){
+            String val = command.stringValueOfParameterNamed(ProductConstants.accountTypeParam);
+            accountType = ACCOUNT_TYPE.valueOf(val);
+        }
+
+        Product productSettings = new Product(PRODUCT_TYPE.SAVINGS ,null ,false ,deductChargesOnAccountBalance ,accountType);
 
         BigDecimal minRequiredBalance = BigDecimal.ZERO;
         if (command.parameterExists(minRequiredBalanceParamName)) {

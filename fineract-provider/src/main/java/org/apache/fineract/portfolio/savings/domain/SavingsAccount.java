@@ -75,12 +75,14 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.teller.helper.CashTransactionLoggingHelper;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFoundException;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
@@ -921,6 +923,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     public SavingsAccountTransaction deposit(final SavingsAccountTransactionDTO transactionDTO) {
+        System.err.println("---------------does it use these type of deposit transactions or ? ");
         return deposit(transactionDTO, SavingsAccountTransactionType.DEPOSIT);
     }
 
@@ -969,18 +972,38 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
         validateActivityNotBeforeClientOrGroupTransferDate(SavingsEvent.SAVINGS_DEPOSIT, transactionDTO.getTransactionDate());
 
-        final Money amount = Money.of(this.currency, transactionDTO.getTransactionAmount());
+        BigDecimal transactionAmount = chargesDeductionCriteria(transactionDTO ,true);
+        
+        //final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
+
+        System.err.println("------------transaction amount is for deposit is  -----------"+transactionAmount);
+
+        final Money amount = Money.of(this.currency, transactionAmount);
 
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.deposit(this, office(), transactionDTO.getPaymentDetail(),
                 transactionDTO.getTransactionDate(), amount, transactionDTO.getCreatedDate(), transactionDTO.getAppUser(),
                 savingsAccountTransactionType);
         addTransaction(transaction);
+
+    
+        /**
+         * Added 05/11/2022 at 1429
+         * Modified 06/11/2022 ay 2038 ,removed witholding paying charges bool param
+         */ 
+        payDepositFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser());
+        
         this.summary.updateSummary(this.currency, this.savingsAccountTransactionSummaryWrapper, this.transactions);
         
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
         		|| this.sub_status.equals(SavingsAccountSubStatusEnum.DORMANT.getValue())){
         	this.sub_status = SavingsAccountSubStatusEnum.NONE.getValue();
         }
+        
+        System.err.println("----------at this point transaction iis now over and lets do some other shit son ");
+
+        //PaymentType paymentType = transaction.getPaymentDetail().getPaymentType();
+
+        //CashTransactionLoggingHelper.savingsAccountTransaction(tellerWritePlatformService , transaction);
 
         return transaction;
     }
@@ -1082,6 +1105,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             // auto pay withdrawal fee
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser(),false);
         }
+
         if(this.sub_status.equals(SavingsAccountSubStatusEnum.INACTIVE.getValue())
         		|| this.sub_status.equals(SavingsAccountSubStatusEnum.DORMANT.getValue())){
         	this.sub_status = SavingsAccountSubStatusEnum.NONE.getValue();
@@ -1099,7 +1123,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         /**
          * If false means charges to be deducted on transaction amount ,hence we calculate them from the charge amount 
-         * Then deduct in advance (only hold ) but not pay 
+         * Then deduct in advance (only hold ) but not pay ,withholdPayingCharges set to true when this should set
          */ 
         BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
 
@@ -1128,6 +1152,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
      /**
       * Added 03/10/2022 at 0829 
       * Modified overloaded version of paywithdrawal feel that just takes two params
+      * If withholdPayinCharges is true then it just calculates the charges but doesnt pay them ie add to journals
       */
 
      private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
@@ -1174,6 +1199,39 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         return totalCharges;
     }
+
+    /**
+     * Added 05/11/2022 at 1420
+     * Added to make up for deposit fees
+     */
+
+    private BigDecimal payDepositFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
+
+        System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
+
+        System.err.println("------------------why there arent any charges in this "+this.charges.size());
+
+        BigDecimal totalCharges = BigDecimal.ZERO ;
+
+        for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
+            
+            System.err.println("---------product apply charges ----------------");
+            
+            if (charge.isDepositFee() && charge.isActive()) {
+                    System.err.println("----------------------------charge is fee and active "+charge.isDepositFee()+"------------and amount is "+transactionAmoount);
+
+                    BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
+
+                    totalCharges =  totalCharges.add(chargeAmount);
+                    this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
+            }
+        }
+
+        System.err.println("----------------------total charges amount is -----"+totalCharges);
+
+        return totalCharges;
+    }
+  
 
     public boolean isBeforeLastPostingPeriod(final LocalDate transactionDate) {
 

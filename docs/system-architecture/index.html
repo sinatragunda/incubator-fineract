@@ -517,7 +517,7 @@ public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
 }
 </code></pre>
 <p><em>Description:</em> check user has permission for this action. if ok, a) parse the json request body, b) create a JsonCommand object to wrap the command details, c) use <strong>CommandProcessingService</strong> to handle command.</p>
-<p><strong>Note</strong>: if a RollbackTransactionAsCommandIsNotApprovedByCheckerException occurs at this point. The original transaction will of been aborted and we only log an entry for the command in the audit table setting its status as 'Pending'.</p>
+<p><strong>Note</strong>: if a RollbackTransactionAsCommandIsNotApprovedByCheckerException occurs at this point. The original cashTransaction will of been aborted and we only log an entry for the command in the audit table setting its status as 'Pending'.</p>
 
 <pre><code>@Transactional
 @Override

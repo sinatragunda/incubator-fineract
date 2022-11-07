@@ -19,10 +19,6 @@ package org.apache.fineract.portfolio.remittance.api;
  * under the License.
  */
 
-import java.io.InputStream;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -51,29 +47,17 @@ import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformS
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookPopulatorService;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
-import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.documentmanagement.command.DocumentCommand;
+import org.apache.fineract.infrastructure.jobs.exception.OperationNotAllowedException;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
-import org.apache.fineract.portfolio.remittance.constants.RxApiConstants;
+import org.apache.fineract.portfolio.remittance.constants.RxDealConstants;
 import org.apache.fineract.portfolio.remittance.data.RxData;
-import org.apache.fineract.portfolio.remittance.service.RxReadPlatformService;
-import org.apache.fineract.portfolio.savings.DepositAccountType;
-import org.apache.fineract.portfolio.savings.SavingsApiConstants;
-import org.apache.fineract.portfolio.savings.api.SavingsApiSetConstants;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
-import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthDividends;
-import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
-import org.apache.fineract.portfolio.savings.helper.NkwaziSavingsAccountHelper;
+import org.apache.fineract.portfolio.remittance.data.RxDealData;
+import org.apache.fineract.portfolio.remittance.service.RxDealReadPlatformService;
 import org.apache.fineract.portfolio.savings.repo.EquityGrowthOnSavingsAccountRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
@@ -88,6 +72,9 @@ import org.springframework.util.CollectionUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Collection;
+import java.util.Optional;
+
 
 @Path("/rx")
 @Component
@@ -97,6 +84,7 @@ public class RxApiResource {
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<RxData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<RxDealData> rxDealDataDefaultToApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
@@ -108,7 +96,7 @@ public class RxApiResource {
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
     private final ClientWritePlatformService clientWritePlatformService;
 
-    private final RxReadPlatformService rxReadPlatformService ;
+    private final RxDealReadPlatformService rxReadPlatformService ;
 
     @Autowired
     public RxApiResource(final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
@@ -118,7 +106,7 @@ public class RxApiResource {
                                       final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
                                       final BulkImportWorkbookService bulkImportWorkbookService,
                                       final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService ,
-                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final ClientWritePlatformService clientWritePlatformService ,final  RxReadPlatformService rxReadPlatformService) {
+                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final ClientWritePlatformService clientWritePlatformService ,final RxDealReadPlatformService rxReadPlatformService ,final DefaultToApiJsonSerializer rxDealDataDefaultToApiJsonSerializer) {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -133,25 +121,77 @@ public class RxApiResource {
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService ;
         this.clientWritePlatformService = clientWritePlatformService;
         this.rxReadPlatformService = rxReadPlatformService;
+        /**
+         * Added 06/11/2022 at 2213
+         */
+        this.rxDealDataDefaultToApiJsonSerializer = rxDealDataDefaultToApiJsonSerializer;
     }
 
     @GET
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String template(@QueryParam("clientId") final Long clientId, @QueryParam("groupId") final Long groupId,
-                           @QueryParam("productId") final Long productId,
-                           @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
-                           @Context final UriInfo uriInfo) {
+    public String template(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RxApiConstants.permission);
+        //this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.permission);
 
         final RxData rxData =this.rxReadPlatformService.template();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, rxData,
-                RxApiConstants.SAVINGS_PRODUCT_RESPONSE_DATA_PARAMETERS);
+                RxDealConstants.RX_DEAL_PARAMETERS);
     }
+
+    /**
+     * Added 06/11/2022 at 2205
+     * Key could be string or id ,would be mentioned in QueryParam is key
+     */
+    @GET
+    @Path("/transactions/{key}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String getData(@Context final UriInfo uriInfo ,@PathParam("key") final String id ,@QueryParam("isKey") boolean isKey) {
+
+        System.err.println("------------validate if this guy has read params ");
+        this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.RESOURCE_NAME);
+
+        System.err.println("------------done valudating ");
+
+        Long rxDealId = null ;
+        RxDealData rxDealData = null ;
+
+        if(!isKey){
+            rxDealId = Long.valueOf(id);
+            rxDealData = rxReadPlatformService.retreiveOne(rxDealId);
+        }
+        else{
+            String key = id ;
+            rxDealData = rxReadPlatformService.retreiveOne(key);
+        }
+
+        System.err.println("---------------------value of object is ------"+ Optional.ofNullable(rxDealData).isPresent());
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.rxDealDataDefaultToApiJsonSerializer.serialize(settings, rxDealData,
+                RxDealConstants.RX_DEAL_PARAMETERS);
+    }
+
+    /**
+     * Added 07/11/2022 at 0837
+     */
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String getAllRxDeals(@Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.RESOURCE_NAME);
+
+        Collection<RxDealData> rxDealDataCollection = this.rxReadPlatformService.retreiveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.rxDealDataDefaultToApiJsonSerializer.serialize(settings, rxDealDataCollection,
+                RxDealConstants.RX_DEAL_PARAMETERS);
+    }
+
 
 
 
@@ -160,7 +200,29 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String create(final String apiRequestBodyAsJson) {
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().createSavingsAccount().withJson(apiRequestBodyAsJson).build();
+        System.err.println("---------------------------------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().createRxDeal().withJson(apiRequestBodyAsJson).build();
+
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.toApiJsonSerializer.serialize(result);
+    }
+
+    /**
+     * Added 06/11/2022 at 0405
+     * @param apiRequestBodyAsJson
+     * @return
+     */
+    @POST
+    @Path("/receive/{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String receive(final String apiRequestBodyAsJson ,@PathParam("id") final Long id) {
+
+        System.err.println("---------------------------------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().receiveRxDeal().withJson(apiRequestBodyAsJson).build();
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
