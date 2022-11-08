@@ -16,8 +16,9 @@
 -- specific language governing permissions and limitations
 -- under the License.
 
--- Created 05/11/2022 at 2031
+-- Created 08/11/2022 at 0316 
 
-ALTER TABLE `m_rx_deal` ADD COLUMN `rx_key` VARCHAR(20) NOT NULL;
-ALTER TABLE `m_rx_deal` ADD CONSTRAINT UNIQUE(`rx_key`);
+ALTER TABLE `m_rx_deal_receive` ADD COLUMN `email_address` VARCHAR(50) default '' ;
+
+
 

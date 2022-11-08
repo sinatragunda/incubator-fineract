@@ -81,6 +81,9 @@ public class RxDeal extends AbstractPersistableCustom<Long> {
 	@Column(name ="rx_key")
 	private String key ;
 
+	@Column(name ="total_charges")
+	private BigDecimal totalCharges;
+
 
 	public RxDeal(){}
 
@@ -107,9 +110,17 @@ public class RxDeal extends AbstractPersistableCustom<Long> {
 	public  void initDeal(){
 		setRxDealStatus(RX_DEAL_STATUS.OPENED);
 		setReversed(false);
-		String key = RxDealKeyHelper.generateKey("");
-		setKey(key);
+		this.key = RxDealKeyHelper.generateKey(currencyCode);
+		//setKey(key);
 		System.err.println("------------key is -----------"+this.key);
+	}
+
+	public BigDecimal getTotalCharges() {
+		return totalCharges;
+	}
+
+	public void setTotalCharges(BigDecimal totalCharges) {
+		this.totalCharges = totalCharges;
 	}
 
 	public String getKey() {

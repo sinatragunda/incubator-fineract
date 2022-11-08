@@ -44,8 +44,8 @@ public class RxDealDataHelper {
             String emailAddress = rxDealData.getEmailAddress();
             String nid = rxDealData.getNid();
 
-            String name = tokenizeData(clientName ,"",0);
-            String surname = tokenizeData(clientName,"",1);
+            String name = tokenizeData(clientName ,"#",0);
+            String surname = tokenizeData(clientName,"#",1);
 
             System.err.println("--------------------activation date "+rxDealData.getTransactionDate());
 
@@ -89,15 +89,13 @@ public class RxDealDataHelper {
     private String tokenizeData(String data ,String delim ,int index){
         StringTokenizer tokenizer = new StringTokenizer(data ,delim);
         int i =0 ;
+        List<String> stringList = new ArrayList<>();
         while (tokenizer.hasMoreTokens()){
             String value = tokenizer.nextToken();
-            if(i > tokenizer.countTokens()){
-                return null;
-            }
-            if(i==index){
-                return value;
-            }
+            stringList.add(value);
         }
-        return null ;
+
+        System.err.println(stringList.get(i));
+        return stringList.get(index) ;
     }
 }

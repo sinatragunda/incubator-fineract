@@ -34,4 +34,16 @@ public class RxDealRepositoryWrapper {
         }
         return rxDeal;
     }
+
+
+    public RxDeal findOneWithNotFoundDetection(Long id){
+
+        RxDeal rxDeal = rxDealRepository.findOne(id);
+        boolean isDealFound = Optional.ofNullable(rxDeal).isPresent();
+
+        if(!isDealFound){
+            throw new RxDealNotFoundException(id);
+        }
+        return rxDeal;
+    }
 }

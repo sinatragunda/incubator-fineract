@@ -22,9 +22,11 @@ import javax.persistence.*;
 @Table(name="m_rx_deal_receive")
 public class RxDealReceive extends AbstractPersistableCustom<Long> {
 
+    @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name="rx_deal_id")
     private RxDeal rxDeal ;
 
+    @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name="savings_account_transaction_id")
     private SavingsAccountTransaction savingsAccountTransaction;
 
@@ -39,11 +41,12 @@ public class RxDealReceive extends AbstractPersistableCustom<Long> {
     @Column(name="transaction_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date transactionDate ;
-
+    @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name="office_id")
     private Office office;
 
     @Column(name="status")
+    @Enumerated(EnumType.ORDINAL)
     private RX_DEAL_STATUS status;
 
     public RxDealReceive(RxDeal rxDeal, SavingsAccountTransaction savingsAccountTransaction, String name, String phoneNumber, String emailAddress ,LocalDate transactionDate , Office office , RX_DEAL_STATUS rxDealStatus) {
@@ -55,6 +58,10 @@ public class RxDealReceive extends AbstractPersistableCustom<Long> {
         this.office = office ;
         this.status = status ;
         this.emailAddress = emailAddress;
+    }
+
+    public void setStatus(RX_DEAL_STATUS status) {
+        this.status = status;
     }
 
     public String getEmailAddress() {

@@ -19,14 +19,10 @@
 -- Added 07/11/2022 at 1043
 
 
-INSERT INTO `stretchy_report` (`report_name`, `report_type`, `report_subtype`, `report_category`, `report_sql`, `description`, `core_report`, `use_report`) VALUES ('Rx Deals Transactions', 'Pentaho', NULL, 'Rx', NULL,"List of Rx Deals ,non dated", 0, 1);
+INSERT INTO `stretchy_report` (`report_name`, `report_type`, `report_subtype`, `report_category`, `report_sql`, `description`, `core_report`, `use_report`) VALUES ('Rx Deal', 'Pentaho', NULL, 'Rx', NULL,"View Rx Deal", 0, 1);
 
 INSERT INTO `stretchy_report_parameter` (`report_id`, `parameter_id`, `report_parameter_name`) VALUES
- ((select sr.id from stretchy_report sr where sr.report_name='Rx Deals Transactions'), 
- (select sp.id from stretchy_parameter sp where sp.parameter_variable='officeId'), 
-  'officeId');
-  
-  INSERT INTO `stretchy_report_parameter` (`report_id`, `parameter_id`, `report_parameter_name`) VALUES
- ((select sr.id from stretchy_report sr where sr.report_name='Rx Deals Transactions'), 
- (select sp.id from stretchy_parameter sp where sp.parameter_variable='currencyCode'), 
-  'currencyCode');
+ ((select sr.id from stretchy_report sr where sr.report_name='Rx Deal'), 
+ (select sp.id from stretchy_parameter sp where sp.parameter_variable='transactionId'), 
+  'transactionId');
+

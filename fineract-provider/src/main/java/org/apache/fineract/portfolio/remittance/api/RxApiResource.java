@@ -214,7 +214,7 @@ public class RxApiResource {
      * @param apiRequestBodyAsJson
      * @return
      */
-    @POST
+    @PUT
     @Path("/receive/{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -222,7 +222,7 @@ public class RxApiResource {
 
         System.err.println("---------------------------------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
 
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().receiveRxDeal().withJson(apiRequestBodyAsJson).build();
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().receiveRxDeal(id).withJson(apiRequestBodyAsJson).build();
 
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 

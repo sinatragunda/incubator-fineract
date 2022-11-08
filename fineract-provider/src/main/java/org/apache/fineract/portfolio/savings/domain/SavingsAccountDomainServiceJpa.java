@@ -34,6 +34,9 @@ import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
+import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
@@ -75,6 +78,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
      * Added 06/11/2022 at 2052
      */
     private final TellerWritePlatformService tellerWritePlatformService;
+    private final PaymentTypeRepositoryWrapper paymentTypeRepositoryWrapper;
 
 
     @Autowired
@@ -85,7 +89,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
             final BusinessEventNotifierService businessEventNotifierService ,
-            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository ,final TellerWritePlatformService tellerWritePlatformService) {
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository ,final TellerWritePlatformService tellerWritePlatformService ,final  PaymentTypeRepositoryWrapper paymentTypeRepositoryWrapper) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -98,6 +102,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.savingsAccountAssembler = savingsAccountAssembler ;
         this.noteRepository = noteRepository;
         this.tellerWritePlatformService = tellerWritePlatformService;
+        this.paymentTypeRepositoryWrapper = paymentTypeRepositoryWrapper;
     }
 
     @Transactional
@@ -105,6 +110,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     public SavingsAccountTransaction handleWithdrawal(final SavingsAccount account, final DateTimeFormatter fmt,
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final SavingsTransactionBooleanValues transactionBooleanValues ,final TransactionCode transactionCode) {
+
+        System.err.println("---------maun functions ");
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -126,14 +133,40 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final SavingsAccountTransaction withdrawal = account.withdraw(transactionDTO, transactionBooleanValues.isApplyWithdrawFee());
 
         final MathContext mc = MathContext.DECIMAL64;
+
+        System.err.println("------------------transaction date ----------------"+transactionDate);
+
         if (account.isBeforeLastPostingPeriod(transactionDate)) {
+            System.err.println("------------------account is before last posting date ------------");
             final LocalDate today = DateUtils.getLocalDateOfTenant();
             account.postInterest(mc, today, transactionBooleanValues.isInterestTransfer(), isSavingsInterestPostingAtCurrentPeriodEnd,
                     financialYearBeginningMonth, postInterestOnDate);
         } else {
+            System.err.println("----------why does it come here ? ,is it do with the dates ? -------------");
+
+            System.err.println("------which value is now here ");
+            System.err.println("==========mc "+Optional.ofNullable(mc).isPresent());
+            System.err.println("==========transaction boolean "+Optional.ofNullable(transactionBooleanValues.isInterestTransfer()).isPresent());
+            System.err.println("==========isSavingsInteresPostin "+Optional.ofNullable(isSavingsInterestPostingAtCurrentPeriodEnd).isPresent());
+            System.err.println("==========financial year "+Optional.ofNullable(financialYearBeginningMonth).isPresent());
+            System.err.println("==========post interest on date "+Optional.ofNullable(postInterestOnDate).isPresent());
+
+            System.err.println("------------------does date uti function brings error ? ");
+
             final LocalDate today = DateUtils.getLocalDateOfTenant();
-            account.calculateInterestUsing(mc, today, transactionBooleanValues.isInterestTransfer(),
-                    isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, postInterestOnDate);
+
+            System.err.println("--------------------is accoount null ? "+Optional.ofNullable(account).isPresent());
+
+            System.err.println("---------------is interest transfer on regular transactions ? ------------------"+transactionBooleanValues.isInterestTransfer());
+            try {
+                account.calculateInterestUsing(mc, today, transactionBooleanValues.isInterestTransfer(),
+                        isSavingsInterestPostingAtCurrentPeriodEnd, financialYearBeginningMonth, postInterestOnDate);
+            }
+            catch (NullPointerException n){
+                System.err.println("----------------get error message ---------"+n.getMessage());
+                n.printStackTrace();
+            }
+
         }
         List<DepositAccountOnHoldTransaction> depositAccountOnHoldTransactions = null;
         if (account.getOnHoldFunds().compareTo(BigDecimal.ZERO) == 1) {
@@ -188,7 +221,8 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     public SavingsAccountTransaction handleWithdrawalLite(final SavingsAccount savingsAccount ,LocalDate transactionDate , BigDecimal transactionAmount ,String noteText){
 
         AppUser user = getAppUserIfPresent();
-        PaymentDetail paymentDetail = null ;
+        PaymentType paymentType = paymentTypeRepositoryWrapper.findOneWithNotFoundDetection(1L);
+        PaymentDetail paymentDetail =  PaymentDetail.withPaymentType(paymentType);
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
 
@@ -221,7 +255,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction) {
         
-        //System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
+        System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
 
         final TransactionCode transactionCode = null;
         final SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;

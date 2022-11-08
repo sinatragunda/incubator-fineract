@@ -10,6 +10,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 public interface RxDealWritePlatformService {
 
     public CommandProcessingResult createRxDeal(JsonCommand jsonCommand);
-    public CommandProcessingResult updateRxDeal(JsonCommand jsonCommand);
+    public CommandProcessingResult receiveRxDeal(final Long id ,JsonCommand jsonCommand);
 
 }

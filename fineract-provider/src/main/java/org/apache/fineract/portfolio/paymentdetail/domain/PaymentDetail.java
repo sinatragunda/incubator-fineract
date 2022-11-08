@@ -104,6 +104,14 @@ public final class PaymentDetail extends AbstractPersistableCustom<Long> {
         this.bankNumber = bankNumber;
     }
 
+    /**
+     * Added 07/11/2022 at 1812
+     */
+
+    public static PaymentDetail withPaymentType(final PaymentType paymentType){
+        return new PaymentDetail(paymentType ,null ,null ,null ,null ,null);
+    }  
+
     public PaymentDetailData toData() {
         final PaymentTypeData paymentTypeData = this.paymentType.toData();
         final PaymentDetailData paymentDetailData = new PaymentDetailData(getId(), paymentTypeData, this.accountNumber, this.checkNumber,

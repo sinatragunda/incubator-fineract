@@ -28,7 +28,7 @@ public class RxDealKeyHelper {
         String fiveKey = strip.substring(0 ,5);
 
         Date date = TimeHelper.fromEpoch(timeNow);
-        String fundsKey = String.format("%d%d%s%s",date.getDate(),date.getYear() ,"USD",fiveKey);
+        String fundsKey = String.format("%d%d%s%s",date.getDate(),date.getYear() ,currencyCode,fiveKey);
         return fundsKey ;
     }
 

@@ -16,8 +16,9 @@
 -- specific language governing permissions and limitations
 -- under the License.
 
--- Created 05/11/2022 at 2031
+-- Created 07/11/2022 at 1427 
 
-ALTER TABLE `m_rx_deal` ADD COLUMN `rx_key` VARCHAR(20) NOT NULL;
-ALTER TABLE `m_rx_deal` ADD CONSTRAINT UNIQUE(`rx_key`);
+ALTER TABLE `m_rx_deal` ADD COLUMN `total_charges` DOUBLE default '0' ;
+
+
 

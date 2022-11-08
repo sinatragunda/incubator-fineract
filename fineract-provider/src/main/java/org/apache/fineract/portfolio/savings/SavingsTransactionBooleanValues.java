@@ -37,7 +37,6 @@ public class SavingsTransactionBooleanValues {
     }
 
     public static SavingsTransactionBooleanValues liteInstance(){
-        System.err.println("---------------------are we calling this instance somehow ? ---------");
         return new SavingsTransactionBooleanValues(false ,true,true ,false ,true);
     }
 

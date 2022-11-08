@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+
+import org.apache.fineract.portfolio.remittance.exceptions.RxDealNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -165,9 +167,9 @@ public class RxDealReadPlatformServiceImpl implements RxDealReadPlatformService 
             return this.jdbcTemplate.queryForObject(sql, rxDealDataMapper ,params);
         } catch (final EmptyResultDataAccessException e) {
             //throw new In(noteId, resourceId, noteType.name().toLowerCase());
+            throw new RxDealNotFoundException();
         }
-        return null ;
-
+        //return null ;
     }
 
 

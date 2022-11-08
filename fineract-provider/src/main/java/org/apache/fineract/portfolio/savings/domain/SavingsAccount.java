@@ -731,33 +731,65 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         // no openingBalance concept supported yet but probably will to allow
         // for migrations.
+
+        System.err.println("------------start functuin now calculate interest");
+
         final Money openingAccountBalance = Money.zero(this.currency);
 
         // update existing transactions so derived balance fields are
         // correct.
+        System.err.println("-----------passed this function -------");
+
         recalculateDailyBalances(openingAccountBalance, upToInterestCalculationDate);
+
+
+        System.err.println("==================money "+Optional.ofNullable(openingAccountBalance).isPresent());
 
         // 1. default to calculate interest based on entire history OR
         // 2. determine latest 'posting period' and find interest credited to
         // that period
 
+        System.err.println("-------------------------------1");
+
         // A generate list of EndOfDayBalances (not including interest postings)
         final SavingsPostingInterestPeriodType postingPeriodType = SavingsPostingInterestPeriodType.fromInt(this.interestPostingPeriodType);
 
+
+        System.err.println("-------------------------------2");
         final SavingsCompoundingInterestPeriodType compoundingPeriodType = SavingsCompoundingInterestPeriodType
                 .fromInt(this.interestCompoundingPeriodType);
 
+
+        System.err.println("-------------------------------3");
+
         final SavingsInterestCalculationDaysInYearType daysInYearType = SavingsInterestCalculationDaysInYearType
-                .fromInt(this.interestCalculationDaysInYearType);      
-         List<LocalDate> postedAsOnDates= getManualPostingDates();
+                .fromInt(this.interestCalculationDaysInYearType);
+
+
+        System.err.println("-------------------------------3.1");
+
+        List<LocalDate> postedAsOnDates= getManualPostingDates();
+
+
+        System.err.println("-------------------------------3.2");
+
          if(postInterestOnDate != null){
              postedAsOnDates.add(postInterestOnDate);
          }
+
+
+        System.err.println("-------------------------------4");
+
         final List<LocalDateInterval> postingPeriodIntervals = this.savingsHelper.determineInterestPostingPeriods(
                 getStartInterestCalculationDate(), upToInterestCalculationDate, postingPeriodType, financialYearBeginningMonth,
                 postedAsOnDates);
 
+
+        System.err.println("-------------------------------5");
+
         final List<PostingPeriod> allPostingPeriods = new ArrayList<>();
+
+        System.err.println("-------------------------");
 
         Money periodStartingBalance;
         if (this.startInterestCalculationDate != null) {
@@ -923,7 +955,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     }
 
     public SavingsAccountTransaction deposit(final SavingsAccountTransactionDTO transactionDTO) {
-        System.err.println("---------------does it use these type of deposit transactions or ? ");
+        //System.err.println("---------------does it use these type of deposit transactions or ? ");
         return deposit(transactionDTO, SavingsAccountTransactionType.DEPOSIT);
     }
 
@@ -972,11 +1004,11 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         }
         validateActivityNotBeforeClientOrGroupTransferDate(SavingsEvent.SAVINGS_DEPOSIT, transactionDTO.getTransactionDate());
 
-        BigDecimal transactionAmount = chargesDeductionCriteria(transactionDTO ,true);
+        BigDecimal transactionAmount = chargesDeductionCriteriaDeposit(transactionDTO);
         
         //final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
 
-        System.err.println("------------transaction amount is for deposit is  -----------"+transactionAmount);
+        //System.err.println("------------transaction amount is for deposit is  -----------"+transactionAmount);
 
         final Money amount = Money.of(this.currency, transactionAmount);
 
@@ -999,7 +1031,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         	this.sub_status = SavingsAccountSubStatusEnum.NONE.getValue();
         }
         
-        System.err.println("----------at this point transaction iis now over and lets do some other shit son ");
+        //System.err.println("----------at this point transaction iis now over and lets do some other shit son ");
 
         //PaymentType paymentType = transaction.getPaymentDetail().getPaymentType();
 
@@ -1113,6 +1145,42 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         return transaction;
     }
     /**
+     * Added 07/11/2022 at 1324
+     * Redundant function will refactor it some other time
+     */
+    private BigDecimal chargesDeductionCriteriaDeposit(SavingsAccountTransactionDTO savingsTransactionDTO){
+
+        Product productSettings = product.productSettings();
+        boolean deductOnAccountBalance = productSettings.isDeductChargesOnAccountBalance();
+
+        /**
+         * If false means charges to be deducted on transaction amount ,hence we calculate them from the charge amount
+         * Then deduct in advance (only hold ) but not pay ,withholdPayingCharges set to true when this should set
+         */
+
+
+        //System.err.println("----------------------deduct on charges for deposit ? ---------"+deductOnAccountBalance);
+
+        /**
+         * Gate of !deductOnAccountBalance and applyWithdrawFee
+         * Deduct on Account Balance vs Deduct on Transaction Amount
+         */
+
+        BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
+        if(!deductOnAccountBalance ){
+
+            BigDecimal totalCharges  = calculateDepositFee(savingsTransactionDTO);
+            transactionAmount = transactionAmount.subtract(totalCharges);
+           // System.err.println("---------------we not deducting from charges so we should pay now---new transaction amount is now  after charges -----"+transactionAmount);
+
+        }
+
+        //System.err.println("-------------returning total amount to pay to custoemr of "+transactionAmount);
+
+        return transactionAmount;
+    }
+
+    /**
      * Added 03/10/2022 at 0822 
      * Get total charge amount and deduct it on transaction amount only if deductOnBalance is set to false in product settings 
      */
@@ -1131,13 +1199,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         boolean gate = !deductOnAccountBalance && applyWithdrawFee;
 
-        System.err.println("----------------------deduct on chatrges ---------"+deductOnAccountBalance);
+        System.err.println("----------------------deduct on charges ---------"+deductOnAccountBalance);
 
         System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
 
          /**
           * Gate of !deductOnAccountBalance and applyWithdrawFee
-          *
+          * Deduct on Account Balance vs Deduct on Transaction Amount
           */
          if(!deductOnAccountBalance && applyWithdrawFee ){
             BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
@@ -1199,6 +1267,33 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         return totalCharges;
     }
+    /**
+     * Added 07/11/2022 at 1330
+     */
+
+    public BigDecimal calculateDepositFee(final SavingsAccountTransactionDTO dto){
+
+        //System.err.println("=------------------calculate total deposit fee function ");
+
+        BigDecimal totalCharges = BigDecimal.ZERO ;
+        LocalDate transactionDate = dto.getTransactionDate();
+        BigDecimal transactionAmount = dto.getTransactionAmount();
+
+        for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
+
+            if (charge.isDepositFee() && charge.isActive()) {
+                //System.err.println("----------------------------charge is fee and active "+charge.isDepositFee()+"------------and amount is "+transactionAmount);
+
+                BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmount);
+                totalCharges =  totalCharges.add(chargeAmount);
+
+            }
+        }
+
+        //System.err.println("---------------total charges are for deposit "+totalCharges);
+
+        return totalCharges ;
+    }
 
     /**
      * Added 05/11/2022 at 1420
@@ -1207,27 +1302,25 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     private BigDecimal payDepositFee(final BigDecimal transactionAmoount, final LocalDate transactionDate, final AppUser user) {
 
-        System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
-
-        System.err.println("------------------why there arent any charges in this "+this.charges.size());
+        //System.err.println("-----------------time to pay fee of ,here just pay whatever is available right ? , ?---------"+transactionAmoount.doubleValue());
 
         BigDecimal totalCharges = BigDecimal.ZERO ;
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
-            
-            System.err.println("---------product apply charges ----------------");
-            
+
             if (charge.isDepositFee() && charge.isActive()) {
-                    System.err.println("----------------------------charge is fee and active "+charge.isDepositFee()+"------------and amount is "+transactionAmoount);
+                    //System.err.println("----------------------------charge is fee and active "+charge.isDepositFee()+"------------and amount is "+transactionAmoount);
 
                     BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
 
                     totalCharges =  totalCharges.add(chargeAmount);
+
                     this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
+
             }
         }
 
-        System.err.println("----------------------total charges amount is -----"+totalCharges);
+        //System.err.println("----------------------total charges amount is -----"+totalCharges);
 
         return totalCharges;
     }

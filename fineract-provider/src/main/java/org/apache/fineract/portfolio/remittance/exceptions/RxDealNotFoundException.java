@@ -8,6 +8,10 @@ import org.apache.fineract.infrastructure.core.exception.AbstractPlatformResourc
 
 public class RxDealNotFoundException extends AbstractPlatformResourceNotFoundException {
 
+    public RxDealNotFoundException(){
+        super("Rx deal with key not found","Rx Deal with key has not been found");
+    }
+
     public RxDealNotFoundException(final Long id) {
         super("Rx Deal not found", "Rx Deal with transaction " + id + " does not exist", id);
     }

@@ -3264,10 +3264,11 @@ public class CommandWrapperBuilder {
     /**
      * Added 06/11/2022 at 0407
      */ 
-    public CommandWrapperBuilder receiveRxDeal() {
+    public CommandWrapperBuilder receiveRxDeal(final Long id) {
         this.actionName = "UPDATE";
         this.entityName = "RXDEAL";
-        this.href = "/rx/?command = receive";
+        this.href = "/rx/receive/"+id;
+        this.entityId = id;
         return this;
     }
 
