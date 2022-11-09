@@ -30,6 +30,9 @@ public class RxDealConstants {
     public static String nidTypeParam = "identificationType";
     public static String keyIdParam ="key";
 
-    public static final Set<String> RX_DEAL_PARAMETERS = new HashSet<>(Arrays.asList(createNewClientParam,providerParam ,identificationTypeParam ,savingsAccountsParam ,rxData ,receiverPhoneNumberParam ,receiverNameParam ,currencyParam ,senderNameParam ,senderPhoneNumberParam ,senderEmailAddressParam ,payinAccountParam ,providerIdParam ,amountParam ,isClientParam ,nidParam , ClientApiConstants.emailAddressParamName ,transactionDateParam ,nidTypeParam ,keyIdParam ,providerIdParam ,rxData));
+    public static String rxDealStatusParam = "rxDealStatus";
+    public static String receiverEmailAddressParam = "receiverEmailAddress";
+
+    public static final Set<String> RX_DEAL_PARAMETERS = new HashSet<>(Arrays.asList(createNewClientParam,providerParam ,identificationTypeParam ,savingsAccountsParam ,rxData ,receiverPhoneNumberParam ,receiverNameParam ,currencyParam ,senderNameParam ,senderPhoneNumberParam ,senderEmailAddressParam ,payinAccountParam ,providerIdParam ,amountParam ,isClientParam ,nidParam , ClientApiConstants.emailAddressParamName ,transactionDateParam ,nidTypeParam ,keyIdParam ,providerIdParam ,rxData,"charges"));
 
 }

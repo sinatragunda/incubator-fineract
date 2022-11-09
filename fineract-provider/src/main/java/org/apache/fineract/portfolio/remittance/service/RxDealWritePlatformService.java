@@ -12,4 +12,6 @@ public interface RxDealWritePlatformService {
     public CommandProcessingResult createRxDeal(JsonCommand jsonCommand);
     public CommandProcessingResult receiveRxDeal(final Long id ,JsonCommand jsonCommand);
 
+    public CommandProcessingResult updateRxDeal(final Long id ,JsonCommand jsonCommand);
+
 }

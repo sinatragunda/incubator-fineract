@@ -81,7 +81,9 @@ public class BusinessEventNotificationConstants {
         RECURRING_DEPOSIT_ACCOUNT_CREATE("recurring_deposit_account_create","") ,
         SHARES_PURCHASE("shares_purchase","Purchase Shares"),
         RX_SEND("rx_send","Rx Deal Send"),
-        RX_RECEIVE("rx_out" ,"Rx Deal Receive");
+        RX_RECEIVE("rx_out" ,"Rx Deal Receive"),
+        RX_UPDATE("rx_update","Rx Deal Update");
+        
         
         private final String value;
         private final String code ;

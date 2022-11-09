@@ -53,4 +53,8 @@ public enum RX_PROVIDER {
         });
         return  enumOptionDataList;
     }
+
+    public EnumOptionData option(){
+        return new EnumOptionData(ordinal() ,code);
+    }
 }

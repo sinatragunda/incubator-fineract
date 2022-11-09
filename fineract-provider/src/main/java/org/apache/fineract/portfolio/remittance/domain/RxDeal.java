@@ -1,12 +1,16 @@
 
 package org.apache.fineract.portfolio.remittance.domain;
 
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.remittance.constants.RxDealConstants;
 import org.apache.fineract.portfolio.remittance.enumerations.IDENTIFICATION_TYPE;
 import org.apache.fineract.portfolio.remittance.enumerations.RX_DEAL_STATUS;
 import org.apache.fineract.portfolio.remittance.enumerations.RX_PROVIDER;
+import org.apache.fineract.portfolio.remittance.exceptions.RxDealClosedUpdateException;
 import org.apache.fineract.portfolio.remittance.helper.RxDealKeyHelper;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 
@@ -17,6 +21,8 @@ import javax.persistence.JoinColumn;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.joda.time.LocalDate ;
 import javax.persistence.Temporal;
@@ -84,10 +90,13 @@ public class RxDeal extends AbstractPersistableCustom<Long> {
 	@Column(name ="total_charges")
 	private BigDecimal totalCharges;
 
+	@Column(name ="receiver_email_address")
+	private String receiverEmailAddress;
+
 
 	public RxDeal(){}
 
-	public RxDeal(IDENTIFICATION_TYPE identificationType, RX_PROVIDER provider, String location, Client client, SavingsAccountTransaction savingsAccountTransaction, BigDecimal amount, Office office,String currencyCode, Date transactionDate, String receiverName, String receiverPhoneNumber ,RX_DEAL_STATUS rxDealStatus) {
+	public RxDeal(IDENTIFICATION_TYPE identificationType, RX_PROVIDER provider, String location, Client client, SavingsAccountTransaction savingsAccountTransaction, BigDecimal amount, Office office,String currencyCode, Date transactionDate, String receiverName, String receiverPhoneNumber ,RX_DEAL_STATUS rxDealStatus ,String receiverEmailAddress) {
 		this.identificationType = identificationType;
 		this.provider = provider;
 		/**
@@ -105,6 +114,7 @@ public class RxDeal extends AbstractPersistableCustom<Long> {
 		this.receiverPhoneNumber = receiverPhoneNumber;
 		this.rxDealStatus = rxDealStatus;
 		this.key = null ;
+		this.receiverEmailAddress = receiverEmailAddress;
 	}
 
 	public  void initDeal(){
@@ -113,6 +123,66 @@ public class RxDeal extends AbstractPersistableCustom<Long> {
 		this.key = RxDealKeyHelper.generateKey(currencyCode);
 		//setKey(key);
 		System.err.println("------------key is -----------"+this.key);
+	}
+
+	public Map update(JsonCommand command){
+
+		Map<String ,Object> actualChanges = new HashMap<>();
+
+		if (command.isChangeInStringParameterNamed(RxDealConstants.currencyParam, this.getCurrency())) {
+			final String newValue = command.stringValueOfParameterNamed(RxDealConstants.currencyParam);
+			actualChanges.put(RxDealConstants.currencyParam, newValue);
+			setCurrency(newValue);
+		}
+		if (command.isChangeInStringParameterNamed(RxDealConstants.receiverNameParam, this.getReceiverName())) {
+			final String newValue = command.stringValueOfParameterNamed(RxDealConstants.receiverNameParam);
+			actualChanges.put(RxDealConstants.receiverNameParam, newValue);
+			setReceiverName(newValue);
+		}
+		if (command.isChangeInStringParameterNamed(RxDealConstants.receiverPhoneNumberParam, this.getReceiverPhoneNumber())) {
+			final String newValue = command.stringValueOfParameterNamed(RxDealConstants.receiverPhoneNumberParam);
+			actualChanges.put(RxDealConstants.receiverPhoneNumberParam, newValue);
+			setReceiverPhoneNumber(newValue);
+		}
+
+
+		if (command.isChangeInStringParameterNamed(RxDealConstants.receiverEmailAddressParam, this.receiverEmailAddress)) {
+			System.err.println("-----------------is there any change registered  on email address son ?");
+			final String newValue = command.stringValueOfParameterNamed(RxDealConstants.receiverEmailAddressParam);
+			actualChanges.put(RxDealConstants.receiverEmailAddressParam, newValue);
+			this.receiverEmailAddress = newValue ;
+		}
+
+		if (command.isChangeInLongParameterNamed(ClientApiConstants.clientIdParamName, this.getClient().getId())) {
+			final Long newValue = command.longValueOfParameterNamed(ClientApiConstants.clientIdParamName);
+			actualChanges.put(ClientApiConstants.clientIdParamName, newValue);
+			//setReceiverPhoneNumber(newValue);
+		}
+
+		if (command.isChangeInStringParameterNamedWithCase(RxDealConstants.rxDealStatusParam, this.rxDealStatus.name())) {
+
+			final String newValue = command.stringValueOfParameterNamed(RxDealConstants.rxDealStatusParam);
+			actualChanges.put(RxDealConstants.rxDealStatusParam, newValue);
+			RX_DEAL_STATUS rxDealStatus = RX_DEAL_STATUS.fromString(newValue);
+
+			validateRxDealState(rxDealStatus);
+			setRxDealStatus(rxDealStatus);
+		}
+		return actualChanges;
+	}
+
+	/**
+	 * Added 09/11/2022 at 0721
+	 * Should not be able to open a closed transaction
+	 */
+	private void validateRxDealState(RX_DEAL_STATUS newRxDealStatus){
+		if(this.rxDealStatus.ordinal() == RX_DEAL_STATUS.CLOSED.ordinal()){
+			throw new RxDealClosedUpdateException();
+		}
+	}
+
+	public String getReceiverEmailAddress() {
+		return receiverEmailAddress;
 	}
 
 	public BigDecimal getTotalCharges() {

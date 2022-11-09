@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.portfolio.remittance.data;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -49,9 +50,16 @@ public class RxDealData {
     private RX_DEAL_STATUS rxDealStatus ;
 
     private String key ;
+
+    private BigDecimal charges ;
+
+    private EnumOptionData provider ;
+    private EnumOptionData dealStatus;
+    private String receiverEmailAddress ;
+
     public RxDealData(){}
 
-    public RxDealData(String nid, String emailAddress, String senderName, String senderPhoneNumber, String receiverName, String receiverPhoneNumber, IDENTIFICATION_TYPE identificationType, RX_PROVIDER rxProvider, boolean createClient, Long clientId, Date transactionDate, Long officeId, BigDecimal amount, Long payinAccountId ,String currencyCode ,Office office) {
+    public RxDealData(String nid, String emailAddress, String senderName, String senderPhoneNumber, String receiverName, String receiverPhoneNumber, IDENTIFICATION_TYPE identificationType, RX_PROVIDER rxProvider, boolean createClient, Long clientId, Date transactionDate, Long officeId, BigDecimal amount, Long payinAccountId ,String currencyCode ,Office office ,String receiverEmailAddress) {
 
         System.err.println("--------start function well now -------------");
         this.nid = nid;
@@ -75,11 +83,12 @@ public class RxDealData {
         this.payinAccountId = payinAccountId;
         this.currencyCode = currencyCode;
         this.office = office ;
+        this.receiverEmailAddress = receiverEmailAddress;
 
         System.err.println("-------------what the f is null here ?");
     }
 
-    public RxDealData(Long id ,String emailAddress, String senderName, String senderPhoneNumber, String receiverName, String receiverPhoneNumber, RX_PROVIDER rxProvider, LocalDate transactionDate, Long officeId, BigDecimal amount, Long payinAccountId, Long clientId, String currencyCode, String officeName , Long savingsAccountTransactionId , RX_DEAL_STATUS rxDealStatus ,String key) {
+    public RxDealData(Long id ,String emailAddress, String senderName, String senderPhoneNumber, String receiverName, String receiverPhoneNumber, RX_PROVIDER rxProvider, LocalDate transactionDate, Long officeId, BigDecimal amount, Long payinAccountId, Long clientId, String currencyCode, String officeName , Long savingsAccountTransactionId , RX_DEAL_STATUS rxDealStatus ,String key ,BigDecimal charges ,EnumOptionData provider ,EnumOptionData dealStatus ,String receiverEmailAddress) {
         this.id = id ;
         this.emailAddress = emailAddress;
         this.senderName = senderName;
@@ -97,8 +106,23 @@ public class RxDealData {
         this.savingsAccountTransactionId = savingsAccountTransactionId;
         this.rxDealStatus = rxDealStatus;
         this.key = key ;
+        this.charges = charges;
+        this.provider = provider;
+        this.dealStatus = dealStatus ;
+        this.receiverEmailAddress = receiverEmailAddress;
     }
 
+    public String getReceiverEmailAddress() {
+        return receiverEmailAddress;
+    }
+
+    public EnumOptionData getProvider() {
+        return provider;
+    }
+
+    public BigDecimal getCharges() {
+        return charges;
+    }
 
     public Long getId() {
         return id;
@@ -236,6 +260,6 @@ public class RxDealData {
     }
 
     public RxDeal rxDeal(){
-        return new RxDeal(identificationType ,rxProvider,null ,client ,null ,amount ,office ,currencyCode ,transactionDate ,receiverName ,receiverPhoneNumber ,null);
+        return new RxDeal(identificationType ,rxProvider,null ,client ,null ,amount ,office ,currencyCode ,transactionDate ,receiverName ,receiverPhoneNumber ,null ,receiverEmailAddress);
     }
 }

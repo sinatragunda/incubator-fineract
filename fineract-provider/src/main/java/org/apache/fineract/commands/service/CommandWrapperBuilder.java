@@ -3265,9 +3265,20 @@ public class CommandWrapperBuilder {
      * Added 06/11/2022 at 0407
      */ 
     public CommandWrapperBuilder receiveRxDeal(final Long id) {
-        this.actionName = "UPDATE";
+        this.actionName = "RECEIVE";
         this.entityName = "RXDEAL";
         this.href = "/rx/receive/"+id;
+        this.entityId = id;
+        return this;
+    }
+
+    /**
+     * Added 06/11/2022 at 0407
+     */ 
+    public CommandWrapperBuilder updateRxDeal(final Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "RXDEAL";
+        this.href = "/rx/"+id;
         this.entityId = id;
         return this;
     }

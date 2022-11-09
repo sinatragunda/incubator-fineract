@@ -283,6 +283,29 @@ public final class JsonCommand {
         return differenceExists;
     }
 
+    /**
+     * Added 09/11/2022 at 0859 
+     * Added to counter case differences 
+     */
+    private boolean differenceExists(final String baseValue, final String workingCopyValue ,boolean ignoreCase) {
+        boolean differenceExists = false;
+
+        if (StringUtils.isNotBlank(baseValue)) {
+            if(ignoreCase){
+                System.err.println("-------------------------we were not doing ignore case thing ");
+                differenceExists = !baseValue.equalsIgnoreCase(workingCopyValue);
+            }
+            else{
+                differenceExists = !baseValue.equals(workingCopyValue);
+            }
+        } else {
+            differenceExists = StringUtils.isNotBlank(workingCopyValue);
+        }
+
+        return differenceExists;
+    }
+  
+
     private boolean differenceExists(final String[] baseValue, final String[] workingCopyValue) {
         Arrays.sort(baseValue);
         Arrays.sort(workingCopyValue);
@@ -423,6 +446,20 @@ public final class JsonCommand {
         }
         return isChanged;
     }
+
+    /**
+     * Added 09/11/2022 at 0901
+     */
+
+    public boolean isChangeInStringParameterNamedWithCase(final String parameterName, final String existingValue) {
+        boolean isChanged = false;
+        if (parameterExists(parameterName)) {
+            final String workingValue = stringValueOfParameterNamed(parameterName);
+            isChanged = differenceExists(existingValue, workingValue ,true);
+            System.err.println("-----------is changed has error ? ------"+isChanged);
+        }
+        return isChanged;
+    }  
 
     public String stringValueOfParameterNamed(final String parameterName) {
         final String value = this.fromApiJsonHelper.extractStringNamed(parameterName, this.parsedCommand);

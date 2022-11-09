@@ -37,14 +37,26 @@ public enum RX_DEAL_STATUS{
         }
         return null ;
     }
+    public static RX_DEAL_STATUS fromString(String arg){
+        for(RX_DEAL_STATUS c : values()){
+            if(c.getCode().equalsIgnoreCase(arg)){
+                return c ;
+            }
+        }
+        return null ;
+    }
 
     public static Collection<EnumOptionData> template(){
         List<EnumOptionData> enumOptionDataList = new ArrayList<>();
         Arrays.stream(values()).forEach(e->{
-            EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.code , e.code);
+            EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.code , e.name());
             enumOptionDataList.add(enumOptionData);
         });
         return  enumOptionDataList;
+    }
+
+    public EnumOptionData option(){
+        return new EnumOptionData(ordinal() ,code);
     }
 
 

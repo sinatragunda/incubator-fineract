@@ -11,7 +11,9 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants;
 import org.apache.fineract.portfolio.common.helper.EntityMap;
 import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService;
@@ -22,10 +24,7 @@ import org.apache.fineract.portfolio.remittance.constants.RxDealConstants;
 import org.apache.fineract.portfolio.remittance.data.RxData;
 import org.apache.fineract.portfolio.remittance.data.RxDealData;
 import org.apache.fineract.portfolio.remittance.data.RxDealValidator;
-import org.apache.fineract.portfolio.remittance.domain.RxDeal;
-import org.apache.fineract.portfolio.remittance.domain.RxDealAsembler;
-import org.apache.fineract.portfolio.remittance.domain.RxDealReceive;
-import org.apache.fineract.portfolio.remittance.domain.RxDealTransaction;
+import org.apache.fineract.portfolio.remittance.domain.*;
 import org.apache.fineract.portfolio.remittance.enumerations.RX_DEAL_STATUS;
 import org.apache.fineract.portfolio.remittance.helper.RxDealDataHelper;
 import org.apache.fineract.portfolio.remittance.repo.RxDealReceiveRepository;
@@ -65,9 +64,10 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
     private SavingsAccountWritePlatformService savingsAccountWritePlatformService;
     private SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     private FromJsonHelper fromJsonHelper;
+    private ClientRepositoryWrapper clientRepositoryWrapper;
 
     @Autowired
-    public RxDealWritePlatformServiceImpl(final PlatformSecurityContext context , final RoutingDataSource routingDataSource ,final RxDealValidator rxDealValidator ,final RxDealAsembler rxDealAsembler ,final RxDealDataHelper rxDealDataHelper ,final SavingsAccountDomainService savingsAccountDomainService ,final RxDealRepository rxDealRepository ,final  RxDealTransactionRepository rxDealTransactionRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final RxDealReceiveRepository rxDealReceiveRepository ,final BusinessEventNotifierService businessEventNotifierService ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final  SavingsAccountTransactionRepository savingsAccountTransactionRepository ,final FromJsonHelper fromJsonHelper){
+    public RxDealWritePlatformServiceImpl(final PlatformSecurityContext context , final RoutingDataSource routingDataSource ,final RxDealValidator rxDealValidator ,final RxDealAsembler rxDealAsembler ,final RxDealDataHelper rxDealDataHelper ,final SavingsAccountDomainService savingsAccountDomainService ,final RxDealRepository rxDealRepository ,final  RxDealTransactionRepository rxDealTransactionRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final RxDealReceiveRepository rxDealReceiveRepository ,final BusinessEventNotifierService businessEventNotifierService ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final  SavingsAccountTransactionRepository savingsAccountTransactionRepository ,final FromJsonHelper fromJsonHelper ,final ClientRepositoryWrapper clientRepositoryWrapper){
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
         this.rxDealValidator = rxDealValidator;
@@ -82,6 +82,7 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
         this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.fromJsonHelper = fromJsonHelper;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
     }
     @Override
     public CommandProcessingResult createRxDeal(JsonCommand jsonCommand){
@@ -149,11 +150,35 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
 
     }
 
+    /**
+     * Added 09/11/2022 at 0724
+     */
+    public CommandProcessingResult updateRxDeal(final Long id ,JsonCommand command){
+
+        RxDeal rxDeal = rxDealRepository.findOne(id);
+
+        Map<String ,Object> changes = rxDeal.update(command);
+
+        if(changes.containsKey(ClientApiConstants.clientIdParamName)){
+            Long clientId = (Long)changes.get(ClientApiConstants.clientIdParamName);
+            Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+            System.err.println("----------did we find client ? "+clientId);
+            rxDeal.setClient(client);
+        }
+
+        rxDealRepository.saveAndFlush(rxDeal);
+
+        CommandProcessingResult result = new CommandProcessingResultBuilder().withEntityId(rxDeal.getId()).with(changes).build();
+
+        return result;
+
+    }
+
     @Override
     public CommandProcessingResult receiveRxDeal(final Long id ,JsonCommand jsonCommand) {
 
 
-        System.err.println("-------------start updating this shit son "+id);
+        System.err.println("----------------------recieve this deal instead of editing ");
 
         // validate for update here
         RxDealReceive  rxDealReceive = rxDealAsembler.assemblerForReceive(id ,jsonCommand);
@@ -162,16 +187,9 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
 
         BigDecimal amount = rxDeal.getAmount();
 
-        System.err.println("this thing is dead set null ,taking client belonging to ? "+rxDealReceive.getSavingsAccountTransaction().getSavingsAccount().getClient().getDisplayName());
-
         SavingsAccount payoutSavingsAccount = rxDeal.getSavingsAccountTransaction().getSavingsAccount();
 
         System.err.println("------------------amount for deal is "+amount);
-
-        System.err.println("------------perform function on savoings account -------"+payoutSavingsAccount.accountBalance());
-
-        System.err.println("---------------------do we have payout account ? "+Optional.ofNullable(payoutSavingsAccount).isPresent());
-
 
         /**
          * To be checked 07/11/2022 at 1535
@@ -183,13 +201,6 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
         //LocalDate transactionDate = DateUtils.toLocalDate(rxDealReceive.getTransactionDate());
 
         String note = String.format("Rx payout transaction for client %s to receiver %s",client.getDisplayName() ,rxDealReceive.getName());
-
-        System.err.println("-----------------------note is -----------------"+note);
-
-
-        System.err.println("-------------------transaction date in borched request is -------------------"+rxDealReceive.getTransactionDate());
-
-        System.err.println("------------------the not botched date is "+transactionDate);
 
         Map map = rxDealAsembler.assembleForWithdrawal(rxDealReceive);
         map.put("note" ,note);
@@ -207,6 +218,9 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
 
         rxDealReceive.setSavingsAccountTransaction(savingsAccountTransaction);
         rxDealReceive.setStatus(RX_DEAL_STATUS.CLOSED);
+
+        BigDecimal transactionAmount = savingsAccountTransaction.getAmount();
+        rxDealReceive.setAmount(transactionAmount);
 
         rxDealReceiveRepository.save(rxDealReceive);
 

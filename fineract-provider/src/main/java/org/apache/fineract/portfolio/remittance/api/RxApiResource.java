@@ -208,6 +208,24 @@ public class RxApiResource {
 
         return this.toApiJsonSerializer.serialize(result);
     }
+    /**
+     * Added 09/11/2022 at 0732
+     * Update client information
+     */
+    @PUT
+    @Path("{key}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String update(final String apiRequestBodyAsJson ,@PathParam("key") final Long id) {
+
+        System.err.println("-------------------------update record with--------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateRxDeal(id).withJson(apiRequestBodyAsJson).build();
+
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.toApiJsonSerializer.serialize(result);
+    }
 
     /**
      * Added 06/11/2022 at 0405

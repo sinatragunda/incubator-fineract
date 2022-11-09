@@ -80,11 +80,13 @@ public class RxDealAsembler {
         String senderName = null ;
         String senderPhoneNumber = null;
         String lastName = null ;
+        String receiverEmailAddress= null ;
 
         Boolean isCreateClient = false ;
         if(fromJsonHelper.parameterExists(RxDealConstants.createNewClientParam ,element)){
             isCreateClient =  fromJsonHelper.extractBooleanNamed(RxDealConstants.createNewClientParam ,element);
         }
+
 
         if(isCreateClient){
             System.err.println("---------is create client now "+isCreateClient);
@@ -123,12 +125,16 @@ public class RxDealAsembler {
 
         System.err.println("-----------transaction date ----------------"+transactionDate);
 
-        RX_PROVIDER rxProvider = null;
+        RX_PROVIDER rxProvider = RX_PROVIDER.INTERNAL;
         if(fromJsonHelper.parameterExists(RxDealConstants.providerIdParam ,element)){
             Integer pInt = fromJsonHelper.extractIntegerWithLocaleNamed(RxDealConstants.providerIdParam ,element);
             rxProvider = RX_PROVIDER.fromInt(pInt);
         }
 
+        if(command.hasParameter(RxDealConstants.receiverEmailAddressParam)){
+            System.err.println("---------------where do we go with this email address ? ----------------");
+            receiverEmailAddress = fromJsonHelper.extractStringNamed(RxDealConstants.receiverEmailAddressParam ,element);
+        }
         String currencyCode = fromJsonHelper.extractStringNamed(RxDealConstants.currencyParam ,element);
 
         final Long payinAccountId = fromJsonHelper.extractLongNamed(RxDealConstants.payinAccountParam ,element);
@@ -136,7 +142,7 @@ public class RxDealAsembler {
         System.err.println("-------------what the f is null here ? ");
         Date transactionDateEx = DateUtils.fromLocalDate(transactionDate);
 
-        RxDealData rxDealData = new RxDealData(nid ,emailAddress ,senderName ,senderPhoneNumber ,receiverName ,receieverPhoneNumber ,identificationType,rxProvider ,isCreateClient,clientId ,transactionDateEx ,officeId ,amount ,payinAccountId ,currencyCode ,office);
+        RxDealData rxDealData = new RxDealData(nid ,emailAddress ,senderName ,senderPhoneNumber ,receiverName ,receieverPhoneNumber ,identificationType,rxProvider ,isCreateClient,clientId ,transactionDateEx ,officeId ,amount ,payinAccountId ,currencyCode ,office ,receiverEmailAddress);
 
         System.err.println("-----------is rxDealData available ------"+Optional.ofNullable(rxDealData).isPresent());
 
@@ -177,7 +183,6 @@ public class RxDealAsembler {
 
         final Office office = appUser.getOffice();
 
-
         System.err.println("---------------user office name is "+office.getName());
 
         final String name = fromJsonHelper.extractStringNamed(RxDealConstants.receiverNameParam ,element);
@@ -201,7 +206,7 @@ public class RxDealAsembler {
          */
         SavingsAccountTransaction savingsAccountTransaction = rxDeal.getSavingsAccountTransaction();
 
-        RxDealReceive rxDealReceive = new RxDealReceive(rxDeal ,savingsAccountTransaction ,name ,phoneNumber ,emailAddress ,transactionDate ,office ,rxDealStatus);
+        RxDealReceive rxDealReceive = new RxDealReceive(rxDeal ,savingsAccountTransaction ,name ,phoneNumber ,emailAddress ,transactionDate ,office ,rxDealStatus ,BigDecimal.ZERO ,BigDecimal.ZERO);
 
         return rxDealReceive;
     }

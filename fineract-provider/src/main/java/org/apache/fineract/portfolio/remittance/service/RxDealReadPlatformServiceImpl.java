@@ -71,10 +71,12 @@ public class RxDealReadPlatformServiceImpl implements RxDealReadPlatformService 
                     "rx.transaction_date AS transactionDate,\n" +
                     "rx.provider AS provider ,\n" +
                     "rx.amount AS amount ,\n" +
+                    "rx.total_charges as charges ,\n"+
                     "rx.status AS status ,\n" +
                     "rx.currency_code as currencyCode ,\n"+
                     "ifnull(rxr.name ,rx.receiver_name) AS receiverName,\n" +
                     "ifnull(rxr.phone_number ,rx.receiver_phone_number) as receiverPhoneNumber, \n"+
+                    "ifnull(rxr.email_address,rx.receiver_email_address) as receiverEmailAddress, \n"+
                     "rxr.transaction_date AS collectionDate,\n" +
                     "mo.name AS officeName,\n" +
                     "mo.id AS officeId ,\n" +
@@ -96,18 +98,23 @@ public class RxDealReadPlatformServiceImpl implements RxDealReadPlatformService 
             final String clientName = rs.getString ("clientName");
             final BigDecimal amount = JdbcSupport.getBigDecimalDefaultToNullIfZero(rs ,"amount");
             final Long savingsAccountTransactionId = JdbcSupport.getLong(rs, "savingsAccountTransactionId");
+
             final Integer providerInt = JdbcSupport.getInteger(rs, "provider");
             final RX_PROVIDER rxProvider = RX_PROVIDER.fromInt(providerInt);
+            final EnumOptionData provider = rxProvider.option();
+
             final String phoneNumber = rs.getString("phoneNumber");
             final LocalDate transactionDate =JdbcSupport.getLocalDate(rs ,"transactionDate");
 
             final Integer statusInt = JdbcSupport.getInteger(rs ,"status");
             final RX_DEAL_STATUS rxDealStatus = RX_DEAL_STATUS.fromInt(statusInt);
+            final EnumOptionData dealStatus = rxDealStatus.option();
+
             final String emailAddress = rs.getString("emailAddress");
 
             final String receiverName = rs.getString("receiverName");
             final String receiverPhoneNumber = rs.getString("receiverPhoneNumber");
-            //final String receiverEmailAddress = rs.getString("receiverEmailAddress");
+            final String receiverEmailAddress = rs.getString("receiverEmailAddress");
 
             final Long officeId = rs.getLong("officeId");
             final String officeName = rs.getString("officeName");
@@ -115,8 +122,9 @@ public class RxDealReadPlatformServiceImpl implements RxDealReadPlatformService 
             final Long payinAccountId = rs.getLong("payinAccountId");
 
             final String key = rs.getString("rxKey");
+            final BigDecimal charges = rs.getBigDecimal("charges");
 
-            final RxDealData rxDealData = new RxDealData(id,emailAddress ,clientName ,phoneNumber ,receiverName ,receiverPhoneNumber ,rxProvider ,transactionDate ,officeId ,amount ,payinAccountId ,clientId ,currencyCode ,officeName ,savingsAccountTransactionId ,rxDealStatus ,key);
+            final RxDealData rxDealData = new RxDealData(id,emailAddress ,clientName ,phoneNumber ,receiverName ,receiverPhoneNumber ,rxProvider ,transactionDate ,officeId ,amount ,payinAccountId ,clientId ,currencyCode ,officeName ,savingsAccountTransactionId ,rxDealStatus ,key ,charges ,provider ,dealStatus ,receiverEmailAddress);
 
             return rxDealData ;
         }

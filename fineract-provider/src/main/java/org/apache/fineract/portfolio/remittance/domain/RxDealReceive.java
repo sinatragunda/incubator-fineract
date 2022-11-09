@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -38,6 +39,7 @@ public class RxDealReceive extends AbstractPersistableCustom<Long> {
 
     @Column(name="email_address")
     private String emailAddress ;
+
     @Column(name="transaction_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date transactionDate ;
@@ -49,7 +51,14 @@ public class RxDealReceive extends AbstractPersistableCustom<Long> {
     @Enumerated(EnumType.ORDINAL)
     private RX_DEAL_STATUS status;
 
-    public RxDealReceive(RxDeal rxDeal, SavingsAccountTransaction savingsAccountTransaction, String name, String phoneNumber, String emailAddress ,LocalDate transactionDate , Office office , RX_DEAL_STATUS rxDealStatus) {
+    @Column(name="amount")
+    private BigDecimal amount;
+
+    @Column(name="total_charges")
+    private BigDecimal charges;
+
+
+    public RxDealReceive(RxDeal rxDeal, SavingsAccountTransaction savingsAccountTransaction, String name, String phoneNumber, String emailAddress ,LocalDate transactionDate , Office office , RX_DEAL_STATUS rxDealStatus ,BigDecimal amount ,BigDecimal charges) {
         this.rxDeal = rxDeal;
         this.savingsAccountTransaction = savingsAccountTransaction;
         this.name = name;
@@ -58,6 +67,24 @@ public class RxDealReceive extends AbstractPersistableCustom<Long> {
         this.office = office ;
         this.status = status ;
         this.emailAddress = emailAddress;
+        this.amount = amount ;
+        this.charges = charges;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getCharges() {
+        return charges;
+    }
+
+    public void setCharges(BigDecimal charges) {
+        this.charges = charges;
     }
 
     public void setStatus(RX_DEAL_STATUS status) {
