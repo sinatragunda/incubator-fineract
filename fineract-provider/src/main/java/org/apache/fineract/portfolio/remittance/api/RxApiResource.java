@@ -133,7 +133,7 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String template(@Context final UriInfo uriInfo) {
 
-        //this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.permission);
+        this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.RESOURCE_NAME);
 
         final RxData rxData =this.rxReadPlatformService.template();
 
@@ -151,10 +151,7 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getData(@Context final UriInfo uriInfo ,@PathParam("key") final String id ,@QueryParam("isKey") boolean isKey) {
 
-        System.err.println("------------validate if this guy has read params ");
         this.context.authenticatedUser().validateHasReadPermission(RxDealConstants.RESOURCE_NAME);
-
-        System.err.println("------------done valudating ");
 
         Long rxDealId = null ;
         RxDealData rxDealData = null ;
@@ -167,8 +164,6 @@ public class RxApiResource {
             String key = id ;
             rxDealData = rxReadPlatformService.retreiveOne(key);
         }
-
-        System.err.println("---------------------value of object is ------"+ Optional.ofNullable(rxDealData).isPresent());
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.rxDealDataDefaultToApiJsonSerializer.serialize(settings, rxDealData,
@@ -200,12 +195,8 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String create(final String apiRequestBodyAsJson) {
 
-        System.err.println("---------------------------------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createRxDeal().withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
     /**
@@ -218,12 +209,8 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String update(final String apiRequestBodyAsJson ,@PathParam("key") final Long id) {
 
-        System.err.println("-------------------------update record with--------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateRxDeal(id).withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 
@@ -238,49 +225,8 @@ public class RxApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String receive(final String apiRequestBodyAsJson ,@PathParam("id") final Long id) {
 
-        System.err.println("---------------------------------apiRequestBodyAsJson -------------"+apiRequestBodyAsJson);
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().receiveRxDeal(id).withJson(apiRequestBodyAsJson).build();
-
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
-        return this.toApiJsonSerializer.serialize(result);
-    }
-
-
-//    @PUT
-//    @Path("{accountId}")
-//    @Consumes({ MediaType.APPLICATION_JSON })
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public String update(@PathParam("accountId") final Long accountId, final String apiRequestBodyAsJson,
-//                         @QueryParam("command") final String commandParam) {
-//
-//        if (is(commandParam, "updateWithHoldTax")) {
-//            final CommandWrapper commandRequest = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson).updateWithHoldTax(accountId)
-//                    .build();
-//            final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-//            return this.toApiJsonSerializer.serialize(result);
-//        }
-//
-//        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateSavingsAccount(accountId).withJson(apiRequestBodyAsJson)
-//                .build();
-//
-//        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-//
-//        return this.toApiJsonSerializer.serialize(result);
-//    }
-
-
-    @DELETE
-    @Path("{accountId}")
-    @Consumes({ MediaType.APPLICATION_JSON })
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String delete(@PathParam("accountId") final Long accountId) {
-
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteSavingsAccount(accountId).build();
-
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-
         return this.toApiJsonSerializer.serialize(result);
     }
 

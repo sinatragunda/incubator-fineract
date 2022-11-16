@@ -19,6 +19,7 @@ import org.apache.fineract.portfolio.remittance.data.RxDealData;
 import org.apache.fineract.portfolio.remittance.enumerations.IDENTIFICATION_TYPE;
 import org.apache.fineract.portfolio.remittance.enumerations.RX_DEAL_STATUS;
 import org.apache.fineract.portfolio.remittance.enumerations.RX_PROVIDER;
+import org.apache.fineract.portfolio.remittance.exceptions.RxDealStatusNotOpenedException;
 import org.apache.fineract.portfolio.remittance.repo.RxDealRepositoryWrapper;
 import org.apache.fineract.portfolio.remittance.service.RxDealReadPlatformService;
 import org.apache.fineract.portfolio.remittance.service.RxDealReadPlatformServiceImpl;
@@ -87,9 +88,7 @@ public class RxDealAsembler {
             isCreateClient =  fromJsonHelper.extractBooleanNamed(RxDealConstants.createNewClientParam ,element);
         }
 
-
         if(isCreateClient){
-            System.err.println("---------is create client now "+isCreateClient);
             nid = fromJsonHelper.extractStringNamed(RxDealConstants.nidParam ,element);
             emailAddress = fromJsonHelper.extractStringNamed(ClientApiConstants.emailAddressParamName ,element);
             StringBuilder stringBuilder = new StringBuilder();
@@ -123,8 +122,6 @@ public class RxDealAsembler {
 
         LocalDate transactionDate = fromJsonHelper.extractLocalDateNamed(RxDealConstants.transactionDateParam ,element);
 
-        System.err.println("-----------transaction date ----------------"+transactionDate);
-
         RX_PROVIDER rxProvider = RX_PROVIDER.INTERNAL;
         if(fromJsonHelper.parameterExists(RxDealConstants.providerIdParam ,element)){
             Integer pInt = fromJsonHelper.extractIntegerWithLocaleNamed(RxDealConstants.providerIdParam ,element);
@@ -132,20 +129,14 @@ public class RxDealAsembler {
         }
 
         if(command.hasParameter(RxDealConstants.receiverEmailAddressParam)){
-            System.err.println("---------------where do we go with this email address ? ----------------");
             receiverEmailAddress = fromJsonHelper.extractStringNamed(RxDealConstants.receiverEmailAddressParam ,element);
         }
         String currencyCode = fromJsonHelper.extractStringNamed(RxDealConstants.currencyParam ,element);
 
         final Long payinAccountId = fromJsonHelper.extractLongNamed(RxDealConstants.payinAccountParam ,element);
-
-        System.err.println("-------------what the f is null here ? ");
         Date transactionDateEx = DateUtils.fromLocalDate(transactionDate);
 
         RxDealData rxDealData = new RxDealData(nid ,emailAddress ,senderName ,senderPhoneNumber ,receiverName ,receieverPhoneNumber ,identificationType,rxProvider ,isCreateClient,clientId ,transactionDateEx ,officeId ,amount ,payinAccountId ,currencyCode ,office ,receiverEmailAddress);
-
-        System.err.println("-----------is rxDealData available ------"+Optional.ofNullable(rxDealData).isPresent());
-
         return rxDealData ;
     }
 
@@ -166,9 +157,7 @@ public class RxDealAsembler {
         map.put("dateFormat" ,"dd MMMM yyyy");
         map.put("paymentTypeId" ,1);
 
-
         return map ;
-        //return JsonCommandHelper.jsonCommand(fromJsonHelper ,map);
 
     }
 
@@ -180,10 +169,13 @@ public class RxDealAsembler {
         JsonElement element = jsonCommand.parsedJson();
 
         RxDeal rxDeal = rxDealRepositoryWrapper.findOneWithNotFoundDetection(id);
+        /**
+         * Added 10/11/2022 at 0707
+         * Throw error if rxdeal status is not open .Only open deals can be remitted
+         */
+        isRxDealOpen(rxDeal);
 
         final Office office = appUser.getOffice();
-
-        System.err.println("---------------user office name is "+office.getName());
 
         final String name = fromJsonHelper.extractStringNamed(RxDealConstants.receiverNameParam ,element);
 
@@ -209,5 +201,13 @@ public class RxDealAsembler {
         RxDealReceive rxDealReceive = new RxDealReceive(rxDeal ,savingsAccountTransaction ,name ,phoneNumber ,emailAddress ,transactionDate ,office ,rxDealStatus ,BigDecimal.ZERO ,BigDecimal.ZERO);
 
         return rxDealReceive;
+    }
+
+    private void isRxDealOpen(RxDeal rxDeal){
+        RX_DEAL_STATUS rxDealStatus = rxDeal.getRxDealStatus();
+        boolean isOpen  = rxDealStatus.equals(RX_DEAL_STATUS.OPENED);
+        if(!isOpen){
+            throw new RxDealStatusNotOpenedException();
+        }
     }
 }

@@ -28,7 +28,7 @@ CREATE TABLE `m_rx_deal` (
 	`savings_account_transaction_id` BIGINT(20) NOT NULL DEFAULT '0',
 	`amount` DOUBLE NOT NULL DEFAULT '0',
 	`office_id` BIGINT(20) NOT NULL DEFAULT '0',
-	`currency_id` BIGINT(20) NOT NULL DEFAULT '0',
+	`currency_code` varchar(5) NOT NULL,
 	`transaction_date` DATE NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`status` SMALLINT(5) NOT NULL DEFAULT '0',
 	`receiver_name` VARCHAR(200) NOT NULL DEFAULT '0' COLLATE 'latin1_swedish_ci',

@@ -1238,8 +1238,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     private void postJournalEntries(final SavingsAccount savingsAccount, final Set<Long> existingTransactionIds,
             final Set<Long> existingReversedTransactionIds ,TransactionCode transactionCode) {
 
-
-        System.err.println("-------------------post journal entries without transactionCode --------");
+        //System.err.println("-------------------post journal entries without transactionCode --------");
 
         final MonetaryCurrency currency = savingsAccount.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(currency);

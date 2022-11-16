@@ -65,9 +65,10 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
     private SavingsAccountTransactionRepository savingsAccountTransactionRepository;
     private FromJsonHelper fromJsonHelper;
     private ClientRepositoryWrapper clientRepositoryWrapper;
+    private RxDealDataValidator rxDealDataValidator;
 
     @Autowired
-    public RxDealWritePlatformServiceImpl(final PlatformSecurityContext context , final RoutingDataSource routingDataSource ,final RxDealValidator rxDealValidator ,final RxDealAsembler rxDealAsembler ,final RxDealDataHelper rxDealDataHelper ,final SavingsAccountDomainService savingsAccountDomainService ,final RxDealRepository rxDealRepository ,final  RxDealTransactionRepository rxDealTransactionRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final RxDealReceiveRepository rxDealReceiveRepository ,final BusinessEventNotifierService businessEventNotifierService ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final  SavingsAccountTransactionRepository savingsAccountTransactionRepository ,final FromJsonHelper fromJsonHelper ,final ClientRepositoryWrapper clientRepositoryWrapper){
+    public RxDealWritePlatformServiceImpl(final PlatformSecurityContext context , final RoutingDataSource routingDataSource ,final RxDealValidator rxDealValidator ,final RxDealAsembler rxDealAsembler ,final RxDealDataHelper rxDealDataHelper ,final SavingsAccountDomainService savingsAccountDomainService ,final RxDealRepository rxDealRepository ,final  RxDealTransactionRepository rxDealTransactionRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final RxDealReceiveRepository rxDealReceiveRepository ,final BusinessEventNotifierService businessEventNotifierService ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final  SavingsAccountTransactionRepository savingsAccountTransactionRepository ,final FromJsonHelper fromJsonHelper ,final ClientRepositoryWrapper clientRepositoryWrapper ,final RxDealDataValidator rxDealDataValidator){
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
         this.rxDealValidator = rxDealValidator;
@@ -83,11 +84,14 @@ public class RxDealWritePlatformServiceImpl implements RxDealWritePlatformServic
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.fromJsonHelper = fromJsonHelper;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.rxDealDataValidator = rxDealDataValidator;
     }
     @Override
     public CommandProcessingResult createRxDeal(JsonCommand jsonCommand){
 
         //rxDealValidator.validateForCreate(jsonCommand.json());
+        String json = jsonCommand.json();
+        rxDealDataValidator.validateForCreate(json);
         RxDealData rxDealData = rxDealAsembler.assembleFrom(jsonCommand);
 
         BigDecimal amount = rxDealData.getAmount();

@@ -732,64 +732,35 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         // no openingBalance concept supported yet but probably will to allow
         // for migrations.
 
-        System.err.println("------------start functuin now calculate interest");
-
         final Money openingAccountBalance = Money.zero(this.currency);
 
         // update existing transactions so derived balance fields are
         // correct.
-        System.err.println("-----------passed this function -------");
 
         recalculateDailyBalances(openingAccountBalance, upToInterestCalculationDate);
 
-
-        System.err.println("==================money "+Optional.ofNullable(openingAccountBalance).isPresent());
-
         // 1. default to calculate interest based on entire history OR
         // 2. determine latest 'posting period' and find interest credited to
-        // that period
-
-        System.err.println("-------------------------------1");
 
         // A generate list of EndOfDayBalances (not including interest postings)
         final SavingsPostingInterestPeriodType postingPeriodType = SavingsPostingInterestPeriodType.fromInt(this.interestPostingPeriodType);
 
-
-        System.err.println("-------------------------------2");
         final SavingsCompoundingInterestPeriodType compoundingPeriodType = SavingsCompoundingInterestPeriodType
                 .fromInt(this.interestCompoundingPeriodType);
-
-
-        System.err.println("-------------------------------3");
 
         final SavingsInterestCalculationDaysInYearType daysInYearType = SavingsInterestCalculationDaysInYearType
                 .fromInt(this.interestCalculationDaysInYearType);
 
-
-        System.err.println("-------------------------------3.1");
-
         List<LocalDate> postedAsOnDates= getManualPostingDates();
-
-
-        System.err.println("-------------------------------3.2");
-
          if(postInterestOnDate != null){
              postedAsOnDates.add(postInterestOnDate);
          }
-
-
-        System.err.println("-------------------------------4");
 
         final List<LocalDateInterval> postingPeriodIntervals = this.savingsHelper.determineInterestPostingPeriods(
                 getStartInterestCalculationDate(), upToInterestCalculationDate, postingPeriodType, financialYearBeginningMonth,
                 postedAsOnDates);
 
-
-        System.err.println("-------------------------------5");
-
         final List<PostingPeriod> allPostingPeriods = new ArrayList<>();
-
-        System.err.println("-------------------------");
 
         Money periodStartingBalance;
         if (this.startInterestCalculationDate != null) {

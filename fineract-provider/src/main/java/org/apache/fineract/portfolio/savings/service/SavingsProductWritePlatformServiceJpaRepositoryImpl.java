@@ -42,6 +42,7 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.domain.ProductRepository;
+import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsProductDataValidator;
 import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
@@ -125,7 +126,6 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             Product productSettings = product.productSettings();
 
             Optional.ofNullable(productSettings).ifPresent(e->{
-                System.err.println("-----------------write product settings ----------");
                 productSettings.setProductId(product.getId());
                 productRepository.save(productSettings);
             });
@@ -159,17 +159,23 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
 
         try {
             this.context.authenticatedUser();
-            final SavingsProduct product = this.savingProductRepository.findOne(productId);
-            if (product == null) { throw new SavingsProductNotFoundException(productId); }
+            final SavingsProduct savingsProduct = this.savingProductRepository.findOne(productId);
 
-            this.fromApiJsonDataValidator.validateForUpdate(command.json(), product);
+            final Product product = this.productRepository.findOneByProductTypeAndProductId(PRODUCT_TYPE.SAVINGS ,savingsProduct.getId());
 
-            final Map<String, Object> changes = product.update(command);
+            if (savingsProduct == null) { throw new SavingsProductNotFoundException(productId); }
+
+            this.fromApiJsonDataValidator.validateForUpdate(command.json(), savingsProduct);
+
+            final Map<String, Object> changes = savingsProduct.update(command);
+            final Map<String ,Object> productSettingsChanges = product.update(command);
+
+            changes.putAll(productSettingsChanges);
 
             if (changes.containsKey(chargesParamName)) {
-                final Set<Charge> savingsProductCharges = this.savingsProductAssembler.assembleListOfSavingsProductCharges(command, product
+                final Set<Charge> savingsProductCharges = this.savingsProductAssembler.assembleListOfSavingsProductCharges(command,savingsProduct
                         .currency().getCode());
-                final boolean updated = product.update(savingsProductCharges);
+                final boolean updated = savingsProduct.update(savingsProductCharges);
                 if (!updated) {
                     changes.remove(chargesParamName);
                 }
@@ -177,8 +183,8 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
 
             if (changes.containsKey(taxGroupIdParamName)) {
                 final TaxGroup taxGroup = this.savingsProductAssembler.assembleTaxGroup(command);
-                product.setTaxGroup(taxGroup);
-                if (product.withHoldTax() && product.getTaxGroup() == null) {
+                savingsProduct.setTaxGroup(taxGroup);
+                if (savingsProduct.withHoldTax() && savingsProduct.getTaxGroup() == null) {
                     final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
                     final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
                             .resource(SAVINGS_PRODUCT_RESOURCE_NAME);
@@ -191,16 +197,20 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             // accounting related changes
             final boolean accountingTypeChanged = changes.containsKey(accountingRuleParamName);
             final Map<String, Object> accountingMappingChanges = this.accountMappingWritePlatformService
-                    .updateSavingsProductToGLAccountMapping(product.getId(), command, accountingTypeChanged, product.getAccountingType(),
+                    .updateSavingsProductToGLAccountMapping(savingsProduct.getId(), command, accountingTypeChanged, savingsProduct.getAccountingType(),
                             DepositAccountType.SAVINGS_DEPOSIT);
             changes.putAll(accountingMappingChanges);
 
             if (!changes.isEmpty()) {
-                this.savingProductRepository.saveAndFlush(product);
+                this.savingProductRepository.saveAndFlush(savingsProduct);
+            }
+
+            if(!productSettingsChanges.isEmpty()){
+                this.productRepository.saveAndFlush(product);
             }
 
             return new CommandProcessingResultBuilder() //
-                    .withEntityId(product.getId()) //
+                    .withEntityId(savingsProduct.getId()) //
                     .with(changes).build();
         } catch (final DataAccessException e) {
             handleDataIntegrityIssues(command, e.getMostSpecificCause(), e);

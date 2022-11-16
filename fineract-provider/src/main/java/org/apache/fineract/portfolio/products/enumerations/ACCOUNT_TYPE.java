@@ -37,4 +37,11 @@ public enum ACCOUNT_TYPE {
         return  enumOptionDataList;
     }
 
+    /**
+     * Added 14/11/2022 at 0305
+     */
+    public EnumOptionData toEnumData(){
+        return new EnumOptionData(ordinal() ,code);
+    }  
+
 }

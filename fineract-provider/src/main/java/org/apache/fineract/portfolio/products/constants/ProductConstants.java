@@ -8,7 +8,7 @@ package org.apache.fineract.portfolio.products.constants;
 
 public class ProductConstants {
 
-
+    public final static String productDatSettingsParam = "productDataSettings";
     public final static String productType = "productType";
     public final static String command = "command";
     public final static String active = "active";

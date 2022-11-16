@@ -85,7 +85,6 @@ public class Product extends AbstractPersistableCustom<Long> {
 
     protected Product(){}
 
-
     public Product(PRODUCT_TYPE productType, Long productId, Boolean active ,Boolean deductChargesOnBalance ,ACCOUNT_TYPE accountType) {
         this.productType = productType;
         this.productId = productId;
@@ -118,8 +117,23 @@ public class Product extends AbstractPersistableCustom<Long> {
             this.accountType = ACCOUNT_TYPE.fromInt(newValue);
         }
 
-
         return actualChanges;
+    }
+
+    public Boolean getDeductChargesOnAccountBalance() {
+        return deductChargesOnAccountBalance;
+    }
+
+    public void setDeductChargesOnAccountBalance(Boolean deductChargesOnAccountBalance) {
+        this.deductChargesOnAccountBalance = deductChargesOnAccountBalance;
+    }
+
+    public ACCOUNT_TYPE getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(ACCOUNT_TYPE accountType) {
+        this.accountType = accountType;
     }
 
     public PRODUCT_TYPE getProductType() {
