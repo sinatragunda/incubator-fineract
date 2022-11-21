@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.Optional;
+
 @Component
 public class RxDealDataValidator {
 
@@ -50,16 +52,28 @@ public class RxDealDataValidator {
 
         final JsonElement element = this.fromApiJsonHelper.parse(json);
 
+        final Long officeId  = this.fromApiJsonHelper.extractLongNamed(ClientApiConstants.officeIdParamName, element);
+        baseDataValidator.reset().parameter(ClientApiConstants.officeIdParamName).value(officeId).notNull().longGreaterThanNumber(0L);
+
         final Long payinAccountId  = this.fromApiJsonHelper.extractLongNamed(RxDealConstants.payinAccountParam, element);
         baseDataValidator.reset().parameter(RxDealConstants.payinAccountParam).value(payinAccountId).notNull().longGreaterThanNumber(0L);
 
         final String currencyCode = this.fromApiJsonHelper.extractStringNamed(RxDealConstants.currencyParam, element);
         baseDataValidator.reset().parameter(RxDealConstants.currencyParam).value(currencyCode).notBlank().notExceedingLengthOf(4);
 
+        final Boolean isCreateNewClientTemp = this.fromApiJsonHelper.extractBooleanNamed(RxDealConstants.createNewClientParam ,element);
+
+        System.err.println("---------------------value here is ? "+isCreateNewClientTemp);
+
+        boolean isCreateNewClient = Optional.ofNullable(isCreateNewClientTemp).orElse(false);
+
+
+        System.err.println("----------isCreateClient -----------------"+isCreateNewClient);
+
         final Long clientId  = this.fromApiJsonHelper.extractLongNamed(ClientApiConstants.clientIdParamName, element);
-        baseDataValidator.reset().parameter(ClientApiConstants.clientIdParamName).value(clientId).notNull().longGreaterThanNumber(0L);
-
-
+        if(!isCreateNewClient){
+            baseDataValidator.reset().parameter(ClientApiConstants.clientIdParamName).value(clientId).notNull().longGreaterThanNumber(0L);
+        }
         final String receiverName = this.fromApiJsonHelper.extractStringNamed(RxDealConstants.receiverNameParam, element);
         baseDataValidator.reset().parameter(RxDealConstants.receiverNameParam).value(receiverName).notBlank().notExceedingLengthOf(2000);
 

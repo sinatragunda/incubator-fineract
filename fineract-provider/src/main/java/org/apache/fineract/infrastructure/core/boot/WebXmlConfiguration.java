@@ -71,8 +71,8 @@ public class WebXmlConfiguration {
 
     @Bean
     public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
 
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(basicAuthenticationProcessingFilter);
         filterRegistrationBean.setEnabled(false);
 

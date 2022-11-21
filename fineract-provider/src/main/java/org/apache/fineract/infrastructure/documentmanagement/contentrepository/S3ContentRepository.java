@@ -46,6 +46,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.lowagie.text.pdf.codec.Base64;
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+
 
 public class S3ContentRepository implements ContentRepository {
 
@@ -160,12 +162,12 @@ public class S3ContentRepository implements ContentRepository {
     }
 
     private String generateFileParentDirectory(final String entityType, final Long entityId) {
-        return "documents" + File.separator + entityType + File.separator + entityId + File.separator
+        return ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim() + File.separator + "documents" + File.separator + entityType + File.separator + entityId + File.separator
                 + ContentRepositoryUtils.generateRandomString();
     }
 
     private String generateClientImageParentDirectory(final Long resourceId) {
-        return "images" + File.separator + "clients" + File.separator + resourceId;
+        return ThreadLocalContextUtil.getTenant().getName().replaceAll(" ", "").trim() + File.separator + "images" + File.separator + "clients" + File.separator + resourceId;
     }
 
     private void deleteObjectFromS3(final String location) {

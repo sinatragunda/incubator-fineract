@@ -60,7 +60,6 @@ public class JsonParserHelper {
             final JsonObject object = element.getAsJsonObject();
             if (object.has(parameterName) && object.get(parameterName).isJsonPrimitive()) {
                 requestParamatersDetected.add(parameterName);
-
                 final JsonPrimitive primitive = object.get(parameterName).getAsJsonPrimitive();
                 value = primitive.getAsBoolean();
             }

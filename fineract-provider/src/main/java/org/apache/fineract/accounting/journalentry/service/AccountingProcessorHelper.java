@@ -811,9 +811,24 @@ public class AccountingProcessorHelper {
          * changing the expected portfolio behavior would also take care of
          * modifying the accounting code appropriately
          **/
-        if (chargePaymentDTOs.size() != 1) { throw new PlatformDataIntegrityException(
+
+        //System.err.println("--------------skip error ,unexpected development ?------- "+chargePaymentDTOs.size());
+
+        //boolean hasCharges = Optional.ofNullable(chargePaymentDTOs.get(0)).isPresent();
+
+        if (chargePaymentDTOs.size() != 1) {
+
+            /**
+
+            throw new PlatformDataIntegrityException(
                 "Recent Portfolio changes w.r.t Charges for Savings have Broken the accounting code",
-                "Recent Portfolio changes w.r.t Charges for Savings have Broken the accounting code"); }
+                "Recent Portfolio changes w.r.t Charges for Savings have Broken the accounting code");
+
+             */
+            System.err.println("----------------charges size dto is less than 0 ,return instead of throwing error");
+            return;
+        }
+
         ChargePaymentDTO chargePaymentDTO = chargePaymentDTOs.get(0);
 
         final GLAccount chargeSpecificAccount = getLinkedGLAccountForSavingsCharges(savingsProductId, accountTypeToBeCredited.getValue(),
