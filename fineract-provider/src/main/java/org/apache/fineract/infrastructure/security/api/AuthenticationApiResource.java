@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,9 +40,12 @@ import org.apache.fineract.infrastructure.security.domain.ResetPasswordService;
 import org.apache.fineract.infrastructure.security.helper.ResetPasswordHelper;
 import org.apache.fineract.infrastructure.security.service.SpringSecurityPlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TwoFactorUtils;
+import org.apache.fineract.infrastructure.userinstancing.enumerations.USER_INSTANCE_ACTION;
+import org.apache.fineract.infrastructure.userinstancing.helper.SingleUserInstanceHelper;
 import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.domain.*;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
+import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.apache.fineract.wese.service.WeseEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -90,7 +94,7 @@ public class AuthenticationApiResource {
     @Path("/resetpassword")
     public String resetPassword(String payload){
 
-        System.err.println("------------------reset password son with paylod -------------"+payload);
+        //System.err.println("------------------reset password son with paylod -------------"+payload);
 
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
         String emailAddress = null ;
@@ -123,6 +127,14 @@ public class AuthenticationApiResource {
             final byte[] base64EncodedAuthenticationKey = Base64.encode(username + ":" + password);
 
             final AppUser principal = (AppUser) authenticationCheck.getPrincipal();
+
+            /**
+             * Added 28/11/2022 at 0300 
+             * Check user instance 
+             */
+
+            //SingleUserInstanceHelper.execute(principal , USER_INSTANCE_ACTION.LOGIN);
+
             final Collection<RoleData> roles = new ArrayList<>();
             final Set<Role> userRoles = principal.getRoles();
             for (final Role role : userRoles) {
@@ -150,7 +162,27 @@ public class AuthenticationApiResource {
             }
 
         }
-
         return this.apiJsonSerializerService.serialize(authenticatedUserData);
     }
+
+    /**
+     * Added 28/11/2022 at 0304
+     * Delete loggin session instance
+     */
+    @Path("/logout")
+    @GET
+    public String logout(){
+
+        System.err.println("------------time to logout ----------------");
+
+        AppUser appUser = springSecurityPlatformSecurityContext.authenticatedUser();
+
+        System.err.println("----------user name is "+appUser.getUsername());
+
+        SingleUserInstanceHelper.execute(appUser ,USER_INSTANCE_ACTION.LOGOUT);
+
+        System.err.println("------------------------user session now cleared what's next ? ----------------");
+
+        return ObjectNodeHelper.statusNode(true).toString();
+    }   
 }

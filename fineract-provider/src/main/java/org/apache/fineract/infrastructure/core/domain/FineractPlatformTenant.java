@@ -34,7 +34,7 @@ public class FineractPlatformTenant {
     /**
      * Added 28/11/2022 at 0237
      */
-    private final Map<Long , UserSessionInstance> userSessionInstanceMap;
+    private static final Map<String , Map<Long ,UserSessionInstance>> userSessionInstanceMap = new HashMap<>();
 
     public FineractPlatformTenant(final Long id, final String tenantIdentifier, final String name,
             final String timezoneId, final FineractPlatformTenantConnection connection) {
@@ -43,10 +43,11 @@ public class FineractPlatformTenant {
         this.name = name;
         this.timezoneId = timezoneId;
         this.connection = connection;
-        this.userSessionInstanceMap = new HashMap<>();
+        setTenantInstance(tenantIdentifier);
+
     }
 
-    public Map<Long, UserSessionInstance> getUserSessionInstanceMap() {
+    public Map<String ,Map<Long ,UserSessionInstance>> getUserSessionInstanceMap() {
         return userSessionInstanceMap;
     }
 
@@ -68,6 +69,16 @@ public class FineractPlatformTenant {
 
     public FineractPlatformTenantConnection getConnection() {
         return connection;
+    }
+
+    public void setTenantInstance(String tenant){
+        boolean containsSession  = userSessionInstanceMap.containsKey(tenant);
+        if(!containsSession){
+            //System.err.println("--------setting instance for client "+tenant);
+            userSessionInstanceMap.put(tenant ,new HashMap<>());
+            //System.err.println("----------------tenant instance is "+userSessionInstanceMap.size());
+        }
+
     }
 
 }

@@ -8,7 +8,6 @@ import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.userinstancing.exceptions.UserAlreadyLoggedInException;
 import org.apache.fineract.useradministration.domain.AppUser;
-import sun.rmi.runtime.Log;
 
 import java.util.Map;
 
@@ -25,16 +24,26 @@ public class LoginUserInstance implements SingleUserInstance{
 
         Long userId = appUser.getId();
         FineractPlatformTenant fineractPlatformTenant = ThreadLocalContextUtil.getTenant();
-        Map<Long ,UserSessionInstance> userSessionInstanceMap = fineractPlatformTenant.getUserSessionInstanceMap();
+        String tenant = fineractPlatformTenant.getTenantIdentifier();
 
-        boolean hasSession = userSessionInstanceMap.containsKey(userId);
+        Map<String ,Map<Long ,UserSessionInstance>> tenantSessionMap = fineractPlatformTenant.getUserSessionInstanceMap();
+
+        //System.err.println("---------------teant session map initial size is "+tenantSessionMap.size());
+
+        Map<Long ,UserSessionInstance> sessionInstanceMap = tenantSessionMap.get(tenant);
+
+        boolean hasSession = sessionInstanceMap.containsKey(userId);
+
+        //System.err.println("--------------user has session ? "+hasSession);
 
         if(hasSession){
            throw new UserAlreadyLoggedInException(appUser);
         }
 
         UserSessionInstance userSessionInstance = new UserSessionInstance(appUser);
-        userSessionInstanceMap.put(userId ,userSessionInstance);
-        ThreadLocalContextUtil.setTenant(fineractPlatformTenant);
+        sessionInstanceMap.put(userId ,userSessionInstance);
+        tenantSessionMap.replace(tenant ,sessionInstanceMap);
+        //ThreadLocalContextUtil.setTenant(fineractPlatformTenant);
+        //System.err.println("-------------session instance record update "+sessionInstanceMap.size());
     }
 }

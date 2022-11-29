@@ -19,7 +19,7 @@
 -- Created 05/11/2022 0728 PM
 
 
-CREATE TABLE `m_rx_deal_receive` (
+CREATE TABLE IF NOT EXISTS `m_rx_deal_receive` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(200) NOT NULL DEFAULT '0' COLLATE 'latin1_swedish_ci',
 	`phone_number` VARCHAR(200) NOT NULL DEFAULT '0' COLLATE 'latin1_swedish_ci',

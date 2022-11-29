@@ -23,13 +23,19 @@ public class LogoutUserInstance implements SingleUserInstance{
 
         Long userId = appUser.getId();
         FineractPlatformTenant fineractPlatformTenant = ThreadLocalContextUtil.getTenant();
-        Map<Long ,UserSessionInstance> userSessionInstanceMap = fineractPlatformTenant.getUserSessionInstanceMap();
+        String tenant = fineractPlatformTenant.getTenantIdentifier();
+        Map<String ,Map<Long ,UserSessionInstance>> tenantUserSessionInstanceMap = fineractPlatformTenant.getUserSessionInstanceMap();
+
+        Map<Long ,UserSessionInstance> userSessionInstanceMap = tenantUserSessionInstanceMap.get(tenant);
 
         boolean hasSession = userSessionInstanceMap.containsKey(userId);
 
         if(hasSession){
+            System.err.println("---------size of user session before removal "+tenantUserSessionInstanceMap.get(tenant).size());
+            System.err.println("-------------remove user id "+userId);
             userSessionInstanceMap.remove(userId);
-            ThreadLocalContextUtil.setTenant(fineractPlatformTenant);
+            //ThreadLocalContextUtil.setTenant(fineractPlatformTenant);
+            System.err.println("---------size of user session after removal "+tenantUserSessionInstanceMap.get(tenant).size());
         }
     }
 }

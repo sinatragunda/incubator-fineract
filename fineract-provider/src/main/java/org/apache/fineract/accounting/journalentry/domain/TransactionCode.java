@@ -23,7 +23,7 @@ import javax.persistence.TemporalType;
 public class TransactionCode extends AbstractPersistableCustom<Long>{
 
     @Column(name="code", nullable = false)
-    private Long code ;
+    private Long code = null;
 
     @Column(name="name", nullable = false)
     private String name;

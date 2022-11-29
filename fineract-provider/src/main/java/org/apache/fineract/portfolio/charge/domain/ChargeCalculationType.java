@@ -88,24 +88,6 @@ public enum ChargeCalculationType {
             }
         }
 
-        // switch (chargeCalculation) {
-        //     case 1:
-        //         chargeCalculationType = FLAT;
-        //     break;
-        //     case 2:
-        //         chargeCalculationType = PERCENT_OF_AMOUNT;
-        //     break;
-        //     case 3:
-        //         chargeCalculationType = PERCENT_OF_AMOUNT_AND_INTEREST;
-        //     break;
-        //     case 4:
-        //         chargeCalculationType = PERCENT_OF_INTEREST;
-        //     break;
-        //     case 5:
-        //     	chargeCalculationType = PERCENT_OF_DISBURSEMENT_AMOUNT;
-        //     break;
-        // }
-
         return chargeCalculationType;
     }
 

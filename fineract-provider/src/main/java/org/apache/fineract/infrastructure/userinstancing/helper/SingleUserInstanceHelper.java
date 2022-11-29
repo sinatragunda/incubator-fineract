@@ -9,7 +9,7 @@ import org.apache.fineract.useradministration.domain.AppUser;
 
 public class SingleUserInstanceHelper {
 
-    public void execute(AppUser appUser , USER_INSTANCE_ACTION userInstanceAction){
+    public static void execute(AppUser appUser , USER_INSTANCE_ACTION userInstanceAction){
 
         userInstanceAction.execute(appUser);
 

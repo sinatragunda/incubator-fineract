@@ -98,75 +98,7 @@ public enum ChargeTimeType {
                 return t ;
             }
         }
-
         return ChargeTimeType.INVALID;
-
-        // ChargeTimeType chargeTimeType = ChargeTimeType.INVALID;
-        // if (chargeTime != null) {
-        //     switch (chargeTime) {
-        //         case 1:
-        //             chargeTimeType = DISBURSEMENT;
-        //         break;
-        //         case 2:
-        //             chargeTimeType = SPECIFIED_DUE_DATE;
-        //         break;
-        //         case 3:
-        //             chargeTimeType = SAVINGS_ACTIVATION;
-        //         break;
-        //         case 4:
-        //             chargeTimeType = SAVINGS_CLOSURE;
-        //         break;
-        //         case 5:
-        //             chargeTimeType = WITHDRAWAL_FEE;
-        //         break;
-        //         case 6:
-        //             chargeTimeType = ANNUAL_FEE;
-        //         break;
-        //         case 7:
-        //             chargeTimeType = MONTHLY_FEE;
-        //         break;
-        //         case 8:
-        //             chargeTimeType = INSTALMENT_FEE;
-        //         break;
-        //         case 9:
-        //             chargeTimeType = OVERDUE_INSTALLMENT;
-        //         break;
-        //         case 10:
-        //             chargeTimeType = OVERDRAFT_FEE;
-        //         break;
-        //         case 11:
-        //             chargeTimeType = WEEKLY_FEE;
-        //         break;
-        //         case 12:
-        //             chargeTimeType = TRANCHE_DISBURSEMENT;
-        //         break;
-        //         case 13:
-        //             chargeTimeType = SHAREACCOUNT_ACTIVATION;
-        //         break;
-        //         case 14:
-        //             chargeTimeType = SHARE_PURCHASE;
-        //         break;
-        //         case 15:
-        //             chargeTimeType = SHARE_REDEEM;
-        //         break;
-        //         case 16:
-        //         	chargeTimeType = SAVINGS_NOACTIVITY_FEE;
-        //         break;
-        //         case 17:
-        //             chargeTimeType = LOAN_APPROVED ;
-        //             break;
-        //         case 18:
-        //             chargeTimeType = LOAN_CLOSED;
-        //             break;
-        //         case 19:
-        //             chargeTimeType = DEPOSIT;
-        //             break;
-        //         default:
-        //             chargeTimeType = INVALID;
-        //         break;
-        //     }
-        // }
-        // return chargeTimeType;
     }
 
     public boolean isTimeOfDisbursement() {

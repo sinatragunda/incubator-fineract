@@ -19,7 +19,7 @@
 -- Created 05/11/2022 0736 PM
 
 
-CREATE TABLE `m_rx_deal` (
+CREATE TABLE IF NOT EXISTS `m_rx_deal` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`nid_type` SMALLINT(5) NULL DEFAULT '0',
 	`provider` SMALLINT(5) NOT NULL DEFAULT '0',

@@ -10,6 +10,6 @@ import org.apache.fineract.useradministration.domain.AppUser;
 public class UserAlreadyLoggedInException extends AbstractPlatformDomainRuleException {
 
     public UserAlreadyLoggedInException(AppUser appUser){
-        super(String.format("User % already logged in .Try logout existing instance and try again" ,appUser.getUsername()) ,String.format("User % already logged in .Try logout existing instance and try again" ,appUser.getUsername()));
+        super(String.format("User %s already logged in .Try logout existing instance and try again" ,appUser.getUsername()) ,String.format("User %s already logged in .Try logout existing instance and try again" ,appUser.getUsername()));
     }
 }

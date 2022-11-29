@@ -17,7 +17,6 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Entity
 @Table(name="m_payment_voucher")
 public class PaymentVoucher extends AbstractPersistableCustom{
-
     @Column(name="journal_entry_id")
     private Long journalEntryId ;
 

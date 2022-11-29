@@ -1097,7 +1097,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         
         final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
 
-        //System.err.println("------------transaction amount is -----------"+transactionAmount);
+        System.err.println("------------transaction amount is -----------"+transactionAmount);
         
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
@@ -1106,6 +1106,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
+            System.err.println("------------------------proceed to pay on charges here son ----------");
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser(),false);
         }
 
@@ -1166,13 +1167,16 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
          */ 
         BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
 
-        //System.err.println("--------------initial amount is ------------"+transactionAmount);
+        System.err.println("--------------initial amount is ------------"+transactionAmount);
 
         boolean gate = !deductOnAccountBalance && applyWithdrawFee;
 
-        //System.err.println("----------------------deduct on charges ---------"+deductOnAccountBalance);
+        System.err.println("----------------------deduct on charges on account balance ---------"+deductOnAccountBalance);
 
-        //System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
+        System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
+
+
+        System.err.println("-------------------appply withdrawal feee ? "+applyWithdrawFee);
 
          /**
           * Gate of !deductOnAccountBalance and applyWithdrawFee
@@ -1180,9 +1184,10 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
           */
          if(!deductOnAccountBalance && applyWithdrawFee ){
             BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
+            System.err.println("----------------withhold paying charges we got total of "+totalCharges);
             transactionAmount = transactionAmount.subtract(totalCharges);
 
-            //System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
+            System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
         } 
 
         return transactionAmount;
@@ -1195,6 +1200,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
       */
 
      private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
+
+         System.err.println("----------paywithdrawal fee and withold paying charges "+withholdPayingCharges);
            final BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
            final LocalDate transactionDate = savingsTransactionDTO.getTransactionDate(); 
            final AppUser appUser = savingsTransactionDTO.getAppUser();
@@ -1214,28 +1221,38 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         //System.err.println("-----------------time to pay fee of ,why is it 0 ?---------"+transactionAmoount.doubleValue());
 
-        //System.err.println("------------------why there arent any charges in this "+this.charges.size());
+        //System.err.println("------------------why there arent any charges in this "+this.chargesWithTracking(transactionDate).size());
 
         BigDecimal totalCharges = BigDecimal.ZERO ;
 
+        //System.err.println("--------tracking charges -------"+transactionDate);
+
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
-            
-            //System.err.println("---------product apply charges ----------------");
+
+            System.err.println("----------------name of the charge is "+charge.getCharge().getName());
+
+            System.err.println("-------------------get type of charge "+charge.getCharge().getChargeTimeType());
+
+            System.err.println("-----------what type is this charge though since not withdrawal fee ? "+charge.isDepositFee());
+
+            System.err.println("---------product apply charges --------- is withdrawal fee and active ? -------"+charge.isWithdrawalFee()+"=============="+charge.isActive());
             
             if (charge.isWithdrawalFee() && charge.isActive()) {
-              //  System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
+
+                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
 
                 BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
 
                 if(withholdPayingCharges){
                     totalCharges =  totalCharges.add(chargeAmount);
+                    System.err.println("----------withhold paying charges and just get total amount of "+totalCharges);
                     continue;
                 }
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
-        //System.err.println("----------------------total charges amount is -----"+totalCharges);
 
+        System.err.println("----------------------total charges amount is -----"+totalCharges);
         return totalCharges;
     }
     /**
@@ -2934,30 +2951,22 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
          */
 
         Consumer<Charge> addToChargesIfNew = (e)->{
-
             Predicate<SavingsAccountCharge> chargeFilter = (x)->{
                 Charge c = x.getCharge();
                 return c.getId().equals(e.getId());
             };
-
             boolean chargeExist = charges.stream().filter(chargeFilter).findFirst().isPresent();
-            
-            //System.err.println("----------------is charge Exists ? ---------"+chargeExist);
+
+            System.err.println("---------------charge needs to be update here "+chargeExist);
 
             if(!chargeExist){
-                
-                //System.err.println("---------charge doesnt exists lets add it -------");
-                
+                System.err.println("---------charge doesnt exists lets add it -------");
                 SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.trackingAccountCharges(this ,e,transactionDate);
-                
-                //System.err.println("------------------charge time is "+savingsAccountCharge.)
-
+                System.err.println("-------------error with tracking mechanism not updating tracking ");
                 this.charges.add(savingsAccountCharge);
             }
         };
-
         savingsProductCharges.stream().forEach(addToChargesIfNew);
-        //System.err.println("--------------current account charges tracking are "+this.charges.size());
         return this.charges;
     }
 

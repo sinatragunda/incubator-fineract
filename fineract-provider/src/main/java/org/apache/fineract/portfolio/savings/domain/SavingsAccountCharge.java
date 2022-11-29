@@ -160,9 +160,16 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
      * For example an account created yesterday cant deduct new charges added today .
      * So this option allows the charge to be tracking 
      */
-
     public static SavingsAccountCharge trackingAccountCharges(final SavingsAccount savingsAccount, final Charge chargeDefinition,final LocalDate dueDate){
-        return new SavingsAccountCharge(savingsAccount ,chargeDefinition,null ,null ,null,dueDate,true,null,null);
+        /**
+         * Modified 28/11/2022 at 1301
+         * Seems when calling for tracking changes objects like chargetimetype and calculation type arent update from the recent live charge but instead take from savingAccountCharge
+         * For which these charges would have changed and cant track changes 
+         */
+        ChargeCalculationType chargeCalculationType = ChargeCalculationType.fromInt(chargeDefinition.getChargeCalculation());
+        ChargeTimeType chargeTimeType  = ChargeTimeType.fromInt(chargeDefinition.getChargeTimeType()); 
+        System.err.println("------------our charge time type is "+chargeTimeType); 
+        return new SavingsAccountCharge(savingsAccount ,chargeDefinition,null ,chargeTimeType ,chargeCalculationType,dueDate,true,null,null);
     }
 
     protected SavingsAccountCharge() {
@@ -176,7 +183,15 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
         this.savingsAccount = savingsAccount;
         this.charge = chargeDefinition;
         this.penaltyCharge = chargeDefinition.isPenalty();
-        this.chargeTime = (chargeTime == null) ? chargeDefinition.getChargeTimeType() : chargeTime.getValue();
+        this.chargeTime = chargeTime.getValue() ;
+        this.chargeCalculation = chargeCalculation.getValue();
+
+        System.err.println("-------------------this charge time is ,should be 5 "+this.chargeTime);
+
+        if(this.chargeTime==null){
+            System.err.println("-------------charge time type not null hence using same old ");
+            this.chargeTime = chargeDefinition.getChargeTimeType();
+        }
 
         if (isOnSpecifiedDueDate()) {
             if (dueDate == null) {
@@ -221,21 +236,17 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
 
         this.dueDate = (dueDate == null) ? null : dueDate.toDate();
 
-        this.chargeCalculation = chargeDefinition.getChargeCalculation();
-        if (chargeCalculation != null) {
-            this.chargeCalculation = chargeCalculation.getValue();
+        if (chargeCalculation == null) {
+            this.chargeCalculation = chargeDefinition.getChargeCalculation();
         }
 
         BigDecimal chargeAmount = chargeDefinition.getAmount();
-        
-        System.err.println("--------------charge amount is "+chargeAmount);
 
         if(amount != null) {
-            System.err.println("----------set charge amount of "+chargeAmount);
             chargeAmount = amount;
         }
 
-        final BigDecimal transactionAmount = new BigDecimal(0);
+        final BigDecimal transactionAmount = BigDecimal.ZERO;
 
         populateDerivedFields(transactionAmount, chargeAmount);
 
@@ -244,11 +255,10 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
             this.amountOutstanding = BigDecimal.ZERO;
         }
 
-
-        System.err.println("-------------------exit this function now ");
-
         this.paid = determineIfFullyPaid();
         this.status = status;
+
+        System.err.println("-----------exit function now -----------------");
     }
 
     public void resetPropertiesForRecurringFees() {

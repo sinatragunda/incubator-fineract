@@ -335,6 +335,15 @@ public class Charge extends AbstractPersistableCustom<Long> {
         return this.transactionCode;
     }
 
+    public Long getTransactionCodeId(){
+        boolean hasCode = Optional.ofNullable(this.transactionCode).isPresent();
+        Long transactionCodeId = null ;
+        if(hasCode){
+            transactionCodeId = this.transactionCode.getId();
+        }
+        return transactionCodeId;
+    }
+
     public Map<String, Object> update(final JsonCommand command) {
 
         final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
@@ -537,13 +546,13 @@ public class Charge extends AbstractPersistableCustom<Long> {
                 baseDataValidator.reset().parameter(ChargesApiConstants.taxGroupIdParamName).failWithCode("modification.not.supported");
             }
         }
-
-
-        if (command.isChangeInLongParameterNamed(ChargesApiConstants.transactionCodeIdParamName, getTransactionCode().getId())){
+        
+        if (command.isChangeInLongParameterNamed(ChargesApiConstants.transactionCodeIdParamName, getTransactionCodeId())){
             final Long newValue = command.longValueOfParameterNamed(ChargesApiConstants.transactionCodeIdParamName);
+            System.err.println("-------------------new value is "+newValue);
             actualChanges.put(ChargesApiConstants.transactionCodeIdParamName, newValue);
-            if(transactionCode != null){
-                baseDataValidator.reset().parameter(ChargesApiConstants.transactionCodeIdParamName).failWithCode("modification.not.supported");
+            if(newValue != null){
+                baseDataValidator.reset().parameter(ChargesApiConstants.transactionCodeIdParamName).notNull().positiveAmount();
             }
         }
 

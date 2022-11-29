@@ -14,7 +14,6 @@ public enum USER_INSTANCE_ACTION {
     LOGOUT,
     TIMEOUT;
 
-
     public void execute(AppUser appUser){
 
         SingleUserInstance singleUserInstance = null ;

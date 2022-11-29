@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 05/11/2022 0742 PM
 
-CREATE TABLE `m_rx_deal_transaction` (
+CREATE TABLE IF NOT EXISTS `m_rx_deal_transaction` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`rx_deal_id` BIGINT(20) NOT NULL DEFAULT '0',
 	PRIMARY KEY (`id`) USING BTREE
