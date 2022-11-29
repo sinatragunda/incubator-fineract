@@ -42,7 +42,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 import org.apache.fineract.portfolio.products.exception.ProductNotFoundException;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.shareaccounts.service.SharesEnumerations;
@@ -66,7 +66,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     private final ShareProductDropdownReadPlatformService shareProductDropdownReadPlatformService;
     private final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService;
     private final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService;
-    private final PaginationHelper<ProductData> shareProductDataPaginationHelper = new PaginationHelper<>();
+    private final PaginationHelper<IProduct> shareProductDataPaginationHelper = new PaginationHelper<>();
 
     @Autowired
     public ShareProductReadPlatformServiceImpl(final RoutingDataSource dataSource,
@@ -83,7 +83,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     }
 
     @Override
-    public Page<ProductData> retrieveAllProducts(Integer offSet, Integer limit) {
+    public Page<IProduct> retrieveAllProducts(Integer offSet, Integer limit) {
         final Collection<ShareProductMarketPriceData> shareMarketCollection = null ;
         final Collection<ChargeData> charges = null ;
         ShareProductRowMapper mapper = new ShareProductRowMapper(shareMarketCollection, charges);
@@ -104,7 +104,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     }
 
     @Override
-    public ProductData retrieveOne(Long productId, boolean includeTemplate) {
+    public IProduct retrieveOne(Long productId, boolean includeTemplate) {
         MarketPriceRowMapper marketRowMapper = new MarketPriceRowMapper();
 
         try {
@@ -146,7 +146,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     }
 
     @Override
-    public ProductData retrieveTemplate() {
+    public IProduct retrieveTemplate() {
         Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
         final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions = this.shareProductDropdownReadPlatformService
@@ -160,7 +160,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     }
 
     @Override
-    public Collection<ProductData> retrieveAllForLookup() {
+    public Collection<IProduct> retrieveAllForLookup() {
         AllShareProductRowMapper mapper = new AllShareProductRowMapper();
         String sql = "select " + mapper.schema();
         return this.jdbcTemplate.query(sql, mapper);
@@ -171,7 +171,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
         return null;
     }
 
-    private static final class AllShareProductRowMapper implements RowMapper<ProductData> {
+    private static final class AllShareProductRowMapper implements RowMapper<IProduct> {
 
         @SuppressWarnings("unused")
         @Override
@@ -207,7 +207,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
         }
     }
 
-    private final static class ShareProductRowMapper implements RowMapper<ProductData> {
+    private final static class ShareProductRowMapper implements RowMapper<IProduct> {
 
         Collection<ShareProductMarketPriceData> shareMarketCollection;
         Collection<ChargeData> charges;

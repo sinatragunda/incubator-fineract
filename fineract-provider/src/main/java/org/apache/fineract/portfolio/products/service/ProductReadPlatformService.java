@@ -22,18 +22,18 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 
 public interface ProductReadPlatformService {
 
-    public Page<ProductData> retrieveAllProducts(Integer offSet, Integer limit);
+    public Page<IProduct> retrieveAllProducts(Integer offSet, Integer limit);
 
-    public ProductData retrieveOne(final Long productId, boolean includeTemplate);
+    public IProduct retrieveOne(final Long productId, boolean includeTemplate);
 
-    public ProductData retrieveTemplate();
+    public IProduct retrieveTemplate();
 
     public Set<String> getResponseDataParams();
     
-    public Collection<ProductData> retrieveAllForLookup() ;
+    public Collection<IProduct> retrieveAllForLookup() ;
 
 }

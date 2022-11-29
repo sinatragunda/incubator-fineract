@@ -43,7 +43,7 @@ import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.products.constants.ProductsApiConstants;
-import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
@@ -122,7 +122,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             toReturn = new ShareAccountData(client.id(), client.displayName(), productData.getCurrency(), charges, marketPrice,
                     minimumActivePeriodFrequencyTypeOptions, lockinPeriodFrequencyTypeOptions, clientSavingsAccounts, productData.getNominaltShares());
         } else {
-            Collection<ProductData> productOptions = service.retrieveAllForLookup();
+            Collection<IProduct> productOptions = service.retrieveAllForLookup();
             final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
             toReturn = new ShareAccountData(client.id(), client.displayName(), productOptions, chargeOptions);
         }
@@ -180,7 +180,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions = lockinPeriodFrequencyTypeOptions;
             final Collection<SavingsAccountData> clientSavingsAccounts = this.savingsAccountReadPlatformService
                     .retrieveActiveForLookup(data.getClientId(), DepositAccountType.SAVINGS_DEPOSIT, productData.getCurrency().code());
-            Collection<ProductData> productOptions = service.retrieveAllForLookup();
+            Collection<IProduct> productOptions = service.retrieveAllForLookup();
             final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveSharesApplicableCharges();
             data = ShareAccountData.template(data, productOptions, chargeOptions, clientSavingsAccounts, lockinPeriodFrequencyTypeOptions,
                     minimumActivePeriodFrequencyTypeOptions);

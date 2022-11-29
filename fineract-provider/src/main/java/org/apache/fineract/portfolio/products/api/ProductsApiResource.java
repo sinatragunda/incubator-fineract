@@ -41,7 +41,6 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.products.constants.ProductsApiConstants;
 import org.apache.fineract.portfolio.products.domain.IProduct;
-import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.exception.ResourceNotFoundException;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
@@ -87,7 +86,7 @@ public class ProductsApiResource {
         String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
         try {
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
-            ProductData data = service.retrieveTemplate();
+            IProduct data = service.retrieveTemplate();
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.toApiJsonSerializer.serialize(settings, data, service.getResponseDataParams());    
         }catch(BeansException e) {
@@ -105,7 +104,7 @@ public class ProductsApiResource {
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-            ProductData data = service.retrieveOne(productId, settings.isTemplate());
+            IProduct data = service.retrieveOne(productId, settings.isTemplate());
             return this.toApiJsonSerializer.serialize(settings, data, service.getResponseDataParams());
         } catch (BeansException e) {
             throw new ResourceNotFoundException();
@@ -120,7 +119,7 @@ public class ProductsApiResource {
         try {
             String serviceName = productType + ProductsApiConstants.READPLATFORM_NAME;
             ProductReadPlatformService service = (ProductReadPlatformService) this.applicationContext.getBean(serviceName);
-            Page<ProductData> data = service.retrieveAllProducts(offset, limit);
+            Page<IProduct> data = service.retrieveAllProducts(offset, limit);
             final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
             return this.toApiJsonSerializer.serialize(settings, data, service.getResponseDataParams());    
         }catch(BeansException e) {

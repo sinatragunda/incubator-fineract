@@ -34,7 +34,7 @@ public interface ProductSettingsReadPlatformService {
 
     public ProductData retrieveOneByProductType(final Long productId, final PRODUCT_TYPE productType);
 
-    public ProductData retrieveTemplate();
+    public ProductData template();
 
     /**
      * Added 29/11/2022 at 0119

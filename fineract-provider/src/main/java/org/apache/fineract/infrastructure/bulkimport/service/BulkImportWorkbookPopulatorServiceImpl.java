@@ -75,7 +75,7 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
-import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.*;
@@ -541,10 +541,10 @@ private WorkbookPopulator populateCenterWorkbook(Long officeId,Long staffId){
 	}
 
 	private List<ShareProductData> fetchSharedProducts() {
-		List<ProductData> productDataList = productReadPlatformService.retrieveAllProducts(0,50).getPageItems() ;
+		List<IProduct> productDataList = productReadPlatformService.retrieveAllProducts(0,50).getPageItems() ;
 		List<ShareProductData> sharedProductDataList=new ArrayList<>();
 		if(productDataList!=null) {
-			for (ProductData data : productDataList) {
+			for (IProduct data : productDataList) {
 				ShareProductData shareProduct = (ShareProductData) data;
 				sharedProductDataList.add(shareProduct);
 			}

@@ -29,7 +29,7 @@ import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.accountdetails.data.ShareAccountSummaryData;
 import org.apache.fineract.portfolio.accounts.data.AccountData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
-import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
 import org.joda.time.LocalDate;
@@ -153,7 +153,7 @@ public class ShareAccountData implements AccountData {
     }
     
     // Data for template
-    private Collection<ProductData> productOptions;
+    private Collection<IProduct> productOptions;
     private Collection<ChargeData> chargeOptions;
     private Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions;
     private Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions;
@@ -187,7 +187,7 @@ public class ShareAccountData implements AccountData {
         this.allowDividendCalculationForInactiveClients = allowdividendsforinactiveclients;
     }
 
-    public ShareAccountData(final Long clientId, final String clientName, final Collection<ProductData> productOptions,
+    public ShareAccountData(final Long clientId, final String clientName, final Collection<IProduct> productOptions,
             final Collection<ChargeData> chargeOptions) {
         this.clientId = clientId;
         this.clientName = clientName;
@@ -218,7 +218,7 @@ public class ShareAccountData implements AccountData {
             final CurrencyData currency, final ShareAccountSummaryData summaryData, final Collection<ShareAccountChargeData> charges,
             final Collection<ShareAccountTransactionData> purchasedSharesData, final Integer lockinPeriod, final EnumOptionData lockPeriodTypeEnum,
             final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodTypeEnum,
-            final Boolean allowDividendCalculationForInactiveClients, final Collection<ProductData> productOptions,
+            final Boolean allowDividendCalculationForInactiveClients, final Collection<IProduct> productOptions,
             final Collection<ChargeData> chargeOptions, final Collection<SavingsAccountData> clientSavingsAccounts,
             final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions,
             final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOption, final BigDecimal currenMarketPrice) {
@@ -258,7 +258,7 @@ public class ShareAccountData implements AccountData {
         return this.clientId;
     }
 
-    public static ShareAccountData template(ShareAccountData data, Collection<ProductData> productOptions,
+    public static ShareAccountData template(ShareAccountData data, Collection<IProduct> productOptions,
             Collection<ChargeData> chargeOptions, Collection<SavingsAccountData> clientSavingsAccounts,
             Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions) {
         return new ShareAccountData(data.id, data.accountNo, data.externalId, data.savingsAccountId, data.savingsAccountNumber,
@@ -291,7 +291,7 @@ public class ShareAccountData implements AccountData {
         final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOption = null;
         final BigDecimal currenMarketPrice = null;
         final Long productId = null;
-        final Collection<ProductData> productOptions = null;
+        final Collection<IProduct> productOptions = null;
 
         return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName, productId,
                 productName, status, timeline, currency, summaryData, charges, purchasedSharesData, lockinPeriod, lockPeriodTypeEnum,

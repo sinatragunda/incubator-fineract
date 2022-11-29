@@ -14,6 +14,7 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.data.PropertyTypeData;
+import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PROPERTY_TYPE;
@@ -24,7 +25,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProductSettingsReadPlatformServiceImpl implements ProductReadPlatformService {
+public class ProductSettingsReadPlatformServiceImpl implements ProductSettingsReadPlatformService {
 
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
@@ -65,6 +66,11 @@ public class ProductSettingsReadPlatformServiceImpl implements ProductReadPlatfo
         Stream.of(productData).forEach(injectPropertyTypes);
         return productData;
 
+    }
+
+    @Override
+    public ProductData template(){
+        return ProductData.template();
     }
 
     private static final class ProductDataMapper implements RowMapper<ProductData> {

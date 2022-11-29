@@ -688,7 +688,9 @@ public class ShareAccountDataSerializer {
                 addtionalSharesParameters);
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("sharesaccount");
+        
         JsonElement element = jsonCommand.parsedJson();
+        
         if(!account.status().equals(ShareAccountStatusType.ACTIVE.getValue())) {
             baseDataValidator.failWithCodeNoParameterAddedToErrorCode("is.not.in.active.state") ;
         }
@@ -697,6 +699,7 @@ public class ShareAccountDataSerializer {
         final Long sharesRequested = this.fromApiJsonHelper.extractLongNamed(ShareAccountApiConstants.requestedshares_paramname, element);
         baseDataValidator.reset().parameter(ShareAccountApiConstants.requestedshares_paramname).value(sharesRequested).notNull();
         ShareProduct shareProduct = account.getShareProduct();
+        
         if (sharesRequested != null) {
             Long totalSharesAfterapproval = account.getTotalApprovedShares() + sharesRequested;
             if(shareProduct.getMaximumClientShares() != null && totalSharesAfterapproval > shareProduct.getMaximumClientShares()) {
