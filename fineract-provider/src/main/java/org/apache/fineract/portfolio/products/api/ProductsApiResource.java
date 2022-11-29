@@ -40,20 +40,18 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.products.constants.ProductsApiConstants;
+import org.apache.fineract.portfolio.products.domain.IProduct;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.exception.ResourceNotFoundException;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
 import org.apache.fineract.wese.helper.JsonHelper;
-import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Path("/products/{type}")
 @Component
@@ -62,7 +60,7 @@ public class ProductsApiResource {
 
     private final ApplicationContext applicationContext;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer;
+    private final DefaultToApiJsonSerializer<IProduct> toApiJsonSerializer;
     private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
@@ -71,8 +69,8 @@ public class ProductsApiResource {
 
     @Autowired
     public ProductsApiResource(final ApplicationContext applicationContext, final ApiRequestParameterHelper apiRequestParameterHelper,
-            final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer, final PlatformSecurityContext platformSecurityContext,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final ProductWritePlatformService productWritePlatformService) {
+                               final DefaultToApiJsonSerializer<IProduct> toApiJsonSerializer, final PlatformSecurityContext platformSecurityContext,
+                               final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final ProductWritePlatformService productWritePlatformService) {
         this.applicationContext = applicationContext;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -134,9 +132,8 @@ public class ProductsApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String createProduct(@PathParam("type") final String productType, final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = null;
         this.platformSecurityContext.authenticatedUser();
-        commandWrapper = new CommandWrapperBuilder().createProduct(productType).withJson(apiRequestBodyAsJson).build();
+        CommandWrapper commandWrapper = new CommandWrapperBuilder().createProduct(productType).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }
@@ -177,7 +174,6 @@ public class ProductsApiResource {
 
         this.platformSecurityContext.authenticatedUser();
         Product product = this.productWritePlatformService.disableEnableProduct(productType ,productId);
-
         // Added 19/12/2021
         String response = JsonHelper.serializeResponse(product ,"Failed to change active status");
         return response ;

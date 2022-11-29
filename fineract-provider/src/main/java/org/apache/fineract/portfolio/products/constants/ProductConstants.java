@@ -12,8 +12,12 @@ public class ProductConstants {
     public final static String productType = "productType";
     public final static String command = "command";
     public final static String active = "active";
-    public final static String deductChargesOnBalance = "deductChargesOnBalance";
-
+    public final static String deductChargesOnBalance = "deductChargesOnAccountBalance";
     public final static String accountTypeParam = "accountType";
+
+    /**
+     * Added 29/11/2022 at 0014
+     */
+    public final static String propertyTypeParam = "propertyType";
 
 }

@@ -6,9 +6,8 @@
 */
 package org.apache.fineract.portfolio.products.helper;
 
-import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.domain.Product;
-import org.apache.fineract.portfolio.products.domain.ProductRepository;
+import org.apache.fineract.portfolio.products.repo.ProductRepository;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 
 import java.util.Optional;

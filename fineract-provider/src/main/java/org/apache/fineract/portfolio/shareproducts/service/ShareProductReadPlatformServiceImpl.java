@@ -55,7 +55,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 
-import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+import org.apache.fineract.wese.enumerations.SACCO_PROPERTY_TYPE;
 
 @Service(value = "shareReadPlatformService")
 public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformService {
@@ -180,7 +180,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
             final String name = rs.getString("name");
             final String shortName = rs.getString("short_name");
             final Long totalShares = rs.getLong("total_shares");
-            final PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"property_type"));
+            final SACCO_PROPERTY_TYPE propertyType = SACCO_PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"property_type"));
             final BigDecimal monthlyDeposit = rs.getBigDecimal("monthly_deposit");
             final BigDecimal dividendLowerLimit = rs.getBigDecimal("dividend_lower_limit");
             return ShareProductData.generic(id, name, shortName, totalShares ,propertyType ,monthlyDeposit ,dividendLowerLimit);
@@ -285,7 +285,7 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
             final EnumOptionData accountingRuleType = AccountingEnumerations.accountingRuleType(accountingRuleId);
 
             /// added 03/11/2020
-            final PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"propertyType"));
+            final SACCO_PROPERTY_TYPE propertyType = SACCO_PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"propertyType"));
             
             final BigDecimal monthlyDeposit = rs.getBigDecimal("monthlyDeposit");
 

@@ -60,7 +60,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+import org.apache.fineract.wese.enumerations.SACCO_PROPERTY_TYPE;
 
 /*
     Updated 18/08/2021
@@ -202,7 +202,7 @@ public class ShareProductDataSerializer {
 
 
         Integer propertyTypeInt = this.fromApiJsonHelper.extractIntegerNamed(ShareProductApiConstants.propertyTypeParam, element, locale);
-        PROPERTY_TYPE propertyType = PROPERTY_TYPE.fromInt(propertyTypeInt);
+        SACCO_PROPERTY_TYPE propertyType = SACCO_PROPERTY_TYPE.fromInt(propertyTypeInt);
 
         final BigDecimal monthlyDeposit = this.fromApiJsonHelper.extractBigDecimalNamed(ShareProductApiConstants.monthlyDepositParam, element,
                 locale);
@@ -236,9 +236,9 @@ public class ShareProductDataSerializer {
     }
 
 
-    private PROPERTY_TYPE extractPropertyType(String paramName ,final JsonElement element){
-        PROPERTY_TYPE propertyType = PROPERTY_TYPE.DEFAULT ;
-        propertyType = PROPERTY_TYPE.fromInt(this.fromApiJsonHelper.extractIntegerWithLocaleNamed(paramName ,element));
+    private SACCO_PROPERTY_TYPE extractPropertyType(String paramName , final JsonElement element){
+        SACCO_PROPERTY_TYPE propertyType = SACCO_PROPERTY_TYPE.DEFAULT ;
+        propertyType = SACCO_PROPERTY_TYPE.fromInt(this.fromApiJsonHelper.extractIntegerWithLocaleNamed(paramName ,element));
         return propertyType ;
     }
 
@@ -487,7 +487,7 @@ public class ShareProductDataSerializer {
         }
 
         if (this.fromApiJsonHelper.parameterExists(ShareProductApiConstants.propertyTypeParam, element)) {
-            PROPERTY_TYPE propertyType = extractPropertyType(ShareProductApiConstants.propertyTypeParam, element);
+            SACCO_PROPERTY_TYPE propertyType = extractPropertyType(ShareProductApiConstants.propertyTypeParam, element);
             if (product.setPropertyType(propertyType)) {
                 actualChanges.put(ShareProductApiConstants.propertyTypeParam, propertyType);
             }

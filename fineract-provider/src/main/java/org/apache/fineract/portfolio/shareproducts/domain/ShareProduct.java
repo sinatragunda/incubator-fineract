@@ -51,7 +51,7 @@ import org.joda.time.DateTime;
 
 
 // added 02/11/2020AT 11:26
-import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+import org.apache.fineract.wese.enumerations.SACCO_PROPERTY_TYPE;
 
 
 @Entity
@@ -136,7 +136,7 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name="property_type" ,nullable= true)
-    private PROPERTY_TYPE propertyType;
+    private SACCO_PROPERTY_TYPE propertyType;
 
     @Column(name = "monthly_deposit", nullable = true)
     private BigDecimal monthlyDeposit ;
@@ -151,12 +151,12 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
     }
 
     public ShareProduct(final String name, final String shortName, final String description, final String externalId,
-            final MonetaryCurrency currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
-            final BigDecimal shareCapital, final Long minimumShares, final Long nominalShares, final Long maximumShares,
-            Set<ShareProductMarketPrice> marketPrice, Set<Charge> charges, final Boolean allowDividendCalculationForInactiveClients,
-            final Integer lockinPeriod, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriod,
-            final PeriodFrequencyType minimumActivePeriodForDividendsType, AppUser createdBy, DateTime createdDate, AppUser lastModifiedBy,
-            DateTime lastModifiedDate, final AccountingRuleType accountingRuleType,final PROPERTY_TYPE propertyType ,BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
+                        final MonetaryCurrency currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
+                        final BigDecimal shareCapital, final Long minimumShares, final Long nominalShares, final Long maximumShares,
+                        Set<ShareProductMarketPrice> marketPrice, Set<Charge> charges, final Boolean allowDividendCalculationForInactiveClients,
+                        final Integer lockinPeriod, final PeriodFrequencyType lockPeriodType, final Integer minimumActivePeriod,
+                        final PeriodFrequencyType minimumActivePeriodForDividendsType, AppUser createdBy, DateTime createdDate, AppUser lastModifiedBy,
+                        DateTime lastModifiedDate, final AccountingRuleType accountingRuleType, final SACCO_PROPERTY_TYPE propertyType , BigDecimal monthlyDeposit , BigDecimal dividendLowerLimit) {
 
         this.name = name;
         this.shortName = shortName;
@@ -459,7 +459,7 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
         return this.nominalShares ;
     }
 
-    public PROPERTY_TYPE getPropertyType(){
+    public SACCO_PROPERTY_TYPE getPropertyType(){
         return this.propertyType ;
     }
 
@@ -468,7 +468,7 @@ public class ShareProduct extends AbstractAuditableCustom<AppUser, Long> {
         return this.monthlyDeposit ;
     }
 
-    public boolean setPropertyType(PROPERTY_TYPE propertyType){
+    public boolean setPropertyType(SACCO_PROPERTY_TYPE propertyType){
         boolean returnValue = false;
         if (this.propertyType == null || !this.propertyType.equals(propertyType)) {
             this.propertyType = propertyType;

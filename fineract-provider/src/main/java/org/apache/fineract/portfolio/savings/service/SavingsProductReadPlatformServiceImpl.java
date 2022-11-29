@@ -31,10 +31,11 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
-import org.apache.fineract.portfolio.products.data.ProductDataSettings;
+import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.products.helper.ProductHelper;
+import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
@@ -240,7 +241,8 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             final ACCOUNT_TYPE accountType = ACCOUNT_TYPE.fromInt(rs.getInt("accountType"));
             final Boolean isActive = rs.getBoolean("isProductActive");
 
-            final ProductDataSettings productDataSettings = new ProductDataSettings(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance ,accountType ,isActive);
+            final ProductData productData = null ;
+            //final ProductData productData = new ProductData(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance ,accountType ,isActive ,null);
 
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockinPeriodFrequency");
             EnumOptionData lockinPeriodFrequencyType = null;
@@ -277,7 +279,7 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
                     minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers,
                     accountingRuleType, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                     minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,productDataSettings);
+                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,productData);
         }
     }
 

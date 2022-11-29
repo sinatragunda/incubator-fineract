@@ -9,7 +9,7 @@ package org.apache.fineract.portfolio.products.service;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.portfolio.products.constants.ProductConstants;
 import org.apache.fineract.portfolio.products.domain.Product;
-import org.apache.fineract.portfolio.products.domain.ProductRepository;
+import org.apache.fineract.portfolio.products.repo.ProductRepository;
 import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.products.helper.DisableEnableProductHelper;

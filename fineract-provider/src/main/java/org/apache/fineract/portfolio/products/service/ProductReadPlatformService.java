@@ -19,21 +19,27 @@
 package org.apache.fineract.portfolio.products.service;
 
 import java.util.Collection;
-import java.util.Set;
 
-import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.portfolio.products.data.ProductData;
+import org.apache.fineract.portfolio.products.data.PropertyTypeData;
+import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 
 public interface ProductReadPlatformService {
 
-    public Page<ProductData> retrieveAllProducts(Integer offSet, Integer limit);
+    /**
+     *  Modified 29/11/2022 at 0118
+     *  Ideally all productdata is found by product type and the corresponding product id
+     */
+    public Collection<ProductData> retrieveAllByProductType(final PRODUCT_TYPE productType);
 
-    public ProductData retrieveOne(final Long productId, boolean includeTemplate);
+    public ProductData retrieveOneByProductType(final Long productId, final PRODUCT_TYPE productType);
 
     public ProductData retrieveTemplate();
 
-    public Set<String> getResponseDataParams();
-    
-    public Collection<ProductData> retrieveAllForLookup() ;
+    /**
+     * Added 29/11/2022 at 0119
+     * ProductId here means the id from the class Product instead of implementing classes ie ShareProduct ,LoanProduct
+     */
+    public Collection<PropertyTypeData> retrieveAllPropertyTypesForLookupByProductId(Long productId) ;
 
 }

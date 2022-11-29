@@ -41,7 +41,7 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.products.domain.Product;
-import org.apache.fineract.portfolio.products.domain.ProductRepository;
+import org.apache.fineract.portfolio.products.repo.ProductRepository;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsProductDataValidator;

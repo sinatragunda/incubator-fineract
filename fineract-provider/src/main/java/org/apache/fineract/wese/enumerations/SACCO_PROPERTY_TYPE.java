@@ -21,7 +21,7 @@
 
 package org.apache.fineract.wese.enumerations;
 
-public enum PROPERTY_TYPE{
+public enum SACCO_PROPERTY_TYPE {
 	
 	BOSA(0 ,"Bosa"),
 	FOSA(1 ,"Fosa"),
@@ -30,7 +30,7 @@ public enum PROPERTY_TYPE{
 	Integer value ;
 	String code ;
 
-	PROPERTY_TYPE(Integer value ,String code){
+	SACCO_PROPERTY_TYPE(Integer value , String code){
 		this.value = value ;
 		this.code =code ;
 	}
@@ -43,9 +43,9 @@ public enum PROPERTY_TYPE{
 		return this.code ;
 	}
 
-	public static PROPERTY_TYPE fromInt(int arg){
+	public static SACCO_PROPERTY_TYPE fromInt(int arg){
 
-		for(PROPERTY_TYPE p : PROPERTY_TYPE.values()){
+		for(SACCO_PROPERTY_TYPE p : SACCO_PROPERTY_TYPE.values()){
 			if(p.ordinal()==arg){
 				return p ;
 			}

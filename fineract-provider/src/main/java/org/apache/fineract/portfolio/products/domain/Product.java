@@ -5,32 +5,14 @@
 
 */
 package org.apache.fineract.portfolio.products.domain;
-import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.ApiParameterError;
-import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
-import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
-import org.apache.fineract.organisation.monetary.domain.Money;
-import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.interestratechart.domain.InterestRateChart;
 import org.apache.fineract.portfolio.products.constants.ProductConstants;
 import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
-import org.apache.fineract.portfolio.savings.*;
-import org.apache.fineract.portfolio.tax.domain.TaxGroup;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -69,8 +51,6 @@ public class Product extends AbstractPersistableCustom<Long> {
     @Column(name = "active" ,nullable =false)
     private Boolean active;
 
-
-
     /**
      * Added 05/09/2022
      * Enables charges to be deducted on transaction amount instead of savings account balance 
@@ -82,6 +62,10 @@ public class Product extends AbstractPersistableCustom<Long> {
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "account_type", nullable = false)
     protected ACCOUNT_TYPE accountType;
+
+    /**
+     * Added 29/11/2022 at 0017
+     */
 
     protected Product(){}
 
@@ -106,8 +90,13 @@ public class Product extends AbstractPersistableCustom<Long> {
         }
 
         if (command.isChangeInBooleanParameterNamed(ProductConstants.deductChargesOnBalance, this.deductChargesOnAccountBalance)) {
+
             final boolean newValue = command.booleanObjectValueOfParameterNamed(ProductConstants.deductChargesOnBalance);
+            
+            System.err.println("-------------value changed here to "+newValue);
+
             actualChanges.put(ProductConstants.deductChargesOnBalance, newValue);
+            
             this.deductChargesOnAccountBalance = newValue;
         }
 
@@ -116,6 +105,8 @@ public class Product extends AbstractPersistableCustom<Long> {
             actualChanges.put(ProductConstants.accountTypeParam, newValue);
             this.accountType = ACCOUNT_TYPE.fromInt(newValue);
         }
+
+        System.err.println("----------------------how many actual changes from this ? ");
 
         return actualChanges;
     }

@@ -18,7 +18,9 @@ public enum PRODUCT_TYPE {
     SAVINGS("SAVINGS"),
     LOANS("LOANS"),
     SHARES("SHARES"),
-    DEPOSITS("DEPOSITS");
+    DEPOSITS("DEPOSITS"),
+    CHARGE("Charge"),
+    UNDEFINED("Undefined");
 
     String code ;
 
@@ -33,8 +35,21 @@ public enum PRODUCT_TYPE {
                 return productType;
             }
         }
-        return null ;
+        return UNDEFINED ;
     }
+
+    /**
+     * Added 29/11/2022 at 0101
+     */ 
+    public static PRODUCT_TYPE fromInt(int arg){
+        for(PRODUCT_TYPE productType : values()){
+            if(arg == productType.ordinal()){
+                return productType;
+            }
+        }
+        return UNDEFINED ;
+    }
+
 
     public String getCode() {
         return code;

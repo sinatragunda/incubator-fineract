@@ -33,9 +33,10 @@ import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.products.data.ProductData;
 
 // added 02/11/2020AT 11:26
-import org.apache.fineract.wese.enumerations.PROPERTY_TYPE ;
+import org.apache.fineract.portfolio.products.domain.IProduct;
+import org.apache.fineract.wese.enumerations.SACCO_PROPERTY_TYPE;
 
-public class ShareProductData implements ProductData {
+public class ShareProductData implements IProduct {
 
     private final Long id;
     private final String name;
@@ -62,7 +63,7 @@ public class ShareProductData implements ProductData {
 
 
     /// added 02/11/2020
-    private final PROPERTY_TYPE propertyType ;
+    private final SACCO_PROPERTY_TYPE propertyType ;
     private final BigDecimal monthlyDeposit ;
 
     // accounting
@@ -82,15 +83,15 @@ public class ShareProductData implements ProductData {
     private final BigDecimal dividendLowerLimit ;
 
     private ShareProductData(final Long id, final String name, final String shortName, final String description, final String externalId,
-            final CurrencyData currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
-            final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares, final Long maximumShares,
-            Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
-            final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodEnum,
-            final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsTypeEnum, EnumOptionData accountingRule,
-            Map<String, Object> accountingMappings, Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
-            Collection<ChargeToGLAccountMapper> feeToGLAccountMappings, final Collection<CurrencyData> currencyOptions,
-            final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions ,PROPERTY_TYPE propertyType ,BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
+                             final CurrencyData currency, final Long totalShares, final Long totalSharesIssued, final BigDecimal unitPrice,
+                             final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares, final Long maximumShares,
+                             Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
+                             final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodEnum,
+                             final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsTypeEnum, EnumOptionData accountingRule,
+                             Map<String, Object> accountingMappings, Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings,
+                             Collection<ChargeToGLAccountMapper> feeToGLAccountMappings, final Collection<CurrencyData> currencyOptions,
+                             final Collection<ChargeData> chargeOptions, final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
+                             final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, Map<String, List<GLAccountData>> accountingMappingOptions , SACCO_PROPERTY_TYPE propertyType , BigDecimal monthlyDeposit , BigDecimal dividendLowerLimit) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -126,12 +127,12 @@ public class ShareProductData implements ProductData {
     }
 
     public static ShareProductData data(final Long id, final String name, final String shortName, final String description,
-            final String externalId, final CurrencyData currency, final Long totalShares, final Long totalSharesIssued,
-            final BigDecimal unitPrice, final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares,
-            final Long maximumShares, Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
+                                        final String externalId, final CurrencyData currency, final Long totalShares, final Long totalSharesIssued,
+                                        final BigDecimal unitPrice, final BigDecimal shareCapital, final Long minimumShares, final Long nominaltShares,
+                                        final Long maximumShares, Collection<ShareProductMarketPriceData> marketPrice, final Collection<ChargeData> charges,
 
-            final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodTypeEnum,
-            final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsEnum, EnumOptionData accountingRule ,PROPERTY_TYPE propertyType ,BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
+                                        final Boolean allowDividendCalculationForInactiveClients, final Integer lockinPeriod, final EnumOptionData lockPeriodTypeEnum,
+                                        final Integer minimumActivePeriod, final EnumOptionData minimumActivePeriodForDividendsEnum, EnumOptionData accountingRule , SACCO_PROPERTY_TYPE propertyType , BigDecimal monthlyDeposit , BigDecimal dividendLowerLimit) {
 
 
     
@@ -155,9 +156,9 @@ public class ShareProductData implements ProductData {
     }
 
     private ShareProductData(final Collection<CurrencyData> currencyOptions, final Collection<ChargeData> chargeOptions,
-            final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
-            final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions,
-            final Map<String, List<GLAccountData>> accountingMappingOptions ,PROPERTY_TYPE propertyType ,BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
+                             final Collection<EnumOptionData> minimumActivePeriodFrequencyTypeOptions,
+                             final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions,
+                             final Map<String, List<GLAccountData>> accountingMappingOptions , SACCO_PROPERTY_TYPE propertyType , BigDecimal monthlyDeposit , BigDecimal dividendLowerLimit) {
         
 
         this.id = null;
@@ -229,7 +230,7 @@ public class ShareProductData implements ProductData {
                 data.minimumActivePeriodFrequencyTypeOptions, data.lockinPeriodFrequencyTypeOptions, data.accountingMappingOptions ,data.propertyType ,data.monthlyDeposit ,data.dividendLowerLimit);
     }
 
-    private ShareProductData(final Long id, final String name, final String shortName, final Long totalShares ,final PROPERTY_TYPE propertyType ,final BigDecimal monthlyDeposit ,BigDecimal dividendLowerLimit) {
+    private ShareProductData(final Long id, final String name, final String shortName, final Long totalShares , final SACCO_PROPERTY_TYPE propertyType , final BigDecimal monthlyDeposit , BigDecimal dividendLowerLimit) {
         
         this.id = id;
         this.name = name;
@@ -265,7 +266,7 @@ public class ShareProductData implements ProductData {
         this.dividendLowerLimit = dividendLowerLimit ;
     }
 
-    public static ShareProductData generic(final Long id, final String name, final String shortName, final Long totalShares ,final PROPERTY_TYPE propertyType ,final BigDecimal monthlyDeposit ,final BigDecimal dividendLowerLimit) {
+    public static ShareProductData generic(final Long id, final String name, final String shortName, final Long totalShares , final SACCO_PROPERTY_TYPE propertyType , final BigDecimal monthlyDeposit , final BigDecimal dividendLowerLimit) {
         return new ShareProductData(id, name, shortName, totalShares ,propertyType ,monthlyDeposit ,dividendLowerLimit);
     }
 
@@ -368,7 +369,7 @@ public class ShareProductData implements ProductData {
         return this.accountingRule;
     }
 
-    public PROPERTY_TYPE getPropertyType(){
+    public SACCO_PROPERTY_TYPE getPropertyType(){
         return this.propertyType ;
     }
 
