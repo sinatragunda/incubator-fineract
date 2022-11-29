@@ -24,7 +24,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProductReadPlatformServiceImpl implements ProductReadPlatformService {
+public class ProductSettingsReadPlatformServiceImpl implements ProductReadPlatformService {
 
     private final PlatformSecurityContext context;
     private final JdbcTemplate jdbcTemplate;
@@ -33,7 +33,7 @@ public class ProductReadPlatformServiceImpl implements ProductReadPlatformServic
 
 
     @Autowired
-    public ProductReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource) {
+    public ProductSettingsReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
 
