@@ -29,24 +29,24 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
-import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
+import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
+import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountDividendData;
-import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountDividendReadPlatformService;
+import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountTransactionData;
+import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountTransactionReadPlatformService;
 import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountTransactionWritePlatformService;
 import org.apache.fineract.portfolio.shareproducts.data.ShareProductDividendPayOutData;
-import org.apache.fineract.portfolio.shareproducts.service.ShareProductDividendReadPlatformService;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -64,15 +64,27 @@ public class ShareAccountTransactionApiResource {
     private final FromJsonHelper fromJsonHelper ;
     private final String resourceNameForPermissions = "REVERSETRANSACTION_SHARE";
 
+    private final ShareAccountTransactionReadPlatformService shareAccountTransactionReadPlatformService;
+    private final DefaultToApiJsonSerializer<ShareAccountTransactionData> shareAccountTransactionDataDefaultToApiJsonSerializer;
+
+    private final ApiRequestParameterHelper apiRequestParameterHelper;
     @Autowired
     public ShareAccountTransactionApiResource(final DefaultToApiJsonSerializer<ShareProductDividendPayOutData> toApiJsonSerializer,
             final PlatformSecurityContext platformSecurityContext,
             final DefaultToApiJsonSerializer<ShareAccountDividendData> toApiDividendsJsonSerializer,
-                                    final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWritePlatformService shareAccountTransactionWritePlatformService) {
+                                    final FromJsonHelper fromJsonHelper ,final ShareAccountTransactionWritePlatformService shareAccountTransactionWritePlatformService ,final ShareAccountTransactionReadPlatformService shareAccountTransactionReadPlatformService ,final DefaultToApiJsonSerializer<ShareAccountTransactionData> shareAccountTransactionDataDefaultToApiJsonSerializer ,
+                                              final ApiRequestParameterHelper apiRequestParameterHelper) {
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.platformSecurityContext = platformSecurityContext;
         this.fromJsonHelper = fromJsonHelper ;
         this.shareAccountTransactionWritePlatformService = shareAccountTransactionWritePlatformService ;
+
+        /**
+         * Added 29/11/2022 at 1300
+         */
+        this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.shareAccountTransactionReadPlatformService = shareAccountTransactionReadPlatformService;
+        this.shareAccountTransactionDataDefaultToApiJsonSerializer = shareAccountTransactionDataDefaultToApiJsonSerializer;
     }
 
     @POST
@@ -84,6 +96,19 @@ public class ShareAccountTransactionApiResource {
         JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
         CommandProcessingResult commandProcessingResult = shareAccountTransactionWritePlatformService.updateShareAccountTransaction(transactionId ,command ,jsonCommand);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveTransaction(@PathParam("transactionId") final Long transactionId,@Context final UriInfo uriInfo) {
+
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        final ShareAccountTransactionData shareAccountTransactionData = this.shareAccountTransactionReadPlatformService.retrieveOne(transactionId);
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        return this.shareAccountTransactionDataDefaultToApiJsonSerializer.serialize(settings, shareAccountTransactionData,null);
+
     }
 
 

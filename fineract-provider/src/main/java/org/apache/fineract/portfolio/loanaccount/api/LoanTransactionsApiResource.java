@@ -164,6 +164,29 @@ public class LoanTransactionsApiResource {
         return this.toApiJsonSerializer.serialize(settings, transactionData, this.RESPONSE_DATA_PARAMETERS);
     }
 
+    /**
+     * LoanId should be null or 0 or any random int 
+     * Had some error so just thought maybe because it was absent thats why we got it 
+     */ 
+    @GET
+    @Path("extended/{transactionId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveTransactionWithoutLoanId(@PathParam("loanId") final Long loanId ,@PathParam("transactionId") final Long transactionId,
+            @Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+
+        System.err.println("------------------we need this transaction instead son ---------");
+
+        LoanTransactionData transactionData = this.loanReadPlatformService.retrieveLoanTransactionWithoutLoanId(transactionId);
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+       
+        return this.toApiJsonSerializer.serialize(settings, transactionData, this.RESPONSE_DATA_PARAMETERS);
+    }
+
+
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })

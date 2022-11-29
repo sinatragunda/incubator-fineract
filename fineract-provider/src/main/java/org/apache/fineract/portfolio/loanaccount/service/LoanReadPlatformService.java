@@ -141,4 +141,12 @@ public interface LoanReadPlatformService {
 
     // added 25/05/2022
     List<LoanAccountData> retrieveAllHirePurchaseLoans();
+
+
+    /**
+     * Added 29/11/2022 
+     */
+
+    LoanTransactionData retrieveLoanTransactionWithoutLoanId(Long transactionId);
+  
 }
