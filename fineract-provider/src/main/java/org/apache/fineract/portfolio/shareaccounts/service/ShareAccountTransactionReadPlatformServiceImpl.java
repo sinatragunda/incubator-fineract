@@ -209,7 +209,7 @@ public class ShareAccountTransactionReadPlatformServiceImpl implements ShareAcco
     private static final class ShareAccountTransactionsMapper implements RowMapper<ShareAccountTransactionData> {
 
         public String schema() {
-            return " tr.id as id ,tr.account_id as accountId ,tr.amount_paid as amountPaid "
+            return " tr.id as id ,tr.account_id as accountId ,tr.amount_paid as amountPaid ,"
                     +" tr.transaction_date as transactionDate ,"
                     +" tr.total_shares as totalShares ,"
                     +" tr.unit_price as unitPrice ,"
@@ -228,7 +228,7 @@ public class ShareAccountTransactionReadPlatformServiceImpl implements ShareAcco
             final BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
             final BigDecimal chargeAmount = rs.getBigDecimal("chargeAmount");
             final Long numberOfShares = rs.getLong("totalShares");
-            final Boolean isReversed = rs.getBoolean("is_reversed");
+            final Boolean isReversed = rs.getBoolean("isReversed");
             final BigDecimal amountPaid = rs.getBigDecimal("amountPaid");
 
             final LocalDate transactionDate = JdbcSupport.getLocalDate(rs, "transactionDate");

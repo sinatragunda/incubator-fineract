@@ -123,10 +123,13 @@ public class SavingsAccountTransactionsApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
         
-        // if savingsId is null or 0 then lets look for its corresponding account 
-        boolean isSavingsIdSpecified = ComparatorUtility.areObjectsEqual(0L ,savingsId);
+        /**
+         * Revisited on 30/11/2022 at 0307 
+         * If savingsId is not specified or 0 then lets search it using transactionId instead 
+         */ 
+        boolean isSavingsIdNotSpecified = ComparatorUtility.areObjectsEqual(0L ,savingsId);
         
-        if(!isSavingsIdSpecified){
+        if(isSavingsIdNotSpecified){
             SavingsAccountTransaction savingsAccountTransaction = savingsAccountTransactionRepository.findOne(transactionId);
             savingsId = savingsAccountTransaction.getSavingsAccount().getId();
         }

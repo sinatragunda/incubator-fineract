@@ -103,7 +103,7 @@ public class ShareAccountDataSerializer {
 
     private static final Set<String> reverseShareAccountTransactionParameters = new HashSet<>(Arrays.asList(ShareAccountApiConstants
                     .locale_paramname,
-            ShareAccountApiConstants.transactionDateParam, ShareAccountApiConstants.dateformat_paramname));
+            ShareAccountApiConstants.transactionDateParam, ShareAccountApiConstants.dateformat_paramname ,ShareAccountApiConstants.transactionIdParam));
 
     
     @Autowired

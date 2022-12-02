@@ -71,6 +71,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import org.apache.fineract.accounting.producttoaccountmapping.domain.PortfolioProductType;
+
 @Service
 public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlatformService {
 
@@ -222,7 +224,22 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                 }
                 Long transaction = null;
                 if (entityType != null) {
-                    transaction = Long.parseLong(transactionId.substring(1).trim());
+                    /**
+                     * Modified 29/11/2022 at 1803
+                     * Conditional using PortfolioProductType
+                     */
+                    System.err.println("---------------------------entity type is ---------"+entityType.getValue());  
+                    PortfolioProductType portfolioProductType =  PortfolioProductType.fromInt(entityTypeId);
+
+                    if(portfolioProductType.isShareProduct()){
+                        System.err.println("------------------is isShareProduct transaction");
+                        transaction = Long.parseLong(transactionId.substring(2).trim());
+                    }
+
+                    else{
+                        transaction = Long.parseLong(transactionId.substring(1).trim());
+                    }
+                
                 }
 
                 TransactionTypeEnumData transactionTypeEnumData = null;

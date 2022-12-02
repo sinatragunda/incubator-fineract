@@ -240,9 +240,9 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             final Boolean deductChargesOnBalance = rs.getBoolean("deductChargesOnBalance");
             final ACCOUNT_TYPE accountType = ACCOUNT_TYPE.fromInt(rs.getInt("accountType"));
             final Boolean isActive = rs.getBoolean("isProductActive");
+            final Long productSettingsId = rs.getLong("productSettingsId");
 
-            final ProductData productData = null ;
-            //final ProductData productData = new ProductData(PRODUCT_TYPE.SAVINGS ,id , deductChargesOnBalance ,accountType ,isActive ,null);
+            final ProductData productData = new ProductData(productSettingsId ,id ,PRODUCT_TYPE.SAVINGS , accountType, deductChargesOnBalance , isActive ,null);
 
             final Integer lockinPeriodFrequency = JdbcSupport.getInteger(rs, "lockinPeriodFrequency");
             EnumOptionData lockinPeriodFrequencyType = null;

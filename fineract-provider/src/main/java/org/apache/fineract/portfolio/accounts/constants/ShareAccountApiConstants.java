@@ -30,6 +30,7 @@ public interface ShareAccountApiConstants {
 	public static final String feeIntervalParamName = "feeInterval";
 	public static final String feeOnMonthDayParamName = "feeOnMonthDay";
 	public static final String localeParamName = "locale";
+	public static final String transactionIdParam  = "transactionId";
 
 	// Command Strings
 	String APPROVE_COMMAND = "approve";
