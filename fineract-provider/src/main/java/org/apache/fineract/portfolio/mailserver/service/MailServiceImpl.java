@@ -79,7 +79,7 @@ public class MailServiceImpl implements MailService {
         // Very Important, Don't use email.setAuthentication()
 
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-        email.setDebug(false); // true if you want to debug
+        email.setDebug(true); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
         try {
@@ -92,8 +92,6 @@ public class MailServiceImpl implements MailService {
             email.setSubject(emailDetails.getSubject());
             email.setMsg(emailDetails.getBody());
 
-            setAttachments(email ,mailContent);
-
             boolean hasAddress = Optional.ofNullable(emailDetails.getAddress()).isPresent();
 
             if(!hasAddress){
@@ -101,8 +99,17 @@ public class MailServiceImpl implements MailService {
             }
 
             email.addTo(emailDetails.getAddress(), emailDetails.getContactName());
-            email.send();
-
+            
+            
+            switch(mailContentType){
+                case MEDIA:
+                    MultiPartEmail multipartEmail = setAttachmentsAndSendMail(email ,mailContent);
+                    multipartEmail.send();
+                    break;
+                default:
+                    email.send();
+                    break;
+            }
             return SEND_MAIL_MESSAGE_STATUS.SUCCESS;
 
         }
@@ -134,14 +141,21 @@ public class MailServiceImpl implements MailService {
         return email;
     }
 
-    private void setAttachments(Email email , MailContent mailContent){
+    /**
+     * Added 05/11/2022 at 0902
+     */
+
+    private MultiPartEmail setAttachmentsAndSendMail(Email email ,MailContent mailContent){
+        
         MAIL_CONTENT_TYPE mailContentType = mailContent.mailContentType();
-        MultiPartEmail multiPartEmail = new MultiPartEmail();
+        MultiPartEmail multiPartEmail = (MultiPartEmail)email;
+        
         switch (mailContentType){
             case MEDIA:
                 List<File> attachments = mailContent.attachments();
                 attachments.stream().forEach(e->{
                     try{
+                        System.err.println("------------------------------attaching file in multiPartEmail-------------------");
                         multiPartEmail.attach(e);
                     }
                     catch(EmailException n){
@@ -150,7 +164,18 @@ public class MailServiceImpl implements MailService {
                 });
                 break;
         }
-        email = multiPartEmail;
+
+        System.err.println("------------------now lets send the mail with attachments ,but with attachments ? "+multiPartEmail.isBoolHasAttachments());
+
+        //email = multiPartEmail;
+
+        //multiPartEmail.send();
+
+
+        //System.err.println("-------------------------does file has attachments ? "+email.isBoolHasAttachments());
+
+
+        return multiPartEmail;
     }
 
 }

@@ -158,11 +158,11 @@ public class MailReportApiResource {
         while(mailRecipientsIterator.hasNext()){
 
             JsonElement jsonElement1 = mailRecipientsIterator.next();
-            //System.err.println("-------------mail recipients keys "+jsonElement1);
+            System.err.println("-------------mail recipients keys "+jsonElement1);
 
             Long keyId = fromJsonHelper.extractLongNamed("id" ,jsonElement1);
 
-            //System.err.println("-----------------key id is "+keyId);
+            System.err.println("-----------------key id is "+keyId);
             Queue<MailRecipients> queue = MailRecipientsHelper.emailRecipients(mailRecipientsKeyRepository ,mailRecipientsRepository ,clientReadPlatformService ,keyId);
             mailRecipientsQueue.addAll(queue);
 
@@ -181,7 +181,7 @@ public class MailReportApiResource {
 
             JsonElement jsonElement1 = reportParamsJson.get(key);
             String value = jsonElement1.getAsString();
-            //System.err.println("-------------------------key is -----------"+key+"-------------------value is "+value);
+            System.err.println("-------------------------key is -----------"+key+"-------------------value is "+value);
             params.put(key ,value);
         }
 
@@ -189,13 +189,13 @@ public class MailReportApiResource {
 
         File file = pentahoReportingProcessService.processRequestEx(reportName ,params);
 
-        //System.err.println("--so we dont here ? --------------------");
+        System.err.println("--so we dont here ? --------------------"+file.getName());
 
         Consumer<MailRecipients> toEmailDetail = (e)->{
 
             String emailAddress = e.getEmailAddress();
             String contactName = e.getName();
-            //System.err.println("-----------------mail recipient ------"+emailAddress+"--------------with contanct name ---"+contactName);
+            System.err.println("-----------------mail recipient ------"+emailAddress+"--------------with contanct name ---"+contactName);
 
             EmailDetail emailDetail = new EmailDetail(subject ,body ,emailAddress,contactName) ;
 
@@ -215,6 +215,8 @@ public class MailReportApiResource {
             mailContentList.add(mailContent);
         };
 
+        System.err.println("-------------------------attachments are -------------------"+attachments.size());
+
         emailDetailList.stream().forEach(toMailContent);
 
         /**
@@ -225,8 +227,13 @@ public class MailReportApiResource {
         System.err.println("---------------------total mail contents are ------------"+mailContentList.size());
 
         mailContentList.stream().forEach(e->{
+            System.err.println("--------------------------mail content send message now --------------------");
             mailServerSenderFactory.sendMail(e);
         });
+
+        //System.err.println("---------------------------------done with this all ,lets delete fiel now ");
+
+        //file.delete();
 
         return ObjectNodeHelper.statusNode(true).toString();
     }

@@ -17,7 +17,7 @@ public class EmailDetailWithAttachment extends EmailDetail implements MailConten
     private MAIL_CONTENT_TYPE mailContent = MAIL_CONTENT_TYPE.MEDIA;
     private List<File> attachments ;
 
-    public EmailDetailWithAttachment(EmailDetail emailDetail ,List attachments){
+    public EmailDetailWithAttachment(EmailDetail emailDetail ,List<File> attachments){
         super(emailDetail);
         this.attachments = attachments;
     }
