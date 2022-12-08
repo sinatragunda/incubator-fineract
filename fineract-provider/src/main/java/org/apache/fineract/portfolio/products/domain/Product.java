@@ -60,7 +60,7 @@ public class Product extends AbstractPersistableCustom<Long> {
     private Boolean deductChargesOnAccountBalance;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "account_type", nullable = false)
+    @Column(name = "account_type", nullable = false ,columnDefinition = "short default 0")
     protected ACCOUNT_TYPE accountType;
 
     /**

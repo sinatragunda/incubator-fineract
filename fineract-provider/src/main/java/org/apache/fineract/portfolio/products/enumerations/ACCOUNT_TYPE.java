@@ -2,16 +2,14 @@ package org.apache.fineract.portfolio.products.enumerations;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public enum ACCOUNT_TYPE {
     
     CHECKING("Checking"),
     SETTLEMENT("Settlement"),
-    FUND("Fund");
+    FUND("Fund"),
+    EQUITY("Equity");
 
     private String code ;
     ACCOUNT_TYPE(String code){
@@ -19,6 +17,8 @@ public enum ACCOUNT_TYPE {
     }
 
     public static ACCOUNT_TYPE fromInt(Integer arg){
+
+        arg = Optional.ofNullable(arg).orElse(0);
 
         for(ACCOUNT_TYPE t : values()){
             if(arg.equals(t.ordinal())  ){

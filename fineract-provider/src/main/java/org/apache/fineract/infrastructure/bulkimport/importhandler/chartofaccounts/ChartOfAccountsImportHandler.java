@@ -148,11 +148,11 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
                             .build(); //
                     final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
-                    System.err.println("---------------result id is ---------------------"+result.resourceId());
+                    //System.err.println("---------------result id is ---------------------"+result.resourceId());
 
                     successCount[0]++;
 
-                    System.err.println("-------------------count is ----------------"+successCount[0]);
+                    //System.err.println("-------------------count is ----------------"+successCount[0]);
                     Cell statusCell = chartOfAccountsSheet.getRow(glAccount.getRowIndex()).createCell(ChartOfAcountsConstants.STATUS_COL);
                     statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                     statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
@@ -163,14 +163,12 @@ public class ChartOfAccountsImportHandler implements ImportHandler {
                 errorCount++;
                 ex.printStackTrace();
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);
-
-                System.err.println("----------------------------------error message some shit is null here -----------------"+errorMessage);
-
+                //System.err.println("----------------------------------error message some shit is null here -----------------"+errorMessage);
                 ImportHandlerUtils.writeErrorMessage(chartOfAccountsSheet,glAccount.getRowIndex(),errorMessage,ChartOfAcountsConstants.STATUS_COL);
             }
         }
 
-        System.err.println("------------------success count is ------------------"+successCount[0]);
+        //System.err.println("------------------success count is ------------------"+successCount[0]);
 
         chartOfAccountsSheet.setColumnWidth(ChartOfAcountsConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(ChartOfAcountsConstants.STATUS_COL, chartOfAccountsSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),

@@ -184,10 +184,10 @@ public class SavingsProductAssembler {
          * Added 04/11/2022 at 0241
          */
         //final boolean isProductActive = true ;
-        ACCOUNT_TYPE accountType = null ;
+        ACCOUNT_TYPE accountType = ACCOUNT_TYPE.CHECKING ;
         if(command.parameterExists(ProductConstants.accountTypeParam)){
-            String val = command.stringValueOfParameterNamed(ProductConstants.accountTypeParam);
-            accountType = ACCOUNT_TYPE.valueOf(val);
+            Integer val = command.integerValueOfParameterNamed(ProductConstants.accountTypeParam);
+            accountType = ACCOUNT_TYPE.fromInt(val);
         }
 
         Product productSettings = new Product(PRODUCT_TYPE.SAVINGS ,null ,false ,deductChargesOnAccountBalance ,accountType);

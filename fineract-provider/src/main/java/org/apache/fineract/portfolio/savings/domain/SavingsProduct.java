@@ -68,6 +68,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
 
 import org.apache.fineract.accounting.common.AccountingRuleType;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -208,8 +210,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 
     // Added 18/12/2021
 
-    @OneToOne
-    @JoinTable(name = "m_product", joinColumns = @JoinColumn(name = "product_id"))
+    @Transient
     protected Product product;
 
     public static SavingsProduct createNew(final String name, final String shortName, final String description,
