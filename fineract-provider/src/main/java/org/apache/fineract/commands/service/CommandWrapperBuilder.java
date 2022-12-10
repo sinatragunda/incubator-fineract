@@ -3283,5 +3283,16 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 09/12/2022 at 0144
+     */
+    public CommandWrapperBuilder createLocalRef() {
+        this.actionName = "CREATE";
+        this.entityName = "LOCAL_REF";
+        this.href = "/localref";
+        return this;
+    }
+
+
 
 }

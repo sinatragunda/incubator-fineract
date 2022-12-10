@@ -35,6 +35,7 @@ import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.address.data.AddressData;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.joda.time.LocalDate;
@@ -130,6 +131,11 @@ final public class ClientData implements Comparable<ClientData> {
 
     // added 09/05/2022
     private String tag ;
+
+    /**
+     * Added 08/12/2022 at 1934
+     */
+    private LocalRefData localRefData;
 
     public static ClientData importClientEntityInstance(Long legalFormId,Integer rowIndex,String fullname,Long officeId, Long clientTypeId,
             Long clientClassificationId,Long staffId,Boolean active,LocalDate activationDate,LocalDate submittedOnDate,
@@ -249,7 +255,7 @@ final public class ClientData implements Comparable<ClientData> {
             final Collection<CodeValueData> genderOptions, final Collection<SavingsProductData> savingProductOptions,
             final Collection<CodeValueData> clientTypeOptions, final Collection<CodeValueData> clientClassificationOptions, final Collection<CodeValueData> clientNonPersonConstitutionOptions,
             final Collection<CodeValueData> clientNonPersonMainBusinessLineOptions, final List<EnumOptionData> clientLegalFormOptions,final ClientFamilyMembersData familyMemberOptions, final AddressData address,
-            final Boolean isAddressEnabled, final List<DatatableData> datatables) {
+            final Boolean isAddressEnabled, final List<DatatableData> datatables,final LocalRefData localRefData) {
         final String accountNo = null;
         final EnumOptionData status = null;
         final CodeValueData subStatus = null;
@@ -289,12 +295,13 @@ final public class ClientData implements Comparable<ClientData> {
         final String tag= null ;
 
 
+
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, joinedDate, imageId, staffId,
                 staffName, officeOptions, groups, staffOptions, narrations, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPersonDetails, clientLegalFormOptions,familyMemberOptions, legalForm,address, isAddressEnabled, datatables, isStaff ,shareProductId ,shareAccountId,createSelfServiceUser ,tag);
+                clientNonPersonDetails, clientLegalFormOptions,familyMemberOptions, legalForm,address, isAddressEnabled, datatables, isStaff ,shareProductId ,shareAccountId,createSelfServiceUser ,tag ,localRefData);
 
     }
 
@@ -309,7 +316,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingsProductName, clientData.savingsAccountId, clientData.savingAccountOptions, clientData.clientType,
                 clientData.clientClassification, templateData.clientTypeOptions, templateData.clientClassificationOptions, 
                 templateData.clientNonPersonConstitutionOptions, templateData.clientNonPersonMainBusinessLineOptions, clientData.clientNonPersonDetails,
-                templateData.clientLegalFormOptions,templateData.familyMemberOptions, clientData.legalForm, clientData.address,clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId ,clientData.createSelfServiceUser ,clientData.tag);
+                templateData.clientLegalFormOptions,templateData.familyMemberOptions, clientData.legalForm, clientData.address,clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId ,clientData.createSelfServiceUser ,clientData.tag ,clientData.localRefData);
 
     }
 
@@ -325,7 +332,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingsProductName, clientData.savingsAccountId, savingAccountOptions, clientData.clientType,
                 clientData.clientClassification, clientData.clientTypeOptions, clientData.clientClassificationOptions,
                 clientData.clientNonPersonConstitutionOptions, clientData.clientNonPersonMainBusinessLineOptions, clientData.clientNonPersonDetails,
-                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId ,clientData.createSelfServiceUser, clientData.tag);
+                clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address, clientData.isAddressEnabled, null, clientData.isStaff ,null ,clientData.shareAccountId ,clientData.createSelfServiceUser, clientData.tag ,clientData.localRefData);
 
     }
 
@@ -339,7 +346,7 @@ final public class ClientData implements Comparable<ClientData> {
                 clientData.savingAccountOptions, clientData.clientType, clientData.clientClassification, clientData.clientTypeOptions,
                 clientData.clientClassificationOptions, clientData.clientNonPersonConstitutionOptions, clientData.clientNonPersonMainBusinessLineOptions, 
                 clientData.clientNonPersonDetails, clientData.clientLegalFormOptions,clientData.familyMemberOptions, clientData.legalForm,clientData.address,
-				clientData.isAddressEnabled, null, clientData.isStaff,null ,clientData.shareAccountId ,clientData.createSelfServiceUser ,clientData.tag);
+				clientData.isAddressEnabled, null, clientData.isStaff,null ,clientData.shareAccountId ,clientData.createSelfServiceUser ,clientData.tag ,clientData.localRefData);
 
     }
 
@@ -388,14 +395,15 @@ final public class ClientData implements Comparable<ClientData> {
         // added 25/09/2021 
         final Boolean createSelfServiceUser = null ;
 
-        final String tag = null ; 
+        final String tag = null ;
+        final LocalRefData localRefData= null ;
 
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate, imageId, staffId,
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,shareProductId ,shareAccountId ,createSelfServiceUser ,tag);
+                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,shareProductId ,shareAccountId ,createSelfServiceUser ,tag ,localRefData);
     }
 
     public static ClientData lookup(final Long id, final String displayName, final Long officeId, final String officeName) {
@@ -441,12 +449,13 @@ final public class ClientData implements Comparable<ClientData> {
         final ClientNonPersonData clientNonPerson = null;
 
         final String tag= null ;
+        final LocalRefData localRefData = null ;
         return new ClientData(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id, firstname,
                 middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate, imageId, staffId,
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, savingAccountOptions, clientType, clientClassification,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, 
-                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,null ,null ,null ,tag);
+                clientNonPerson, clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff ,null ,null ,null ,tag ,localRefData);
 
     }
     
@@ -462,7 +471,7 @@ final public class ClientData implements Comparable<ClientData> {
             final String externalId, final String mobileNo, final String emailAddress, final LocalDate dateOfBirth, final CodeValueData gender,
             final LocalDate activationDate, final Long imageId, final Long staffId, final String staffName,
             final ClientTimelineData timeline, final Long savingsProductId, final String savingsProductName, final Long savingsAccountId,
-            final CodeValueData clientType, final CodeValueData clientClassification, final EnumOptionData legalForm, final ClientNonPersonData clientNonPerson, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId ,final Boolean createSelfServiceUser ,final String tag) {
+            final CodeValueData clientType, final CodeValueData clientClassification, final EnumOptionData legalForm, final ClientNonPersonData clientNonPerson, final Boolean isStaff,final Long shareProductId ,final Long shareAccountId ,final Boolean createSelfServiceUser ,final String tag ,final LocalRefData localRefData) {
 
         final Collection<OfficeData> allowedOffices = null;
         final Collection<GroupGeneralData> groups = null;
@@ -481,7 +490,7 @@ final public class ClientData implements Comparable<ClientData> {
                 staffName, allowedOffices, groups, staffOptions, closureReasons, genderOptions, timeline, savingProductOptions,
                 savingsProductId, savingsProductName, savingsAccountId, null, clientType, clientClassification, clientTypeOptions,
                 clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientNonPerson,
-                clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff,shareProductId ,shareAccountId, createSelfServiceUser ,tag);
+                clientLegalFormOptions,familyMemberOptions, legalForm,null,null, null, isStaff,shareProductId ,shareAccountId, createSelfServiceUser ,tag ,localRefData);
 
     }
 
@@ -499,7 +508,7 @@ final public class ClientData implements Comparable<ClientData> {
             final Collection<CodeValueData> clientClassificationOptions, final Collection<CodeValueData> clientNonPersonConstitutionOptions,
             final Collection<CodeValueData> clientNonPersonMainBusinessLineOptions, final ClientNonPersonData clientNonPerson,
             final List<EnumOptionData> clientLegalFormOptions,final ClientFamilyMembersData familyMemberOptions, final EnumOptionData legalForm, final AddressData address,
-            final Boolean isAddressEnabled, final List<DatatableData> datatables, final Boolean isStaff ,final Long shareProductId ,final Long shareAccountId ,final Boolean createSelfServiceUser ,final String tag) {
+            final Boolean isAddressEnabled, final List<DatatableData> datatables, final Boolean isStaff ,final Long shareProductId ,final Long shareAccountId ,final Boolean createSelfServiceUser ,final String tag ,final LocalRefData localRefData) {
         this.accountNo = accountNo;
         this.status = status;
         if (status != null) {
@@ -573,6 +582,7 @@ final public class ClientData implements Comparable<ClientData> {
         this.createSelfServiceUser = createSelfServiceUser ;
 
         this.tag = tag;
+        this.localRefData = localRefData;
 
     }
 
@@ -682,5 +692,10 @@ final public class ClientData implements Comparable<ClientData> {
 
     public String getTag(){
         return this.tag ;
+    }
+
+
+    public LocalRefData getLocalRefData(){
+        return this.localRefData;
     }
 }

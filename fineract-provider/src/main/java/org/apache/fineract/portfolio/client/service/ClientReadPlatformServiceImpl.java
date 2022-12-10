@@ -59,6 +59,9 @@ import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.client.domain.LegalForm;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -100,6 +103,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final ConfigurationReadPlatformService configurationReadPlatformService;
     private final EntityDatatableChecksReadService entityDatatableChecksReadService;
     private final ColumnValidator columnValidator;
+    private final LocalRefReadPlatformService localRefReadPlatformService;
 
     @Autowired
     public ClientReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource,
@@ -109,7 +113,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final AddressReadPlatformService addressReadPlatformService,final ClientFamilyMembersReadPlatformService clientFamilyMembersReadPlatformService,
             final ConfigurationReadPlatformService configurationReadPlatformService,
             final EntityDatatableChecksReadService entityDatatableChecksReadService,
-            final ColumnValidator columnValidator) {
+            final ColumnValidator columnValidator ,final LocalRefReadPlatformService localRefReadPlatformService) {
         this.context = context;
         this.officeReadPlatformService = officeReadPlatformService;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -121,6 +125,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         this.configurationReadPlatformService=configurationReadPlatformService;
         this.entityDatatableChecksReadService = entityDatatableChecksReadService;
         this.columnValidator = columnValidator;
+        this.localRefReadPlatformService = localRefReadPlatformService;
     }
 
     @Override
@@ -176,9 +181,11 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final List<DatatableData> datatableTemplates = this.entityDatatableChecksReadService
                 .retrieveTemplates(StatusEnum.CREATE.getCode().longValue(), EntityTables.CLIENT.getName(), null);
 
+        final LocalRefData localRefData = localRefReadPlatformService.template(REF_TABLE.CLIENT);
+
         return ClientData.template(defaultOfficeId, new LocalDate(), offices, staffOptions, null, genderOptions, savingsProductDatas,
                 clientTypeOptions, clientClassificationOptions, clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions,
-                clientLegalFormOptions,familyMemberOptions,address,isAddressEnabled, datatableTemplates);
+                clientLegalFormOptions,familyMemberOptions,address,isAddressEnabled, datatableTemplates ,localRefData);
     }
 
     @Override
@@ -319,9 +326,6 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
 
         if (StringUtils.isNotBlank(extraCriteria)) {
             sql += " and (" + extraCriteria + ")";
-
-            System.err.println("-----------------------full query is "+sql);
-
             this.columnValidator.validateSqlInjection(sql, extraCriteria);
         }        
         return this.jdbcTemplate.query(sql, this.lookupMapper, new Object[] {});
@@ -561,10 +565,12 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
                     submittedByLastname, activationDate, activatedByUsername, activatedByFirstname, activatedByLastname, closedOnDate,
                     closedByUsername, closedByFirstname, closedByLastname);
 
+            final LocalRefData localRefData = null ;
+
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false ,tag);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false ,tag ,localRefData);
 
         }
     }
@@ -754,6 +760,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             // added 16/06/2022 
             final String tag = rs.getString("tag");
 
+            final LocalRefData localRefData = null ;
+
             final ClientNonPersonData clientNonPerson = new ClientNonPersonData(constitution, incorpNo, incorpValidityTill, mainBusinessLine, remarks);
 
             final ClientTimelineData timeline = new ClientTimelineData(submittedOnDate, submittedByUsername, submittedByFirstname,
@@ -763,7 +771,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             return ClientData.instance(accountNo, status, subStatus, officeId, officeName, transferToOfficeId, transferToOfficeName, id,
                     firstname, middlename, lastname, fullname, displayName, externalId, mobileNo, emailAddress, dateOfBirth, gender, activationDate,
                     imageId, staffId, staffName, timeline, savingsProductId, savingsProductName, savingsAccountId, clienttype,
-                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false, tag);
+                    classification, legalForm, clientNonPerson, isStaff ,shareProductId ,shareAccountId ,false, tag ,localRefData);
 
         }
     }
@@ -906,8 +914,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         final Collection<CodeValueData> clientNonPersonConstitutionOptions = null;
         final Collection<CodeValueData> clientNonPersonMainBusinessLineOptions = null;
         final List<EnumOptionData> clientLegalFormOptions = null;
+        final LocalRefData localRefData = null ;
         return ClientData.template(null, null, null, null, narrations, null, null, clientTypeOptions, clientClassificationOptions, 
-        		clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions,null,null,null, null);
+        		clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions,null,null,null, null ,localRefData);
     }
 
 }

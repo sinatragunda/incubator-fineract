@@ -73,6 +73,8 @@ import org.apache.fineract.portfolio.group.exception.GroupMemberCountNotInPermis
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
+import org.apache.fineract.portfolio.localref.service.LocalRefWritePlatformService;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountDataDTO;
@@ -150,28 +152,32 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     // Added 08/10/2021
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
+    /**
+     * Added 10/12/2022 at 0219
+     */
+    private final LocalRefRecordHelper localRefRecordHelper ;
+
 
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
-            final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteRepository noteRepository,
-            final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator,
-            final GroupRepository groupRepository, final StaffRepositoryWrapper staffRepository,
-            final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
-            final SavingsAccountRepositoryWrapper savingsRepositoryWrapper, final SavingsProductRepository savingsProductRepository,
-            final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService,
-            final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService,
-            final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper,
-            final ConfigurationReadPlatformService configurationReadPlatformService,
-            final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService,
-            final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService ,
-            final ShareProductWritePlatformService shareProductWritePlatformService ,
-            final ShareProductRepository shareProductRepository,
-            final ShareAccountWritePlatformService shareAccountWritePlatformService,
-            final ShareProductReadPlatformServiceImpl shareProductReadPlatformService,
-                                                       final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,
-                                                       final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService
-    ) {
+                                                       final ClientRepositoryWrapper clientRepository, final ClientNonPersonRepositoryWrapper clientNonPersonRepository,
+                                                       final OfficeRepositoryWrapper officeRepositoryWrapper, final NoteRepository noteRepository,
+                                                       final ClientDataValidator fromApiJsonDeserializer, final AccountNumberGenerator accountNumberGenerator,
+                                                       final GroupRepository groupRepository, final StaffRepositoryWrapper staffRepository,
+                                                       final CodeValueRepositoryWrapper codeValueRepository, final LoanRepositoryWrapper loanRepositoryWrapper,
+                                                       final SavingsAccountRepositoryWrapper savingsRepositoryWrapper, final SavingsProductRepository savingsProductRepository,
+                                                       final SavingsApplicationProcessWritePlatformService savingsApplicationProcessWritePlatformService,
+                                                       final CommandProcessingService commandProcessingService, final ConfigurationDomainService configurationDomainService,
+                                                       final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository, final FromJsonHelper fromApiJsonHelper,
+                                                       final ConfigurationReadPlatformService configurationReadPlatformService,
+                                                       final AddressWritePlatformService addressWritePlatformService, final ClientFamilyMembersWritePlatformService clientFamilyMembersWritePlatformService, final BusinessEventNotifierService businessEventNotifierService,
+                                                       final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService ,
+                                                       final ShareProductWritePlatformService shareProductWritePlatformService ,
+                                                       final ShareProductRepository shareProductRepository,
+                                                       final ShareAccountWritePlatformService shareAccountWritePlatformService,
+                                                       final ShareProductReadPlatformServiceImpl shareProductReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService ,
+                                                       final LocalRefRecordHelper localRefRecordHelper
+                                                       ) {
         this.context = context;
         this.clientRepository = clientRepository;
         this.clientNonPersonRepository = clientNonPersonRepository;
@@ -201,6 +207,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.shareProductReadPlatformService = shareProductReadPlatformService;
         this.selfServiceRegistrationWritePlatformService = selfServiceRegistrationWritePlatformService;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService ;
+        this.localRefRecordHelper = localRefRecordHelper;
     }
 
     @Transactional
@@ -284,9 +291,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
     @Override
     public CommandProcessingResult createClient(final JsonCommand command) {
 
-
         Client newClient= null ;
-
         try {
             final AppUser currentUser = this.context.authenticatedUser();
 
@@ -395,6 +400,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
 
             this.clientRepository.save(newClient);
 
+            /**
+             * Added 10/12/2022 at 0218
+             * LocalRef implementation ,add values to local ref value
+             */
+            localRefRecordHelper.create(command ,newClient);
+
             if (newClient.isActive()) {
                 this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
                         constructEntityMap(BUSINESS_ENTITY.CLIENT, newClient));
@@ -464,9 +475,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         }catch(final PersistenceException dve) {
 
             dve.printStackTrace();
-
-            System.err.println("------------item has id ------------------------"+newClient.getId());
-        	
             Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
             handleDataIntegrityIssues(command, throwable, dve);
          	return CommandProcessingResult.empty();

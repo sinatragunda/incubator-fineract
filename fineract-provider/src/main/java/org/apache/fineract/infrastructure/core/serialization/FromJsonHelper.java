@@ -97,7 +97,6 @@ public class FromJsonHelper {
 
         if (!unsupportedParameterList.isEmpty()){
             for(String s : unsupportedParameterList){
-                System.err.println("-----------------unsupported param is ---------"+s);
             }
             throw new UnsupportedParameterException(unsupportedParameterList); 
         }
