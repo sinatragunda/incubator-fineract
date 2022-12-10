@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.codes.data;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * Immutable data object representing a code.
@@ -30,6 +31,8 @@ public class CodeData implements Serializable {
     private final String name;
     @SuppressWarnings("unused")
     private final boolean systemDefined;
+
+    private Collection<CodeValueData> codeValueDataCollection ;
 
     public static CodeData instance(final Long id, final String name, final boolean systemDefined) {
         return new CodeData(id, name, systemDefined);
@@ -43,5 +46,9 @@ public class CodeData implements Serializable {
 
     public Long getCodeId() {
         return this.id;
+    }
+
+    public void setCodeValueData(Collection codeValueData){
+        this.codeValueDataCollection = codeValueData;
     }
 }

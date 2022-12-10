@@ -24,8 +24,12 @@ public class LocalRefConstants {
     public static String refValueParam = "refValue";
     public static String localRefIdParam = "localRefId";
 
+    public static String localRefsParam = "localrefs";
+
+    public static String isMandatoryParam ="isMandatory";
+
     public static final Set<String> LOCAL_REF_REQUEST_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList(LocalRefConstants.nameParam ,LocalRefConstants.descriptionParam ,LocalRefConstants.codeIdParam ,LocalRefConstants.refTableParam ,
-                    LocalRefConstants.refValueTypeParam , ClientApiConstants.officeIdParamName,"locale" ,"dateFormat" ,LocalRefConstants.submittedDateParam));
+                    LocalRefConstants.refValueTypeParam , ClientApiConstants.officeIdParamName,"locale" ,"dateFormat" ,LocalRefConstants.submittedDateParam ,isMandatoryParam));
 
 }

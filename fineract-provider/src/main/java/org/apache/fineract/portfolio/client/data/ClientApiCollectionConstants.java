@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.client.data;
 
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.localref.helper.LocalRefConstants;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,21 +33,21 @@ public class ClientApiCollectionConstants extends ClientApiConstants{
                     mobileNoParamName, emailAddressParamName, firstnameParamName, middlenameParamName, lastnameParamName, fullnameParamName, officeIdParamName,
                     activeParamName, activationDateParamName, staffIdParamName, submittedOnDateParamName, savingsProductIdParamName,
                     dateOfBirthParamName, genderIdParamName, clientTypeIdParamName, clientClassificationIdParamName,
-                    clientNonPersonDetailsParamName, displaynameParamName, legalFormIdParamName, datatables, isStaffParamName ,shareProductIdParamName ,createSelfServiceUserParam ,tagParam));
+                    clientNonPersonDetailsParamName, displaynameParamName, legalFormIdParamName, datatables, isStaffParamName ,shareProductIdParamName ,createSelfServiceUserParam ,tagParam , LocalRefConstants.localRefsParam));
 
     protected static final Set<String> CLIENT_NON_PERSON_CREATE_REQUEST_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList(familyMembers,address,localeParamName, dateFormatParamName, incorpNumberParamName, remarksParamName, incorpValidityTillParamName,
-                    constitutionIdParamName, mainBusinessLineIdParamName, datatables ,tagParam));
+                    constitutionIdParamName, mainBusinessLineIdParamName, datatables ,tagParam ,LocalRefConstants.localRefsParam));
 
     protected static final Set<String> CLIENT_UPDATE_REQUEST_DATA_PARAMETERS = new HashSet<>(Arrays.asList(localeParamName,
             dateFormatParamName, accountNoParamName, externalIdParamName, mobileNoParamName, emailAddressParamName, firstnameParamName, middlenameParamName,
 
             lastnameParamName, fullnameParamName, activeParamName, activationDateParamName, staffIdParamName, savingsProductIdParamName,
-            dateOfBirthParamName, genderIdParamName, clientTypeIdParamName, clientClassificationIdParamName, submittedOnDateParamName, clientNonPersonDetailsParamName, displaynameParamName, legalFormIdParamName, isStaffParamName ,tagParam));
+            dateOfBirthParamName, genderIdParamName, clientTypeIdParamName, clientClassificationIdParamName, submittedOnDateParamName, clientNonPersonDetailsParamName, displaynameParamName, legalFormIdParamName, isStaffParamName ,tagParam ,LocalRefConstants.localRefsParam));
 
     protected static final Set<String> CLIENT_NON_PERSON_UPDATE_REQUEST_DATA_PARAMETERS = new HashSet<>(Arrays.asList(localeParamName,
             dateFormatParamName, incorpNumberParamName, remarksParamName, incorpValidityTillParamName,
-            constitutionIdParamName, mainBusinessLineIdParamName ,tagParam));
+            constitutionIdParamName, mainBusinessLineIdParamName ,tagParam ,LocalRefConstants.localRefsParam));
 
 
     /**
@@ -76,11 +77,11 @@ public class ClientApiCollectionConstants extends ClientApiConstants{
             Arrays.asList(localeParamName, dateFormatParamName, reopenedDateParamName));
 
     protected static final Set<String> CLIENT_CHARGES_ADD_REQUEST_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList(chargeIdParamName, amountParamName, dueAsOfDateParamName, dateFormatParamName, localeParamName));
+            Arrays.asList(chargeIdParamName, amountParamName, dueAsOfDateParamName, dateFormatParamName, localeParamName ,LocalRefConstants.localRefsParam));
 
     protected static final Set<String> CLIENT_CHARGES_PAY_CHARGE_REQUEST_DATA_PARAMETERS = new HashSet<>(Arrays.asList(amountParamName,
             transactionDateParamName, dateFormatParamName, localeParamName, paymentTypeIdParamName, transactionAccountNumberParamName,
-            checkNumberParamName, routingCodeParamName, receiptNumberParamName, bankNumberParamName));
+            checkNumberParamName, routingCodeParamName, receiptNumberParamName, bankNumberParamName ,LocalRefConstants.localRefsParam));
 
 
 }

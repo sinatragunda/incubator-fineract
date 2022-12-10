@@ -17,8 +17,10 @@ public class LocalRefData {
     private Long id ;
     private String name ;
     private String description ;
+    private Boolean isMandatory ;
     private EnumOptionData refTable ;
     private EnumOptionData refValueType;
+
     private String codeName ;
     private String officeName ;
     private Collection<EnumOptionData> refTableOptions ;
@@ -26,6 +28,9 @@ public class LocalRefData {
     private Collection<EnumOptionData> permissionOptions ;
     private Collection<CodeData> codeData;
     private Collection<LocalRefData> existingLocalRefs;
+
+
+    private Long codeId ;
 
     public static LocalRefData template(){
         return new LocalRefData(REF_TABLE.template() , REF_VALUE_TYPE.template() ,null);
@@ -36,7 +41,7 @@ public class LocalRefData {
         this.permissionOptions = permissionOptions;
     }
 
-    public LocalRefData(Long id, String name, String description, REF_TABLE refTable, REF_VALUE_TYPE refValueType, String codeName ,String officeName) {
+    public LocalRefData(Long id, String name, String description, REF_TABLE refTable, REF_VALUE_TYPE refValueType, String codeName ,String officeName ,Long codeId ,Boolean isMandatory) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,8 +49,17 @@ public class LocalRefData {
         this.refValueType = refValueType.toEnumData();
         this.codeName = codeName;
         this.officeName = officeName;
+        this.codeId = codeId ;
+        this.isMandatory = isMandatory;
     }
 
+    public Long getCodeId() {
+        return codeId;
+    }
+
+    public EnumOptionData getRefValueType(){
+        return refValueType ;
+    }
     public void setCodeData(Collection<CodeData> codeData) {
         this.codeData = codeData;
     }

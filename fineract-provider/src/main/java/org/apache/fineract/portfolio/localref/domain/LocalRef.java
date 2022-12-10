@@ -46,7 +46,8 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
     @Column(name="ref_value_type" ,nullable=false)
     private REF_VALUE_TYPE refValueType;
 
-    @JoinColumn(name ="code_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name ="code_id" ,nullable=true)
     private Code code ;
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -61,7 +62,10 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
     @JoinColumn(name ="office_id" ,nullable=false)
     private Office office;
 
-    public LocalRef(String name, String description, REF_TABLE refTable, REF_VALUE_TYPE refValueType, Code code, Permission permission, Date submittedDate ,Office office) {
+    @Column(name="is_mandatory")
+    private Boolean isMandatory;
+
+    public LocalRef(String name, String description, REF_TABLE refTable, REF_VALUE_TYPE refValueType, Code code, Permission permission, Date submittedDate ,Office office ,Boolean isMandatory) {
         this.name = name;
         this.description = description;
         this.refTable = refTable;
@@ -70,5 +74,6 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
         this.permission = permission;
         this.submittedDate = submittedDate;
         this.office = office;
+        this.isMandatory = isMandatory;
     }
 }

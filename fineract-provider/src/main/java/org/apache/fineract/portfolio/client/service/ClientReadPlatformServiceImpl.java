@@ -61,6 +61,7 @@ import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
 import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
@@ -104,6 +105,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     private final EntityDatatableChecksReadService entityDatatableChecksReadService;
     private final ColumnValidator columnValidator;
     private final LocalRefReadPlatformService localRefReadPlatformService;
+    private final LocalRefRecordHelper localRefRecordHelper;
 
     @Autowired
     public ClientReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource,
@@ -113,7 +115,8 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final AddressReadPlatformService addressReadPlatformService,final ClientFamilyMembersReadPlatformService clientFamilyMembersReadPlatformService,
             final ConfigurationReadPlatformService configurationReadPlatformService,
             final EntityDatatableChecksReadService entityDatatableChecksReadService,
-            final ColumnValidator columnValidator ,final LocalRefReadPlatformService localRefReadPlatformService) {
+            final ColumnValidator columnValidator ,final LocalRefReadPlatformService localRefReadPlatformService,
+                                         final LocalRefRecordHelper localRefRecordHelper) {
         this.context = context;
         this.officeReadPlatformService = officeReadPlatformService;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -126,6 +129,7 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         this.entityDatatableChecksReadService = entityDatatableChecksReadService;
         this.columnValidator = columnValidator;
         this.localRefReadPlatformService = localRefReadPlatformService;
+        this.localRefRecordHelper = localRefRecordHelper;
     }
 
     @Override
@@ -312,7 +316,17 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
             final Collection<GroupGeneralData> parentGroups = this.jdbcTemplate.query(clientGroupsSql, this.clientGroupsMapper,
                     new Object[] { clientId });
 
-            return ClientData.setParentGroups(clientData, parentGroups);
+            ClientData clientDataParentGroups = ClientData.setParentGroups(clientData, parentGroups);
+
+            /**
+             * Added 10/12/2022 at 0521
+             * For getting and settings local refs
+             */
+            localRefRecordHelper.setRecordData(clientDataParentGroups ,REF_TABLE.CLIENT);
+            //System.err.println("----------------------do we have anything on local ref ? "+clientDataParentGroups.getLocalRefValueDataCollection().size());
+
+            return clientDataParentGroups;
+
 
         } catch (final EmptyResultDataAccessException e) {
             throw new ClientNotFoundException(clientId);

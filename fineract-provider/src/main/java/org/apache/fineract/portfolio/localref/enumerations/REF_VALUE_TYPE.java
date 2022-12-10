@@ -18,7 +18,8 @@ public enum REF_VALUE_TYPE implements IEnum{
     STRING("String"),
     DECIMAL("Decimal"),
     CODE_VALUE("Template"),
-    NUMERAL("Numeric");
+    NUMERAL("Numeric"),
+    DATE("Date");
 
     private String code ;
     REF_VALUE_TYPE(String code){

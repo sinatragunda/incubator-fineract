@@ -41,6 +41,8 @@ public class LocalRefAssembler {
         final Integer refValueTypeInt = command.integerValueOfParameterNamed(LocalRefConstants.refValueTypeParam);
         final Long codeId = command.longValueOfParameterNamed(LocalRefConstants.codeIdParam);
 
+        final Boolean isMandatory = command.booleanObjectValueOfParameterNamed(LocalRefConstants.isMandatoryParam);
+
         final REF_TABLE refTable = REF_TABLE.fromInt(refTableInt);
         final REF_VALUE_TYPE refValueType = REF_VALUE_TYPE.fromInt(refValueTypeInt);
 
@@ -54,11 +56,9 @@ public class LocalRefAssembler {
 
         final Office office = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
 
-        System.err.println("------------------did we find office ? "+office.getName());
-
         final LocalDate submittedDate = command.localDateValueOfParameterNamed(LocalRefConstants.submittedDateParam);
 
-        LocalRef localRef = new LocalRef(name ,description ,refTable ,refValueType,code[0],null , DateUtils.fromLocalDate(submittedDate) ,office);
+        LocalRef localRef = new LocalRef(name ,description ,refTable ,refValueType,code[0],null , DateUtils.fromLocalDate(submittedDate) ,office ,isMandatory);
         return localRef;
 
     }

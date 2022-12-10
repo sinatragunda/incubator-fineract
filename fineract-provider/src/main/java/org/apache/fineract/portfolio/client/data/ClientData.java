@@ -36,14 +36,16 @@ import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.address.data.AddressData;
 import org.apache.fineract.portfolio.group.data.GroupGeneralData;
 import org.apache.fineract.portfolio.localref.data.LocalRefData;
+import org.apache.fineract.portfolio.localref.data.LocalRefValueData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.utility.domain.Record;
 import org.joda.time.LocalDate;
 
 /**
  * Immutable data object representing client data.
  */
-final public class ClientData implements Comparable<ClientData> {
+final public class ClientData extends Record implements Comparable<ClientData> {
 
     private final Long id;
     private final String accountNo;
@@ -136,6 +138,7 @@ final public class ClientData implements Comparable<ClientData> {
      * Added 08/12/2022 at 1934
      */
     private LocalRefData localRefData;
+   // private Collection<LocalRefValueData> localRefValueDataCollection;
 
     public static ClientData importClientEntityInstance(Long legalFormId,Integer rowIndex,String fullname,Long officeId, Long clientTypeId,
             Long clientClassificationId,Long staffId,Boolean active,LocalDate activationDate,LocalDate submittedOnDate,
@@ -698,4 +701,12 @@ final public class ClientData implements Comparable<ClientData> {
     public LocalRefData getLocalRefData(){
         return this.localRefData;
     }
+
+//    public void setLocalRefValueData(Collection<LocalRefValueData> localRefValueData) {
+//        System.err.println("------------------we are calling child ? ");
+//        this.localRefValueDataCollection = localRefValueData;
+//
+//        System.err.println("=================new local ref calue is =========="+this.localRefValueDataCollection.size());
+//    }
+
 }
