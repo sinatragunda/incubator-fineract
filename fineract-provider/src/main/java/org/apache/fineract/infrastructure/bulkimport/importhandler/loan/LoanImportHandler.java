@@ -479,6 +479,12 @@ public class LoanImportHandler implements ImportHandler {
         return Count.instance(successCount,errorCount);
     }
 
+    private void writeLoanErrorMessage(Row row,String errorMessage ,String loanId){
+        Cell errorReportCell = row.createCell(LoanConstants.FAILURE_REPORT_COL);
+        Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
+        writeLoanErrorMessage(loanId,errorMessage,0,statusCell,errorReportCell,row);
+    }
+
     private void writeLoanErrorMessage(String loanId,String errorMessage,int progressLevel,Cell statusCell,Cell errorReportCell,Row row){
         String status = "";
         if (progressLevel == 0)
