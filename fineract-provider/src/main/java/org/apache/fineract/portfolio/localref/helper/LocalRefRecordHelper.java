@@ -61,16 +61,15 @@ public class LocalRefRecordHelper {
 
             JsonElement element = entry.getValue();
 
-            System.err.println("----------------------------------data "+element);
+            //System.err.println("----------------------------------data "+element);
 
-            System.err.println("---------------------entry key is "+entry.getKey());
+            //System.err.println("---------------------entry key is "+entry.getKey());
 
             JsonObject data = fromJsonHelper.extractJsonObjectNamed("data" ,element);
 
             Set<Map.Entry<String,JsonElement>> dataSet = data.entrySet();
 
-
-            System.err.println("--------------data object is -----------"+data);
+            //System.err.println("--------------data object is -----------"+data);
 
             for (Map.Entry<String,JsonElement> dataEntry : dataSet) {
                 /**
@@ -80,10 +79,7 @@ public class LocalRefRecordHelper {
                 String idKey = dataEntry.getKey();
                 Long localRefId = localRefId(idKey);
 
-                String value = dataEntry.getValue().toString();
-
-                System.err.println("-----------------localref id is "+localRefId);
-                System.err.println("---------------value is "+value);
+                String value = dataEntry.getValue().toString().replace("\"","");
                 /**
                  * Consumer to populate localrefvalue
                  */
@@ -98,8 +94,6 @@ public class LocalRefRecordHelper {
             }
 
         }
-
-        System.err.println("-----------------records size to create "+localRefValueList.size());
 
         Consumer<LocalRefValue> saveConsumer = (e)->localRefValueRepositoryWrapper.save(e);
         localRefValueList.forEach(saveConsumer);
@@ -118,13 +112,7 @@ public class LocalRefRecordHelper {
 
     public void setRecordData(Record record, REF_TABLE refTable){
         Long recordId = record.getId();
-
-        System.err.println("---------------our record is is "+record.getId());
-
         Collection<LocalRefValueData> localRefValueDataCollection = localRefReadPlatformService.retrieveRecord(refTable ,recordId);
-
-        System.err.println("---------------response we have these record ? "+localRefValueDataCollection.size());
-
         record.setLocalRefValueData(localRefValueDataCollection);
 
     }

@@ -1122,9 +1122,10 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
      */
     private BigDecimal chargesDeductionCriteriaDeposit(SavingsAccountTransactionDTO savingsTransactionDTO){
 
+        BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
+        
         Product productSettings = product.productSettings();
         boolean deductOnAccountBalance = productSettings.isDeductChargesOnAccountBalance();
-
         /**
          * If false means charges to be deducted on transaction amount ,hence we calculate them from the charge amount
          * Then deduct in advance (only hold ) but not pay ,withholdPayingCharges set to true when this should set
@@ -1138,7 +1139,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
          * Deduct on Account Balance vs Deduct on Transaction Amount
          */
 
-        BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
         if(!deductOnAccountBalance ){
 
             BigDecimal totalCharges  = calculateDepositFee(savingsTransactionDTO);

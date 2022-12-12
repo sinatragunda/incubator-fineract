@@ -53,6 +53,7 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.withdraw
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Supplier;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -209,7 +210,6 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 	private Long daysToEscheat;
 
     // Added 18/12/2021
-
     @Transient
     protected Product product;
 
@@ -772,7 +772,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
      * Added so that it becomes self explanatory that we intend to get an object that has product settings
      */
     public Product productSettings(){
-        return this.product ;
+        return Optional.ofNullable(product).orElse(new Product()) ;
     }  
 
     /**

@@ -288,9 +288,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             final LOAN_TYPE loanType = LOAN_TYPE.fromString(loanTypeStr);
             Boolean isGroupLoan = false;
 
-
-            System.err.println("--------------loanType ---------------"+loanType);
-
             switch (loanType){
                 case GROUP:
                     /**
@@ -306,7 +303,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     }
                     break;
                 case INDIVIDUAL:
-                    System.err.println("-----------------why does it come here ? ");
                     if(clientId !=null) {
                         client = this.clientRepository.findOneWithNotFoundDetection(clientId);
                         officeSpecificLoanProductValidation(productId, client.getOffice().getId());
@@ -341,8 +337,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              *   Modified to allow to exclude special loans from the checking instance .
              */
             AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId ,excludeLoansList ,isGroupLoan ,groupId);
-
-            System.err.println("----------------multiple instance stuff should excape when its group ");
             /**
              *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             */
@@ -359,11 +353,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 command = injectAccountId(command, loanProduct, clientId);
             }
 
-            System.err.println("--------validate for loans ------");
+            //System.err.println("--------validate for loans ------");
 
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
 
-            System.err.println("-----------failed ------------");
+            //System.err.println("-----------failed ------------");
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");

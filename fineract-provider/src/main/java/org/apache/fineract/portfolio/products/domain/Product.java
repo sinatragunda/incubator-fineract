@@ -57,7 +57,7 @@ public class Product extends AbstractPersistableCustom<Long> {
      * If false charges are deducted on transaction amount 
      */
     @Column(name = "deduct_charges_on_balance" ,nullable =false)
-    private Boolean deductChargesOnAccountBalance;
+    private Boolean deductChargesOnAccountBalance = false ;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "account_type", nullable = false ,columnDefinition = "short default 0")
@@ -67,7 +67,7 @@ public class Product extends AbstractPersistableCustom<Long> {
      * Added 29/11/2022 at 0017
      */
 
-    protected Product(){}
+    public Product(){}
 
     public Product(PRODUCT_TYPE productType, Long productId, Boolean active ,Boolean deductChargesOnBalance ,ACCOUNT_TYPE accountType) {
         this.productType = productType;

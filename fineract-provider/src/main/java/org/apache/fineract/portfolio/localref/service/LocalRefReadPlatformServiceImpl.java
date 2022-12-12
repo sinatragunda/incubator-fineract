@@ -176,7 +176,7 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
             builder.append("lrv.id as id, ");
             builder.append("lr.name as columnName, ");
-            builder.append("lrv.value as value, ");
+            builder.append("ifnull(mcv.code_value ,lrv.value) as value, ");
             builder.append("mcv.code_value as codeValue, ");
             builder.append("lrv.record_id as recordId ");
             builder.append("from m_local_ref_value lrv ");
