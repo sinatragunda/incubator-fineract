@@ -70,6 +70,9 @@ public class LoanImportHandler implements ImportHandler {
     // Added 04/10/2021
     private final ClientReadPlatformService clientReadPlatformService ;
 
+    private final String adjustDate = "18/11/2022";
+
+
     @Autowired
     public LoanImportHandler(final PortfolioCommandSourceWritePlatformService
             commandsSourceWritePlatformService ,final  ClientReadPlatformService clientReadPlatformService) {
@@ -104,7 +107,8 @@ public class LoanImportHandler implements ImportHandler {
                         try{
                             addLoanToList(locale, dateFormat, row);
                         }
-                        catch (FormulaParseException f){
+                        catch (FormulaParseException | IllegalStateException f){
+                            System.err.println("--------------------------error "+f.getMessage());
                             continue;
                         }
                     }
@@ -169,7 +173,7 @@ public class LoanImportHandler implements ImportHandler {
     private DisbursementData readDisbursalData(Row row,String locale,String dateFormat) {
 
         //LocalDate disbursedDate = ImportHandlerUtils.readAsDate(LoanConstants.DISBURSED_DATE_COL, row);
-        LocalDate disbursedDate = DateUtils.parseLocalDate("31/12/2021" ,"dd/MM/YYYY");
+        LocalDate disbursedDate = DateUtils.parseLocalDate(adjustDate ,"dd/MM/YYYY");
 
         String linkAccountId = null;
         if ( ImportHandlerUtils.readAsLong(LoanConstants.LINK_ACCOUNT_ID, row)!=null){
@@ -186,7 +190,7 @@ public class LoanImportHandler implements ImportHandler {
     private LoanApprovalData readLoanApproval(Row row,String locale,String dateFormat) {
         
         //LocalDate approvedDate = ImportHandlerUtils.readAsDate(LoanConstants.APPROVED_DATE_COL, row);
-        LocalDate approvedDate = DateUtils.parseLocalDate("31/12/2021","dd/MM/YYYY");
+        LocalDate approvedDate = DateUtils.parseLocalDate(adjustDate,"dd/MM/YYYY");
         
         if (approvedDate!=null)
             return LoanApprovalData.importInstance(approvedDate, row.getRowNum(),locale,dateFormat);
@@ -255,7 +259,7 @@ public class LoanImportHandler implements ImportHandler {
         }
 
         // loan adjustments here 
-        int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan("31/12/2021" ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
+        int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan(adjustDate ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
 
         /// nkwazi adjustments to be removed 
         if(newNumberOfRepayments <= 0){
