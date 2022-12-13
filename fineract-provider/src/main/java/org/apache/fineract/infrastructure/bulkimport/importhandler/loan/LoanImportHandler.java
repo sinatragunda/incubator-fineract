@@ -258,15 +258,21 @@ public class LoanImportHandler implements ImportHandler {
             loanTermFrequencyEnum = new EnumOptionData(null, null, loanTermFrequencyId);
         }
 
+        System.err.println("---------------start to adjust for loan "+externalId);
+
         // loan adjustments here 
         int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan(adjustDate ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
 
         /// nkwazi adjustments to be removed 
         if(newNumberOfRepayments <= 0){
+            System.err.println("--------------------skipping loan "+externalId);
+            System.err.println("--------------------skipping loan "+externalId);
+            String message = String.format("Loan is past due as of %s ,Process skipped" ,adjustDate);
+            writeLoanErrorMessage(row ,message ,externalId);
             return null;
         }
 
-        submittedOnDate = DateUtils.parseLocalDate("31/12/2021" ,"dd/MM/YYYY");
+        submittedOnDate = DateUtils.parseLocalDate(adjustDate ,"dd/MM/YYYY");
 
         numberOfRepayments = newNumberOfRepayments;
 
@@ -586,7 +592,7 @@ public class LoanImportHandler implements ImportHandler {
         loanJsonOb.remove("isTopup");
         String payload=loanJsonOb.toString();
 
-        System.err.println("----------------loan payload ------------------"+payload);
+        //System.err.println("----------------loan payload ------------------"+payload);
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createLoanApplication() //
                 .withJson(payload) //

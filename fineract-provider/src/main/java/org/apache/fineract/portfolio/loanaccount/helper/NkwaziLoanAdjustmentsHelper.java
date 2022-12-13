@@ -21,18 +21,25 @@ public class NkwaziLoanAdjustmentsHelper {
     // returns new repayment times remaining
     public static int adjustLoan(String startDateArg ,LocalDate submittedDate ,Integer numberOfRepayments ,String repaymentFrequency){
 
+
+        int duration = 0 ;
+        int remainingPayments = 0 ;
+
         System.err.println("--------------------------------this date is -------------"+startDateArg);
 
         LocalDate startDate = DateUtils.parseLocalDate(startDateArg ,"dd/MM/YYYY");
+
+        if(submittedDate.isAfter(startDate)){
+            System.err.println("--------------------------date "+submittedDate+"after submittedDate "+startDate+"return error");
+            return remainingPayments;
+        }
+      
 
         //Days diff = Days.between(startDateTime ,submittedDateTime);
 
         // 52 per 2 weeks right .....should we devide by 2
 
         System.err.println("-----------initial number of repayments is "+numberOfRepayments+"-----------for "+repaymentFrequency);
-
-        int duration = 0 ;
-        int remainingPayments = 0 ;
 
         switch (repaymentFrequency){
 
@@ -59,11 +66,5 @@ public class NkwaziLoanAdjustmentsHelper {
         }
 
         return remainingPayments;
-
-        //Period period = Period.between(startDateJoda ,submittedDate);
-        //period.
-        //LocalDate diff = startDateJoda.minus(submittedDate);
-
-
     }
 }

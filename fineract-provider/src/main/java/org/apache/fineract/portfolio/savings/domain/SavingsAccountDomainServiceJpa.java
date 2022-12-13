@@ -236,7 +236,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final boolean isAccountTransfer, final boolean isRegularTransaction) {
         
-        System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
+        //System.err.println("----------------------------handleDeposit with regular transaction -----------------------");
 
         final TransactionCode transactionCode = null;
         final SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
@@ -252,7 +252,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final boolean isAccountTransfer, final boolean isRegularTransaction ,TransactionCode transactionCode) {
         final SavingsAccountTransactionType savingsAccountTransactionType = SavingsAccountTransactionType.DEPOSIT;
         
-        System.err.println("---------------where does this function go now -----handleDeposit--");
+        //System.err.println("---------------where does this function go now -----handleDeposit--");
         return handleDeposit(account, fmt, transactionDate, transactionAmount, paymentDetail, isAccountTransfer, isRegularTransaction,
                 savingsAccountTransactionType ,transactionCode);
     }
@@ -270,7 +270,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         final TransactionCode transactionCode = null ;
 
 
-        System.err.println("------------handle deposit lite -----------------");
+        //System.err.println("------------handle deposit lite -----------------");
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd MMM yyyy");
 
@@ -310,7 +310,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final boolean isAccountTransfer, final boolean isRegularTransaction,
             final SavingsAccountTransactionType savingsAccountTransactionType,final TransactionCode transactionCode) {
         
-        System.err.println("---------private function to handle deposit----------------"+isAccountTransfer);
+        //System.err.println("---------private function to handle deposit----------------"+isAccountTransfer);
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -352,7 +352,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
                     financialYearBeginningMonth, postInterestOnDate);
         }
 
-        System.err.println("-----------------does this function always handle deposits all the time son ?");
+        //System.err.println("-----------------does this function always handle deposits all the time son ?");
 
 
         saveTransactionToGenerateTransactionId(deposit);
