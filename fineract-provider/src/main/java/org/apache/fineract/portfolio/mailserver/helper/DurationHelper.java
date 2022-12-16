@@ -27,6 +27,8 @@ public class DurationHelper {
                 durationSoFar = duration.toMinutes();
                 break;
         }
+
+        System.err.println("----------------------duration so far to covered is "+durationSoFar);
         return durationSoFar;
     }
 }

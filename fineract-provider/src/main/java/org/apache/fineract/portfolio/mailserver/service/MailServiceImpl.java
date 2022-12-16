@@ -79,7 +79,7 @@ public class MailServiceImpl implements MailService {
         // Very Important, Don't use email.setAuthentication()
 
         email.setAuthenticator(new DefaultAuthenticator(authuser, authpwd));
-        email.setDebug(true); // true if you want to debug
+        email.setDebug(false); // true if you want to debug
         email.setHostName(smtpCredentialsData.getHost());
 
         try {

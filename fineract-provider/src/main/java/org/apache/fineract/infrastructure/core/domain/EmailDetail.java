@@ -18,6 +18,10 @@
  */
 package org.apache.fineract.infrastructure.core.domain;
 
+import org.apache.fineract.portfolio.mailserver.domain.MailContent;
+import org.apache.fineract.portfolio.mailserver.enumerations.MAIL_CONTENT_TYPE;
+import org.apache.fineract.portfolio.mailserver.utility.MailContentFactory;
+
 public class EmailDetail {
 
     private final String subject;
@@ -63,5 +67,12 @@ public class EmailDetail {
                 ", address='" + address + '\'' +
                 ", contactName='" + contactName + '\'' +
                 '}';
+    }
+
+    public MailContent toMailContent(){
+
+        MailContent mailContent = MailContentFactory.createMailContent(MAIL_CONTENT_TYPE.PLAIN ,null ,this);
+        return mailContent;
+
     }
 }

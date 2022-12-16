@@ -810,6 +810,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             if(isCreateSelfServiceUser){
                 // still other steps can be removed here as well
                 if (client.isActive()){
+                    System.err.println("--------------------------create self service user here -----------");
                     selfServiceRegistrationWritePlatformService.createSelfServiceUserEx(client);
                 }
             }

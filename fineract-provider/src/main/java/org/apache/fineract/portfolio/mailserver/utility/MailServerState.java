@@ -29,6 +29,8 @@ public class MailServerState {
     private Instant lastSentMailTime ;
     private volatile Boolean isThreadSleeping = false;
     private MailSenderQueueManager mailSenderQueueManager ;
+    private static int NANO_SECONDS_PER_SECOND = 1000;
+    private int maxPermits = 0;
 
     private MailServerState(MailServerSettings mailServerSettings){
         this.mailServerSettings = mailServerSettings;
@@ -42,17 +44,23 @@ public class MailServerState {
 
     private void initPermit(){
 
-        int maxPermit = mailServerSettings.getLimit();
-        semaphore = new Semaphore(maxPermit);
+        this.maxPermits = mailServerSettings.getLimit();
+        semaphore = new Semaphore(maxPermits);
     }
 
     public synchronized void trySend(MailService mailService){
 
         boolean acquirePermit = semaphore.tryAcquire();
+
+        System.err.println("-------------------acquire permits after sleeping ? "+acquirePermit);
+
         if(acquirePermit){
+            System.err.println("----------------------------Acquire permmit now son ");
             permitGranted(mailService);
             return;
         }
+
+        System.err.println("----------------------permit not granted ------------");
         permitNotGranted(mailService);
     }
 
@@ -62,6 +70,8 @@ public class MailServerState {
         mailService.send(mailContent);
 
         int availablePermits = semaphore.availablePermits();
+
+        System.err.println("----------------available permits are --------"+availablePermits);
 
         /**
          *No permits available now take note of current time so as to aid in synchronization of durations
@@ -79,46 +89,68 @@ public class MailServerState {
          * Else if its sleeping we should just wait for it to wake up
          */
 
-        if(!isThreadSleeping){
 
-            Duration duration = Duration.between(lastSentMailTime ,Instant.now());
+        System.err.println("-----------------permission not granted sleep thread");
 
-            DURATION_TYPE durationType = DURATION_TYPE.fromInt(mailServerSettings.getTimerType());
+        Duration duration = Duration.between(lastSentMailTime ,Instant.now());
 
-            Long durationSoFar = DurationHelper.duration(duration ,durationType);
+        DURATION_TYPE durationType = DURATION_TYPE.fromInt(mailServerSettings.getTimerType());
 
-            Long qoutaDuration = Long.valueOf(mailServerSettings.getQuotaDuration());
+        Long durationSoFar = DurationHelper.duration(duration ,durationType);
 
-            if(durationSoFar > qoutaDuration){
-                synchronized (this){
-                    semaphore.drainPermits();
-                    isThreadSleeping = false ;
-                }
-                /**
-                 * Then call recursive method of sending message again from mail sender metered
-                 */
-                return ;
-            }
+        // time to waking up now in durationSoFar
 
-            int sleepTime = duration.getNano();
+        Long qoutaDuration = Long.valueOf(mailServerSettings.getQuotaDuration());
 
-            System.err.println("---------------nano second now is "+sleepTime);
+        System.err.println("-----------------duration so far ? "+durationSoFar+"------------and qoutaDuration------"+qoutaDuration);
 
-            sleepThread(sleepTime);
+        // if(durationSoFar > qoutaDuration){
 
-            System.err.println("-------------------------waking up thread lets send again ");
-            trySend(mailService);
-        }
+        //     System.err.println("----------------SUPPOSE TO START THREADING MAILS NOW ,send mail ");
+
+        //     synchronized (this){
+        //         System.err.println("----------------------------DRAIN PERMITS NOW ");
+        //         semaphore.release(maxPermits);
+
+        //         System.err.println("---------------PERMITS AFTER DRAINING ? "+semaphore.availablePermits());
+        //         isThreadSleeping = false ;
+        //     }
+        //     /**
+        //      * Then call recursive method of sending message again from mail sender metered
+        //      */
+        //     trySend(mailService);
+        //     System.err.println("---------------we have recursively called trySend -------------");
+        //     return ;
+        // }
+
+        int sleepTime = duration.getNano() /NANO_SECONDS_PER_SECOND;
+
+        System.err.println("---------------nano second now is "+sleepTime);
+
+        sleepThread(sleepTime);
+
+        System.err.println("-------------------------waking up thread lets send again ");
+        trySend(mailService);
+    
     }
 
     private synchronized void sleepThread(int sleepTime){
         try{
+            isThreadSleeping = true ;
             Thread.sleep(sleepTime);
             isThreadSleeping = false ;
+            System.err.println("-----------------thread has woken up ,is not sleeping anymore ");
+            wakeUpThread();
         }
         catch (InterruptedException n){
             n.printStackTrace();
         }
+    }
+
+
+    private void wakeUpThread(){
+        System.err.println("-------------------------------sempahores relseas ");
+        semaphore.release(maxPermits);
     }
 
 

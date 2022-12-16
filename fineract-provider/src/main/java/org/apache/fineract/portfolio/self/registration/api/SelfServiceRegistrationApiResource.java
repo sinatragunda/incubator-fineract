@@ -42,6 +42,7 @@ public class SelfServiceRegistrationApiResource {
     private final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService;
     private final DefaultToApiJsonSerializer<AppUser> toApiJsonSerializer;
 
+
     @Autowired
     public SelfServiceRegistrationApiResource(
             final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService,
@@ -63,6 +64,18 @@ public class SelfServiceRegistrationApiResource {
     public String createSelfServiceUser(final String apiRequestBodyAsJson) {
         AppUser user = this.selfServiceRegistrationWritePlatformService.createUser(apiRequestBodyAsJson);
         return this.toApiJsonSerializer.serialize(CommandProcessingResult.resourceResult(user.getId(), null));
+    }
+
+    /**
+     * Added 16/12/2022 at 0031
+     * Create self service for users but create as mass ie for many clients by office etc .By office solution for now
+     */
+    @POST
+    @Path("massregistration")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String massCreateSelfService(final String apiRequestBodyAsJson) {
+        CommandProcessingResult result = selfServiceRegistrationWritePlatformService.massRegistration(1L);
+        return this.toApiJsonSerializer.serialize(result);
     }
 
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.self.registration.service;
 
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistration;
 import org.apache.fineract.useradministration.domain.AppUser;
 
@@ -32,4 +33,9 @@ public interface SelfServiceRegistrationWritePlatformService {
 
     // Added 25/09/2021
     public SelfServiceRegistration createSelfServiceUserEx(Client client);
+
+    /**
+     * Added 16/12/2022 at 0007
+     */
+    public CommandProcessingResult massRegistration(Long officeId);
 }

@@ -70,7 +70,7 @@ public class LoanImportHandler implements ImportHandler {
     // Added 04/10/2021
     private final ClientReadPlatformService clientReadPlatformService ;
 
-    private final String adjustDate = "18/11/2022";
+    private final String adjustDate = "01/12/2022";
 
 
     @Autowired

@@ -19,13 +19,8 @@
 package org.apache.fineract.portfolio.self.registration.service;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
 import javax.persistence.PersistenceException;
 
@@ -35,6 +30,7 @@ import org.apache.fineract.infrastructure.campaigns.sms.domain.SmsCampaign;
 import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDropdownReadPlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.domain.EmailDetail;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
@@ -46,10 +42,14 @@ import org.apache.fineract.infrastructure.sms.domain.SmsMessageRepository;
 import org.apache.fineract.infrastructure.sms.domain.SmsMessageStatusType;
 import org.apache.fineract.infrastructure.sms.scheduler.SmsMessageScheduledJobService;
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.group.domain.Group;
+import org.apache.fineract.portfolio.mailserver.domain.MailContent;
+import org.apache.fineract.portfolio.mailserver.service.MailServerSenderFactory;
 import org.apache.fineract.portfolio.self.registration.SelfServiceApiConstants;
 import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistration;
 import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistrationRepository;
@@ -88,6 +88,9 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
     private final SmsCampaignDropdownReadPlatformService smsCampaignDropdownReadPlatformService;
     private final AppUserReadPlatformService appUserReadPlatformService;
     private final RoleRepository roleRepository;
+    private final MailServerSenderFactory mailServerSenderFactory;
+    private final ClientReadPlatformService clientReadPlatformService;
+    private final ClientRepositoryWrapper clientRepositoryWrapper;
 
     @Autowired
     public SelfServiceRegistrationWritePlatformServiceImpl(final SelfServiceRegistrationRepository selfServiceRegistrationRepository,
@@ -97,7 +100,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             final UserDomainService userDomainService, final GmailBackedPlatformEmailService gmailBackedPlatformEmailService,
             final SmsMessageRepository smsMessageRepository, SmsMessageScheduledJobService smsMessageScheduledJobService,
             final SmsCampaignDropdownReadPlatformService smsCampaignDropdownReadPlatformService,
-            final AppUserReadPlatformService appUserReadPlatformService,final RoleRepository roleRepository) {
+            final AppUserReadPlatformService appUserReadPlatformService,final RoleRepository roleRepository,final MailServerSenderFactory mailServerSenderFactory ,final ClientReadPlatformService clientReadPlatformService ,final ClientRepositoryWrapper clientRepositoryWrapper) {
         this.selfServiceRegistrationRepository = selfServiceRegistrationRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.selfServiceRegistrationReadPlatformService = selfServiceRegistrationReadPlatformService;
@@ -110,6 +113,9 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         this.smsCampaignDropdownReadPlatformService = smsCampaignDropdownReadPlatformService;
         this.appUserReadPlatformService = appUserReadPlatformService;
         this.roleRepository = roleRepository;
+        this.mailServerSenderFactory = mailServerSenderFactory;
+        this.clientReadPlatformService = clientReadPlatformService;
+        this.clientRepositoryWrapper = clientRepositoryWrapper;
     }
 
     @Override
@@ -177,11 +183,36 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
     }
 
+    /**
+     * Added 16/12/2022 at 0008
+     */
+    public CommandProcessingResult massRegistration(Long officeId){
+
+        Collection<ClientData> clientDataCollection = clientReadPlatformService.retrieveAllForLookupByOfficeId(officeId);
+        Collection<Client> clientCollection = new ArrayList();
+
+        Consumer<ClientData> consumer = (e)->{
+            Long clientId = e.getId();
+            Client client = clientRepositoryWrapper.findOneWithNotFoundDetection(clientId);
+            clientCollection.add(client);
+        };
+
+        clientDataCollection.stream().forEach(consumer);
+
+        Consumer<Client> register = (e)->{
+            boolean userExists = userExists(e.emailAddress());
+            if(!userExists){
+                createSelfServiceUserEx(e);
+            }
+        };
+        clientCollection.stream().forEach(register);
+        return CommandProcessingResult.empty();
+    }  
+
     // Added 25/09/2021 ,for creating self service user from client data 
     @Override
     public SelfServiceRegistration createSelfServiceUserEx(Client client){
 
-        
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("user");
@@ -198,6 +229,16 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         baseDataValidator.reset().parameter(SelfServiceApiConstants.lastNameParamName).value(lastName).notBlank().notExceedingLengthOf(100);
 
         String username = client.emailAddress();
+
+        boolean hasEmailUsername = Optional.ofNullable(username).isPresent();
+
+        if(!hasEmailUsername){
+            return null ;
+        }
+
+
+        System.err.println("---------------------username is "+username);
+
         baseDataValidator.reset().parameter(SelfServiceApiConstants.usernameParamName).value(username).notBlank().notExceedingLengthOf(100);
 
 
@@ -205,24 +246,26 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         final String regex = validationPolicy.getRegex();
         final String description = validationPolicy.getDescription();
 
-        String email = client.emailAddress();
+        //String email = client.emailAddress();
+        String email = "treyviis@gmail.com";
+        
         baseDataValidator.reset().parameter(SelfServiceApiConstants.emailParamName).value(email).notNull().notBlank()
                 .notExceedingLengthOf(100);
 
         boolean isEmailAuthenticationMode = true;
         
         validateForDuplicateUsername(username);
-
+     
         //throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName,null ,false);
 
         String authenticationToken = randomAuthorizationTokenGeneration();
 
- 
         SelfServiceRegistration selfServiceRegistration = SelfServiceRegistration.instance(client, accountNumber, firstName, lastName,
                 null, email, authenticationToken, username, authenticationToken);
         this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
         sendAuthorizationToken(selfServiceRegistration, isEmailAuthenticationMode);
         return selfServiceRegistration;
+
     }
 
     public void validateForDuplicateUsername(String username) {
@@ -233,6 +276,11 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             throw new PlatformDataIntegrityException("error.msg.user.duplicate.username", defaultMessageBuilder.toString(),
                     SelfServiceApiConstants.usernameParamName, username);
         }
+    }
+
+    private boolean userExists(String username){
+        boolean isDuplicateUserName = this.appUserReadPlatformService.isUsernameExist(username);
+        return isDuplicateUserName;
     }
 
     public void sendAuthorizationToken(SelfServiceRegistration selfServiceRegistration, Boolean isEmailAuthenticationMode) {
@@ -248,10 +296,14 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         if (smsProviders.isEmpty()) { throw new PlatformDataIntegrityException("error.msg.mobile.service.provider.not.available",
                 "Mobile service provider not available."); }
         Long providerId = (new ArrayList<>(smsProviders)).get(0).getId();
+        
         final String message = "Hi  " + selfServiceRegistration.getFirstName() + "," + "\n"
                 + "To create user, please use following details \n" + "Request Id : " + selfServiceRegistration.getId()
                 + "\n Authentication Token : " + selfServiceRegistration.getAuthenticationToken();
+        
+
         String externalId = null;
+
         Group group = null;
         Staff staff = null;
         SmsCampaign smsCampaign = null;
@@ -264,14 +316,36 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
     private void sendAuthorizationMail(SelfServiceRegistration selfServiceRegistration) {
         
-        final String subject = "Authorization token ";
-        final String body = "Hi  " + selfServiceRegistration.getFirstName() + "," + "\n" + "To create user, please use following details\n"
+        //final String subject = "Authorization token ";
+
+        final String subject = "Self service membership";
+
+        String body = "Hi  " + selfServiceRegistration.getFirstName() + "," + "\n" + "To create user, please use following details\n"
                 + "Request Id : " + selfServiceRegistration.getId() + "\n Authentication Token : "
                 + selfServiceRegistration.getAuthenticationToken();
 
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(String.format("Dear %s %s\n",selfServiceRegistration.getFirstName() ,selfServiceRegistration.getLastName()));
+        stringBuilder.append("Happy Festive Season! Nkwazi Cooperative  brings an exciting feature of real time experience with your membership");
+        stringBuilder.append("Follow the link below or login from the website www.nkwazicoop.com to access an integrated member self- service.");
+        stringBuilder.append("https://nkwazi.portal.wesecbs.co"); 
+        stringBuilder.append("Use the login details provided, ensure to change your password at first login. Should you have challenges accessing your account, kindly contact us at customercare@nkwazicoop.com  or 260956797719");
+        stringBuilder.append("NB: Keep your password confidential, regularly change your password.");
+        stringBuilder.append(String.format("Your username and password are %s ,%s",selfServiceRegistration.getUsername(), selfServiceRegistration.getPassword()));
+
+        body = stringBuilder.toString();
+
+        System.err.println("--------------------"+body);
+
         final EmailDetail emailDetail = new EmailDetail(subject, body, selfServiceRegistration.getEmail(),
                 selfServiceRegistration.getFirstName());
-        this.gmailBackedPlatformEmailService.sendDefinedEmail(emailDetail);
+        //this.gmailBackedPlatformEmailService.sendDefinedEmail(emailDetail);
+
+        MailContent mailContent = emailDetail.toMailContent();
+
+        mailServerSenderFactory.sendMail(mailContent);
+
     }
 
     private void throwExceptionIfValidationError(final List<ApiParameterError> dataValidationErrors, String accountNumber,
