@@ -77,7 +77,11 @@ public class WeseApiResource {
         return ObjectNodeHelper.statusNode(status).put("message",message);
     
     }
-
+    @Path("/version")
+    @GET
+    public String getVersion(){
+        return new String("16.0.0");
+    }
 
     @Path("/mailserversettings")
     @POST

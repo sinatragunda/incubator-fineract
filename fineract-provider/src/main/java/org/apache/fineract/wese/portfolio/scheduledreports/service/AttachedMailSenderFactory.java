@@ -25,7 +25,7 @@ public class AttachedMailSenderFactory {
         if(mailServerSettings !=null){
             boolean isTimedServer = mailServerSettings.isTimedServer();
             if (isTimedServer){
-                System.err.println("---------------------mail sender metered --------------");
+                //System.err.println("---------------------mail sender metered --------------");
                 attachedMailSender = new AttachedMailSenderMetered(weseEmailService ,mailServerSettings);
             }
         }

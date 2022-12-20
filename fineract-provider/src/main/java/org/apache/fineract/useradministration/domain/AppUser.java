@@ -18,14 +18,7 @@
  */
 package org.apache.fineract.useradministration.domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,6 +33,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Transient;
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -124,6 +118,10 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
     @JoinColumn(name = "appuser_id", referencedColumnName= "id", nullable = false)
     private Set<AppUserClientMapping> appUserClientMappings = new HashSet<>();
 
+
+    @Transient
+    private String unencodedPassword ;
+
 	public static AppUser fromJson(final Office userOffice, final Staff linkedStaff, final Set<Role> allRoles, 
 			final Collection<Client> clients, final JsonCommand command) {
 
@@ -131,7 +129,7 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
         String password = command.stringValueOfParameterNamed("password");
         final Boolean sendPasswordToEmail = command.booleanObjectValueOfParameterNamed("sendPasswordToEmail");
 
-        if (sendPasswordToEmail.booleanValue()) {
+        if (Optional.ofNullable(sendPasswordToEmail.booleanValue()).orElse(true)) {
             password = new RandomPasswordGenerator(13).generate();
         }
 
@@ -635,11 +633,9 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
             System.err.println("--------------------------------jsoncommand null ------------");
         }
 
-        System.err.println("----------------------where is error-----------------------"+this.password);
+        System.err.println("----------------------this is one password but is it encoded or now ? -----------------------"+this.password);
 
-        System.err.println(command.hasParameter(passwordParamName));
-
-        System.err.println("-------------why do we have error ----------------------");
+        System.err.println("-------------orignal password before encoding is ---"+command.hasParameter(passwordParamName));
 
         if (command.hasParameter(passwordParamName)) {
 
@@ -647,7 +643,7 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
                 passwordEncodedValue = command.passwordValueOfParameterNamed(passwordParamName, platformPasswordEncoder, getId());
 
-                System.err.println("--------------encoded password is -------------"+passwordEncodedValue);
+                //System.err.println("--------------encoded password is -------------"+passwordEncodedValue);
 
             }
         } else if (command.hasParameter(passwordEncodedParamName)) {
@@ -657,7 +653,6 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 
             }
         }
-
         return passwordEncodedValue;
     }
 
@@ -683,5 +678,16 @@ public class AppUser extends AbstractPersistableCustom<Long> implements Platform
 		}
 		return newAppUserClientMappings;
 	}
+
+    /**
+     * Added 19/12/2022 at 0835
+     */
+    public void setUnencodedPassword(String value){
+        this.unencodedPassword = value;
+    }
+
+    public String getUnencodedPassword(){
+        return this.unencodedPassword;
+    }  
 
 }

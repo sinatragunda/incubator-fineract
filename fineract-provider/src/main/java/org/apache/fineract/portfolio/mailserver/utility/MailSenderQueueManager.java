@@ -23,20 +23,36 @@ public class MailSenderQueueManager {
 
     }
 
-    public static MailSenderQueueManager getInstance() {
+    public static MailSenderQueueManager getInstance(){
+        //System.err.println("-------------is instance null or "+Optional.ofNullable(instance).isPresent());
         instance = Optional.ofNullable(instance).orElseGet(MailSenderQueueManager::new);
         return instance;
     }
 
     public void add(MailContent mailContent){
-        mailDataQueue.add(mailContent);
+        //System.err.println("-------------------------add another thing to mail content");
+        synchronized (mailDataQueue) {
+            mailDataQueue.add(mailContent);
+            //System.err.println("-------------whose calling this function ? ");
+        }
     }
 
     public MailContent peekOrPoll(boolean peek){
-        if(peek){
-            return mailDataQueue.peek();
+        
+        MailContent mailContent = null;
+        
+        synchronized(mailDataQueue){
+            //System.err.println("----------------mail sender size is "+mailDataQueue.size()+"--------------"+peek);
+            if(peek){
+                mailContent = mailDataQueue.peek();
+            }
+            else{
+                mailContent = mailDataQueue.poll();
+                //System.err.println("----------------mail sender size after polling "+mailDataQueue.size());
+            }
         }
-        return mailDataQueue.poll();
+
+        return mailContent;
     }
 
     public boolean isQueueEmpty(){

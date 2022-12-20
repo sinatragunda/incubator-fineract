@@ -77,18 +77,16 @@ public class MailServiceApiResource {
     public String test(){
 
         MailContent mailContent = MailContentFactory.createMailContent(MAIL_CONTENT_TYPE.PLAIN ,null ,"treyviis@gmail.com" ,"Trevis Gunda","Mail Server Test" ,"Wese Mail server test");
-        List<MailContent> mailContentList = new ArrayList<>(10);
-        System.err.println("---------------initial size is "+mailContentList.size());
+        List<MailContent> mailContentList = new ArrayList<>(1);
         for(int i = 0 ; i < 10 ;++i){
             mailContentList.add(mailContent);
         }
+        //mailContentList.stream().forEach(e->{
 
-        mailContentList.stream().forEach(e->{
-
-            System.err.println("---------lets send mail now -------------------");
+          //  System.err.println("---------lets send mail now -------------------");
             //mailService.send(e);
-            mailServerSenderFactory.sendMail(e);
-        });
+        mailServerSenderFactory.sendMail(mailContent);
+        //});
 
         return "Test";
     }

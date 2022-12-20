@@ -48,6 +48,7 @@ public class SelfAuthenticationApiResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String authenticate(@QueryParam("username") final String username,
 			@QueryParam("password") final String password) {
+
 		return this.authenticationApiResource.authenticate(username, password);
 	}
 

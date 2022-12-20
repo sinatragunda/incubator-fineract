@@ -27,7 +27,7 @@ public class AttachedMailSenderNonMetered implements IAttachedMailSender {
     @Override
     public SEND_MAIL_MESSAGE_STATUS sendMail(File file , EmailDetail emailDetail) {
 
-        System.err.println("-----------mail sender non metered---------");
+        //System.err.println("-----------mail sender non metered---------");
 
             //send reports here son
         SEND_MAIL_MESSAGE_STATUS sendMailMessageStatus = ReportsEmailHelper.sendClientReport(weseEmailService ,emailDetail ,file.getPath());

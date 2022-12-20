@@ -8,6 +8,7 @@ package org.apache.fineract.portfolio.mailserver.helper;
 
 import org.apache.fineract.wese.enumerations.DURATION_TYPE;
 
+import java.net.URL;
 import java.time.Duration;
 
 public class DurationHelper {
@@ -15,7 +16,6 @@ public class DurationHelper {
     public static Long duration(Duration duration ,DURATION_TYPE durationType){
 
         Long durationSoFar = 0L;
-
         switch (durationType){
             case HOURLY:
                 durationSoFar = duration.toHours();
@@ -27,8 +27,7 @@ public class DurationHelper {
                 durationSoFar = duration.toMinutes();
                 break;
         }
-
-        System.err.println("----------------------duration so far to covered is "+durationSoFar);
+        //System.err.println("----------------------duration so far to covered is "+durationSoFar);
         return durationSoFar;
     }
 }

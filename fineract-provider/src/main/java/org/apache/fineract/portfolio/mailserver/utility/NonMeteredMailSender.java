@@ -21,7 +21,7 @@ public class NonMeteredMailSender implements MailServerSender {
          * Lets first test this option of sending a mail at a time ,would have time issues now
          */
 
-        System.err.println("-------------------non metered mail sender -------------");
+        //System.err.println("-------------------non metered mail sender -------------");
         if(!isQueueEmpty){
             MailContent mailContent = queueManager.peekOrPoll(false);
             mailService.send(mailContent);

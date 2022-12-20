@@ -35,7 +35,9 @@ public class MailServerSenderFactory {
 
     public void sendMail(MailContent mailContent){
 
+        //System.err.println("-----------------initial function call ,send mail and add to queue manager ");
         MailSenderQueueManager.getInstance().add(mailContent);
+        //System.err.println("----------------------add jobs to queeue mananger ----------------");
         MailServerSettings mailSettings = mailServerSettings();
         MailServerSender mailServerSender = mailServerSenderFactory(mailSettings);
         mailServerSender.send(mailService);

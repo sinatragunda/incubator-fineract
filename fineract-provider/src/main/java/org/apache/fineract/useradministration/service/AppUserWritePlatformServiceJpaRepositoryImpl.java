@@ -43,6 +43,7 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepositoryWrapper;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
+import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistration;
 import org.apache.fineract.useradministration.api.AppUserApiConstant;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.AppUserPreviousPassword;
@@ -54,6 +55,7 @@ import org.apache.fineract.useradministration.domain.UserDomainService;
 import org.apache.fineract.useradministration.exception.PasswordPreviouslyUsedException;
 import org.apache.fineract.useradministration.exception.RoleNotFoundException;
 import org.apache.fineract.useradministration.exception.UserNotFoundException;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +114,72 @@ public class AppUserWritePlatformServiceJpaRepositoryImpl implements AppUserWrit
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.topicDomainService = topicDomainService;
         this.fromJsonHelper = fromJsonHelper ;
+    }
+
+    /**
+     * Added 18/12/2022 at 0704
+     */
+
+    @Transactional
+    @Override
+    @Caching(evict = { @CacheEvict(value = "users", allEntries = true), @CacheEvict(value = "usersByUsername", allEntries = true) })
+    public CommandProcessingResult createSelfServiceUser(final Client client , final SelfServiceRegistration selfServiceRegistration) {
+
+        JsonCommand command = null;
+        try {
+            this.context.authenticatedUser();
+            final Office userOffice = client.getOffice();
+            final Role role = roleRepository.getRoleByName("Self Service User");
+            final Set<Role> allRoles = new HashSet<>();
+            allRoles.add(role);
+
+            Map map = selfServiceRegistration.toJsonMap();
+
+            command = JsonCommandHelper.jsonCommand(fromJsonHelper ,map);
+
+            Staff linkedStaff = null;
+
+            Collection<Client> clients = Arrays.asList(client);
+
+            AppUser appUser = AppUser.fromJson(userOffice, linkedStaff, allRoles, clients, command);
+
+            final Boolean sendPasswordToEmail = false ;
+
+            this.userDomainService.create(appUser, sendPasswordToEmail);
+
+            String password = appUser.getUnencodedPassword();
+
+            //System.err.println("------------------password is "+password);
+
+            selfServiceRegistration.setPassword(password);
+
+            this.topicDomainService.subscribeUserToTopic(appUser);
+
+            return new CommandProcessingResultBuilder() //
+                    .withCommandId(client.getId()) //
+                    .withEntityId(appUser.getId()) //
+                    .withOfficeId(userOffice.getId()) //
+                    .build();
+        } catch (final DataIntegrityViolationException dve) {
+            handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
+            return CommandProcessingResult.empty();
+        }catch (final PersistenceException | AuthenticationServiceException dve) {
+            Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
+            handleDataIntegrityIssues(command, throwable, dve);
+            return new CommandProcessingResultBuilder() //
+                    .withCommandId(client.getId()) //
+                    .build();
+        }catch (final PlatformEmailSendException e) {
+            final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
+
+            final String email = client.emailAddress();
+            final ApiParameterError error = ApiParameterError.parameterError("error.msg.user.email.invalid",
+                    "The parameter email is invalid.", "email", email);
+            dataValidationErrors.add(error);
+
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist", "Validation errors exist.",
+                    dataValidationErrors);
+        }
     }
 
     @Transactional

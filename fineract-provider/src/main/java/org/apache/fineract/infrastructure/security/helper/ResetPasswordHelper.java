@@ -38,7 +38,7 @@ public class ResetPasswordHelper{
 
             String unencodedPassword = userDomainService.unencodedPassword();
 
-            System.err.println("-------------------new password is ----------------"+unencodedPassword);
+            //System.err.println("-------------------new password is ----------------"+unencodedPassword);
 
             String contact = String.format("%s %s",appUser.getFirstname() ,appUser.getFirstname());
             String message = String.format("You have requested for a password request ,your new instant token is %\n .When logged in you can then change your own password again",unencodedPassword);

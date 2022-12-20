@@ -19,6 +19,8 @@
 package org.apache.fineract.portfolio.self.registration.domain;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +32,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.useradministration.service.AppUserConstants;
 
 @Entity
 @Table(name = "request_audit_table")
@@ -126,6 +129,23 @@ public class SelfServiceRegistration extends AbstractPersistableCustom<Long> {
 
     public String getAccountNumber() {
         return this.accountNumber;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public Map<String ,String> toJsonMap(){
+
+        Map map = new HashMap();
+        map.put("username" ,username);
+        map.put("firstname",firstName);
+        map.put("lastname" ,lastName);
+        map.put("email" ,email);
+        map.put("sendPasswordToEmail" ,true);
+        map.put(AppUserConstants.IS_SELF_SERVICE_USER ,true);
+        return map ;
     }
 
 }

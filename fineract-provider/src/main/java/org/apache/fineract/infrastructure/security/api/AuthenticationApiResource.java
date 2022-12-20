@@ -116,9 +116,11 @@ public class AuthenticationApiResource {
         final Authentication authenticationCheck = this.customAuthenticationProvider.authenticate(authentication);
 
         final Collection<String> permissions = new ArrayList<>();
+
         AuthenticatedUserData authenticatedUserData = new AuthenticatedUserData(username, permissions);
 
         if (authenticationCheck.isAuthenticated()) {
+
             final Collection<GrantedAuthority> authorities = new ArrayList<>(authenticationCheck.getAuthorities());
             for (final GrantedAuthority grantedAuthority : authorities) {
                 permissions.add(grantedAuthority.getAuthority());
@@ -173,16 +175,10 @@ public class AuthenticationApiResource {
     @GET
     public String logout(){
 
-        System.err.println("------------time to logout ----------------");
 
         AppUser appUser = springSecurityPlatformSecurityContext.authenticatedUser();
 
-        System.err.println("----------user name is "+appUser.getUsername());
-
         SingleUserInstanceHelper.execute(appUser ,USER_INSTANCE_ACTION.LOGOUT);
-
-        System.err.println("------------------------user session now cleared what's next ? ----------------");
-
         return ObjectNodeHelper.statusNode(true).toString();
     }   
 }

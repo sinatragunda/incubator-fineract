@@ -25,7 +25,7 @@ public class MailServerState {
 
     private Semaphore semaphore ;
     private MailServerSettings mailServerSettings;
-    private static MailServerState instance ;
+    private static MailServerState instance = null;
     private Instant lastSentMailTime ;
     private volatile Boolean isThreadSleeping = false;
     private MailSenderQueueManager mailSenderQueueManager ;
@@ -43,7 +43,6 @@ public class MailServerState {
     }
 
     private void initPermit(){
-
         this.maxPermits = mailServerSettings.getLimit();
         semaphore = new Semaphore(maxPermits);
     }
@@ -55,11 +54,9 @@ public class MailServerState {
         System.err.println("-------------------acquire permits after sleeping ? "+acquirePermit);
 
         if(acquirePermit){
-            System.err.println("----------------------------Acquire permmit now son ");
             permitGranted(mailService);
             return;
         }
-
         System.err.println("----------------------permit not granted ------------");
         permitNotGranted(mailService);
     }
@@ -67,19 +64,21 @@ public class MailServerState {
     private void permitGranted(MailService mailService){
 
         MailContent mailContent = MailSenderQueueManager.getInstance().peekOrPoll(false);
-        mailService.send(mailContent);
 
-        int availablePermits = semaphore.availablePermits();
+        Optional.ofNullable(mailContent).ifPresent(e->{
 
-        System.err.println("----------------available permits are --------"+availablePermits);
+            mailService.send(mailContent);
 
-        /**
-         *No permits available now take note of current time so as to aid in synchronization of durations
-         */
+            int availablePermits = semaphore.availablePermits();
 
-         if(availablePermits == 0){
-            lastSentMailTime = Instant.now();
-        }
+            System.err.println("----------------available permits are --------"+availablePermits);
+            /**
+             *No permits available now take note of current time so as to aid in synchronization of durations
+             */
+             if(availablePermits == 0){
+                lastSentMailTime = Instant.now();
+            }
+        });
     }
 
     private void permitNotGranted(MailService mailService){
@@ -88,10 +87,6 @@ public class MailServerState {
          * if thread is not sleeping then lets do some checking to sleep it based on duration of last sent message
          * Else if its sleeping we should just wait for it to wake up
          */
-
-
-        System.err.println("-----------------permission not granted sleep thread");
-
         Duration duration = Duration.between(lastSentMailTime ,Instant.now());
 
         DURATION_TYPE durationType = DURATION_TYPE.fromInt(mailServerSettings.getTimerType());
@@ -102,7 +97,7 @@ public class MailServerState {
 
         Long qoutaDuration = Long.valueOf(mailServerSettings.getQuotaDuration());
 
-        System.err.println("-----------------duration so far ? "+durationSoFar+"------------and qoutaDuration------"+qoutaDuration);
+        //System.err.println("-----------------duration so far ? "+durationSoFar+"------------and qoutaDuration------"+qoutaDuration);
 
         // if(durationSoFar > qoutaDuration){
 
@@ -124,12 +119,7 @@ public class MailServerState {
         // }
 
         int sleepTime = duration.getNano() /NANO_SECONDS_PER_SECOND;
-
-        System.err.println("---------------nano second now is "+sleepTime);
-
         sleepThread(sleepTime);
-
-        System.err.println("-------------------------waking up thread lets send again ");
         trySend(mailService);
     
     }
@@ -149,7 +139,6 @@ public class MailServerState {
 
 
     private void wakeUpThread(){
-        System.err.println("-------------------------------sempahores relseas ");
         semaphore.release(maxPermits);
     }
 

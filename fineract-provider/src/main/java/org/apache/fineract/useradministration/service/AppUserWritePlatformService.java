@@ -20,6 +20,8 @@ package org.apache.fineract.useradministration.service;
 
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.self.registration.domain.SelfServiceRegistration;
 
 public interface AppUserWritePlatformService {
 
@@ -28,4 +30,7 @@ public interface AppUserWritePlatformService {
     CommandProcessingResult updateUser(Long userId, JsonCommand command);
 
     CommandProcessingResult deleteUser(Long userId);
+    CommandProcessingResult createSelfServiceUser(Client client , SelfServiceRegistration selfServiceRegistration);
+
+
 }

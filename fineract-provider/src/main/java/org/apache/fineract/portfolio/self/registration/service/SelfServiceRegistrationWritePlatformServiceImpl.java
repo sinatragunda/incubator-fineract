@@ -19,8 +19,11 @@
 package org.apache.fineract.portfolio.self.registration.service;
 
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.persistence.PersistenceException;
 
@@ -62,6 +65,7 @@ import org.apache.fineract.useradministration.domain.RoleRepository;
 import org.apache.fineract.useradministration.domain.UserDomainService;
 import org.apache.fineract.useradministration.exception.RoleNotFoundException;
 import org.apache.fineract.useradministration.service.AppUserReadPlatformService;
+import org.apache.fineract.useradministration.service.AppUserWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -91,6 +95,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
     private final MailServerSenderFactory mailServerSenderFactory;
     private final ClientReadPlatformService clientReadPlatformService;
     private final ClientRepositoryWrapper clientRepositoryWrapper;
+    private final AppUserWritePlatformService appUserWritePlatformService;
 
     @Autowired
     public SelfServiceRegistrationWritePlatformServiceImpl(final SelfServiceRegistrationRepository selfServiceRegistrationRepository,
@@ -100,7 +105,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             final UserDomainService userDomainService, final GmailBackedPlatformEmailService gmailBackedPlatformEmailService,
             final SmsMessageRepository smsMessageRepository, SmsMessageScheduledJobService smsMessageScheduledJobService,
             final SmsCampaignDropdownReadPlatformService smsCampaignDropdownReadPlatformService,
-            final AppUserReadPlatformService appUserReadPlatformService,final RoleRepository roleRepository,final MailServerSenderFactory mailServerSenderFactory ,final ClientReadPlatformService clientReadPlatformService ,final ClientRepositoryWrapper clientRepositoryWrapper) {
+            final AppUserReadPlatformService appUserReadPlatformService,final RoleRepository roleRepository,final MailServerSenderFactory mailServerSenderFactory ,final ClientReadPlatformService clientReadPlatformService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final AppUserWritePlatformService appUserWritePlatformService) {
         this.selfServiceRegistrationRepository = selfServiceRegistrationRepository;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.selfServiceRegistrationReadPlatformService = selfServiceRegistrationReadPlatformService;
@@ -116,6 +121,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         this.mailServerSenderFactory = mailServerSenderFactory;
         this.clientReadPlatformService = clientReadPlatformService;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
+        this.appUserWritePlatformService = appUserWritePlatformService;
     }
 
     @Override
@@ -199,13 +205,13 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
         clientDataCollection.stream().forEach(consumer);
 
+        Predicate<Client> userExists = (e)-> !userExists(e.emailAddress());
+
         Consumer<Client> register = (e)->{
-            boolean userExists = userExists(e.emailAddress());
-            if(!userExists){
-                createSelfServiceUserEx(e);
-            }
+            createSelfServiceUserEx(e);
         };
-        clientCollection.stream().forEach(register);
+
+        clientCollection.stream().filter(userExists).forEach(register);
         return CommandProcessingResult.empty();
     }  
 
@@ -236,18 +242,16 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
             return null ;
         }
 
-
-        System.err.println("---------------------username is "+username);
+        //System.err.println("---------------------username is "+username);
 
         baseDataValidator.reset().parameter(SelfServiceApiConstants.usernameParamName).value(username).notBlank().notExceedingLengthOf(100);
-
 
         final PasswordValidationPolicy validationPolicy = this.passwordValidationPolicy.findActivePasswordValidationPolicy();
         final String regex = validationPolicy.getRegex();
         final String description = validationPolicy.getDescription();
 
-        //String email = client.emailAddress();
-        String email = "treyviis@gmail.com";
+        String email = client.emailAddress();
+        //String email = "treyviis@gmail.com";
         
         baseDataValidator.reset().parameter(SelfServiceApiConstants.emailParamName).value(email).notNull().notBlank()
                 .notExceedingLengthOf(100);
@@ -255,15 +259,27 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         boolean isEmailAuthenticationMode = true;
         
         validateForDuplicateUsername(username);
-     
-        //throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName,null ,false);
+
+//        if(throwErrorIfUserExists){
+    //        throwExceptionIfValidationError(dataValidationErrors, accountNumber, firstName, lastName,null ,false);
+
+  //      }
 
         String authenticationToken = randomAuthorizationTokenGeneration();
 
         SelfServiceRegistration selfServiceRegistration = SelfServiceRegistration.instance(client, accountNumber, firstName, lastName,
                 null, email, authenticationToken, username, authenticationToken);
-        this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
-        sendAuthorizationToken(selfServiceRegistration, isEmailAuthenticationMode);
+
+        boolean userExists = userExists(username);
+
+        System.err.println("----------------------------user exists ? "+userExists);
+
+        if(!userExists){
+            System.err.println("----------------user doesnt exists ,highly unlikely will get here ");
+            this.selfServiceRegistrationRepository.saveAndFlush(selfServiceRegistration);
+            appUserWritePlatformService.createSelfServiceUser(client ,selfServiceRegistration);
+            sendAuthorizationToken(selfServiceRegistration, isEmailAuthenticationMode);
+        }
         return selfServiceRegistration;
 
     }
@@ -318,7 +334,7 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
         
         //final String subject = "Authorization token ";
 
-        final String subject = "Self service membership";
+        final String subject = "Self Service Membership";
 
         String body = "Hi  " + selfServiceRegistration.getFirstName() + "," + "\n" + "To create user, please use following details\n"
                 + "Request Id : " + selfServiceRegistration.getId() + "\n Authentication Token : "
@@ -326,17 +342,25 @@ public class SelfServiceRegistrationWritePlatformServiceImpl implements SelfServ
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(String.format("Dear %s %s\n",selfServiceRegistration.getFirstName() ,selfServiceRegistration.getLastName()));
-        stringBuilder.append("Happy Festive Season! Nkwazi Cooperative  brings an exciting feature of real time experience with your membership");
-        stringBuilder.append("Follow the link below or login from the website www.nkwazicoop.com to access an integrated member self- service.");
-        stringBuilder.append("https://nkwazi.portal.wesecbs.co"); 
-        stringBuilder.append("Use the login details provided, ensure to change your password at first login. Should you have challenges accessing your account, kindly contact us at customercare@nkwazicoop.com  or 260956797719");
-        stringBuilder.append("NB: Keep your password confidential, regularly change your password.");
-        stringBuilder.append(String.format("Your username and password are %s ,%s",selfServiceRegistration.getUsername(), selfServiceRegistration.getPassword()));
+        URL url = null;
+        try{
+            url = new URL("https://nkwazi.portal.wesecbs.co");
+        }
+        catch (MalformedURLException m){
+            System.err.println("----------------------------------"+m.getMessage());
+        }
+
+
+        stringBuilder.append(String.format("Dear %s %s,\n\n\n",selfServiceRegistration.getFirstName() ,selfServiceRegistration.getLastName()));
+        stringBuilder.append("Happy Festive Season! Nkwazi Cooperative brings an exciting feature of real time experience with your membership. ");
+        stringBuilder.append("Follow the link below or login from the website www.nkwazicoop.com to access an integrated member self- service.\n\n\n");
+        stringBuilder.append(url.toString());
+        stringBuilder.append("\n\n\nUse the login details provided, ensure to change your password at first login. Should you have challenges accessing your account, kindly contact us at customercare@nkwazicoop.com  or 260956797719");
+        stringBuilder.append(String.format("\n\n\nUsername : %s\nPassword : %s\n",selfServiceRegistration.getUsername(), selfServiceRegistration.getPassword()));
+        stringBuilder.append("\nNB: Keep your password confidential, regularly change your password.");
+        
 
         body = stringBuilder.toString();
-
-        System.err.println("--------------------"+body);
 
         final EmailDetail emailDetail = new EmailDetail(subject, body, selfServiceRegistration.getEmail(),
                 selfServiceRegistration.getFirstName());

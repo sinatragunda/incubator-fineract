@@ -21,13 +21,18 @@ public class MeteredMailSender implements MailServerSender {
     public void send(MailService mailService) {
 
         MailSenderQueueManager queueManager = MailSenderQueueManager.getInstance();
+        
         boolean isQueueEmpty = queueManager.isQueueEmpty();
+
+        System.err.println("-----------------------meteredmailsender  ,is isQueueEmpty-------------"+isQueueEmpty);
 
         /**
          * This will have many design problems since this will be executed in a thread
          */
         if(!isQueueEmpty){
+            //System.err.println("------------------try send to server state ");
             MailServerState.getInstance(mailServerSettings).trySend(mailService);
+            //System.err.println("-------------------------------mail server state send message now-");
         }
 
     }
