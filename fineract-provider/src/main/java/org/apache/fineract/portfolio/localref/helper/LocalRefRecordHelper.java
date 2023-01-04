@@ -53,10 +53,19 @@ public class LocalRefRecordHelper {
 
         List<LocalRefValue> localRefValueList = new ArrayList<>();
         JsonElement jsonElement = command.parsedJson();
+
+        /**
+         * Modified 02/01/2023 
+         * NullPointerException thrown when creating new client in case when application has no localref
+         */
+        boolean hasParameter  = command.parameterExists("localrefs");
+
+        if(!hasParameter){
+            return ;
+        } 
+
         JsonObject jsonObject = fromJsonHelper.extractJsonObjectNamed("localrefs" ,jsonElement);
-
         Set<Map.Entry<String ,JsonElement>> set = jsonObject.entrySet();
-
         for(Map.Entry<String ,JsonElement> entry : set){
 
             JsonElement element = entry.getValue();

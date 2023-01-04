@@ -7,6 +7,8 @@
 package org.apache.fineract.accounting.journalentry.domain;
 
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
+import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @Entity
@@ -43,6 +47,37 @@ public class TransactionCode extends AbstractPersistableCustom<Long>{
         this.name = name;
         this.debitAccount = debitAccount;
         this.creditAccount = creditAccount;
+    }
+
+    public Map<String, Object> update(final JsonCommand command , GLAccountRepositoryWrapper glAccountRepositoryWrapper) {
+
+        final Map<String, Object> actualChanges = new LinkedHashMap<>(7);
+
+        if(command.isChangeInStringParameterNamed("name", this.name)) {
+            final String newValue = command.stringValueOfParameterNamed("name");
+            actualChanges.put("name", newValue);
+            this.name = newValue;
+        }
+        if(command.isChangeInLongParameterNamed("code", this.code)) {
+            final Long newValue = command.longValueOfParameterNamed("code");
+            actualChanges.put("code", newValue);
+            this.code = newValue;
+        }
+
+        final String debitAccountIdParam = "debitAccountId";
+        if (command.isChangeInLongParameterNamed(debitAccountIdParam,debitAccount.getId())){
+            final Long id = command.longValueOfParameterNamed(debitAccountIdParam);
+            final GLAccount glAccount = glAccountRepositoryWrapper.findOneWithNotFoundDetection(id);
+            this.debitAccount = glAccount ;      
+        }
+
+        final String creditAccountIdParam = "creditAccountId";
+        if (command.isChangeInLongParameterNamed(creditAccountIdParam,creditAccount.getId())){
+            final Long id = command.longValueOfParameterNamed(creditAccountIdParam);
+            final GLAccount glAccount = glAccountRepositoryWrapper.findOneWithNotFoundDetection(id);
+            this.creditAccount = glAccount ;
+        }
+        return actualChanges;
     }
 
     public Long getCode() {

@@ -9,6 +9,7 @@ package org.apache.fineract.accounting.journalentry.api;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -62,7 +63,7 @@ public class TransactionCodeApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createTransactionCode(final String jsonRequestBody) {
 
-        this.context.authenticatedUser();
+        this.context.authenticatedUser().validateHasPermissionTo(TransactionCodeConstants.CREATE_PERMISSION);
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createTransactionCode().withJson(jsonRequestBody).build();
 
@@ -71,6 +72,28 @@ public class TransactionCodeApiResource {
         return this.transactionCodeDataToApiJsonSerializer.serialize(result);
     }
 
+    @PUT
+    @Path("{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String updateTransactionCode(final String jsonRequestBody ,@PathParam("id") Long transactionCodeId) {
+
+        this.context.authenticatedUser().validateHasPermissionTo(TransactionCodeConstants.UPDATE_PERMISSION);
+
+        System.err.println("--------------update transaction code -----------------------"+transactionCodeId);
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTransactionCode(transactionCodeId).withJson(jsonRequestBody).build();
+
+        System.err.println("------------------update transaction code here son ,at least give it correct naming ");
+
+        final CommandProcessingResult result = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
+
+        String response = this.transactionCodeDataToApiJsonSerializer.serialize(result);
+
+        System.err.println("----------------response is "+response);
+
+        return response;
+    }
 
     @GET
     @Path("{id}")
@@ -78,7 +101,7 @@ public class TransactionCodeApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTransactionCode(@PathParam("id") final Long id, @Context final UriInfo uriInfo) {
 
-        //this.context.authenticatedUser().validateHasReadPermission();
+        this.context.authenticatedUser().validateHasReadPermission(TransactionCodeConstants.READ_PERMISSION);
 
         final TransactionCodeData transactionCodeData = transactionCodeReadPlatformService.retrieveOne(id);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -91,12 +114,9 @@ public class TransactionCodeApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTransactionCode(@Context final UriInfo uriInfo) {
 
-        //this.context.authenticatedUser().validateHasReadPermission();
-
+        this.context.authenticatedUser();
         final List<TransactionCodeData> transactionCodeDataList = transactionCodeReadPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.transactionCodeDataToApiJsonSerializer.serialize(settings, transactionCodeDataList, TransactionCodeConstants.TRANSACTION_CODE_DATA_PARAMETERS);
     }
-
-
 }

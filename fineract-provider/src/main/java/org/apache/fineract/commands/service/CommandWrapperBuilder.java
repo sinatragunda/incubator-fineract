@@ -3293,6 +3293,15 @@ public class CommandWrapperBuilder {
         return this;
     }
 
-
+    /**
+     * Added 22/12/2022 at 0524
+     */
+    public CommandWrapperBuilder updateTransactionCode(Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "TRANSACTION_CODE";
+        this.href = "/transactioncodes";
+        this.entityId = id ;
+        return this;
+    }
 
 }

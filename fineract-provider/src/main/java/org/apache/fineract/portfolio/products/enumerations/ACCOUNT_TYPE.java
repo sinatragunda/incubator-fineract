@@ -9,7 +9,8 @@ public enum ACCOUNT_TYPE {
     CHECKING("Checking"),
     SETTLEMENT("Settlement"),
     FUND("Fund"),
-    EQUITY("Equity");
+    EQUITY("Equity"),
+    DRAWDOWN("Drawdown");
 
     private String code ;
     ACCOUNT_TYPE(String code){

@@ -11,6 +11,7 @@ import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountRepositoryWrapper;
 import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.repo.TransactionCodeRepository;
+import org.apache.fineract.accounting.journalentry.repo.TransactionCodeRepositoryWrapper;
 import org.apache.fineract.infrastructure.bulkimport.constants.TransactionConstants;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -29,13 +31,13 @@ public class TransactionCodeWritePlatformServiceImpl implements TransactionCodeW
 
     private final PlatformSecurityContext context ;
     private final GLAccountRepositoryWrapper glAccountRepositoryWrapper;
-    private final TransactionCodeWrapper transactionCodeWrapper;
+    private final TransactionCodeRepositoryWrapper transactionCodeRepositoryWrapper;
 
     @Autowired
-    public TransactionCodeWritePlatformServiceImpl(PlatformSecurityContext context, GLAccountRepositoryWrapper glAccountRepositoryWrapper, TransactionCodeWrapper transactionCodeWrapper) {
+    public TransactionCodeWritePlatformServiceImpl(PlatformSecurityContext context, GLAccountRepositoryWrapper glAccountRepositoryWrapper, TransactionCodeRepositoryWrapper transactionCodeRepositoryWrapper) {
         this.context = context;
         this.glAccountRepositoryWrapper = glAccountRepositoryWrapper;
-        this.transactionCodeWrapper = transactionCodeWrapper;
+        this.transactionCodeRepositoryWrapper = transactionCodeRepositoryWrapper ;
     }
 
     /**
@@ -61,7 +63,7 @@ public class TransactionCodeWritePlatformServiceImpl implements TransactionCodeW
 
         TransactionCode transactionCode = new TransactionCode(code ,name ,debitAcccount ,creditAccount);
 
-        Long id = transactionCodeWrapper.save(transactionCode);
+        Long id = transactionCodeRepositoryWrapper.save(transactionCode);
 
         CommandProcessingResult commandProcessingResult = new CommandProcessingResultBuilder().
                 withCommandId(jsonCommand.commandId()).
@@ -70,5 +72,23 @@ public class TransactionCodeWritePlatformServiceImpl implements TransactionCodeW
                 build();
 
         return commandProcessingResult;
+    }
+
+    public CommandProcessingResult update(Long transactionCodeId ,JsonCommand command){
+
+        TransactionCode transactionCode = transactionCodeRepositoryWrapper.findOneWithNotFoundDetection(transactionCodeId);
+
+        System.err.println("----------------update transaction code now -------------------");
+
+        Map changes = transactionCode.update(command ,glAccountRepositoryWrapper);
+
+        System.err.println("-------------------changes are "+changes);
+
+        this.transactionCodeRepositoryWrapper.save(transactionCode);
+
+        CommandProcessingResult result = new CommandProcessingResultBuilder().withCommandId(transactionCodeId).with(changes).build();
+
+        return result;
+
     }
 }

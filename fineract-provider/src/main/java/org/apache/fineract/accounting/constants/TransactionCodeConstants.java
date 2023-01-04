@@ -17,5 +17,11 @@ public class TransactionCodeConstants {
     public static final String creditAccountParam ="creditAccountId";
     public static final String debitAccountParam ="debitAccountId";
 
+    public static final String UPDATE_PERMISSION = "UPDATE_TRANSACTION_CODE"; 
+    public static final String READ_PERMISSION = "READ_TRANSACTION_CODE"; 
+    public static final String CREATE_PERMISSION = "CREATE_TRANSACTION_CODE"; 
+
+
+
     public static final Set<String> TRANSACTION_CODE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id","name","code","debitAccountId","debitAccountName","creditAccountId","creditAccountName"));
 }

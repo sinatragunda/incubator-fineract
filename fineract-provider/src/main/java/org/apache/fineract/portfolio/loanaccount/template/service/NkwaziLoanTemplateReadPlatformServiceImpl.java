@@ -107,18 +107,24 @@ public class NkwaziLoanTemplateReadPlatformServiceImpl implements NkwaziLoanTemp
 
         Integer loanFactor[] = {0};
 
-        Predicate<LoanProductData> crossLinkPredicate = (e)->{
-            return e.isCrossLink();
-        };
+        Predicate<LoanProductData> crossLinkPredicate = (e)->e.isCrossLink();
+
+        /**
+         * Modified 03/01/2022 at 1229
+         * To avoid null pointer exception caused when cross linking is set but loan factor amount not defined
+         */
+
+        Predicate<LoanProductData> loanFactorNotNull = (e)-> Optional.ofNullable(e.loanFactor()).isPresent();
+
 
         Comparator maxFactor = Comparator.comparing(LoanProductData::loanFactor);
 
+
         Collection<LoanProductData> loanProductCollection = loanProductReadPlatformService.retrieveAllLoanProducts();
-        Optional maxFactorProduct = loanProductCollection.stream().filter(crossLinkPredicate).max(maxFactor);
+        Optional maxFactorProduct = loanProductCollection.stream().filter(crossLinkPredicate).filter(loanFactorNotNull).max(maxFactor);
+
 
         maxFactorProduct.ifPresent(e->{
-
-            // not sure what actual value we have here
             LoanProductData loanProductData = (LoanProductData) maxFactorProduct.get();
             loanFactor[0] = loanProductData.loanFactor();
         });

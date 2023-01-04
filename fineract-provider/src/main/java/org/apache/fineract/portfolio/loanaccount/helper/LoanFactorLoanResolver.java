@@ -71,6 +71,7 @@ public class LoanFactorLoanResolver {
             boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal ,excludeLoansList);
             // if successful just proceed with this loan and throw no errors
             // System.err.println("------------proceed with transaction -------------"+transact);
+
         }
     }
 

@@ -268,19 +268,18 @@ public class LoanFactorSavingsAccountHelper {
 
         List<LoanProduct> loanProductDataCollection = loanProductRepository.findAll();
 
-        //System.err.println("----------------we have load all load products now "+loanProductDataCollection.size());
-
         Predicate<LoanProduct> crossLinkPredicate = (e)-> e.isCrossLink();
+
+        Predicate<LoanProduct> loanFactorNotNull = (e)-> Optional.ofNullable(e.loanFactor()).isPresent();
 
         Comparator<LoanProduct> comparator = Comparator.comparing(LoanProduct::loanFactor);
 
-        List<LoanProduct> loanProductDataList = loanProductDataCollection.stream().filter(crossLinkPredicate).sorted(comparator).collect(Collectors.toList());
-
-        //System.err.println("--------------------we have loan factored this system "+loanProductDataList.size());
+        List<LoanProduct> loanProductDataList = loanProductDataCollection.stream().filter(crossLinkPredicate).filter(loanFactorNotNull).sorted(comparator.reversed()).collect(Collectors.toList());
 
         if(!loanProductDataList.isEmpty()){
             /// we have selected by top one with highest loan factor
-            this.crossLinkLoanProduct = loanProductDataList.get(0);
+            this.crossLinkLoanProduct = loanProductDataList.stream().findFirst().get();
+            System.err.println("--------------------big loan factor value is ----------"+crossLinkLoanProduct.loanFactor());
             return crossLinkLoanProduct;
         }
 
