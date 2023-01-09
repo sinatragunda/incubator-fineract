@@ -100,6 +100,7 @@ public class LoanTransactionsApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
+
         LoanTransactionData transactionData = null;
         if (is(commandParam, "repayment")) {
             transactionData = this.loanReadPlatformService.retrieveLoanTransactionTemplate(loanId);
@@ -115,6 +116,10 @@ public class LoanTransactionsApiResource {
             transactionData = this.loanReadPlatformService.retrieveDisbursalTemplate(loanId, true);
         } else if (is(commandParam, "disburseToSavings")) {
             transactionData = this.loanReadPlatformService.retrieveDisbursalTemplate(loanId, false);
+        }
+        else if (is(commandParam, "disburseToLoan")) {
+            LocalDate transactionDate = LocalDate.fromDateFields(transactionDateParam.getDate("transactionDate", dateFormat, locale));
+            transactionData = this.loanReadPlatformService.retrieveDisbursalToLoanTemplate(loanId, transactionDate);
         } else if (is(commandParam, "recoverypayment")) {
             transactionData = this.loanReadPlatformService.retrieveRecoveryPaymentTemplate(loanId);
         } else if (is(commandParam, "prepayLoan")) {

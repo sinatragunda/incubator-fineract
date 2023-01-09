@@ -461,15 +461,40 @@ public class AccountingProcessorHelper {
     public void createCashBasedJournalEntriesAndReversalsForSavings(final Office office, final String currencyCode,
             final Integer accountTypeToBeDebited, final Integer accountTypeToBeCredited, final Long savingsProductId,
             final Long paymentTypeId, final Long loanId, final String transactionId, final Date transactionDate, final BigDecimal amount,
-            final Boolean isReversal,final TransactionCode transactionCode) {
+            final Boolean isReversal,final TransactionCode transactionCodeFinal) {
         int accountTypeToDebitId = accountTypeToBeDebited;
         int accountTypeToCreditId = accountTypeToBeCredited;
         // reverse debits and credits for reversals
-        if (isReversal) {
+        TransactionCode transactionCode = transactionCodeFinal ;
+
+        if(isReversal) {
+
             accountTypeToDebitId = accountTypeToBeCredited;
             accountTypeToCreditId = accountTypeToBeDebited;
-        }
 
+
+            System.err.println("------------------transaction is a reversal transaction --------------");
+
+            System.err.println("---------------account type to debit ? "+accountTypeToDebitId);
+
+            System.err.println("------------------account type to credit is "+accountTypeToCreditId);
+
+            boolean isTransactionCodePresent = Optional.ofNullable(transactionCode).isPresent();
+
+            /**
+             * Added 04/01/2023 at 0855 by Sinatra Gunda
+             * Inorder to reverse transactions with custom TransactionCodes 
+             * TransactionCode is sent by calling function ..
+             */ 
+            if(isTransactionCodePresent){
+                System.err.println("-----------------hold up we checking something here son reverse these accounts ,make credit be debit etc");
+                GLAccount debitAccount = transactionCode.getCreditAccount();
+                GLAccount creditAccount = transactionCode.getDebitAccount();
+                TransactionCode transactionCodeReversal = new TransactionCode(transactionCode.getCode() ,transactionCode.getName() ,debitAccount ,creditAccount);
+                transactionCode = transactionCodeReversal;
+                System.err.println("----------------------------------------reverse debit to credit -------");
+            }
+        }
         // could we check these if there are null for simplicity ? 
         //System.err.println("---------------------create entries ---------"+accountTypeToDebitId+"----------------credit ------"+accountTypeToCreditId);
 
@@ -597,7 +622,7 @@ public class AccountingProcessorHelper {
          */
         if(isTransactionCodePresent){
 
-            //System.err.println("----------------------transactioncodes being used are custom -----------");
+            System.err.println("----------------------transactioncodes being used are custom -----------");
 
             debitAccount[0] = transactionCode.getDebitAccount();
             creditAccount[0]= transactionCode.getCreditAccount();

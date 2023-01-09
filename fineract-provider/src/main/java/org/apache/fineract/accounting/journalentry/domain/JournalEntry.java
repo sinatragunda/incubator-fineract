@@ -225,4 +225,8 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
         return this.shareTransactionId;
     }
 
+    public boolean isReversed(){
+        return this.reversed;
+    }
+
 }

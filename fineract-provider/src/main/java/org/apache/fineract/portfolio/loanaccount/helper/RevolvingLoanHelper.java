@@ -23,7 +23,10 @@
 */
 package org.apache.fineract.portfolio.loanaccount.helper;
 
+import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.exception.RevolvingAccountInsufficientPayoffException;
 import com.google.gson.JsonElement;
 import java.math.BigDecimal ;
@@ -35,10 +38,13 @@ import org.apache.fineract.portfolio.loanaccount.domain.Loan ;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
 
 /// Added 31/05/2021
 import java.util.ArrayList ;
 import java.util.List ;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
 public class RevolvingLoanHelper{
 
@@ -94,70 +100,45 @@ public class RevolvingLoanHelper{
         		return revolveLoanBalance;
         	}
 
-        	///check if it allows partial payments as well 
-
+        	///check if it allows partial payments as well
         	if(loanProduct.isSettlementPartialPayment()){
         		return savingsAccountBalance;
         	}
-
         	BigDecimal dueBalance = revolveLoanBalance.subtract(savingsAccountBalance);
         	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
-
         }
+
         return revolveLoanBalance ;
-	}	
-
-
-
-	// what does this even do ? 
-	public static BigDecimal revolvingLoanDTOAmount(Loan revolveLoanAccount ,SavingsAccount fromSavingsAccount){
-		
-		BigDecimal revolveLoanBalance = revolveLoanAccount.getTotalOutstanding();
-        BigDecimal savingsAccountBalance = fromSavingsAccount.accountBalance();
-
-        LoanProduct loanProduct = revolveLoanAccount.loanProduct();
-
-        int cmp = revolveLoanBalance.compareTo(savingsAccountBalance);
-
-        // revolve amount greater than savings account balance
-        if(cmp > 0){
-
-        	if(fromSavingsAccount.allowOverdraft()){
-        		return revolveLoanBalance;
-        	}
-
-        	///check if it allows partial payments as well 
-        	
-        	if(loanProduct.isSettlementPartialPayment()){
-        		return savingsAccountBalance;
-        	}
-
-        	BigDecimal dueBalance = revolveLoanBalance.subtract(savingsAccountBalance);
-        	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
-
-        }
-        return revolveLoanBalance ;
-
-	}	
-
-
-	public static void closeLoan(Long loanId ,boolean payOffBalance){
-
-		ObjectNode objectNode = ObjectNodeHelper.objectNode();
-		//objectNode.put("locale","en") ;
-		//objectNode.put("dateFormat","dd MMMM yyyy");
-	
 	}
 
-	public static void payOffBalance(Long loanId ,BigDecimal availableFunds ,boolean checkException){
+	public static void payOffLoanWithLoan(AccountTransfersWritePlatformService accountTransfersWritePlatformService ,Loan fromLoan , Loan toLoan , LocalDate transactionDate , DateTimeFormatter dateTimeFormatter ,Locale locale, BigDecimal amount ,String description){
 
-		if(checkException){
-			/// throw error 
-			throw new RevolvingAccountInsufficientPayoffException(availableFunds);
-		
+		AccountTransferDTO accountTransferDTO = AccountTransferDTO.loanToLoan(fromLoan ,toLoan ,transactionDate ,locale ,dateTimeFormatter ,amount, description);
+		accountTransfersWritePlatformService.repayLoanWithTopup(accountTransferDTO);
+
+	}
+
+	/**
+	 * Added 08/01/2023 at 1652
+	 */
+	public static List<Loan> revolvingLoans(LoanRepositoryWrapper loanRepositoryWrapper, Loan loan){
+
+		String loanAccountIds = loan.revolvingAccountId();
+
+		StringTokenizer stringTokenizer = new StringTokenizer(loanAccountIds ,",");
+		List<Loan> loanList = new ArrayList<>();
+		while (stringTokenizer.hasMoreTokens()){
+			String idStr = stringTokenizer.nextToken();
+			try{
+				Long id = Long.valueOf(idStr);
+				Loan loan1 = loanRepositoryWrapper.findOneWithNotFoundDetection(id);
+				loanList.add(loan1);
+			}
+			catch (Exception n){
+
+			}
 		}
-
-	}   
-
+        return loanList ;
+	} 
 
 }

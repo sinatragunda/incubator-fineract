@@ -97,6 +97,7 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTransactionNotFoundException;
+import org.apache.fineract.portfolio.loanaccount.helper.RevolvingLoanHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.OverdueLoanScheduleData;
@@ -559,7 +560,26 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
         }
         return LoanTransactionData.LoanTransactionDataForDisbursalTemplate(transactionType, loan.getExpectedDisbursedOnLocalDateForTemplate(), loan.getDisburseAmountForTemplate(), 
-        		paymentOptions, loan.retriveLastEmiAmount(), loan.getNextPossibleRepaymentDateForRescheduling());
+        		paymentOptions, loan.retriveLastEmiAmount(), loan.getNextPossibleRepaymentDateForRescheduling(),null);
+
+    }
+
+    @Override
+    public LoanTransactionData retrieveDisbursalToLoanTemplate(final Long loanId ,final LocalDate transactionDate) {
+        final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        final LoanTransactionEnumData transactionType = LoanEnumerations.transactionType(LoanTransactionType.DISBURSEMENT);
+        Collection<PaymentTypeData> paymentOptions = null;
+        Collection<Loan> revolvingLoans = RevolvingLoanHelper.revolvingLoans(loanRepositoryWrapper,loan);
+        Collection<LoanTransactionData> topupLoans = new ArrayList<>();
+        
+        revolvingLoans.stream().forEach((e)->{
+            LoanTransactionData  loanTransactionData = retrieveLoanForeclosureTemplate(loanId,transactionDate);
+            topupLoans.add(loanTransactionData);
+        });
+
+        // mix revolving loans here and their balances 
+        return LoanTransactionData.LoanTransactionDataForDisbursalTemplate(transactionType, loan.getExpectedDisbursedOnLocalDateForTemplate(), loan.getDisburseAmountForTemplate(), 
+                paymentOptions, loan.retriveLastEmiAmount(), loan.getNextPossibleRepaymentDateForRescheduling(),topupLoans);
 
     }
 

@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
@@ -37,6 +38,7 @@ import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.group.service.GroupReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.LoanApplicationTimelineData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanStatusEnumData;
+import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountApplicationTimelineData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountStatusEnumData;
@@ -58,15 +60,17 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     private final ClientReadPlatformService clientReadPlatformService;
     private final GroupReadPlatformService groupReadPlatformService;
     private final ColumnValidator columnValidator;
+    private final LoanTransactionReadPlatformService loanTransactionReadPlatformService;
 
     @Autowired
     public AccountDetailsReadPlatformServiceJpaRepositoryImpl(final ClientReadPlatformService clientReadPlatformService,
             final RoutingDataSource dataSource, final GroupReadPlatformService groupReadPlatformService,
-            final ColumnValidator columnValidator) {
+            final ColumnValidator columnValidator ,final LoanTransactionReadPlatformService loanTransactionReadPlatformService) {
         this.clientReadPlatformService = clientReadPlatformService;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.groupReadPlatformService = groupReadPlatformService;
         this.columnValidator = columnValidator;
+        this.loanTransactionReadPlatformService = loanTransactionReadPlatformService;
     }
 
     @Override
@@ -124,7 +128,14 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
         final LoanAccountSummaryDataMapper rm = new LoanAccountSummaryDataMapper();
         final String sql = "select " + rm.loanAccountSummarySchema() + loanwhereClause;
         this.columnValidator.validateSqlInjection(rm.loanAccountSummarySchema(), loanwhereClause);
-        return this.jdbcTemplate.query(sql, rm, inputs);
+        List<LoanAccountSummaryData> loanAccountSummaryDataList = this.jdbcTemplate.query(sql, rm, inputs);
+
+        Consumer<LoanAccountSummaryData> setInterestAccrued = (e)->{
+            //BigDecimal interestAccrued = loanTransactionReadPlatformService.interestAccrued(e.id());
+            e.setInterestAccrued(BigDecimal.ZERO);
+        };
+        loanAccountSummaryDataList.stream().forEach(setInterestAccrued);
+        return loanAccountSummaryDataList;
     }
 
     /**
@@ -145,7 +156,6 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     }
     
     private final static class ShareAccountSummaryDataMapper implements RowMapper<ShareAccountSummaryData> {
-
     	private final String schema ;
     	
     	ShareAccountSummaryDataMapper() {
@@ -166,7 +176,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
     		.append("sa.closed_date as closedDate, cbu.username as closedByUsername, ")
 
              // added 28/03/2022
-                    .append("p.unit_price as unitPrice, ")
+            .append("p.unit_price as unitPrice, ")
 
     		.append("cbu.firstname as closedByFirstname, cbu.lastname as closedByLastname, ")
     		.append("sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, ")
@@ -490,6 +500,8 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                 inArrears = false;
             }
 
+            BigDecimal interestAccrued = BigDecimal.ZERO;
+
             final LoanApplicationTimelineData timeline = new LoanApplicationTimelineData(submittedOnDate, submittedByUsername,
                     submittedByFirstname, submittedByLastname, rejectedOnDate, rejectedByUsername, rejectedByFirstname, rejectedByLastname,
                     withdrawnOnDate, withdrawnByUsername, withdrawnByFirstname, withdrawnByLastname, approvedOnDate, approvedByUsername,
@@ -498,7 +510,7 @@ public class AccountDetailsReadPlatformServiceJpaRepositoryImpl implements Accou
                     expectedMaturityDate, writtenOffOnDate, closedByUsername, closedByFirstname, closedByLastname);
 
             return new LoanAccountSummaryData(id, accountNo, externalId, productId, loanProductName, shortLoanProductName, loanStatus, loanType, loanCycle,
-                    timeline, inArrears,originalLoan,loanBalance,amountPaid);
+                    timeline, inArrears,originalLoan,loanBalance,amountPaid ,interestAccrued);
         }
     }
 

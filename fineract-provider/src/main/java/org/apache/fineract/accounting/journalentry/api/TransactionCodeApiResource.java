@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.fineract.accounting.constants.TransactionCodeConstants;
 import org.apache.fineract.accounting.journalentry.data.TransactionCodeData;
+import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.service.TransactionCodeReadPlatformService;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
@@ -49,13 +50,20 @@ public class TransactionCodeApiResource {
     private final TransactionCodeReadPlatformService transactionCodeReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
+    /**
+     * Added 06/01/2023 at 1303 
+     */ 
+    private final ToApiJsonSerializer<TransactionCode> transactionCodeSerializer;
+    
+
     @Autowired
-    public TransactionCodeApiResource(PlatformSecurityContext context, PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService, DefaultToApiJsonSerializer<TransactionCodeData> transactionCodeDataToApiJsonSerializer, TransactionCodeReadPlatformService transactionCodeReadPlatformService, ApiRequestParameterHelper apiRequestParameterHelper) {
+    public TransactionCodeApiResource(PlatformSecurityContext context, PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService, DefaultToApiJsonSerializer<TransactionCodeData> transactionCodeDataToApiJsonSerializer, TransactionCodeReadPlatformService transactionCodeReadPlatformService, ApiRequestParameterHelper apiRequestParameterHelper ,ToApiJsonSerializer<TransactionCode> transactionCodeSerializer) {
         this.context = context;
         this.portfolioCommandSourceWritePlatformService = portfolioCommandSourceWritePlatformService;
         this.transactionCodeDataToApiJsonSerializer = transactionCodeDataToApiJsonSerializer;
         this.transactionCodeReadPlatformService = transactionCodeReadPlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
+        this.transactionCodeSerializer = transactionCodeSerializer;
     }
 
     @POST
@@ -88,9 +96,9 @@ public class TransactionCodeApiResource {
 
         final CommandProcessingResult result = this.portfolioCommandSourceWritePlatformService.logCommandSource(commandRequest);
 
-        String response = this.transactionCodeDataToApiJsonSerializer.serialize(result);
+        String response = this.transactionCodeSerializer.serialize(result);
 
-        System.err.println("----------------response is "+response);
+        System.err.println("----------------response is =-----------------"+response);
 
         return response;
     }

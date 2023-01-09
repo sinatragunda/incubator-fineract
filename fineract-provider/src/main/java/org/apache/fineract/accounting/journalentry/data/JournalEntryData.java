@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.fineract.accounting.glaccount.data.GLAccountData;
+import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -258,5 +259,12 @@ public class JournalEntryData {
 
     public String getTransactionId() {
         return transactionId;
+    }
+    /**
+     * Added 04/01/2023 at 0847 by Sinatra Gunda
+     */ 
+    public JournalEntryType getJournalEntryType(){
+        JournalEntryType journalEntryType = JournalEntryType.fromInt(this.entryType.getId().intValue());
+        return journalEntryType;
     }
 }

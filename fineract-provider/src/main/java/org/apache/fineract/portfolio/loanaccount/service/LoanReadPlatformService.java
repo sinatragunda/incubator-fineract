@@ -146,7 +146,12 @@ public interface LoanReadPlatformService {
     /**
      * Added 29/11/2022 
      */
-
     LoanTransactionData retrieveLoanTransactionWithoutLoanId(Long transactionId);
+
+    /**
+     * Added 06/01/2022 at 1418
+     */
+    LoanTransactionData retrieveDisbursalToLoanTemplate(Long loanId ,LocalDate transactionDate);
   
+
 }

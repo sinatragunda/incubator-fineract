@@ -256,8 +256,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final SavingsAccountAssembler savingsAccountAssembler ,
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,
             final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer ,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final CommissionsHelperService commissionsHelperService
-    ,final SavingsAccountDomainService savingsAccountDomainService ,final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository) {
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , 
+            final CommissionsHelperService commissionsHelperService,
+            final SavingsAccountDomainService savingsAccountDomainService ,
+            final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository) {
         this.context = context;
         this.loanEventApiJsonValidator = loanEventApiJsonValidator;
         this.loanAssembler = loanAssembler;
@@ -465,7 +467,6 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
             // auto create standing instruction
             createStandingInstruction(loan);
-
             postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds);
 
             // added 07/01/2022 ,apply commission charging here .Since we have dibursed amount here why not use it ?
@@ -1815,6 +1816,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
 
+        System.err.println("-------------new account balance is now --------"+savingsAccount.accountBalance());
+
         if(revolveAccountIds != null){
 
             StringTokenizer token = new StringTokenizer(revolveAccountIds ,",");
@@ -1846,25 +1849,28 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 String description = String.format("Revolving loan pay off ,to loan with account number %s",revolveLoanAccount.getAccountNumber());
 
                 // do some withdrawal transaction here then pay off loan in next transaction
-                SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,revolveDTOAmount ,description);
+                //SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,revolveDTOAmount ,description);
 
-                boolean transactionSuccesss = Optional.ofNullable(transaction).isPresent();
+                //boolean transactionSuccesss = Optional.ofNullable(transaction).isPresent();
 
-                if(!transactionSuccesss){
-                    throw new FailedToPayoffRevolvingLoanException(loan.getId());
+                //if(!transactionSuccesss){
+                  //  throw new FailedToPayoffRevolvingLoanException(loan.getId());
                 
-                }
+                //}
+
+                System.err.println("------------------------------------------loan to loan transfer ----------");
+
+                RevolvingLoanHelper.payOffLoanWithLoan(accountTransfersWritePlatformService , loan ,revolveLoanAccount ,transactionDate ,fmt ,locale ,totalRevolveAmount ,description);
 
                 // transaction successful hence its been triggered by this event 
-                SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(transaction ,loan.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
-                SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository,null ,trigger);
-                loanAccountDomainService.foreCloseLoan(revolveLoanAccount ,transactionDate ,description);   
+                //SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(transaction ,loan.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                //SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository,null ,trigger);
+                //loanAccountDomainService.foreCloseLoan(revolveLoanAccount ,transactionDate ,description);   
             }
         }
 
         // added 02/07/2021 
         // after revolving accounts then comes auto settle and diburse 
-        //
 
         boolean shouldCreateStandingInstructionAtDisbursement = loan.shouldCreateStandingInstructionAtDisbursement();
         boolean disburseLoanToSavingsAutoSettlement = loan.autoSettlementAtDisbursement();
@@ -1879,6 +1885,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                     boolean isDisbursementCharge = charge.isDueAtDisbursement();
                     if(isDisbursementCharge){
                         totalCharges = totalCharges.add(charge.amount());
+                        System.err.println("-------------------------totalCharges are ------------------"+totalCharges);
                     }
                 }
             }
@@ -1886,7 +1893,11 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             // since charges would be deducted next ,its ideal to subtract charges from the money to deduct so at to not have insufficient balance when deducting charges
             BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
 
+            System.err.println("------------------------balance to deduct -------------"+balanceToDeduct);
+
             BigDecimal principal = amount.getAmount();
+
+            System.err.println("--------------------------total principal is ------------------"+principal);
             
             int cmp = principal.compareTo(balanceToDeduct);
 
@@ -1895,23 +1906,10 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
                 BigDecimal settleAmount = principal.subtract(balanceToDeduct);
 
-                /// now we have total amount to settle ,lets now settle 
-//                ObjectNode node = ObjectNodeHelper.objectNode();
-//                node.put("transactionAmount" ,settleAmount.doubleValue());
-//                node.put("locale" ,"en");
-//                node.put("dateFormat" ,"dd MMMM yyyy");
-//                node.put("paymentTypeId",1);
-//                node.put("transactionDate" ,transactionDate.toString(fmt));
-//                node.put("note","Auto Disbursement Settlement");
-//
-//                String apiRequestBodyAsJson = node.toString();
-//
                 Long savingsAccountId = portfolioAccountData.accountId();
 
-                //final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
-                //final CommandWrapper commandRequest = builder.savingsAccountWithdrawal(savingsAccountId).build();
-                //CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-                //toApiJsonSerializer.serialize(result);
+
+                System.err.println("-------------------------amount to settle -----------"+settleAmount);
 
                 String description = "Auto Disbursement Settlement";
 
@@ -1920,14 +1918,16 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 // lets get transaction id of that transaction and create reference to it
                 Long transactionId = transaction.getId();
 
-                System.err.println("-----------------------transactionid from command id is "+transactionId);
+                System.err.println("-----------------------transactionid from command id is "+transactionId+"-----------------");
 
                 SavingsTransactionTrigger savingsTransactionTrigger = new SavingsTransactionTrigger(transaction,loan.getId() ,SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+
                 SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository ,null ,savingsTransactionTrigger);
             }
 
         }
     }
+
 
     @Override
     @CronTarget(jobName = JobName.TRANSFER_FEE_CHARGE_FOR_LOANS)

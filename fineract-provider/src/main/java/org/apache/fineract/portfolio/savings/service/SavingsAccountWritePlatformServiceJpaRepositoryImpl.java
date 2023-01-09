@@ -25,8 +25,14 @@ import java.math.MathContext;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.accounting.enumerations.ENTITY_TYPE;
+import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
+import org.apache.fineract.accounting.journalentry.domain.JournalEntry;
+import org.apache.fineract.accounting.journalentry.domain.JournalEntryRepositoryWrapper;
+import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.repo.TransactionCodeRepository;
+import org.apache.fineract.accounting.journalentry.service.JournalEntryReadPlatformService;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.bulkimport.constants.SavingsConstants;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
@@ -38,6 +44,7 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.exception.PlatformServiceUnavailableException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
@@ -143,6 +150,11 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
      */
     private final TransactionCodeRepository transactionCodeRepository;
 
+    /**
+     * Added 04/01/2022 at 0925
+     */
+    private JournalEntryReadPlatformService journalEntryReadPlatformService;
+    private JournalEntryRepositoryWrapper journalEntryRepositoryWrapper;
 
     @Autowired
     public SavingsAccountWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -164,7 +176,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository,
             final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
             final AppUserRepositoryWrapper appuserRepository, final StandingInstructionRepository standingInstructionRepository,
-            final BusinessEventNotifierService businessEventNotifierService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final TransactionCodeRepository transactionCodeRepository) {
+            final BusinessEventNotifierService businessEventNotifierService ,
+            final ClientRepositoryWrapper clientRepositoryWrapper ,
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,
+            final TransactionCodeRepository transactionCodeRepository ,
+            final JournalEntryReadPlatformService journalEntryReadPlatformService,
+            final JournalEntryRepositoryWrapper journalEntryRepositoryWrapper
+        ) {
         this.context = context;
         this.savingAccountRepositoryWrapper = savingAccountRepositoryWrapper;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
@@ -200,6 +218,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         // added 18/04/2022
         this.savingsAccountMonthlyDepositRepository = savingsAccountMonthlyDepositRepository;
         this.transactionCodeRepository = transactionCodeRepository;
+        this.journalEntryReadPlatformService = journalEntryReadPlatformService;
+        this.journalEntryRepositoryWrapper = journalEntryRepositoryWrapper;
 
     }
 
@@ -529,6 +549,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
     public CommandProcessingResult undoTransaction(final Long savingsId, final Long transactionId,
             final boolean allowAccountTransferModification) {
 
+
+        System.err.println("--------------------undo transaction searching for rogue elements ");
+
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService
                 .isSavingsInterestPostingAtCurrentPeriodEnd();
         final Integer financialYearBeginningMonth = this.configurationDomainService.retrieveFinancialYearBeginningMonth();
@@ -576,6 +599,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 account.undoTransaction(transactionId + 1);
             }
         }
+
         boolean isInterestTransfer = false;
         LocalDate postInterestOnDate = null;
         checkClientOrGroupActive(account);
@@ -594,11 +618,30 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         }
         account.validateAccountBalanceDoesNotBecomeNegative(SavingsApiConstants.undoTransactionAction, depositAccountOnHoldTransactions);
         account.activateAccountBasedOnBalance();
+
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
 
-        TransactionCode transactionCode = null;
+        /**
+         * Modified 04/01/2023 at 0759 
+         * Problem with transactions with custom transaction code when reversing 
+         * The transaction code is not picked but rather checks for usual accounting mapping in product settings
+         * Solution find the codes from gl entry and use them instead ..
+         */ 
+        
+        TransactionCode transactionCode = transactionCodeFromGlEntries(transactionId.toString());
+
+        System.err.println("-------------------------------------existing ids are----------------- ");
+        existingTransactionIds.stream().forEach((e)-> System.err.println(e));
+
+
+        System.err.println("-------------------------------------existing reversed ids are----------------- ");
+        existingReversedTransactionIds.stream().forEach((e)-> System.err.println(e));
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
+
+        System.err.println("---------------------------we should then mark the transactions as reversed here ? ");
+
+        markTransactionsAsReversed(transactionId.toString());
 
         return new CommandProcessingResultBuilder() //
                 .withEntityId(savingsId) //
@@ -608,6 +651,53 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                 .withSavingsId(savingsId) //
                 .build();
     }
+
+    /**
+     * Added 04/01/2023 at 0820 
+     */
+    private TransactionCode transactionCodeFromGlEntries(String transactionId){
+
+        ENTITY_TYPE entityType = ENTITY_TYPE.SAVINGS ;
+        Page<JournalEntryData> journalEntryDataPage = journalEntryReadPlatformService.retrieveJournalEntriesByTransactionId(transactionId,entityType);
+
+        Long debitAccountId = 0L ;
+        Long creditAccountId = 0L ;
+        
+        for(JournalEntryData journalEntryData : journalEntryDataPage.getPageItems()){
+            JournalEntryType journalEntryType = journalEntryData.getJournalEntryType();
+            if(journalEntryType == JournalEntryType.DEBIT){
+                debitAccountId = journalEntryData.getGlAccountId();
+                continue;
+            }
+            creditAccountId = journalEntryData.getGlAccountId();   
+        }
+        System.err.println("------------have a feeling these could null ? ,should we initialize accounts to 0 -----");
+        TransactionCode transactionCode = transactionCodeRepository.getByGLAccounts(debitAccountId,creditAccountId);
+        return transactionCode ;
+    }
+
+
+    private void markTransactionsAsReversed(String transactionId){
+        
+        ENTITY_TYPE entityType = ENTITY_TYPE.SAVINGS ;
+        Page<JournalEntryData> journalEntryDataPage = journalEntryReadPlatformService.retrieveJournalEntriesByTransactionId(transactionId,entityType);
+
+        // here we should have 4 transactions only last two need to be marked ,what if its null ? 
+
+       System.err.println("----------------------------print transactiion id -----------------");
+        
+       journalEntryDataPage.getPageItems().stream().forEach((e)-> System.err.println(e.getId()));
+
+       if(journalEntryDataPage.getTotalFilteredRecords()==4){
+
+            List<JournalEntryData> items = journalEntryDataPage.getPageItems();
+
+            JournalEntry entry1 = journalEntryRepositoryWrapper.findOneWithNotFoundDetection(items.get(2).getId());
+            JournalEntry entry2 = journalEntryRepositoryWrapper.findOneWithNotFoundDetection(items.get(3).getId());
+            journalEntryRepositoryWrapper.reverseEntry(entry1 ,entry2);
+       }       
+
+    }  
 
     @Override
     public CommandProcessingResult adjustSavingsTransaction(final Long savingsId, final Long transactionId, final JsonCommand command) {

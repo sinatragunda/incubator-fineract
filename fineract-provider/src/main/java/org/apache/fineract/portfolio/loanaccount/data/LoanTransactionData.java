@@ -85,6 +85,8 @@ public class LoanTransactionData {
 
     private Long loanId ;
 
+    private Collection<LoanTransactionData> topUpLoans ;
+
     public static LoanTransactionData importInstance(BigDecimal repaymentAmount,LocalDate lastRepaymentDate,
             Long repaymentTypeId,Integer rowIndex,String locale,String dateFormat){
         return new LoanTransactionData(repaymentAmount, lastRepaymentDate, repaymentTypeId, rowIndex,locale,dateFormat);
@@ -267,7 +269,7 @@ public class LoanTransactionData {
     
     public static LoanTransactionData LoanTransactionDataForDisbursalTemplate(final LoanTransactionEnumData transactionType, final LocalDate expectedDisbursedOnLocalDateForTemplate, 
 			final BigDecimal disburseAmountForTemplate,	final Collection<PaymentTypeData> paymentOptions,
-			final BigDecimal retriveLastEmiAmount, final LocalDate possibleNextRepaymentDate) {
+			final BigDecimal retriveLastEmiAmount, final LocalDate possibleNextRepaymentDate ,final Collection<LoanTransactionData> topUpLoans) {
 		    final Long id = null;
 		    final Long officeId = null;
 		    final String officeName = null;
@@ -285,10 +287,13 @@ public class LoanTransactionData {
 		    final LocalDate submittedOnDate = null;
 		    final boolean manuallyReversed = false;
             final Long loanId = null ;
-			return new LoanTransactionData(id, officeId, officeName, transactionType, paymentDetailData, currency, expectedDisbursedOnLocalDateForTemplate,
+
+			LoanTransactionData loanTransactionData = new LoanTransactionData(id, officeId, officeName, transactionType, paymentDetailData, currency, expectedDisbursedOnLocalDateForTemplate,
 					disburseAmountForTemplate, principalPortion, interestPortion, feeChargesPortion, penaltyChargesPortion, overpaymentPortion,	unrecognizedIncomePortion, 
 					paymentOptions, transfer, externalId, retriveLastEmiAmount, outstandingLoanBalance, submittedOnDate, manuallyReversed, possibleNextRepaymentDate);
-		
+
+            loanTransactionData.setTopUpLoans(topUpLoans);
+            return loanTransactionData;
 	}
 
     private LoanTransactionData(Long id , final Long officeId, final String officeName, LoanTransactionEnumData transactionType, final PaymentDetailData paymentDetailData,
@@ -367,5 +372,13 @@ public class LoanTransactionData {
         BigDecimal outstanding = interest.add(principal).add(fees).add(penalty);
 
         return outstanding ;
+    }
+
+    public Collection<LoanTransactionData> getTopUpLoans() {
+        return topUpLoans;
+    }
+
+    public void setTopUpLoans(Collection<LoanTransactionData> topUpLoans) {
+        this.topUpLoans = topUpLoans;
     }
 }

@@ -24,6 +24,7 @@ import java.util.Locale;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
@@ -164,6 +165,20 @@ public class AccountTransferDTO {
         this.isExceptionForBalanceCheck = true;
         this.toShareAccount = toShareAccount ;
     }
+
+    /**
+     * Added 05/01/2023 at 1613
+     */
+    public static AccountTransferDTO loanToLoan(Loan fromLoan ,Loan toLoan ,LocalDate transactionDate ,Locale locale, DateTimeFormatter dateTimeFormatter ,BigDecimal amount,String description){
+
+        PortfolioAccountType fromPortfolioAccountType = PortfolioAccountType.LOAN ;
+        PortfolioAccountType toPortfolioAccountType = PortfolioAccountType.LOAN ;
+        Integer fromTransferType = LoanTransactionType.DISBURSEMENT.ordinal();
+        Integer toTransferType = LoanTransactionType.REPAYMENT.getValue();
+        AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate ,amount ,fromPortfolioAccountType ,toPortfolioAccountType ,null ,null ,description ,locale ,dateTimeFormatter ,fromTransferType ,toTransferType ,null ,fromLoan ,toLoan);
+        return accountTransferDTO;
+
+    }  
 
     public LocalDate getTransactionDate() {
         return this.transactionDate;

@@ -1032,7 +1032,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public SavingsAccountTransaction withdraw(final SavingsAccountTransactionDTO transactionDTO, final boolean applyWithdrawFee) {
 
-        System.err.println("-------------------apply withdrawal fee now ? ---------"+applyWithdrawFee);
+        //System.err.println("-------------------apply withdrawal fee now ? ---------"+applyWithdrawFee);
 
         if (!isTransactionsAllowed()) {
 
@@ -1097,7 +1097,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         
         final Money transactionAmountMoney = Money.of(this.currency, transactionAmount);
 
-        System.err.println("------------transaction amount is -----------"+transactionAmount);
+        //System.err.println("------------transaction amount is -----------"+transactionAmount);
         
         final SavingsAccountTransaction transaction = SavingsAccountTransaction.withdrawal(this, office(),
                 transactionDTO.getPaymentDetail(), transactionDTO.getTransactionDate(), transactionAmountMoney,
@@ -1106,7 +1106,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         if (applyWithdrawFee) {
             // auto pay withdrawal fee
-            System.err.println("------------------------proceed to pay on charges here son ----------");
+            //System.err.println("------------------------proceed to pay on charges here son ----------");
             payWithdrawalFee(transactionDTO.getTransactionAmount(), transactionDTO.getTransactionDate(), transactionDTO.getAppUser(),false);
         }
 
@@ -1167,16 +1167,16 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
          */ 
         BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
 
-        System.err.println("--------------initial amount is ------------"+transactionAmount);
+        //System.err.println("--------------initial amount is ------------"+transactionAmount);
 
         boolean gate = !deductOnAccountBalance && applyWithdrawFee;
 
-        System.err.println("----------------------deduct on charges on account balance ---------"+deductOnAccountBalance);
+        //System.err.println("----------------------deduct on charges on account balance ---------"+deductOnAccountBalance);
 
-        System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
+        //System.err.println("-----------the gate should be true ,apply fee and is not  deduct on balance----"+gate);
 
 
-        System.err.println("-------------------appply withdrawal feee ? "+applyWithdrawFee);
+        //System.err.println("-------------------appply withdrawal feee ? "+applyWithdrawFee);
 
          /**
           * Gate of !deductOnAccountBalance and applyWithdrawFee
@@ -1186,8 +1186,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
             System.err.println("----------------withhold paying charges we got total of "+totalCharges);
             transactionAmount = transactionAmount.subtract(totalCharges);
-
-            System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
+            //System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
         } 
 
         return transactionAmount;
