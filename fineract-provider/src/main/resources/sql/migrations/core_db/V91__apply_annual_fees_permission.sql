@@ -22,3 +22,6 @@ INSERT INTO `m_permission`
 VALUES
 ('transaction_savings', 'APPLYANNUALFEE_SAVINGSACCOUNT', 'SAVINGSACCOUNT', 'APPLYANNUALFEE', 1),
 ('transaction_savings', 'APPLYANNUALFEE_SAVINGSACCOUNT_CHECKER', 'SAVINGSACCOUNT', 'APPLYANNUALFEE', 0);
+
+INSERT INTO `c_configuration` (`name`, `enabled`) VALUES ('allow-transactions-on-holiday', 0);
+INSERT INTO `c_configuration` (`name`, `enabled`) VALUES ('allow-transactions-on-non_workingday', 0);

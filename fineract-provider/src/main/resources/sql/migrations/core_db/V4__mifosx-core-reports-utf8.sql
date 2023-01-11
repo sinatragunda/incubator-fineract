@@ -28,3 +28,9 @@ INSERT INTO `stretchy_report_parameter` VALUES (1,5,NULL),(2,5,NULL),(2,6,NULL),
 insert into m_permission(grouping, `code`, entity_name, action_name, can_maker_checker)
 select 'report', concat('READ_', r.report_name), r.report_name, 'READ', false
 from stretchy_report r;
+
+
+INSERT INTO `stretchy_parameter` VALUES (null, 'selectLoanId', 'loanId', 'Select Loan', 'select', 'number', 'n/a', NULL, NULL, 'Y', 'select ml.id from m_loan ml', NULL);
+
+INSERT INTO `stretchy_parameter` VALUES (null, 'selectAccountId', 'accountId', 'Select Account', 'select', 'number', 'n/a', NULL, NULL, 'Y', 'select msa.id from m_savings_account msa', NULL);
+
