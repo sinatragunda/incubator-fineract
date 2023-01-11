@@ -24,8 +24,11 @@
 package org.apache.fineract.portfolio.loanaccount.helper;
 
 import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.account.domain.AccountTransferDetails;
+import org.apache.fineract.portfolio.account.domain.AccountTransferTransaction;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.exception.RevolvingAccountInsufficientPayoffException;
 import com.google.gson.JsonElement;
@@ -78,17 +81,30 @@ public class RevolvingLoanHelper{
 		}		
 	}
 
+	/**
+	 *	Added 10/01/2023 at 0707
+	 */
+	public static BigDecimal loanBalance(Loan loan ,LoanReadPlatformService loanReadPlatformService, LocalDate transactionDate) {
+		Long loanId = loan.getId();
+		LoanTransactionData loanTransactionData = loanReadPlatformService.retrieveLoanForeclosureTemplate(loanId, transactionDate);
+		BigDecimal loanBalance = loanTransactionData.outstandingLoanBalance();
+		return loanBalance;
+	}
 
-	// what does this even do ?
+
+
+		// what does this even do ?
 	// gets the amount being revolved like outstanding balance from previous loan
 	// added 02/08/2022 at 0505
 	public static BigDecimal revolvingLoanDTOAmountEx(Loan loan , SavingsAccount fromSavingsAccount , LoanReadPlatformService loanReadPlatformService, LocalDate transactionDate){
 
  	  	Long loanId = loan.getId();
+
 	    LoanTransactionData loanTransactionData = loanReadPlatformService.retrieveLoanForeclosureTemplate(loanId ,transactionDate);
 		
 		BigDecimal revolveLoanBalance =  loanTransactionData.outstandingLoanBalance();
-        BigDecimal savingsAccountBalance = fromSavingsAccount.accountBalance();
+
+		BigDecimal savingsAccountBalance = fromSavingsAccount.accountBalance();
 
         LoanProduct loanProduct = loan.loanProduct();
 
@@ -107,15 +123,20 @@ public class RevolvingLoanHelper{
         	BigDecimal dueBalance = revolveLoanBalance.subtract(savingsAccountBalance);
         	throw new RevolvingAccountInsufficientPayoffException(dueBalance);
         }
-
         return revolveLoanBalance ;
 	}
 
-	public static void payOffLoanWithLoan(AccountTransfersWritePlatformService accountTransfersWritePlatformService ,Loan fromLoan , Loan toLoan , LocalDate transactionDate , DateTimeFormatter dateTimeFormatter ,Locale locale, BigDecimal amount ,String description){
+	public static List payOffLoanWithLoan(AccountTransfersWritePlatformService accountTransfersWritePlatformService ,LoanAccountDomainService loanAccountDomainService, Loan fromLoan , Loan toLoan , LocalDate transactionDate , DateTimeFormatter dateTimeFormatter ,Locale locale, BigDecimal amount ,String description){
 
 		AccountTransferDTO accountTransferDTO = AccountTransferDTO.loanToLoan(fromLoan ,toLoan ,transactionDate ,locale ,dateTimeFormatter ,amount, description);
-		accountTransfersWritePlatformService.repayLoanWithTopup(accountTransferDTO);
+		AccountTransferDetails accountTransferDetails = accountTransfersWritePlatformService.repayLoanWithTopup(accountTransferDTO);
+		forecloseLoan(loanAccountDomainService ,toLoan ,transactionDate ,description);
+		List<AccountTransferTransaction> accountTransferTransactions = accountTransferDetails.accountTransferTransactions();
+		return accountTransferTransactions;
+	}
 
+	public static void forecloseLoan(LoanAccountDomainService loanAccountDomainService ,Loan loan ,LocalDate transactionDate ,String description){
+		loanAccountDomainService.foreCloseLoan(loan ,transactionDate ,description);
 	}
 
 	/**

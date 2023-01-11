@@ -1798,22 +1798,14 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final SavingsAccount fromSavingsAccount = null;
         final boolean isExceptionForBalanceCheck = false;
         final boolean isRegularTransaction = true;
-        final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, amount.getAmount(),
-                PortfolioAccountType.LOAN, PortfolioAccountType.SAVINGS, loan.getId(), portfolioAccountData.accountId(),
-                "Loan Disbursement", locale, fmt, paymentDetail, LoanTransactionType.DISBURSEMENT.getValue(), null, null, null,
-                AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, txnExternalId, loan, null, fromSavingsAccount,
-                isRegularTransaction, isExceptionForBalanceCheck);
 
-        this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
-
-
-        // added 25/05/2021
-        // if then we get savings account balance and pay off exising linked loan now
-        // RevolveAccountHelper.disburseTransfer()
+        /**
+         * Modified 10/01/2023 at 0635
+         * Payoff loans with topup first
+         */
 
         String revolveAccountIds = loan.revolvingAccountId();
         BigDecimal totalRevolveAmount = BigDecimal.ZERO;
-
         SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
 
         System.err.println("-------------new account balance is now --------"+savingsAccount.accountBalance());
@@ -1825,9 +1817,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             List<Loan> loansList = new ArrayList<>();
 
             while(token.hasMoreTokens()){
+
                 Long id = Long.decode(token.nextToken());
                 LoanTransactionData revolveLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
-
                 Optional.ofNullable(revolveLoanAccount).ifPresent(e->{
                     revolveLoanAccountsList.add(revolveLoanAccount);
                     Loan loanTemp = loanAssembler.assembleFrom(id);
@@ -1835,50 +1827,56 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 });
             }
 
-            RevolvingLoanHelper.revolvingLoansBalanceCheck(revolveLoanAccountsList ,savingsAccount);
+            //RevolvingLoanHelper.revolvingLoansBalanceCheck(revolveLoanAccountsList ,savingsAccount);
             
             for(Loan revolveLoanAccount : loansList){
 
-                // why is it suffixed DTO ?
-                BigDecimal revolveDTOAmount = RevolvingLoanHelper.revolvingLoanDTOAmountEx(revolveLoanAccount ,savingsAccount ,loanReadPlatformService ,transactionDate);
+                BigDecimal revolveDTOAmount = RevolvingLoanHelper.loanBalance(revolveLoanAccount,loanReadPlatformService ,transactionDate);
 
-                // added 02/07/2021 
+                // added 02/07/2021
                 // Added to make up for amount being auto settled 
                 totalRevolveAmount = totalRevolveAmount.add(revolveDTOAmount);
 
                 String description = String.format("Revolving loan pay off ,to loan with account number %s",revolveLoanAccount.getAccountNumber());
-
-                // do some withdrawal transaction here then pay off loan in next transaction
-                //SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,revolveDTOAmount ,description);
-
-                //boolean transactionSuccesss = Optional.ofNullable(transaction).isPresent();
-
-                //if(!transactionSuccesss){
-                  //  throw new FailedToPayoffRevolvingLoanException(loan.getId());
-                
-                //}
-
                 System.err.println("------------------------------------------loan to loan transfer ----------");
 
-                RevolvingLoanHelper.payOffLoanWithLoan(accountTransfersWritePlatformService , loan ,revolveLoanAccount ,transactionDate ,fmt ,locale ,totalRevolveAmount ,description);
+                List<AccountTransferTransaction> accountTransferTransactions = RevolvingLoanHelper.payOffLoanWithLoan(accountTransfersWritePlatformService ,loanAccountDomainService, loan ,revolveLoanAccount ,transactionDate ,fmt ,locale ,revolveDTOAmount ,description);
 
-                // transaction successful hence its been triggered by this event 
-                //SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(transaction ,loan.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
-                //SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository,null ,trigger);
-                //loanAccountDomainService.foreCloseLoan(revolveLoanAccount ,transactionDate ,description);   
+                if(!accountTransferTransactions.isEmpty()){
+                    //LoanTr
+                    //SavingsTransactionTrigger trigger = new SavingsTransactionTrigger(transaction ,loan.getId() , SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                    //SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository,null ,trigger)
+                }
             }
         }
-
-        // added 02/07/2021 
-        // after revolving accounts then comes auto settle and diburse 
-
+        /**
+         * Modified 10/01/2023 at 0637
+         * Disburse balance to account first ,then auto settle from there
+         */
         boolean shouldCreateStandingInstructionAtDisbursement = loan.shouldCreateStandingInstructionAtDisbursement();
         boolean disburseLoanToSavingsAutoSettlement = loan.autoSettlementAtDisbursement();
+
+        BigDecimal disbusementAmount = amount.getAmount().subtract(totalRevolveAmount);
+
+        System.err.println("-------------------disbursement amount is---------"+disbusementAmount);
+
+        final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate,disbusementAmount,
+                PortfolioAccountType.LOAN, PortfolioAccountType.SAVINGS, loan.getId(), portfolioAccountData.accountId(),
+                "Loan Disbursement", locale, fmt, paymentDetail, LoanTransactionType.DISBURSEMENT.getValue(), null, null, null,
+                AccountTransferType.ACCOUNT_TRANSFER.getValue(), null, null, txnExternalId, loan, null, fromSavingsAccount,
+                isRegularTransaction, isExceptionForBalanceCheck);
+
+        this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+
+        System.err.println("------------------------------depositing this amount into account -------------"+disbusementAmount);
 
         if(disburseLoanToSavingsAutoSettlement){
 
             Set<LoanCharge> chargesList = loan.charges();
             BigDecimal totalCharges = BigDecimal.ZERO;
+
+            System.err.println("-----------------------------------------should create standing instruction ? "+shouldCreateStandingInstructionAtDisbursement);
+
             if(shouldCreateStandingInstructionAtDisbursement){
                 //it means charges are already deducted we just need to get amount of charges due at disbursement
                 for(LoanCharge charge : chargesList){
@@ -1889,13 +1887,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                     }
                 }
             }
-
             // since charges would be deducted next ,its ideal to subtract charges from the money to deduct so at to not have insufficient balance when deducting charges
-            BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
+            //BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
+            BigDecimal balanceToDeduct = totalCharges;
 
             System.err.println("------------------------balance to deduct -------------"+balanceToDeduct);
 
-            BigDecimal principal = amount.getAmount();
+            BigDecimal principal = disbusementAmount;
 
             System.err.println("--------------------------total principal is ------------------"+principal);
             
@@ -1906,23 +1904,18 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
                 BigDecimal settleAmount = principal.subtract(balanceToDeduct);
 
-                Long savingsAccountId = portfolioAccountData.accountId();
-
-
                 System.err.println("-------------------------amount to settle -----------"+settleAmount);
 
                 String description = "Auto Disbursement Settlement";
 
-                SavingsAccountTransaction transaction =  savingsAccountDomainService.handleWithdrawalLite(savingsAccount ,transactionDate,settleAmount ,description);
-
-                // lets get transaction id of that transaction and create reference to it
-                Long transactionId = transaction.getId();
-
-                System.err.println("-----------------------transactionid from command id is "+transactionId+"-----------------");
-
-                SavingsTransactionTrigger savingsTransactionTrigger = new SavingsTransactionTrigger(transaction,loan.getId() ,SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
-
-                SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository ,null ,savingsTransactionTrigger);
+                if(shouldCreateStandingInstructionAtDisbursement) {
+                    SavingsAccountTransaction transaction = savingsAccountDomainService.handleWithdrawalLite(savingsAccount, transactionDate, settleAmount, description);
+                    // lets get transaction id of that transaction and create reference to it
+                    Long transactionId = transaction.getId();
+                    //System.err.println("-----------------------transaction id from command id is " + transactionId + "-----------------");
+                    SavingsTransactionTrigger savingsTransactionTrigger = new SavingsTransactionTrigger(transaction, loan.getId(), SAVINGS_TRANSACTION_TRIGGER_TYPE.LOAN);
+                    SavingsTransactionsTriggerHelper.trigger(savingsTransactionTriggerRepository, null, savingsTransactionTrigger);
+                }
             }
 
         }

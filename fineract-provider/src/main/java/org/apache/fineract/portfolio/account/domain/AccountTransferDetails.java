@@ -211,4 +211,8 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     public ShareAccount toShareAccount(){
         return this.toShareAccount ;
     }
+
+    public List accountTransferTransactions(){
+        return this.accountTransferTransactions;
+    }
 }

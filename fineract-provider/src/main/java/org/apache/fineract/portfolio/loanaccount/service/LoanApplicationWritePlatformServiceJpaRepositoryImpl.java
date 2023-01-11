@@ -598,26 +598,26 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
                 settlementAccountId[0] = loanProductSettings.getSettlementAccountId();
 
-                System.err.println("----------------settlement product id is -------------"+settlementAccountId[0]);
+                //System.err.println("----------------settlement product id is -------------"+settlementAccountId[0]);
 
                 List<SavingsAccountData> savingsAccounts =  savingsAccountReadPlatformService.retrieveAllForClientUnderPortfolio(clientId ,settlementAccountId[0]);
 
-                System.err.println("------------savingsaccounts ----------"+savingsAccounts.size());
+                //System.err.println("------------savingsaccounts ----------"+savingsAccounts.size());
 
                 boolean hasAccount = savingsAccounts.stream().findFirst().isPresent();
 
                 if(hasAccount){
                     
-                    System.err.println("-----------------------has account ? ------------------");
+                    //System.err.println("-----------------------has account ? ------------------");
                     
                     SavingsAccountData savingsAccountData = savingsAccounts.stream().findFirst().get();
                     
                     Long savingsAccountId = savingsAccountData.getId();
-                    System.err.println("--------------account id is is -------------"+savingsAccountId);
+                    //System.err.println("--------------account id is is -------------"+savingsAccountId);
                     json[0] = JsonHelper.update(json[0] ,"linkAccountId",savingsAccountId);
                 }
             });
-            System.err.println("--------------------------new json -------------------------"+json[0]);
+            //System.err.println("--------------------------new json -------------------------"+json[0]);
             command = JsonCommandHelper.jsonCommand(fromJsonHelper ,json[0]);
         }
 
@@ -628,7 +628,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
         boolean isPresent = Optional.ofNullable(savingsAccountIdArg).isPresent();
 
-        System.err.println("----------------------------------is present -------------"+isPresent);
+        //System.err.println("----------------------------------is present -------------"+isPresent);
 
         Long savingsAccountId[] = {savingsAccountIdArg};
 

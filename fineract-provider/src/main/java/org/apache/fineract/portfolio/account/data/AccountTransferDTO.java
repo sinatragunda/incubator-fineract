@@ -175,7 +175,9 @@ public class AccountTransferDTO {
         PortfolioAccountType toPortfolioAccountType = PortfolioAccountType.LOAN ;
         Integer fromTransferType = LoanTransactionType.DISBURSEMENT.ordinal();
         Integer toTransferType = LoanTransactionType.REPAYMENT.getValue();
-        AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate ,amount ,fromPortfolioAccountType ,toPortfolioAccountType ,null ,null ,description ,locale ,dateTimeFormatter ,fromTransferType ,toTransferType ,null ,fromLoan ,toLoan);
+        Long fromAccountId = fromLoan.getId();
+        Long toAccountId = toLoan.getId();
+        AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate ,amount ,fromPortfolioAccountType ,toPortfolioAccountType ,fromAccountId ,toAccountId ,description ,locale ,dateTimeFormatter ,fromTransferType ,toTransferType ,null ,fromLoan ,toLoan);
         return accountTransferDTO;
 
     }  

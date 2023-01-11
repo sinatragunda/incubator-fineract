@@ -180,6 +180,8 @@ public class SavingsAccountCharge extends AbstractPersistableCustom<Long> {
             final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculation, final LocalDate dueDate, final boolean status,
             MonthDay feeOnMonthDay, final Integer feeInterval) {
 
+        System.err.println("-------------------charge time showing other error why null ? "+chargeTime);
+
         this.savingsAccount = savingsAccount;
         this.charge = chargeDefinition;
         this.penaltyCharge = chargeDefinition.isPenalty();

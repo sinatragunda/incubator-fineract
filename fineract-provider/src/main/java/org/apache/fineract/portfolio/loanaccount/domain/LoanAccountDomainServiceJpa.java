@@ -230,9 +230,13 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     private void saveLoanTransactionWithDataIntegrityViolationChecks(LoanTransaction newRepaymentTransaction) {
         try {
+            //System.err.println("------------------------------------------saving loan with integrity checks now son -------");
             this.loanTransactionRepository.save(newRepaymentTransaction);
+            //System.err.println("-----------------------loan saved ------------");
+
         } catch (DataIntegrityViolationException e) {
             final Throwable realCause = e.getCause();
+            //System.err.println("-------------------------get cause ------------"+e.getMessage());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.transaction");
             if (realCause.getMessage().toLowerCase().contains("external_id_unique")) {
@@ -240,12 +244,14 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                         .failWithCode("value.must.be.unique");
             }
             if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                    "Validation errors exist.", dataValidationErrors); }
+                    "Validation errors exist.", dataValidationErrors); 
+            }
         }
     }
 
     private void saveAndFlushLoanWithDataIntegrityViolationChecks(final Loan loan) {
         try {
+            //System.err.println("----------------save and flush this shit ---------------");
             List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
             for (LoanRepaymentScheduleInstallment installment : installments) {
                 if (installment.getId() == null) {
@@ -268,6 +274,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Override
     public void saveLoanWithDataIntegrityViolationChecks(final Loan loan) {
         try {
+            //System.err.println("--------------------violation checks --------");
             List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
             for (LoanRepaymentScheduleInstallment installment : installments) {
                 if (installment.getId() == null) {
@@ -552,7 +559,13 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     private void updateLoanTransaction(final Long loanTransactionId, final LoanTransaction newLoanTransaction) {
+        
+        System.err.println("------------------------our transaction id is "+loanTransactionId);
+
         final AccountTransferTransaction transferTransaction = this.accountTransferRepository.findByToLoanTransactionId(loanTransactionId);
+        
+        System.err.println("---------------------find by loan transaction --------"+loanTransactionId);
+
         if (transferTransaction != null) {
             transferTransaction.updateToLoanTransaction(newLoanTransaction);
             this.accountTransferRepository.save(transferTransaction);
@@ -626,7 +639,15 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         existingReversedTransactionIds.addAll(loan.findExistingReversedTransactionIds());
         final ScheduleGeneratorDTO scheduleGeneratorDTO = null;
         AppUser appUser = getAppUserIfPresent();
+
         final LoanRepaymentScheduleInstallment foreCloseDetail = loan.fetchLoanForeclosureDetail(foreClosureDate);
+        
+        /**
+         * Modified 11/01/2023 at 0124
+         * Zero balance foreclosures bring error if function updateloantransaction called ,so this bool check is to skip it in case its a 0 balance transaction 
+         */
+        boolean zeroBalanceForeclosure = false ;
+
         if (loan.isPeriodicAccrualAccountingEnabledOnLoanProduct()
                 && (loan.getAccruedTill() == null || !foreClosureDate.isEqual(loan.getAccruedTill()))) {
             loan.reverseAccrualsAfter(foreClosureDate);
@@ -658,7 +679,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                 }
             }
         }
-        
+
 
         Money interestPayable = foreCloseDetail.getInterestCharged(currency);
         Money feePayable = foreCloseDetail.getFeeChargesCharged(currency);
@@ -669,7 +690,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         LoanTransaction payment = null;
 
         if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()){
-            System.err.println("--------------------balance greater than 0 here ");
             final PaymentDetail paymentDetail = null;
             String externalId = null;            
             final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
@@ -682,7 +702,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         }
         else{
             // zero balance payment meant to close off loan at current date if it has 0 amount on that specific date
-            System.err.println("--------------------balance less than 0 here---------------");
+            zeroBalanceForeclosure = true ;
             final PaymentDetail paymentDetail = null;
             Money zero = Money.zero(loan.getCurrency());
             String externalId = null;
@@ -693,17 +713,9 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             payment.updateCreatedDate(createdDate.toDate());
             payment.updateLoan(loan);
             newTransactions.add(payment);
-
-            System.err.println("----------------transaction to pay off here ----------------");
-
         }
 
-
-        System.err.println("----------------------------payment information updated in that other loan here nothing has happened -----------"+ Optional.ofNullable(payment).isPresent());
-
         List<Long> transactionIds = new ArrayList<>();
-
-        System.err.println("-------------get transaction ids -------------");
 
         final ChangedTransactionDetail changedTransactionDetail = loan.handleForeClosureTransactions(payment,
                 defaultLoanLifecycleStateMachine(), scheduleGeneratorDTO, appUser);
@@ -720,6 +732,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             saveLoanTransactionWithDataIntegrityViolationChecks(newTransaction);
             transactionIds.add(newTransaction.getId());
         }
+
         changes.put("transactions", transactionIds);
         changes.put("eventAmount", payPrincipal.getAmount().negate());
         
@@ -728,7 +741,15 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                 saveLoanTransactionWithDataIntegrityViolationChecks(mapEntry.getValue());
                 // update loan with references to the newly created transactions
                 loan.getLoanTransactions().add(mapEntry.getValue());
-                updateLoanTransaction(mapEntry.getKey(), mapEntry.getValue());
+                //System.err.println("------------------updating loan transactions -----------"+mapEntry.getKey());
+                /**
+                 * Modified 11/01/2023 at 0126 
+                 * ZeroBalanceForeclosure bool to skip this action if zeroBalance closure 
+                 * Brings some error no idea of its origin from calling AccountTransferRepository
+                 */ 
+                if(!zeroBalanceForeclosure){
+                    updateLoanTransaction(mapEntry.getKey(), mapEntry.getValue());
+                }
             }
         }
         
@@ -740,7 +761,12 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             this.noteRepository.save(note);
         }
 
+        //System.err.println("------------------------finish this --------------------");
+
         postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds, false);
+
+        //System.err.println("--------------------------post journal entries here for closing ----------");
+
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.LOAN_FORECLOSURE,
                 constructEntityMap(BUSINESS_ENTITY.LOAN_TRANSACTION, payment));
         return changes;

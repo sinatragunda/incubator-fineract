@@ -96,7 +96,8 @@ public class SavingsAccountChargeAssembler {
                     final Integer feeInterval = this.fromApiJsonHelper.extractIntegerNamed(feeIntervalParamName, savingsChargeElement,
                             locale);
 
-                    if (id == null) {
+                    if (id == null){
+                        System.err.println("-----------------why is charge id null ? ----------");
                         final Charge chargeDefinition = this.chargeRepository.findOneWithNotFoundDetection(chargeId);
 
                         if (!chargeDefinition.isSavingsCharge()) {
@@ -105,17 +106,39 @@ public class SavingsAccountChargeAssembler {
                             throw new ChargeCannotBeAppliedToException("savings.product", errorMessage, chargeDefinition.getId());
                         }
 
-                        ChargeTimeType chargeTime = null;
-                        if (chargeTimeType != null) {
+                        System.err.println("---------------------get name from charge ----------"+chargeDefinition.getName());
+
+                        System.err.println("---------------------charge time type -------------"+chargeDefinition.getChargeTimeType());
+
+                        System.err.println("-----------------------calculation type ------"+chargeDefinition.getChargeCalculation());
+
+                        ChargeTimeType chargeTime = null ;
+
+                        boolean isChargeTimeTypePresent = Optional.ofNullable(chargeDefinition.getChargeTimeType()).isPresent();
+
+                        if(isChargeTimeTypePresent){
+                            System.err.println("----------------------we have charge time type ,set it from charge definition -----------");
+                            Integer t = chargeDefinition.getChargeTimeType();
+                            chargeTime = ChargeTimeType.fromInt(t);
+                        }
+                        else{
+                            System.err.println("------------------------get from parseed json "+chargeTime);
                             chargeTime = ChargeTimeType.fromInt(chargeTimeType);
                         }
 
                         ChargeCalculationType chargeCalculation = null;
-                        if (chargeCalculationType != null) {
+                        boolean isChargeCalculationTypePresent = Optional.ofNullable(chargeDefinition.getChargeCalculation()).isPresent();
+
+                        if(isChargeCalculationTypePresent){
+                            Integer t = chargeDefinition.getChargeCalculation();
+                            chargeCalculation = ChargeCalculationType.fromInt(t);
+                        }
+                        else{
                             chargeCalculation = ChargeCalculationType.fromInt(chargeCalculationType);
                         }
 
                         final boolean status = true;
+
                         final SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.createNewWithoutSavingsAccount(
                                 chargeDefinition, amount, chargeTime, chargeCalculation, dueDate, status, feeOnMonthDay, feeInterval);
                         savingsAccountCharges.add(savingsAccountCharge);
@@ -126,7 +149,6 @@ public class SavingsAccountChargeAssembler {
                         if (savingsAccountCharge == null) { throw new SavingsAccountChargeNotFoundException(savingsAccountChargeId); }
 
                         savingsAccountCharge.update(amount, dueDate, feeOnMonthDay, feeInterval);
-
                         savingsAccountCharges.add(savingsAccountCharge);
                     }
                 }

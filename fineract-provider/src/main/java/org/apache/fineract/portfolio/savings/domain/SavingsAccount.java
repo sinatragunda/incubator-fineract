@@ -1228,13 +1228,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
 
-            System.err.println("----------------name of the charge is "+charge.getCharge().getName());
-
-            System.err.println("-------------------get type of charge "+charge.getCharge().getChargeTimeType());
-
-            System.err.println("-----------what type is this charge though since not withdrawal fee ? "+charge.isDepositFee());
-
-            System.err.println("---------product apply charges --------- is withdrawal fee and active ? -------"+charge.isWithdrawalFee()+"=============="+charge.isActive());
+            //System.err.println("-------------------get type of charge "+charge.getCharge().getChargeTimeType());
+            //System.err.println("-----------what type is this charge though since not withdrawal fee ? "+charge.isDepositFee());
+            //System.err.println("---------product apply charges --------- is withdrawal fee and active ? -------"+charge.isWithdrawalFee()+"=============="+charge.isActive());
             
             if (charge.isWithdrawalFee() && charge.isActive()) {
 
@@ -1250,7 +1246,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
-
         System.err.println("----------------------total charges amount is -----"+totalCharges);
         return totalCharges;
     }

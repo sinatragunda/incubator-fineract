@@ -621,6 +621,8 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         final boolean isAccountTransfer = true;
         Loan fromLoanAccount = null;
         if (accountTransferDTO.getFromLoan() == null) {
+
+            System.err.println("------------------------from loan is null how coem > ");
             fromLoanAccount = this.loanAccountAssembler.assembleFrom(accountTransferDTO.getFromAccountId());
         } else {
             fromLoanAccount = accountTransferDTO.getFromLoan();
@@ -628,6 +630,8 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
         }
         Loan toLoanAccount = null;
         if (accountTransferDTO.getToLoan() == null) {
+
+            System.err.println("-------------------to loan account is null --------------");
             toLoanAccount = this.loanAccountAssembler.assembleFrom(accountTransferDTO.getToAccountId());
         } else {
             toLoanAccount = accountTransferDTO.getToLoan();
@@ -644,6 +648,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleLoanToLoanTransfer(accountTransferDTO, fromLoanAccount,
                 toLoanAccount, disburseTransaction, repayTransaction);
+        
         this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
 
         return accountTransferDetails;

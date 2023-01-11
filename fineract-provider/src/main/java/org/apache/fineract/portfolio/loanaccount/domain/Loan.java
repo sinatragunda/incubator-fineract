@@ -1237,15 +1237,10 @@ public class Loan extends AbstractPersistableCustom<Long> {
                                 || installment.getPenaltyChargesCharged(getCurrency()).isLessThan(penality)
                                 || (getAccruedTill().isEqual(loanTransaction.getTransactionDate()) && !installment.getDueDate().isEqual(
                                         getAccruedTill()))) {
-                        
-                            System.err.println("------still no null");
 
                             interest = interest.minus(loanTransaction.getInterestPortion(getCurrency()));
                             fee = fee.minus(loanTransaction.getFeeChargesPortion(getCurrency()));
                             penality = penality.minus(loanTransaction.getPenaltyChargesPortion(getCurrency()));
-
-                            System.err.println("-----new interest is ------"+interest);
-
                             loanTransaction.reverse();
                         }
                     }
@@ -1996,7 +1991,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         if (this.client != null && this.client.isActivatedAfter(submittedOn)) {
             final String errorMessage = "The date on which a loan is submitted cannot be earlier than client's activation date.";
-            System.err.println("-----------------exception masked here");
+            //System.err.println("-----------------exception masked here");
             throw new InvalidLoanStateTransitionException("submittal", "cannot.be.before.client.activation.date", errorMessage, submittedOn);
         }
 
@@ -3021,9 +3016,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final LoanTransaction adjustedTransaction,
             final ScheduleGeneratorDTO scheduleGeneratorDTO, final AppUser currentUser) {
 
-
-        System.err.println("----what re we doing in here ");
-
         ChangedTransactionDetail changedTransactionDetail = null;
 
         LoanStatus statusEnum = null;
@@ -3091,8 +3083,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
             }
         }
 
-
-        System.err.println("---------------------do we get out of here ? -------------");
+        //System.err.println("---------------------do we get out of here ? -------------");
 
         final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = this.transactionProcessorFactory
                 .determineProcessor(this.transactionProcessingStrategy);
@@ -3100,6 +3091,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         final LoanRepaymentScheduleInstallment currentInstallment = fetchLoanRepaymentScheduleInstallment(loanTransaction
                 .getTransactionDate());
         boolean reprocess = true;
+
+        //System.err.println("-----------------------processign strategy determined ------------------");
 
         if (!isForeclosure() && isTransactionChronologicallyLatest && adjustedTransaction == null
                 && loanTransaction.getTransactionDate().isEqual(DateUtils.getLocalDateOfTenant()) && currentInstallment != null
@@ -3165,6 +3158,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
         if (changedTransactionDetail != null) {
             this.loanTransactions.removeAll(changedTransactionDetail.getNewTransactionMappings().values());
         }
+
         return changedTransactionDetail;
     }
 
@@ -4972,8 +4966,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
             break;
             case LOAN_FORECLOSURE:
 
-                System.err.println("--------------fore close an opened loan "+isOpen());
-
                 if (!isOpen()) {
                     final String defaultUserMessage = "Loan foreclosure is not allowed. Loan Account is not active.";
                     final ApiParameterError error = ApiParameterError.generalError(
@@ -6365,30 +6357,21 @@ public class Loan extends AbstractPersistableCustom<Long> {
             }
         }
     }
-
     public ChangedTransactionDetail handleForeClosureTransactions(final LoanTransaction repaymentTransaction,
             final LoanLifecycleStateMachine loanLifecycleStateMachine, final ScheduleGeneratorDTO scheduleGeneratorDTO,
             final AppUser appUser) {
 
-        System.err.println("---------------------start eventing ----------");
-
         LoanEvent event = LoanEvent.LOAN_FORECLOSURE;
 
-        System.err.println("----------------------foreclosure event -----------"+event);
+        //System.err.println("----------------------foreclosure event -----------"+event);
         
         validateAccountStatus(event);
 
-        System.err.println("-----------------------is repayment null ? "+ Optional.ofNullable(repaymentTransaction).isPresent());
-        
         validateForForeclosure(repaymentTransaction.getTransactionDate());
-
-        System.err.println("---------------------------validate failed ---------");
-
         this.loanSubStatus = LoanSubStatus.FORECLOSED.getValue();
         applyAccurals(appUser);
         return handleRepaymentOrRecoveryOrWaiverTransaction(repaymentTransaction, loanLifecycleStateMachine, null, scheduleGeneratorDTO,
                 appUser);
-
     }
 
     public Money retrieveAccruedAmountAfterDate(final LocalDate tillDate) {
@@ -6418,9 +6401,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateForForeclosure(final LocalDate transactionDate) {
 
-        System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
+        //System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
 
-        System.err.println("--------------validate class with trans date-----------"+transactionDate);
+        //System.err.println("--------------validate class with trans date-----------"+transactionDate);
 
         if (isInterestRecalculationEnabledForProduct()) {
             final String defaultUserMessage = "The loan with interest recalculation enabled cannot be foreclosed.";
@@ -6429,8 +6412,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
         }
 
         LocalDate lastUserTransactionDate = getLastUserTransactionDate();
-
-        System.err.println("--------------with transaction date lets validate ---------"+lastUserTransactionDate);
 
         if (DateUtils.isDateInTheFuture(transactionDate)) {
             final String defaultUserMessage = "The transactionDate cannot be in the future.";
@@ -6442,9 +6423,6 @@ public class Loan extends AbstractPersistableCustom<Long> {
             throw new LoanForeclosureException("loan.foreclosure.transaction.date.cannot.before.the.last.transaction.date",
                     defaultUserMessage, transactionDate);
         }
-
-
-        System.err.println("--------------out of that shit class now --------");
     }
 
     public void updateInstallmentsPostDate(LocalDate transactionDate) {
