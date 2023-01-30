@@ -134,4 +134,8 @@ public class AccountTransferData {
         this.toAccountTypeOptions = toAccountTypeOptions;
         this.toAccountOptions = toAccountOptions;
     }
+
+    public Long getId(){
+        return this.id ;
+    }
 }

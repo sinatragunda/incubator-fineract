@@ -532,7 +532,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // Modified 31/05/2022 get linked account from product id if one exists
             final Long savingsAccountId = command.longValueOfParameterNamed("linkAccountId");
 
-            System.err.println("-----------------------linked account id is ------------"+savingsAccountId);
+            //System.err.println("-----------------------linked account id is ------------"+savingsAccountId);
 
             // added 31/05/2022 ,this method associates savings account id to loan but it needs to do lot more now
             associateLoanWithSettlementAccount(newLoanApplication, savingsAccountId);

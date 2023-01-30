@@ -228,11 +228,11 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                      * Modified 29/11/2022 at 1803
                      * Conditional using PortfolioProductType
                      */
-                    System.err.println("---------------------------entity type is ---------"+entityType.getValue());  
+                    //System.err.println("---------------------------entity type is ---------"+entityType.getValue());
                     PortfolioProductType portfolioProductType =  PortfolioProductType.fromInt(entityTypeId);
 
                     if(portfolioProductType.isShareProduct()){
-                        System.err.println("------------------is isShareProduct transaction");
+                        //System.err.println("------------------is isShareProduct transaction");
                         transaction = Long.parseLong(transactionId.substring(2).trim());
                     }
 

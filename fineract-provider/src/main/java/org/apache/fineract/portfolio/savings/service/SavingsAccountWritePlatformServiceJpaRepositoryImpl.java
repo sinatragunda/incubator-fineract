@@ -320,8 +320,6 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
 
         TransactionCode transactionCode = transactionCode(command);
 
-        //System.err.println("-----------depositing with transaction code now ? "+Optional.ofNullable(transactionCode).isPresent());
-
         if(isZero){
             return null ;
         }
@@ -566,7 +564,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (savingsAccountTransaction == null) { throw new SavingsAccountTransactionNotFoundException(savingsId, transactionId); }
 
 
-        //System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
+        System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
         //
 //        if (!allowAccountTransferModification && this.accountTransfersReadPlatformService.isAccountTransfer(transactionId,
 //                PortfolioAccountType.SAVINGS)) { throw new PlatformServiceUnavailableException(
@@ -616,7 +614,10 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             depositAccountOnHoldTransactions = this.depositAccountOnHoldTransactionRepository
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
+
+        System.err.println("------------validating account balance negativity ------------------");
         account.validateAccountBalanceDoesNotBecomeNegative(SavingsApiConstants.undoTransactionAction, depositAccountOnHoldTransactions);
+
         account.activateAccountBasedOnBalance();
 
         this.savingAccountRepositoryWrapper.saveAndFlush(account);
@@ -630,16 +631,13 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         
         TransactionCode transactionCode = transactionCodeFromGlEntries(transactionId.toString());
 
-        System.err.println("-------------------------------------existing ids are----------------- ");
+        //System.err.println("-------------------------------------existing ids are----------------- ");
         existingTransactionIds.stream().forEach((e)-> System.err.println(e));
-
-
-        System.err.println("-------------------------------------existing reversed ids are----------------- ");
+        //System.err.println("-------------------------------------existing reversed ids are----------------- ");
         existingReversedTransactionIds.stream().forEach((e)-> System.err.println(e));
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
-
-        System.err.println("---------------------------we should then mark the transactions as reversed here ? ");
+        //System.err.println("---------------------------we should then mark the transactions as reversed here ? ");
 
         markTransactionsAsReversed(transactionId.toString());
 
@@ -671,9 +669,16 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             }
             creditAccountId = journalEntryData.getGlAccountId();   
         }
-        System.err.println("------------have a feeling these could null ? ,should we initialize accounts to 0 -----");
-        TransactionCode transactionCode = transactionCodeRepository.getByGLAccounts(debitAccountId,creditAccountId);
-        return transactionCode ;
+
+        System.err.println("------------have a feeling these could null ? ,should we initialize accounts to 0 with debit account "+debitAccountId+"---------"+creditAccountId);
+        
+        List<TransactionCode> transactionCodeList = transactionCodeRepository.getByGLAccounts(debitAccountId,creditAccountId);
+
+        if(!transactionCodeList.isEmpty()){
+            transactionCodeList.get(0);
+        }
+        return null ;
+    
     }
 
 
@@ -682,9 +687,8 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         ENTITY_TYPE entityType = ENTITY_TYPE.SAVINGS ;
         Page<JournalEntryData> journalEntryDataPage = journalEntryReadPlatformService.retrieveJournalEntriesByTransactionId(transactionId,entityType);
 
-        // here we should have 4 transactions only last two need to be marked ,what if its null ? 
-
-       System.err.println("----------------------------print transactiion id -----------------");
+        // here we should have 4 transactions only last two need to be marked ,what if its null ?
+       //System.err.println("----------------------------print transactiion id -----------------");
         
        journalEntryDataPage.getPageItems().stream().forEach((e)-> System.err.println(e.getId()));
 

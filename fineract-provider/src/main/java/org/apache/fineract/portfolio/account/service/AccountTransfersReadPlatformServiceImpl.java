@@ -316,6 +316,39 @@ public class AccountTransfersReadPlatformServiceImpl implements
 		}
 	}
 
+	/**
+	 * Added 29/01/2023 at 1018 
+	 * Failure of AccountTransferRepository.findAllByLoan has prompted this to be a replace function
+	 * Will only loan ids of transfer transactions then later load the actual transaction 
+	 */
+	public Collection<AccountTransferData> findAllByLoanId(final Long loanId){
+		
+		try{
+
+			/*final String sqlBuilder = new StringBuilder();
+			sqlBuilder.append("SELECT matt.id AS id ");
+			sqlBuilder.append("FROM m_account_transfer_transaction matt ");
+			sqlBuilder.append("JOIN m_account_transfer_details m ON m.id = matt.account_transfer_details_id ");
+			sqlBuilder.append("WHERE m.from_loan_account_id = ? ");
+			sqlBuilder.append("OR m.to_loan_account_id = ? ");
+			sqlBuilder.append("AND matt.is_reversed = FALSE "); */
+
+
+			final String sql = "select " + this.accountTransfersMapper.schema()
+					+ " where att.is_reversed = false and atd.from_loan_account_id = ? or atd.to_loan_account_id = ?";
+
+			System.err.println("-------------------------sql query is "+sql);
+					
+			return this.jdbcTemplate.query(sql,
+					this.accountTransfersMapper, new Object[] { loanId ,loanId }); 
+
+		}
+		catch (final EmptyResultDataAccessException e) {
+			throw new AccountTransferNotFoundException(loanId);
+		}
+
+	}
+
 	@Override
 	public Collection<Long> fetchPostInterestTransactionIds(final Long accountId) {
 		final String sql = "select att.from_savings_transaction_id from m_account_transfer_transaction att inner join m_account_transfer_details atd on atd.id = att.account_transfer_details_id where atd.from_savings_account_id=? and att.is_reversed =0 and atd.transfer_type = ?";

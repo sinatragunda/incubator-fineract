@@ -1184,7 +1184,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
           */
          if(!deductOnAccountBalance && applyWithdrawFee ){
             BigDecimal totalCharges  = payWithdrawalFee(savingsTransactionDTO,true);
-            System.err.println("----------------withhold paying charges we got total of "+totalCharges);
+            //System.err.println("----------------withhold paying charges we got total of "+totalCharges);
             transactionAmount = transactionAmount.subtract(totalCharges);
             //System.err.println("------------------new transaction amount is now  after charges -----"+transactionAmount);
         } 
@@ -1200,7 +1200,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
      private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
 
-         System.err.println("----------paywithdrawal fee and withold paying charges "+withholdPayingCharges);
+           //System.err.println("----------paywithdrawal fee and withold paying charges "+withholdPayingCharges);
            final BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
            final LocalDate transactionDate = savingsTransactionDTO.getTransactionDate(); 
            final AppUser appUser = savingsTransactionDTO.getAppUser();
@@ -1234,19 +1234,19 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             
             if (charge.isWithdrawalFee() && charge.isActive()) {
 
-                System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
+                //System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
 
                 BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
 
                 if(withholdPayingCharges){
                     totalCharges =  totalCharges.add(chargeAmount);
-                    System.err.println("----------withhold paying charges and just get total amount of "+totalCharges);
+                    //System.err.println("----------withhold paying charges and just get total amount of "+totalCharges);
                     continue;
                 }
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
-        System.err.println("----------------------total charges amount is -----"+totalCharges);
+        //System.err.println("----------------------total charges amount is -----"+totalCharges);
         return totalCharges;
     }
     /**
@@ -1402,12 +1402,19 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         Money runningBalance = Money.zero(this.currency);
         Money minRequiredBalance = minRequiredBalanceDerived(getCurrency());
         LocalDate lastSavingsDate = null;
+        Money accountBalance = Money.of(this.currency ,getAccountBalance());
+
+        System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
+
+        
         for (final SavingsAccountTransaction transaction : transactionsSortedByDate) {
             if (transaction.isNotReversed() && transaction.isCredit()) {
                 runningBalance = runningBalance.plus(transaction.getAmount(this.currency));
             } else if (transaction.isNotReversed() && transaction.isDebit()) {
                 runningBalance = runningBalance.minus(transaction.getAmount(this.currency));
             }
+
+            System.err.println("-----------------running balance is "+runningBalance);
 
             /*
              * Loop through the onHold funds and see if we need to deduct or add
@@ -1430,13 +1437,19 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
             // enforceMinRequiredBalance
-            //System.err.println("----------------------bring back this mean balance violation rule thing -------------------");
+            //System.err.println("----------------------bring back this mean balance violation rule thing -------------------"+getAccountBalance());
 
             if (transaction.canProcessBalanceCheck()) {
-               if (runningBalance.minus(minRequiredBalance).isLessThanZero()) {
+               
+               //System.err.println("---------------transaction can process balance check ------ ,minRequiredBalance-"+minRequiredBalance+"-------------running balance "+runningBalance);
+
+               boolean accountBalanceLessThanRunningBalance = accountBalance.isLessThan(runningBalance);
+
+               if (runningBalance.minus(minRequiredBalance).isLessThanZero() && accountBalanceLessThanRunningBalance ) {
+
                    final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
-                   final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors)
-                           .resource(depositAccountType().resourceName() + transactionAction);
+                   final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource(depositAccountType().resourceName() + transactionAction);
+
                    if (!this.allowOverdraft) {
                        baseDataValidator.reset().failWithCodeNoParameterAddedToErrorCode("results.in.balance.going.negative");
                    }
@@ -2951,12 +2964,12 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             };
             boolean chargeExist = charges.stream().filter(chargeFilter).findFirst().isPresent();
 
-            System.err.println("---------------charge needs to be update here "+chargeExist);
+            //System.err.println("---------------charge needs to be update here "+chargeExist);
 
             if(!chargeExist){
-                System.err.println("---------charge doesnt exists lets add it -------");
+                //System.err.println("---------charge doesnt exists lets add it -------");
                 SavingsAccountCharge savingsAccountCharge = SavingsAccountCharge.trackingAccountCharges(this ,e,transactionDate);
-                System.err.println("-------------error with tracking mechanism not updating tracking ");
+                //System.err.println("-------------error with tracking mechanism not updating tracking ");
                 this.charges.add(savingsAccountCharge);
             }
         };

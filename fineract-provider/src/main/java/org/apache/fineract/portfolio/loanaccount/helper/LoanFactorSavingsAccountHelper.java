@@ -279,7 +279,7 @@ public class LoanFactorSavingsAccountHelper {
         if(!loanProductDataList.isEmpty()){
             /// we have selected by top one with highest loan factor
             this.crossLinkLoanProduct = loanProductDataList.stream().findFirst().get();
-            System.err.println("--------------------big loan factor value is ----------"+crossLinkLoanProduct.loanFactor());
+            //System.err.println("--------------------big loan factor value is ----------"+crossLinkLoanProduct.loanFactor());
             return crossLinkLoanProduct;
         }
 

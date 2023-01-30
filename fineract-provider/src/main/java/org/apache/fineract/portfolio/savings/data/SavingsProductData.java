@@ -188,9 +188,7 @@ public class SavingsProductData {
             final Collection<PaymentTypeData> paymentTypeOptions, final Collection<EnumOptionData> accountingRuleOptions,
             final Map<String, List<GLAccountData>> accountingMappingOptions, final Collection<ChargeData> chargeOptions,
             final Collection<ChargeData> penaltyOptions, Collection<TaxGroupData> taxGroupOptions) {
-
-
-            System.err.println("----------------calling function with template though ");
+            //System.err.println("----------------calling function with template though ");
 
         return new SavingsProductData(existingProduct.id, existingProduct.name, existingProduct.shortName, existingProduct.description,
                 existingProduct.currency, existingProduct.nominalAnnualInterestRate, existingProduct.interestCompoundingPeriodType,

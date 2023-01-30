@@ -31,6 +31,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import javax.persistence.*;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
@@ -47,19 +48,19 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
     @JoinColumn(name = "account_transfer_details_id", nullable = true)
     private AccountTransferDetails accountTransferDetails;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_savings_transaction_id", nullable = true)
     private SavingsAccountTransaction fromSavingsTransaction;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_savings_transaction_id", nullable = true)
     private SavingsAccountTransaction toSavingsTransaction;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_loan_transaction_id", nullable = true)
     private LoanTransaction toLoanTransaction;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_loan_transaction_id", nullable = true)
     private LoanTransaction fromLoanTransaction;
 
@@ -81,7 +82,7 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
 
     // added 31/01/2022
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_share_account_transaction_id",nullable = true)
     private ShareAccountTransaction toShareAccountTransaction;
 
@@ -205,5 +206,22 @@ public class AccountTransferTransaction extends AbstractPersistableCustom<Long> 
                 LoanTransaction repaymentTransaction, LocalDate transactionDate, Money transactionMonetaryAmount, String description) {
             return new AccountTransferTransaction(accountTransferDetails, null, null, repaymentTransaction, disburseTransaction, transactionDate,
                     transactionMonetaryAmount, description);
-        }
+    }
+
+    @Override
+    public String toString() {
+        return "AccountTransferTransaction{" +
+                "accountTransferDetails=" + accountTransferDetails +
+                ", fromSavingsTransaction=" + fromSavingsTransaction +
+                ", toSavingsTransaction=" + toSavingsTransaction +
+                ", toLoanTransaction=" + toLoanTransaction +
+                ", fromLoanTransaction=" + fromLoanTransaction +
+                ", reversed=" + reversed +
+                ", date=" + date +
+                ", currency=" + currency +
+                ", amount=" + amount +
+                ", description='" + description + '\'' +
+                ", toShareAccountTransaction=" + toShareAccountTransaction +
+                '}';
+    }
 }

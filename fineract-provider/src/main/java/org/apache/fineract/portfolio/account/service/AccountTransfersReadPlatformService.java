@@ -47,4 +47,10 @@ public interface AccountTransfersReadPlatformService {
 
 	BigDecimal getTotalTransactionAmount(Long accountId, Integer accountType,
 			LocalDate transactionDate);
+
+    /**
+     * Added 29/01/2023 at 1038
+     */
+    Collection<AccountTransferData> findAllByLoanId(Long transferId);
+ 
 }

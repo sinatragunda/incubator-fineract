@@ -2211,6 +2211,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         this.context.authenticatedUser();
 
         final Loan loan = this.loanRepositoryWrapper.findOneWithNotFoundDetection(loanId, true);
+        
         loan.validateForForeclosure(transactionDate);
         final MonetaryCurrency currency = loan.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepository.findOneWithNotFoundDetection(currency);
@@ -2227,6 +2228,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final Boolean isReversed = false;
 
         final Money outStandingAmount = loanRepaymentScheduleInstallment.getTotalOutstanding(currency);
+
+        //System.err.println("---------------------------foreclosure template status "+loan.getLoanStatus());
 
         return new LoanTransactionData(null, null, null, transactionType, null, currencyData, earliestUnpaidInstallmentDate,
                 outStandingAmount.getAmount(), loanRepaymentScheduleInstallment.getPrincipalOutstanding(currency).getAmount(),

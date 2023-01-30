@@ -120,12 +120,10 @@ public class SavingsMonthlyDepositHelper{
 
 		Date startDate = TimeHelper.startDate(epoch);
 
-
 		BigDecimal openingBalance = SavingsAccountTransactionHelper.openingBalanceAtSpecificDate(savingsAccount , startDate);
 
 		System.err.println("------------------------opening balance in this month was ------"+startDate);
 
-		
 		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
 		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);
 
@@ -157,7 +155,7 @@ public class SavingsMonthlyDepositHelper{
 				System.err.println("------------reverse this -----------------");
 				savingsAccountMonthlyDeposit.setOpeningBalance(openingBalance);
 				repository.save(savingsAccountMonthlyDeposit);
-				return ;
+				System.err.println("---------------opening balance set to "+openingBalance);
 			}
 		}
 	}	

@@ -128,14 +128,26 @@ public class RevolvingLoanHelper{
 
 	public static List payOffLoanWithLoan(AccountTransfersWritePlatformService accountTransfersWritePlatformService ,LoanAccountDomainService loanAccountDomainService, Loan fromLoan , Loan toLoan , LocalDate transactionDate , DateTimeFormatter dateTimeFormatter ,Locale locale, BigDecimal amount ,String description){
 
+		//System.err.println("---------------------------payoffloan with loan --------"+toLoan.getLoanStatus());
+
 		AccountTransferDTO accountTransferDTO = AccountTransferDTO.loanToLoan(fromLoan ,toLoan ,transactionDate ,locale ,dateTimeFormatter ,amount, description);
+
+		
 		AccountTransferDetails accountTransferDetails = accountTransfersWritePlatformService.repayLoanWithTopup(accountTransferDTO);
+
+		//System.err.println("----------------after transfer the details status is "+toLoan.getLoanStatus());
+		
 		forecloseLoan(loanAccountDomainService ,toLoan ,transactionDate ,description);
+
+		//System.err.println("-----------then foreclosre loan here ---------");
+
 		List<AccountTransferTransaction> accountTransferTransactions = accountTransferDetails.accountTransferTransactions();
+		
 		return accountTransferTransactions;
 	}
 
 	public static void forecloseLoan(LoanAccountDomainService loanAccountDomainService ,Loan loan ,LocalDate transactionDate ,String description){
+		//System.err.println("----------loan we closing is "+loan.getId()+"--------------has status "+loan.getLoanStatus());
 		loanAccountDomainService.foreCloseLoan(loan ,transactionDate ,description);
 	}
 

@@ -1808,7 +1808,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         BigDecimal totalRevolveAmount = BigDecimal.ZERO;
         SavingsAccount savingsAccount = this.savingsAccountAssembler.assembleFrom(portfolioAccountData.accountId());
 
-        System.err.println("-------------new account balance is now --------"+savingsAccount.accountBalance());
+        //System.err.println("-------------new account balance is now --------"+savingsAccount.accountBalance());
 
         if(revolveAccountIds != null){
 
@@ -1817,7 +1817,6 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             List<Loan> loansList = new ArrayList<>();
 
             while(token.hasMoreTokens()){
-
                 Long id = Long.decode(token.nextToken());
                 LoanTransactionData revolveLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
                 Optional.ofNullable(revolveLoanAccount).ifPresent(e->{
@@ -1830,17 +1829,15 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             //RevolvingLoanHelper.revolvingLoansBalanceCheck(revolveLoanAccountsList ,savingsAccount);
             
             for(Loan revolveLoanAccount : loansList){
-
                 BigDecimal revolveDTOAmount = RevolvingLoanHelper.loanBalance(revolveLoanAccount,loanReadPlatformService ,transactionDate);
-
                 // added 02/07/2021
                 // Added to make up for amount being auto settled 
                 totalRevolveAmount = totalRevolveAmount.add(revolveDTOAmount);
 
                 String description = String.format("Revolving loan pay off ,to loan with account number %s",revolveLoanAccount.getAccountNumber());
-                System.err.println("------------------------------------------loan to loan transfer ----------");
-
+                //System.err.println("------------------------------------------loan to loan transfer ,with foreclosure ----------"+revolveLoanAccount.getLoanStatus());
                 List<AccountTransferTransaction> accountTransferTransactions = RevolvingLoanHelper.payOffLoanWithLoan(accountTransfersWritePlatformService ,loanAccountDomainService, loan ,revolveLoanAccount ,transactionDate ,fmt ,locale ,revolveDTOAmount ,description);
+                //System.err.println("-----------------where does it update its status ? ");
 
                 if(!accountTransferTransactions.isEmpty()){
                     //LoanTr
@@ -1868,14 +1865,16 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
 
-        System.err.println("------------------------------depositing this amount into account -------------"+disbusementAmount);
+        //System.err.println("------------------------------depositing this amount into account -------------"+disbusementAmount);
+
+        //System.err.println("------------------------this value being regarded as null ,disburse to loan savings ? ? "+disburseLoanToSavingsAutoSettlement);
 
         if(disburseLoanToSavingsAutoSettlement){
 
             Set<LoanCharge> chargesList = loan.charges();
             BigDecimal totalCharges = BigDecimal.ZERO;
 
-            System.err.println("-----------------------------------------should create standing instruction ? "+shouldCreateStandingInstructionAtDisbursement);
+            //System.err.println("-----------------------------------------should create standing instruction ? "+shouldCreateStandingInstructionAtDisbursement);
 
             if(shouldCreateStandingInstructionAtDisbursement){
                 //it means charges are already deducted we just need to get amount of charges due at disbursement
@@ -1883,7 +1882,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                     boolean isDisbursementCharge = charge.isDueAtDisbursement();
                     if(isDisbursementCharge){
                         totalCharges = totalCharges.add(charge.amount());
-                        System.err.println("-------------------------totalCharges are ------------------"+totalCharges);
+                        //System.err.println("-------------------------totalCharges are ------------------"+totalCharges);
                     }
                 }
             }
@@ -1891,11 +1890,11 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             //BigDecimal balanceToDeduct = totalRevolveAmount.add(totalCharges);
             BigDecimal balanceToDeduct = totalCharges;
 
-            System.err.println("------------------------balance to deduct -------------"+balanceToDeduct);
+            //System.err.println("------------------------balance to deduct -------------"+balanceToDeduct);
 
             BigDecimal principal = disbusementAmount;
 
-            System.err.println("--------------------------total principal is ------------------"+principal);
+            //System.err.println("--------------------------total principal is ------------------"+principal);
             
             int cmp = principal.compareTo(balanceToDeduct);
 
@@ -1904,7 +1903,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
                 BigDecimal settleAmount = principal.subtract(balanceToDeduct);
 
-                System.err.println("-------------------------amount to settle -----------"+settleAmount);
+                //System.err.println("-------------------------amount to settle -----------"+settleAmount);
 
                 String description = "Auto Disbursement Settlement";
 

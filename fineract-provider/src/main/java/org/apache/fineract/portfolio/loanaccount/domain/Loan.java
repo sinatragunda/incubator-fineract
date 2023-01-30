@@ -3018,6 +3018,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         ChangedTransactionDetail changedTransactionDetail = null;
 
+        System.err.println("---------handle payment for loan ------------");
+
         LoanStatus statusEnum = null;
 
         LocalDate recalculateFrom = loanTransaction.getTransactionDate();
@@ -3032,6 +3034,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         }
 
         this.loanStatus = statusEnum.getValue();
+
+        System.err.println("------------------loan status changed to "+this.loanStatus);
 
         loanTransaction.updateLoan(this);
 
@@ -3267,6 +3271,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         } else if (LoanStatus.fromInt(this.loanStatus).isOverpaid()) {
             final LoanStatus statusEnum = loanLifecycleStateMachine.transition(LoanEvent.LOAN_REPAYMENT_OR_WAIVER,
                     LoanStatus.fromInt(this.loanStatus));
+
+            System.err.println("--------------------do we change loan status here ? ");
             this.loanStatus = statusEnum.getValue();
         }
         processIncomeAccrualTransactionOnLoanClosure();
@@ -3500,7 +3506,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     private ChangedTransactionDetail reverseLoanTransaction(LoanTransaction newTransactionDetail, LoanLifecycleStateMachine loanLifecycleStateMachine, LoanTransaction transactionForAdjustment, ScheduleGeneratorDTO scheduleGeneratorDTO, AppUser currentUser, ChangedTransactionDetail changedTransactionDetail) {
 
-        //System.err.println("=---------------------------reversing loan transaction --------------");
+        System.err.println("=---------------------------reversing loan transaction --------------");
 
         transactionForAdjustment.reverse();
         transactionForAdjustment.manuallyAdjustedOrReversed();
@@ -3831,6 +3837,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
     }
 
     public LoanStatus status() {
+        //System.err.println("---------------------loan status is ---------"+this.loanStatus+"------------------with id "+this.getId());
         return LoanStatus.fromInt(this.loanStatus);
     }
 
@@ -3891,6 +3898,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
     public boolean isOpen() {
         return status().isActive();
     }
+
 
     private boolean isAllTranchesNotDisbursed() {
         return this.loanProduct.isMultiDisburseLoan()
@@ -4966,11 +4974,23 @@ public class Loan extends AbstractPersistableCustom<Long> {
             break;
             case LOAN_FORECLOSURE:
 
+                System.err.println("---------------------loan id is "+getId()+"----------------and status is "+this.loanStatus+"============get loan sub status is "+getLoanSubStatus());
+
                 if (!isOpen()) {
-                    final String defaultUserMessage = "Loan foreclosure is not allowed. Loan Account is not active.";
-                    final ApiParameterError error = ApiParameterError.generalError(
-                            "error.msg.loan.foreclosure.account.is.not.active", defaultUserMessage);
-                    dataValidationErrors.add(error);
+                    /**
+                     * Added 25/01/2023 at 1211
+                     * If all obligations met then throw this error ,else skip
+                     */
+                    boolean obligationsMet = isClosedObligationsMet();
+
+                    System.err.println("--------------what will this line show for loans not opened yet ? "+obligationsMet);
+
+                    if(obligationsMet) {
+                        final String defaultUserMessage = "Loan foreclosure is not allowed. Loan Account is not active.";
+                        final ApiParameterError error = ApiParameterError.generalError(
+                                "error.msg.loan.foreclosure.account.is.not.active", defaultUserMessage);
+                        dataValidationErrors.add(error);
+                    }
                 }
             break;
             default:
@@ -6184,7 +6204,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
         return loanProduct;
     }
         
-    public LoanRepaymentScheduleInstallment fetchLoanForeclosureDetail(final LocalDate closureDate) {        
+    public LoanRepaymentScheduleInstallment fetchLoanForeclosureDetail(final LocalDate closureDate) {
+
         Money[] receivables = retriveIncomeOutstandingTillDate(closureDate);
         Money totalPrincipal = (Money.of(getCurrency(), this.getSummary().getTotalPrincipalOutstanding()));
         totalPrincipal = totalPrincipal.minus(receivables[3]);
@@ -6363,13 +6384,18 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         LoanEvent event = LoanEvent.LOAN_FORECLOSURE;
 
-        //System.err.println("----------------------foreclosure event -----------"+event);
-        
+        //System.err.println("----------------------foreclosure event ,-----------"+event);
+
+        //System.err.println("----------------------loan status before validation is ,has status changed already ? "+this.loanStatus);
+
         validateAccountStatus(event);
+
 
         validateForForeclosure(repaymentTransaction.getTransactionDate());
         this.loanSubStatus = LoanSubStatus.FORECLOSED.getValue();
         applyAccurals(appUser);
+
+        //System.err.println("--------------------handling foreclosure event ,we intend to give it own status ");
         return handleRepaymentOrRecoveryOrWaiverTransaction(repaymentTransaction, loanLifecycleStateMachine, null, scheduleGeneratorDTO,
                 appUser);
     }
@@ -6618,7 +6644,10 @@ public class Loan extends AbstractPersistableCustom<Long> {
     public void setHirePurchase(HirePurchase hirePurchase){
         this.hirePurchase = hirePurchase;
         this.hirePurchase.setLoan(this);
+    }
 
+    public Integer getLoanStatus(){
+        return this.loanStatus;
     }
 
 

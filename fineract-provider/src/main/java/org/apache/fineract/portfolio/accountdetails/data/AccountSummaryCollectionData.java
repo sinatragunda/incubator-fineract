@@ -79,7 +79,7 @@ public class AccountSummaryCollectionData {
     }
 
     public Collection<LoanAccountSummaryData> loanAccounts(){
-        System.err.println("-------------------are accounts present ? "+Optional.ofNullable(this.loanAccounts).isPresent());
+        //System.err.println("-------------------are accounts present ? "+Optional.ofNullable(this.loanAccounts).isPresent());
         return Optional.ofNullable(this.loanAccounts).orElse(new ArrayList<>()) ;
     }
 

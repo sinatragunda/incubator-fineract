@@ -64,9 +64,9 @@ public class LoanFactorLoanResolver {
 
             BigDecimal principal = command.bigDecimalValueOfParameterNamed("principal");
 
-            System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
+            //System.err.println("---------------proposed principal is --------------"+principal.doubleValue());
 
-            System.err.println("---------------- is loan product present ?-------"+ Optional.ofNullable(loanProduct).isPresent());
+            //System.err.println("---------------- is loan product present ?-------"+ Optional.ofNullable(loanProduct).isPresent());
 
             boolean transact = loanFactorSavingsAccountHelper.transact(savingsAccountReadPlatformService ,loanReadPlatformService ,loanProduct ,client ,loanFactorAccountId, principal ,excludeLoansList);
             // if successful just proceed with this loan and throw no errors

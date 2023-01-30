@@ -626,8 +626,10 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     @Override
     public Map<String, Object> foreCloseLoan(final Loan loan, final LocalDate foreClosureDate, final String noteText) {
+
         this.businessEventNotifierService.notifyBusinessEventToBeExecuted(BUSINESS_EVENTS.LOAN_FORECLOSURE,
                 constructEntityMap(BUSINESS_ENTITY.LOAN, loan));
+
         MonetaryCurrency currency = loan.getCurrency();
         LocalDateTime createdDate = DateUtils.getLocalDateTimeOfTenant();
         final Map<String, Object> changes = new LinkedHashMap<>();
@@ -639,6 +641,8 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         existingReversedTransactionIds.addAll(loan.findExistingReversedTransactionIds());
         final ScheduleGeneratorDTO scheduleGeneratorDTO = null;
         AppUser appUser = getAppUserIfPresent();
+
+        //System.err.println("-------------------fetch foreclosure details ------------"+loan.getLoanStatus());
 
         final LoanRepaymentScheduleInstallment foreCloseDetail = loan.fetchLoanForeclosureDetail(foreClosureDate);
         
@@ -680,7 +684,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             }
         }
 
-
         Money interestPayable = foreCloseDetail.getInterestCharged(currency);
         Money feePayable = foreCloseDetail.getFeeChargesCharged(currency);
         Money penaltyPayable = foreCloseDetail.getPenaltyChargesCharged(currency);
@@ -689,7 +692,10 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
         LoanTransaction payment = null;
 
+        System.out.println("-----------calculate some intricases------------ ");
+
         if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()){
+            System.err.println("---------------not a zero balance foreclosure -------------"+loan.getId());
             final PaymentDetail paymentDetail = null;
             String externalId = null;            
             final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
@@ -697,7 +703,11 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                     paymentDetail, foreClosureDate, externalId, currentDateTime, appUser);
             createdDate = createdDate.plusSeconds(1);
             payment.updateCreatedDate(createdDate.toDate());
+
+            //System.err.println("---------loan not updated -----------"+loan.getLoanStatus());
             payment.updateLoan(loan);
+
+            //System.err.println("----------loan has been updated now -----------"+loan.getLoanStatus());
             newTransactions.add(payment);
         }
         else{
@@ -713,13 +723,24 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             payment.updateCreatedDate(createdDate.toDate());
             payment.updateLoan(loan);
             newTransactions.add(payment);
+
+            /**
+             * Added 26/01/2023 at 0018
+             * Mark loan as still active ,then change later on flush so as to avoid closing loan before foreclosure
+             */
+            loan.setLoanStatus(LoanStatus.ACTIVE.getValue());
+
+            System.err.println("-------------------zero balance route here ---------------");
         }
 
         List<Long> transactionIds = new ArrayList<>();
 
+        //System.err.println("--------------------loan status now at before application is-------------- "+loan.getLoanStatus());
+
         final ChangedTransactionDetail changedTransactionDetail = loan.handleForeClosureTransactions(payment,
                 defaultLoanLifecycleStateMachine(), scheduleGeneratorDTO, appUser);
 
+        //System.err.println("------------------let's change status somewhere inside here ----------");
         /***
          * TODO Vishwas Batch save is giving me a
          * HibernateOptimisticLockingFailureException, looping and saving for
@@ -727,7 +748,6 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
          * only in edge cases (when a payment is made before the latest payment
          * recorded against the loan)
          ***/
-
         for (LoanTransaction newTransaction : newTransactions) {
             saveLoanTransactionWithDataIntegrityViolationChecks(newTransaction);
             transactionIds.add(newTransaction.getId());
@@ -752,7 +772,12 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                 }
             }
         }
-        
+
+        /**
+         * Added 26/01/2023 at 0020
+         * Mark loan as closed here .Assumption is it would have already run into an error before reaching here
+         */
+        loan.setLoanStatus(LoanStatus.CLOSED_OBLIGATIONS_MET.getValue());
         saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
 
         if (StringUtils.isNotBlank(noteText)) {
