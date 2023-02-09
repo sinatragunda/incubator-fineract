@@ -18,11 +18,13 @@
  */
 package org.apache.fineract.organisation.monetary.domain;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
+import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +48,22 @@ public class MoneyHelper {
             roundingMode = RoundingMode.valueOf(staticConfigurationDomainService.getRoundingMode());
         }
         return roundingMode;
+    }
+
+    public static boolean depositable(BigDecimal amount){
+        return ComparatorUtility.isDepositableAmount(amount);
+    }
+
+    public static Double decimalFormat(Double value){
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    public static Double decimalFormat(BigDecimal value){
+        BigDecimal bd = value;
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 }

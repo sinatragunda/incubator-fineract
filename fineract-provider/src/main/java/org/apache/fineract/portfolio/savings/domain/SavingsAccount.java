@@ -329,6 +329,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         //
     }
 
+    public SavingsAccount(Long id){
+        setId(id);
+    }
 
     public static SavingsAccount createNewApplicationForSubmittal(final Client client, final Group group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final String externalId, final AccountType accountType,
@@ -443,6 +446,10 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
     public boolean isActive() {
         return SavingsAccountStatusType.fromInt(this.status).isActive();
+    }
+
+    public String productName(){
+        return this.savingsProduct().getShortName();
     }
 
     public boolean isNotSubmittedAndPendingApproval() {

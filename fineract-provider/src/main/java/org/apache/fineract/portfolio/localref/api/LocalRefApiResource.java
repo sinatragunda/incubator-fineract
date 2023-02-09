@@ -13,14 +13,20 @@ package org.apache.fineract.portfolio.localref.api;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
+import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
+import org.apache.fineract.infrastructure.dataqueries.service.ReadWriteNonCoreDataService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.localref.domain.LocalRef;
+import org.apache.fineract.portfolio.localref.enumerations.APPLICATION_ACTION;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.helper.ApplicationTableHelper;
 import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 
 import javax.ws.rs.POST;
@@ -31,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,15 +67,19 @@ public class LocalRefApiResource {
     private final ToApiJsonSerializer<LocalRef> localRefToApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final LocalRefReadPlatformService localRefReadPlatformService;
+    private final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer;
+    private final ReadWriteNonCoreDataService readWriteNonCoreDataService;
 
     @Autowired
-    public LocalRefApiResource(PlatformSecurityContext platformSecurityContext, FromJsonHelper fromJsonHelper, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, ToApiJsonSerializer<LocalRef> localRefToApiJsonSerializer, ApiRequestParameterHelper apiRequestParameterHelper, LocalRefReadPlatformService localRefReadPlatformService) {
+    public LocalRefApiResource(PlatformSecurityContext platformSecurityContext, FromJsonHelper fromJsonHelper, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, ToApiJsonSerializer<LocalRef> localRefToApiJsonSerializer, ApiRequestParameterHelper apiRequestParameterHelper, LocalRefReadPlatformService localRefReadPlatformService ,ToApiJsonSerializer toApiJsonSerializer ,ReadWriteNonCoreDataService readWriteNonCoreDataService) {
         this.platformSecurityContext = platformSecurityContext;
         this.fromJsonHelper = fromJsonHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.localRefToApiJsonSerializer = localRefToApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.localRefReadPlatformService = localRefReadPlatformService;
+        this.toApiJsonSerializer = toApiJsonSerializer ;
+        this.readWriteNonCoreDataService = readWriteNonCoreDataService;
     }
 
     @POST
@@ -109,6 +120,30 @@ public class LocalRefApiResource {
         final Collection<LocalRefData> localRefDataCollection = this.localRefReadPlatformService.retrieveAll(officeId);
         //final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.localRefToApiJsonSerializer.serialize(localRefDataCollection);
+    }
+
+    /**
+     * Added 02/02/2023 at 1154
+     * Returns application table template and data
+     * If application is view ,we expert an id etc if list we list all data right .If create new we return template 
+     */ 
+    @Path("application")
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String application(@Context final UriInfo uriInfo, @QueryParam("table") String table ,@QueryParam("action") String action) {
+
+        System.err.println("------------------------------------table name is "+table+"-----------and action is "+action);
+        //this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+
+        APPLICATION_ACTION applicationAction = (APPLICATION_ACTION) EnumTemplateHelper.fromString(APPLICATION_ACTION.values(),action);
+
+        DatatableData result = ApplicationTableHelper.getTable(readWriteNonCoreDataService , table ,applicationAction);
+
+        final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
+
+        return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
+    
     }
 
 }

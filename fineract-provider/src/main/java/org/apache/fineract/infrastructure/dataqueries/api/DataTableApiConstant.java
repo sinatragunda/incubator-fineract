@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.api;
 
+import org.apache.fineract.infrastructure.core.serialization.DatatableCommandFromApiJsonDeserializer;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,5 +35,8 @@ public class DataTableApiConstant {
     public static final String categoryParamName ="category";
     public static final String localParamName = "locale";
     public static final String DATATABLE_RESOURCE_NAME ="dataTables";
+
+    public static final Set<String> supportedTables = new HashSet<>(Arrays.asList( "m_loan", "m_savings_account", "m_client", "m_group", "m_center", "m_office",
+            "m_savings_product", "m_product_loan" ,"m_application"));
 
 }

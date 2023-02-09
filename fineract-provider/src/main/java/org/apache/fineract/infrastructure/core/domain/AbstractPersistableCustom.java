@@ -55,6 +55,11 @@ public abstract class AbstractPersistableCustom<PK extends Serializable> impleme
                 this.id = id;
         }
 
+
+        public void setIdEx(final Long id){
+                this.id = id ;
+        }
+
         /*
          * (non-Javadoc)
          * 

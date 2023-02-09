@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.data;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+
 import java.util.List;
 
 /**
@@ -32,6 +34,18 @@ public class DatatableData {
     @SuppressWarnings("unused")
     private final List<ResultsetColumnHeaderData> columnHeaderData;
 
+    /**
+     * Added 02/02/2023 at 0944
+     */
+    private final String portfolioName ;
+
+    private List<EnumOptionData> applicationOptions ;
+    private GenericResultsetData genericResultsetData;
+
+    public static DatatableData template(){
+        return new DatatableData();
+    }
+
 
     public static DatatableData create(final String applicationTableName, final String registeredTableName,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
@@ -43,17 +57,27 @@ public class DatatableData {
         this.applicationTableName = applicationTableName;
         this.registeredTableName = registeredTableName;
         this.columnHeaderData = columnHeaderData;
+        this.portfolioName = EntityTables.portfolioName(applicationTableName);
+    }
 
+
+    private DatatableData() {
+        this.applicationTableName = null;
+        this.registeredTableName = null;
+        this.columnHeaderData = null;
+        this.portfolioName = null;
+        this.applicationOptions = EntityTables.template();
     }
 
     public boolean hasColumn(final String columnName){
-
         for(ResultsetColumnHeaderData c : this.columnHeaderData){
-
             if(c.getColumnName().equals(columnName)) return true;
         }
-
         return false;
+    }
+
+    public void setGenericResultsetData(GenericResultsetData genericResultsetData) {
+        this.genericResultsetData = genericResultsetData;
     }
 
     public String getRegisteredTableName(){

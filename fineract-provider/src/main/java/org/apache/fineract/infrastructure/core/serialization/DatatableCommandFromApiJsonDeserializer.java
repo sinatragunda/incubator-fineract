@@ -60,7 +60,7 @@ public class DatatableCommandFromApiJsonDeserializer {
     private final Set<String> supportedParametersForDropColumns = new HashSet<>(Arrays.asList("name"));
     private final Object[] supportedColumnTypes = { "string", "number", "boolean", "decimal", "date", "datetime", "text", "dropdown" };
     private final Object[] supportedApptableNames = { "m_loan", "m_savings_account", "m_client", "m_group", "m_center", "m_office",
-            "m_savings_product", "m_product_loan" };
+            "m_savings_product", "m_product_loan" ,"m_application"};
 
     private final FromJsonHelper fromApiJsonHelper;
 

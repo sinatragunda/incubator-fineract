@@ -60,4 +60,8 @@ public class MonetaryCurrency {
     public Integer getCurrencyInMultiplesOf() {
         return this.inMultiplesOf;
     }
+
+    public static MonetaryCurrency of(String code){
+        return new MonetaryCurrency(code ,2 ,1);
+    }
 }

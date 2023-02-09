@@ -25,5 +25,5 @@ import java.util.List;
 
 
 public interface ShareAccountRepository extends JpaRepository<ShareAccount, Long>, JpaSpecificationExecutor<ShareAccount> {
-
+    List<ShareAccount> findAllByClientId(Long clientId);
 }

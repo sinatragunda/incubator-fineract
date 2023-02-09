@@ -52,6 +52,7 @@ import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookS
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
@@ -68,6 +69,9 @@ import org.springframework.util.CollectionUtils;
 // Added 16/12/2021
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import org.taat.wese.weseaddons.ssb.service.SsbService;
 
 
 @Path("/ssbpayments")
@@ -83,34 +87,36 @@ public class SsbPaymentsApiResource {
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
-    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ;
+    private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository;
 
     // Added 16/12/2021
     private final SavingsAccountWritePlatformService savingsAccountWritePlatformService;
     private final ClientWritePlatformService clientWritePlatformService;
+    private final SsbService ssbService ;
 
     @Autowired
     public SsbPaymentsApiResource(final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-                                      final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer,
-                                      final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-                                      final ApiRequestParameterHelper apiRequestParameterHelper,
-                                      final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
-                                      final BulkImportWorkbookService bulkImportWorkbookService,
-                                      final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService ,
-                                      final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,final ClientWritePlatformService clientWritePlatformService) {
+                                  final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer,
+                                  final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+                                  final ApiRequestParameterHelper apiRequestParameterHelper,
+                                  final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService,
+                                  final BulkImportWorkbookService bulkImportWorkbookService,
+                                  final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
+                                  final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository, final SavingsAccountWritePlatformService savingsAccountWritePlatformService, final ClientWritePlatformService clientWritePlatformService ,final SsbService ssbService) {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.savingsAccountChargeReadPlatformService = savingsAccountChargeReadPlatformService;
-        this.bulkImportWorkbookService=bulkImportWorkbookService;
-        this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
+        this.bulkImportWorkbookService = bulkImportWorkbookService;
+        this.bulkImportWorkbookPopulatorService = bulkImportWorkbookPopulatorService;
         this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository;
 
         // added 16/12/2021
-        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService ;
+        this.savingsAccountWritePlatformService = savingsAccountWritePlatformService;
         this.clientWritePlatformService = clientWritePlatformService;
+        this.ssbService = ssbService;
     }
 
 
@@ -119,10 +125,46 @@ public class SsbPaymentsApiResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String postSavingsTransactionTemplate(@FormDataParam("file") InputStream uploadedInputStream,
                                                  @FormDataParam("file") FormDataContentDisposition fileDetail,
-                                                 @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat){
-        final Long importDocumentId = this. bulkImportWorkbookService.importWorkbook(GlobalEntityType.SSB_PAYMENTS.toString(), uploadedInputStream,
-                fileDetail,locale,dateFormat);
+                                                 @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat) {
+        final Long importDocumentId = this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.SSB_PAYMENTS.toString(), uploadedInputStream,
+                fileDetail, locale, dateFormat);
         return this.toApiJsonSerializer.serialize(importDocumentId);
     }
+
+    @POST
+    @Path("/ssb")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public String postFinancialTransactions(@FormDataParam("file") MultipartFile file, @RequestPart String ssb) {
+
+        System.err.println("------------------------------post financial transactions ----------");
+        String response = ssbService.postFinancialTransactions(file ,ssb).toString();
+        return response;
+
+    }
+
+    @GET
+    @Path("/reverse")
+    public String reverseFinancialTransactions(@QueryParam("type") String type) {
+
+        String response = ssbService.reverseFinancialTransactions(type).toString();
+        return response;
+
+    }
+
+    @Path("/clear")
+    public String clear() {
+
+        String tenant = ThreadLocalContextUtil.getTenant().getName();
+        String response = ssbService.clear(tenant).toString();
+        return response;
+    }
+
+
+    @Path("/status")
+    public String status(){
+        String response = ssbService.status().toString();
+        return response;
+    }
+
 
 }

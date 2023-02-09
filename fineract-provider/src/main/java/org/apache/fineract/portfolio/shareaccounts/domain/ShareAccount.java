@@ -226,6 +226,10 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         return this.shareProduct;
     }
 
+    public Long shareProductId(){
+        return this.shareProduct.getId();
+    }
+
     public boolean setSubmittedDate(final Date submittedDate) {
         boolean toReturn = false;
         if (!this.submittedDate.equals(submittedDate)) {

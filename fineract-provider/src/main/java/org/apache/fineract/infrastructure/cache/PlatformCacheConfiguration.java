@@ -46,4 +46,6 @@ public class PlatformCacheConfiguration implements CachingConfigurer {
     public KeyGenerator keyGenerator() {
         return new DefaultKeyGenerator();
     }
+
+
 }

@@ -118,4 +118,9 @@ public class SavingsAccountRepositoryWrapper {
             }
         }
     }
+
+
+    public List<SavingsAccount> findAll(){
+        return this.repository.findAll();
+    }
 }

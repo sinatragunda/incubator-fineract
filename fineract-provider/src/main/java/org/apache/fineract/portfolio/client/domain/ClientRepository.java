@@ -35,5 +35,7 @@ abstract interface ClientRepository extends JpaRepository<Client, Long>, JpaSpec
 
     @Query(FIND_CLIENT_BY_OFFICE_ID)
     List<Client> getClientsByOfficeId(@Param("officeId") Long officeId);
+
+    Client findByExternalId(String externalId);
     
 }

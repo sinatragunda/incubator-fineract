@@ -108,4 +108,8 @@ public class ClientRepositoryWrapper {
         return this.repository.getClientsByOfficeId(officeId);
 
     }
+
+    public Client findByExternalId(String externalId){
+        return this.repository.findByExternalId(externalId);
+    }
 }

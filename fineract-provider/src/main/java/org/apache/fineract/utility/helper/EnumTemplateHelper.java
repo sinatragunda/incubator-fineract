@@ -36,4 +36,13 @@ public class EnumTemplateHelper {
         }
         return null ;
     }
+
+    public static IEnum fromString(IEnum values[], String arg){
+        for(IEnum iEnum : values){
+            if(iEnum.getCode().equalsIgnoreCase(arg)){
+                return iEnum;
+            }
+        }
+        return null ;
+    }
 }

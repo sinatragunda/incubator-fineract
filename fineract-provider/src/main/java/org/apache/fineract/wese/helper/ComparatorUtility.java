@@ -76,8 +76,15 @@ public class ComparatorUtility {
         }
         // here it will be false since isPresent wouldnt have compared
         return false ;
+    }
 
-    
+       // Added 16/02/2022
+    public static boolean isDepositableAmount(BigDecimal amount){
+        int cmp = amount.compareTo(BigDecimal.ONE);
+        if(cmp >= 0){
+            return true ;
+        }
+        return false ;
     }
 
 

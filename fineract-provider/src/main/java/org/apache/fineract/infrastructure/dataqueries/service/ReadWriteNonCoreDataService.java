@@ -71,4 +71,12 @@ public interface ReadWriteNonCoreDataService {
     String getDataTableName(String Url);
 
     Long countDatatableEntries(String datatableName,Long appTableId,String foreignKeyColumn);
+
+    /**
+     * Added 02/02/2023 at 1008
+     */
+    DatatableData template();
+
+    GenericResultsetData retrieveAllTableEntries(String datatableName ,String order);
+  
 }

@@ -91,6 +91,21 @@ public class DatatablesApiResource {
         return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
     }
 
+    /**
+     * Added 02/02/2023 at 1006
+     */
+    @GET
+    @Path("template")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String template(@Context final UriInfo uriInfo) {
+
+        final DatatableData result = this.readWriteNonCoreDataService.template();
+
+        final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
+    }
+
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -214,6 +229,27 @@ public class DatatablesApiResource {
             json = this.genericDataService.generateJsonFromGenericResultsetData(results);
         }
 
+        return json;
+    }
+
+    @GET
+    @Path("{datatable}/entries")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String getDatatableEntries(@PathParam("datatable") final String datatable,@QueryParam("order") final String order, @Context final UriInfo uriInfo) {
+
+        logger.debug("--------------------get entries for datatable -------------");
+
+        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
+
+        final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveAllTableEntries(datatable,order);
+        final DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
+        datatableData.setGenericResultsetData(results);
+
+        final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
+        String json = this.toApiJsonSerializer.serializePretty(prettyPrint, datatableData);
+
+        System.err.println("-------------------------response is "+json);
         return json;
     }
 

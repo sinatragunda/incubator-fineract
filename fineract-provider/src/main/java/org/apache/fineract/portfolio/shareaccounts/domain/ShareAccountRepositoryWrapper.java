@@ -52,6 +52,10 @@ public class ShareAccountRepositoryWrapper {
 		return shareAccount ;
 	}
 
+	public List<ShareAccount> clientShareAccounts(Long clientId){
+		return this.shareAccountRepository.findAllByClientId(clientId);
+	}
+
 	public void save(final ShareAccount shareAccount) {
 		this.shareAccountRepository.save(shareAccount) ;
 	}

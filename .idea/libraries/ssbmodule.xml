@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ssbmodule">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/fineract-provider/jars/ssbmodule.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

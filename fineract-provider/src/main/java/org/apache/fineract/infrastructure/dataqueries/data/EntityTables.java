@@ -18,18 +18,19 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.service.IEnum;
 
-public enum EntityTables {
+import java.util.*;
+
+public enum EntityTables implements IEnum {
 
 	CLIENT("m_client",
         new Integer[]{StatusEnum.CREATE.getCode(),
                 StatusEnum.ACTIVATE.getCode(),
                 StatusEnum.CLOSE.getCode()},
-        "client_id"),
+        "client_id" ,"Client"),
     LOAN("m_loan",
         new Integer[]{StatusEnum.CREATE.getCode(),
                 StatusEnum.APPROVE.getCode(),
@@ -37,12 +38,12 @@ public enum EntityTables {
                 StatusEnum.WITHDRAWN.getCode(),
                 StatusEnum.REJECTED.getCode(),
                 StatusEnum.WRITE_OFF.getCode()},
-        "loan_id"),
+        "loan_id" ,"Loan"),
     GROUP("m_group",
         new Integer[]{StatusEnum.CREATE.getCode(),
                 StatusEnum.ACTIVATE.getCode(),
                 StatusEnum.CLOSE.getCode(),},
-        "group_id"),
+        "group_id" ,"Group"),
     SAVING("m_savings_account",
         new Integer[]{StatusEnum.CREATE.getCode(),
                 StatusEnum.APPROVE.getCode(),
@@ -50,7 +51,11 @@ public enum EntityTables {
                 StatusEnum.WITHDRAWN.getCode(),
                 StatusEnum.REJECTED.getCode(),
                 StatusEnum.CLOSE.getCode()},
-        "savings_account_id");
+        "savings_account_id" ,"Account"),
+	APPLICATION("m_application",
+			new Integer[]{StatusEnum.CREATE.getCode(),
+					StatusEnum.ACTIVATE.getCode()},
+			"m_application_id" ,"Application"),;
 
 	private static final Map<String, EntityTables> lookup = new HashMap<String, EntityTables>();
 	static {
@@ -59,15 +64,17 @@ public enum EntityTables {
 	}
 
 	private String name;
+	private String portfolioName;
 
 	private Integer[] codes;
 
 	private String foreignKeyColumnNameOnDatatable;
 
-	private EntityTables(String name, Integer[] codes, String foreignKeyColumnNameOnDatatable) {
+	private EntityTables(String name, Integer[] codes, String foreignKeyColumnNameOnDatatable ,String portfolioName) {
 		this.name = name;
 		this.codes = codes;
 		this.foreignKeyColumnNameOnDatatable = foreignKeyColumnNameOnDatatable;
+		this.portfolioName = portfolioName;
 	}
 
 	public static List<String> getEntitiesList() {
@@ -105,4 +112,23 @@ public enum EntityTables {
 		return lookup.get(name).foreignKeyColumnNameOnDatatable;
 	}
 
+	public static String portfolioName(String table){
+		EntityTables entityTables = (EntityTables)EnumTemplateHelper.fromString(EntityTables.values() ,table);
+		return Optional.ofNullable(entityTables.portfolioName).orElse("Undefined");
+	}
+
+	public static List<EnumOptionData> template(){
+		List<EnumOptionData> enumOptionDataList = new ArrayList<>();
+		EntityTables[] entityTables = EntityTables.values();
+		for(EntityTables e : entityTables){
+			EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.name ,e.portfolioName);
+			enumOptionDataList.add(enumOptionData);
+		}
+		return enumOptionDataList;
+	}
+
+	@Override
+	public String getCode() {
+		return getName();
+	}
 }

@@ -132,6 +132,13 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         // this.configurationWriteService = configurationWriteService;
     }
 
+
+    @Override
+    public DatatableData template() {
+        final DatatableData datatables = DatatableData.template();
+        return datatables;
+    }
+
     @Override
     public List<DatatableData> retrieveDatatableNames(final String appTable) {
 
@@ -1165,6 +1172,35 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         return commandProcessingResult;
     }
 
+    /**
+     * Added 02/02/2023 at 1648
+     * RetrieveAll entries within a table
+     */
+    @Override
+    public GenericResultsetData retrieveAllTableEntries(final String dataTableName ,String order) {
+
+        final String appTable = queryForApplicationTableName(dataTableName);
+
+        final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
+
+        String sql = String.format("select * from %s",dataTableName);
+
+        System.err.println("-----------------------------mysql query "+sql);
+
+        //SQLInjectionValidator.validateSQLInput(sql);
+
+        System.err.println("---------------------validate sql ? ");
+
+        if(StringUtils.isNotBlank(order)) {
+            this.columnValidator.validateSqlInjection(sql, order);
+            sql = String.format("%s order by %s ",sql ,order);
+        }
+
+        final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
+        return new GenericResultsetData(columnHeaders, result);
+    }
+
+
     @Override
     public GenericResultsetData retrieveDataTableGenericResultSet(final String dataTableName, final Long appTableId, final String order,
             final Long id) {
@@ -1173,7 +1209,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         final String appTable = queryForApplicationTableName(dataTableName);
 
         checkMainResourceExistsWithinScope(appTable, appTableId);
-
 
         final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
 
@@ -1186,7 +1221,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         if (id == null) {
         	String whereClause = getFKField(appTable) + " = " + appTableId;
 
-     
         	SQLInjectionValidator.validateSQLInput(whereClause);
             //sql = null;
             sql ="select * from `" + dataTableName + "` where " + whereClause;
@@ -1198,10 +1232,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             sql = sql + " order by " + order;
         }
 
-
-     
         final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
-
         return new GenericResultsetData(columnHeaders, result);
     }
 
@@ -1323,15 +1354,12 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private void validateAppTable(final String appTable) {
 
-        if (appTable.equalsIgnoreCase("m_loan")) { return; }
-        if (appTable.equalsIgnoreCase("m_savings_account")) { return; }
-        if (appTable.equalsIgnoreCase("m_client")) { return; }
-        if (appTable.equalsIgnoreCase("m_group")) { return; }
-        if (appTable.equalsIgnoreCase("m_center")) { return; }
-        if (appTable.equalsIgnoreCase("m_office")) { return; }
-        if (appTable.equalsIgnoreCase("m_product_loan")) { return; }
-        if (appTable.equalsIgnoreCase("m_savings_product")) { return; }
-
+        Set<String> set = DataTableApiConstant.supportedTables;
+        for(String table : set){
+            if(table.equalsIgnoreCase(appTable)){
+                return;
+            }
+        }
         throw new PlatformDataIntegrityException("error.msg.invalid.application.table", "Invalid Application Table: " + appTable, "name",
                 appTable);
     }
@@ -1366,6 +1394,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private String queryForApplicationTableName(final String datatable) {
     	SQLInjectionValidator.validateSQLInput(datatable);
+
         final String sql = "SELECT application_table_name FROM x_registered_table where registered_table_name = '" + datatable + "'";
 
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
