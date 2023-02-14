@@ -152,10 +152,10 @@ public class SavingsMonthlyDepositHelper{
 					savingsAccountMonthlyDeposit.setDeposit(amountUpdate);
 				}
 
-				System.err.println("------------reverse this -----------------");
+				//System.err.println("------------reverse this -----------------");
 				savingsAccountMonthlyDeposit.setOpeningBalance(openingBalance);
 				repository.save(savingsAccountMonthlyDeposit);
-				System.err.println("---------------opening balance set to "+openingBalance);
+				//System.err.println("---------------opening balance set to "+openingBalance);
 			}
 		}
 	}	

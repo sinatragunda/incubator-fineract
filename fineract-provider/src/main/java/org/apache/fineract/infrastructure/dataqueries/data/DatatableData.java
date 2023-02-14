@@ -38,6 +38,7 @@ public class DatatableData {
      * Added 02/02/2023 at 0944
      */
     private final String portfolioName ;
+    private final String prettyName;
 
     private List<EnumOptionData> applicationOptions ;
     private GenericResultsetData genericResultsetData;
@@ -52,13 +53,31 @@ public class DatatableData {
         return new DatatableData(applicationTableName, registeredTableName, columnHeaderData);
     }
 
+
+    public static DatatableData create(final String applicationTableName, final String registeredTableName,final String prettyName ,
+            final List<ResultsetColumnHeaderData> columnHeaderData) {
+        return new DatatableData(applicationTableName, registeredTableName,prettyName, columnHeaderData);
+    }
+
     private DatatableData(final String applicationTableName, final String registeredTableName,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
         this.applicationTableName = applicationTableName;
         this.registeredTableName = registeredTableName;
         this.columnHeaderData = columnHeaderData;
         this.portfolioName = EntityTables.portfolioName(applicationTableName);
+        this.prettyName = null ;
     }
+
+
+    private DatatableData(final String applicationTableName, final String registeredTableName,String prettyName ,
+            final List<ResultsetColumnHeaderData> columnHeaderData) {
+        this.applicationTableName = applicationTableName;
+        this.registeredTableName = registeredTableName;
+        this.columnHeaderData = columnHeaderData;
+        this.prettyName = prettyName;
+        this.portfolioName = EntityTables.portfolioName(applicationTableName);
+    }
+
 
 
     private DatatableData() {
@@ -66,6 +85,7 @@ public class DatatableData {
         this.registeredTableName = null;
         this.columnHeaderData = null;
         this.portfolioName = null;
+        this.prettyName = null ;
         this.applicationOptions = EntityTables.template();
     }
 

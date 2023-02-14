@@ -1411,7 +1411,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         LocalDate lastSavingsDate = null;
         Money accountBalance = Money.of(this.currency ,getAccountBalance());
 
-        System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
+        //System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
 
         
         for (final SavingsAccountTransaction transaction : transactionsSortedByDate) {
@@ -1421,7 +1421,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 runningBalance = runningBalance.minus(transaction.getAmount(this.currency));
             }
 
-            System.err.println("-----------------running balance is "+runningBalance);
+            //System.err.println("-----------------running balance is "+runningBalance);
 
             /*
              * Loop through the onHold funds and see if we need to deduct or add

@@ -576,11 +576,11 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
             final String sqlCountRows = "SELECT FOUND_ROWS()";
             Page<JournalEntryData> page = this.paginationHelper.fetchPage(this.jdbcTemplate, sqlCountRows, sql ,rm);
 
-            System.err.println("------------------initial page items is --------------"+page.getTotalFilteredRecords());
+            //System.err.println("------------------initial page items is --------------"+page.getTotalFilteredRecords());
 
             page = page.filterPage(filterDuplicateEntries(transactionId));
 
-            System.err.println("-------------------results filtered to -----------------"+page.getTotalFilteredRecords());
+            //System.err.println("-------------------results filtered to -----------------"+page.getTotalFilteredRecords());
             return page ;
         } catch (final EmptyResultDataAccessException e) {
             throw new JournalEntriesNotFoundException(transactionId);
@@ -591,7 +591,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
     private Predicate<JournalEntryData> filterDuplicateEntries(String transactionId){
 
         Predicate<JournalEntryData> predicate = (e)->{
-                System.err.printf("-------------comparing %s with id %s\n" ,e.getTransactionId() ,transactionId);
+             //System.err.printf("-------------comparing %s with id %s\n" ,e.getTransactionId() ,transactionId);
              return e.getTransactionId().equalsIgnoreCase(transactionId);   
         };
         return predicate;

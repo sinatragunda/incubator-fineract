@@ -260,6 +260,10 @@ public class DatatablesApiResource {
     public String createDatatableEntry(@PathParam("datatable") final String datatable, @PathParam("apptableId") final Long apptableId,
             final String apiRequestBodyAsJson) {
 
+
+
+        System.err.println("--------------create new entry database ------------------");
+
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .createDatatable(datatable, apptableId, null) //
                 .withJson(apiRequestBodyAsJson) //

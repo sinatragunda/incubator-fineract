@@ -548,7 +548,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             final boolean allowAccountTransferModification) {
 
 
-        System.err.println("--------------------undo transaction searching for rogue elements ");
+        //System.err.println("--------------------undo transaction searching for rogue elements ");
 
         final boolean isSavingsInterestPostingAtCurrentPeriodEnd = this.configurationDomainService
                 .isSavingsInterestPostingAtCurrentPeriodEnd();
@@ -564,7 +564,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         if (savingsAccountTransaction == null) { throw new SavingsAccountTransactionNotFoundException(savingsId, transactionId); }
 
 
-        System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
+        //System.err.println("---------------SavingsAccountWritePlatformServiceJpaRepository --------------line 490 we skipping transaction to see if it goes well ----------");
         //
 //        if (!allowAccountTransferModification && this.accountTransfersReadPlatformService.isAccountTransfer(transactionId,
 //                PortfolioAccountType.SAVINGS)) { throw new PlatformServiceUnavailableException(
@@ -615,7 +615,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
                     .findBySavingsAccountAndReversedFalseOrderByCreatedDateAsc(account);
         }
 
-        System.err.println("------------validating account balance negativity ------------------");
+        //System.err.println("------------validating account balance negativity ------------------");
         account.validateAccountBalanceDoesNotBecomeNegative(SavingsApiConstants.undoTransactionAction, depositAccountOnHoldTransactions);
 
         account.activateAccountBasedOnBalance();
@@ -670,7 +670,7 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
             creditAccountId = journalEntryData.getGlAccountId();   
         }
 
-        System.err.println("------------have a feeling these could null ? ,should we initialize accounts to 0 with debit account "+debitAccountId+"---------"+creditAccountId);
+        //System.err.println("------------have a feeling these could null ? ,should we initialize accounts to 0 with debit account "+debitAccountId+"---------"+creditAccountId);
         
         List<TransactionCode> transactionCodeList = transactionCodeRepository.getByGLAccounts(debitAccountId,creditAccountId);
 

@@ -20,10 +20,16 @@ package org.apache.fineract.portfolio.shareaccounts.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 
 import java.util.List;
 
 
 public interface ShareAccountRepository extends JpaRepository<ShareAccount, Long>, JpaSpecificationExecutor<ShareAccount> {
-    List<ShareAccount> findAllByClientId(Long clientId);
+    
+    @Query("select sh from ShareAccount sh where sh.client.id= :clientId")
+    List<ShareAccount> findAllByClientId(@Param("clientId")Long clientId);
+
 }
