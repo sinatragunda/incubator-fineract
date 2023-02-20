@@ -17,6 +17,7 @@ public class ApplicationTableHelper {
         applicationAction = Optional.ofNullable(applicationAction).orElse(APPLICATION_ACTION.LIST);
         DatatableData datatableData = null ;
 
+        System.err.println("===================when is this called when creatonmg new app record ?");
         switch (applicationAction){
             default:
                 datatableData = readWriteNonCoreDataService.retrieveDatatable(table);

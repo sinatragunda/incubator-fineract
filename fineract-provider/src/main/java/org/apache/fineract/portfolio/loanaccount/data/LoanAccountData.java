@@ -47,7 +47,9 @@ import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.data.TransactionProcessingStrategyData;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableAttributes;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProductValueConditionType;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.note.data.NoteData;
+import org.apache.fineract.utility.domain.Record;
 import org.joda.time.LocalDate;
 import org.springframework.util.CollectionUtils;
 
@@ -55,7 +57,7 @@ import org.springframework.util.CollectionUtils;
  * Immutable data object representing loan account data.
  */
 @SuppressWarnings("unused")
-public class LoanAccountData {
+public class LoanAccountData extends Record {
 
     // basic loan details
 
@@ -245,6 +247,11 @@ public class LoanAccountData {
 
     // added 25/05/2022
     private HirePurchaseData hirePurchaseData ;
+
+    /**
+     * Added 18/02/2023 at 1656
+     */
+    private LocalRefData localRefData;  
 
     public static LoanAccountData importInstanceIndividual(EnumOptionData loanTypeEnumOption,Long clientId,Long productId,
             Long loanOfficerId,LocalDate submittedOnDate,
@@ -608,6 +615,7 @@ public class LoanAccountData {
         final boolean isEqualAmortization = false;
         final String revolvingAccountId = null ;
         final Long loanFactorAccountId = null ;
+        final LocalRefData localRefData = null ;
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal, principal,
@@ -626,7 +634,7 @@ public class LoanAccountData {
                 maxOutstandingLoanBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges,
                 isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled, interestRecalculationData, originalSchedule,
                 createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, isVariableInstallmentsAllowed, minimumGap,
-                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization,revolvingAccountId,false ,loanFactorAccountId,null);
+                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization,revolvingAccountId,false ,loanFactorAccountId,null ,localRefData);
 
     }
 
@@ -752,6 +760,7 @@ public class LoanAccountData {
         final boolean autoSettlementAtDisbursement = false ;
         final Long loanFactorAccountId = null ;
         final HirePurchaseData hirePurchaseData = null ;
+        final LocalRefData localRefData= null;
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal, principal,
@@ -770,7 +779,7 @@ public class LoanAccountData {
                 maxOutstandingLoanBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges,
                 isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled, interestRecalculationData, originalSchedule,
                 createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, isVariableInstallmentsAllowed, minimumGap,
-                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization,revolvingAccountId, autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData);
+                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization,revolvingAccountId, autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData,localRefData);
 
     }
 
@@ -800,7 +809,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, acc.interestRecalculationData, acc.originalSchedule,
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     /**
@@ -927,6 +936,8 @@ public class LoanAccountData {
         final Long loanAccountId = null ;
         final Long loanFactorAccountId = null ;
         final HirePurchaseData hirePurchaseData = null ;
+        final LocalRefData localRefData = null;
+
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal, principal,
@@ -945,7 +956,7 @@ public class LoanAccountData {
                 maxOutstandingBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges,
                 isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled, interestRecalculationData, originalSchedule,
                 createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, isVariableInstallmentsAllowed, minimumGap,
-                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,null ,false ,loanFactorAccountId ,hirePurchaseData);
+                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,null ,false ,loanFactorAccountId ,hirePurchaseData ,localRefData);
 
     }
 
@@ -976,7 +987,7 @@ public class LoanAccountData {
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
                 acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData
-                );
+                ,acc.localRefData);
 
     }
 
@@ -1109,6 +1120,7 @@ public class LoanAccountData {
         final String revolvingAccountId = null ;
         final Long loanFactorAccountId = null ;
         final HirePurchaseData hirePurchaseData = null ;
+        final LocalRefData localRefData = null;
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, product.getId(), product.getName(), product.getDescription(), product.isLinkedToFloatingInterestRates(),
                 product.getFundId(), product.getFundName(), loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName,
@@ -1133,7 +1145,7 @@ public class LoanAccountData {
                 originalSchedule, createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods,
                 product.isVariableInstallmentsAllowed(), product.getMinimumGapBetweenInstallments(),
                 product.getMaximumGapBetweenInstallments(), subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId,
-                closureLoanAccountNo, topupAmount, product.isEqualAmortization(),revolvingAccountId ,false ,loanFactorAccountId ,hirePurchaseData);
+                closureLoanAccountNo, topupAmount, product.isEqualAmortization(),revolvingAccountId ,false ,loanFactorAccountId ,hirePurchaseData ,localRefData);
     }
 
     public static LoanAccountData populateLoanProductDefaults(final LoanAccountData acc, final LoanProductData product) {
@@ -1193,7 +1205,7 @@ public class LoanAccountData {
                 product.toLoanInterestRecalculationData(), acc.originalSchedule, acc.createStandingInstructionAtDisbursement,
                 paidInAdvance, acc.interestRatesPeriods, product.isVariableInstallmentsAllowed(),
                 product.getMinimumGapBetweenInstallments(), product.getMaximumGapBetweenInstallments(), acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, product.isEqualAmortization(),acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, product.isEqualAmortization(),acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
 
     }
 
@@ -1225,7 +1237,7 @@ public class LoanAccountData {
             final LoanInterestRecalculationData interestRecalculationData, final Boolean createStandingInstructionAtDisbursement,
             final Boolean isVariableInstallmentsAllowed, Integer minimumGap, Integer maximumGap, final EnumOptionData subStatus,
             final boolean canUseForTopup, final boolean isTopup, final Long closureLoanId, final String closureLoanAccountNo,
-            final BigDecimal topupAmount, final boolean isEqualAmortization ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData) {
+            final BigDecimal topupAmount, final boolean isEqualAmortization ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData ,final LocalRefData localRefData) {
 
         final LoanScheduleData repaymentSchedule = null;
         final Collection<LoanTransactionData> transactions = null;
@@ -1263,6 +1275,7 @@ public class LoanAccountData {
         final Collection<InterestRatePeriodData> interestRatesPeriods = null;
         final Collection<LoanAccountSummaryData> clientActiveLoanOptions = null;
 
+
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal,
@@ -1281,7 +1294,7 @@ public class LoanAccountData {
                 outstandingLoanBalance, emiAmountVariations, memberVariations, product, inArrears, graceOnArrearsAgeing, overdueCharges,
                 isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled, interestRecalculationData, originalSchedule,
                 createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, isVariableInstallmentsAllowed, minimumGap,
-                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData);
+                maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData,localRefData);
     }
 
     /*
@@ -1305,7 +1318,7 @@ public class LoanAccountData {
             final PortfolioAccountData linkedAccount, final Collection<DisbursementData> disbursementDetails,
             final Collection<LoanTermVariationsData> emiAmountVariations, final Collection<ChargeData> overdueCharges,
             final PaidInAdvanceData paidInAdvance, Collection<InterestRatePeriodData> interestRatesPeriods,
-            final Collection<LoanAccountSummaryData> clientActiveLoanOptions) {
+            final Collection<LoanAccountSummaryData> clientActiveLoanOptions ,final LocalRefData localRefData) {
         LoanProductConfigurableAttributes loanProductConfigurableAttributes = null;
         if (acc.product != null) {
             loanProductConfigurableAttributes = acc.product.getloanProductConfigurableAttributes();
@@ -1334,7 +1347,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, acc.interestRecalculationData, acc.originalSchedule,
                 acc.createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, acc.isVariableInstallmentsAllowed,
                 acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup, clientActiveLoanOptions, acc.isTopup,
-                acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     public static LoanAccountData associationsAndTemplate(final LoanAccountData acc, final Collection<LoanProductData> productOptions,
@@ -1347,7 +1360,7 @@ public class LoanAccountData {
                 acc.interestTypeOptions, acc.interestCalculationPeriodTypeOptions, acc.fundOptions, acc.chargeOptions, null,
                 allowedLoanOfficers, acc.loanPurposeOptions, acc.loanCollateralOptions, calendarOptions, acc.notes, accountLinkingOptions,
                 acc.linkedAccount, acc.disbursementDetails, acc.emiAmountVariations, acc.overdueCharges, acc.paidInAdvance,
-                acc.interestRatesPeriods, acc.clientActiveLoanOptions);
+                acc.interestRatesPeriods, acc.clientActiveLoanOptions ,acc.localRefData);
     }
 
     public static LoanAccountData associateGroup(final LoanAccountData acc, final GroupGeneralData group) {
@@ -1376,7 +1389,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, acc.interestRecalculationData, acc.originalSchedule,
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization, acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization, acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     public static LoanAccountData associateMemberVariations(final LoanAccountData acc, final Map<Long, Integer> memberLoanCycle) {
@@ -1441,7 +1454,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, acc.interestRecalculationData, acc.originalSchedule,
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
 
     }
 
@@ -1475,7 +1488,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, interestRecalculationData, acc.originalSchedule,
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     public static LoanAccountData withLoanCalendarData(final LoanAccountData acc, final CalendarData calendarData) {
@@ -1503,7 +1516,7 @@ public class LoanAccountData {
                 acc.isNPA, acc.daysInMonthType, acc.daysInYearType, acc.isInterestRecalculationEnabled, acc.interestRecalculationData,
                 acc.originalSchedule, acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     public static LoanAccountData withOriginalSchedule(final LoanAccountData acc, final LoanScheduleData originalSchedule) {
@@ -1532,7 +1545,7 @@ public class LoanAccountData {
                 acc.isInterestRecalculationEnabled, acc.interestRecalculationData, originalSchedule,
                 acc.createStandingInstructionAtDisbursement, acc.paidInAdvance, acc.interestRatesPeriods,
                 acc.isVariableInstallmentsAllowed, acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup,
-                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData);
+                acc.clientActiveLoanOptions, acc.isTopup, acc.closureLoanId, acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization ,acc.revolvingAccountId ,acc.autoSettlementAtDisbursement ,acc.loanFactorAccountId ,acc.hirePurchaseData ,acc.localRefData);
     }
 
     private LoanAccountData(final Long id, //
@@ -1582,7 +1595,7 @@ public class LoanAccountData {
             final Collection<InterestRatePeriodData> interestRatesPeriods, final Boolean isVariableInstallmentsAllowed,
             final Integer minimumGap, final Integer maximumGap, final EnumOptionData subStatus, final Boolean canUseForTopup,
             final Collection<LoanAccountSummaryData> clientActiveLoanOptions, final boolean isTopup,
-            final Long closureLoanId, final String closureLoanAccountNo, final BigDecimal topupAmount, final boolean isEqualAmortization ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData) {
+            final Long closureLoanId, final String closureLoanAccountNo, final BigDecimal topupAmount, final boolean isEqualAmortization ,final String revolvingAccountId ,final Boolean autoSettlementAtDisbursement ,final Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData ,final LocalRefData localRefData) {
 
         this.id = id;
         this.accountNo = accountNo;
@@ -1779,6 +1792,11 @@ public class LoanAccountData {
         // added 25/05/2022
         this.hirePurchaseData = hirePurchaseData ;
 
+        /**
+         * Added 18/02/2023 at 1655
+         */
+        this.localRefData = localRefData;  
+
     }
 
     public RepaymentScheduleRelatedLoanData repaymentScheduleRelatedData() {
@@ -1952,5 +1970,13 @@ public class LoanAccountData {
     // added 21/01/2022
     public boolean isNpa(){
         return this.isNPA;
+    }
+
+    public LocalRefData localRefData(){
+        return this.localRefData;
+    }
+
+    public void setLocalRefData(LocalRefData localRefData){
+        this.localRefData = localRefData;
     }
 }

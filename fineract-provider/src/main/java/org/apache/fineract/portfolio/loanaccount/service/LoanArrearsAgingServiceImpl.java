@@ -512,7 +512,6 @@ public class LoanArrearsAgingServiceImpl implements LoanArrearsAgingService, Bus
                 Loan loan = (Loan) loanEntity;
                 updateLoanArrearsAgeingDetails(loan);
             }
-
         }
 
     }

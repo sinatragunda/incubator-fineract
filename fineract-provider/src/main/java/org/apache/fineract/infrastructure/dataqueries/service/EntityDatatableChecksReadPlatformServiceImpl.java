@@ -39,6 +39,8 @@ import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecks;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecksRepository;
+import org.apache.fineract.infrastructure.dataqueries.helper.TemplateRecordHelper;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
@@ -60,12 +62,13 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     private final SavingsProductReadPlatformService savingsProductReadPlatformService;
     private final PaginationHelper<EntityDataTableChecksData> paginationHelper = new PaginationHelper<>();
 
+
     @Autowired
     public EntityDatatableChecksReadPlatformServiceImpl(final RoutingDataSource dataSource,
-            final LoanProductReadPlatformService loanProductReadPlatformService,
-            final SavingsProductReadPlatformService savingsProductReadPlatformService,
-            final EntityDatatableChecksRepository entityDatatableChecksRepository,
-            final ReadWriteNonCoreDataService readWriteNonCoreDataService) {
+                                                        final LoanProductReadPlatformService loanProductReadPlatformService,
+                                                        final SavingsProductReadPlatformService savingsProductReadPlatformService,
+                                                        final EntityDatatableChecksRepository entityDatatableChecksRepository,
+                                                        final ReadWriteNonCoreDataService readWriteNonCoreDataService) {
 
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.registerDataTableMapper = new RegisterDataTableMapper();
@@ -74,6 +77,7 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         this.savingsProductReadPlatformService = savingsProductReadPlatformService;
         this.entityDatatableChecksRepository = entityDatatableChecksRepository;
         this.readWriteNonCoreDataService = readWriteNonCoreDataService;
+
     }
 
     @Override
@@ -116,6 +120,9 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     @Override
     public List<DatatableData> retrieveTemplates(final Long status, final String entity, final Long productId) {
 
+
+        System.err.println("-----------------template for table in entity checks ");
+
         List<EntityDatatableChecks> tableRequiredBeforeAction = null;
         if (productId != null) {
             tableRequiredBeforeAction = this.entityDatatableChecksRepository.findByEntityStatusAndProduct(entity, status, productId);
@@ -126,8 +133,12 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         }
         if (tableRequiredBeforeAction != null && tableRequiredBeforeAction.size() > 0) {
             List<DatatableData> ret = new ArrayList<>();
-            for (EntityDatatableChecks t : tableRequiredBeforeAction) {
-                ret.add(this.readWriteNonCoreDataService.retrieveDatatable(t.getDatatableName()));
+            for (EntityDatatableChecks t : tableRequiredBeforeAction){
+                System.err.println("---------------------set records list here son ========"+t.getEntity());
+
+                DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(t.getDatatableName());
+                //TemplateRecordHelper.templateRecords(null ,loanReadPlatformService ,datatableData ,t.getEntity());
+                ret.add(datatableData);
             }
             return ret;
         }

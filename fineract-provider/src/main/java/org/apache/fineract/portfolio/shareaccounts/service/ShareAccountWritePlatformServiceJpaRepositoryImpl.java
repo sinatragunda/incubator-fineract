@@ -221,7 +221,9 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
 
     @Override
     public CommandProcessingResult applyAddtionalShares(final Long accountId, JsonCommand jsonCommand) {
-        try {
+        try{
+
+            System.err.println("---------------------why are we coming here again ? with id "+accountId);
 
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);
@@ -397,8 +399,11 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     @Override
     public CommandProcessingResult approveAdditionalShares(Long accountId, JsonCommand jsonCommand) {
 
+        System.err.println("----------------------------approve additional shares son with id "+accountId);
+
         try {
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
+
             Map<String, Object> changes = this.accountDataSerializer.validateAndApproveAddtionalShares(jsonCommand, account);
             if (!changes.isEmpty()) {
                 this.shareAccountRepository.save(account);

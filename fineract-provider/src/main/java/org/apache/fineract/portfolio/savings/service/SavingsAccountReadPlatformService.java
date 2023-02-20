@@ -74,4 +74,9 @@ public interface SavingsAccountReadPlatformService {
      * Added 04/11/2022 at 0215
      */
     Collection<SavingsAccountData> retrieveAllByAccountType(ACCOUNT_TYPE accountType);
+
+    /**
+     * Added 16/02/2023 at 2341
+     */ 
+    Collection<SavingsAccountData> findByCurrency(Long clientId ,String ccy);
 }

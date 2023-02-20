@@ -66,11 +66,6 @@ import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.collateral.domain.LoanCollateral;
 import org.apache.fineract.portfolio.collateral.service.CollateralAssembler;
-import org.apache.fineract.portfolio.commissions.domain.LoansFromAgents;
-import org.apache.fineract.portfolio.commissions.helper.CommissionsHelper;
-import org.apache.fineract.portfolio.commissions.helper.CommissionsHelperService;
-import org.apache.fineract.portfolio.commissions.service.AttachedCommissionChargesWritePlatformService;
-import org.apache.fineract.portfolio.commissions.service.LoansFromAgentsWritePlatformService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -91,7 +86,6 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateEx
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
 import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorLoanResolver;
-import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorSavingsAccountHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
@@ -101,16 +95,15 @@ import org.apache.fineract.portfolio.loanaccount.serialization.LoanApplicationCo
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanApplicationTransitionApiJsonValidator;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
 import org.apache.fineract.portfolio.loanproduct.domain.*;
-import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
+import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountAssembler;
-import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
@@ -183,13 +176,13 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     /// added 21/08/2021
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
 
-    // added 06/01/2021
-    private final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService;
-    private final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService ;
-    private final CommissionsHelperService commissionsHelperService ;
-
     // added 25/05/2022
     private final HirePurchaseRepository hirePurchaseRepository;
+
+    /**
+     * Added 20/02/2023 at 0001
+     */
+    private final LocalRefRecordHelper localRefRecordHelper;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
@@ -214,7 +207,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                                                                 final FineractEntityToEntityMappingRepository repository, final FineractEntityRelationRepository fineractEntityRelationRepository,
                                                                 final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
                                                                 final AccountDetailsReadPlatformService accountDetailsReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-                                                                final LoansFromAgentsWritePlatformService loansFromAgentsWritePlatformService , final AttachedCommissionChargesWritePlatformService attachedCommissionChargesWritePlatformService , final CommissionsHelperService commissionsHelperService ,final HirePurchaseRepository hirePurchaseRepository) {
+                                                                final HirePurchaseRepository hirePurchaseRepository,
+                                                                final LocalRefRecordHelper localRefRecordHelper) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -251,11 +245,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.fineractEntityRelationRepository = fineractEntityRelationRepository;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService ;
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
-        this.loansFromAgentsWritePlatformService = loansFromAgentsWritePlatformService;
-        this.attachedCommissionChargesWritePlatformService = attachedCommissionChargesWritePlatformService;
-        this.commissionsHelperService = commissionsHelperService;
-
         this.hirePurchaseRepository = hirePurchaseRepository ;
+        this.localRefRecordHelper = localRefRecordHelper;
 
     }
 
@@ -348,6 +339,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              * Modified 01/11/2022 at 1253
              * Skip function if isGroupLoan ,function will later be modified
              */
+
 
             if(!isGroupLoan) {
                 command = injectAccountId(command, loanProduct, clientId);
@@ -466,13 +458,13 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // loan created at this point now
             this.loanRepositoryWrapper.save(newLoanApplication);
 
-            // we have a loan now lets create the loan commission link 
-            // should also have checker to check if loan is being submitted through a loan agent
-            CommissionsHelper.linkLoanToCommissions(newLoanApplication ,loansFromAgentsWritePlatformService ,attachedCommissionChargesWritePlatformService , fromJsonHelper ,command);
 
-            // at this stage chargetime is loan application
-            // CommissionsHelper.depositCommissionCharges(commissionsHelperService ,newLoanApplication ,ChargeTimeType.LOAN_APPLICATION);
-
+            /**
+             * Added 19/02/2023 at 2349
+             * Create value for local ref
+             */
+            localRefRecordHelper.create(command ,newLoanApplication);  
+            System.err.println("===============will it reverse the loan transaction ?=======");
 
             // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists
             HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
@@ -1378,8 +1370,6 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             }
 
             saveAndFlushLoanWithDataIntegrityViolationChecks(loan);
-
-            CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan ,ChargeTimeType.LOAN_APPROVED);
 
             final String noteText = command.stringValueOfParameterNamed("note");
             if (StringUtils.isNotBlank(noteText)) {

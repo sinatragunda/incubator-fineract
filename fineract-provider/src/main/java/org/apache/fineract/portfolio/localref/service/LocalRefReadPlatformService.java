@@ -13,8 +13,8 @@ import java.util.Collection;
 public interface LocalRefReadPlatformService {
 
     public LocalRefData template(REF_TABLE refTable);
+    public LocalRefData retrieveOne(Long id);
     public Collection<LocalRefData> retrieveAll(Long officeId);
-
     public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable , Long recordId);
 
 

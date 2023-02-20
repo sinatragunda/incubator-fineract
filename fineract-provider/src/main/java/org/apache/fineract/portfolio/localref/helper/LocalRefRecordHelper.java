@@ -19,6 +19,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.exception.LocalRefValueMandatoryException;
 import org.apache.fineract.portfolio.localref.repo.LocalRefRepositoryWrapper;
 import org.apache.fineract.portfolio.localref.repo.LocalRefValueRepositoryWrapper;
 
@@ -94,6 +95,7 @@ public class LocalRefRecordHelper {
                  */
                 Consumer consumer = (e)->{
                     LocalRef localRef = localRefRepositoryWrapper.findOneWithoutNotFoundDetection(localRefId);
+                    validateEntry(localRef ,value);
                     LocalRefValue localRefValue = new LocalRefValue(localRef ,recordId ,value);
                     localRefValueList.add(localRefValue);
                 };
@@ -121,9 +123,39 @@ public class LocalRefRecordHelper {
 
     public void setRecordData(Record record, REF_TABLE refTable){
         Long recordId = record.getId();
+        System.err.println("=========================record id "+recordId);
         Collection<LocalRefValueData> localRefValueDataCollection = localRefReadPlatformService.retrieveRecord(refTable ,recordId);
+
+        System.err.println("======================values collected "+localRefValueDataCollection.size());
         record.setLocalRefValueData(localRefValueDataCollection);
 
+        System.err.println("========================record value set ===========");
+
+    }
+
+    private void validateEntry(LocalRef localRef , String entry){
+
+        //System.err.println("--------------is localref null now ? "+Optional.ofNullable(localRef).isPresent());
+        boolean isPresent = Optional.ofNullable(entry).isPresent();
+        boolean isMandatory = localRef.isMandatory();
+        String key = localRef.getName();
+
+        //System.err.println("-------------is mandatory "+isMandatory);
+        if(isMandatory){
+            if(isPresent){
+                // check if string is not blank here ,need another efficient method but this is just temp
+                int l = entry.length();
+                //System.err.println("----------------------length is "+l);
+                if(l <= 0){
+                    //System.err.println("-------------throw this error son of length --");
+                    throw new LocalRefValueMandatoryException(key);
+                }
+            }
+            else{
+                //System.err.println("===============errro thrown when not present =======");
+                throw new LocalRefValueMandatoryException(key);
+            }
+        }
     }
 
 

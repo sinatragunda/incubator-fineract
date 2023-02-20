@@ -40,7 +40,9 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.api.ChargesApiConstants;
 import org.apache.fineract.portfolio.charge.domain.Charge;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepository;
+import org.apache.fineract.portfolio.charge.domain.ChargeProperties;
+import org.apache.fineract.portfolio.charge.repo.ChargePropertiesRepository;
+import org.apache.fineract.portfolio.charge.repo.ChargeRepository;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeDeletedException;
 import org.apache.fineract.portfolio.charge.exception.ChargeCannotBeUpdatedException;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
@@ -72,13 +74,14 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     private final GLAccountRepositoryWrapper gLAccountRepository;
     private final TaxGroupRepositoryWrapper taxGroupRepository;
     private final TransactionCodeWrapper transactionCodeWrapper;
+    private final ChargePropertiesRepository chargePropertiesRepository;
 
     @Autowired
     public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository,
             final LoanProductRepository loanProductRepository, final RoutingDataSource dataSource,
             final FineractEntityAccessUtil fineractEntityAccessUtil, final GLAccountRepositoryWrapper glAccountRepository,
-            final TaxGroupRepositoryWrapper taxGroupRepository ,final TransactionCodeWrapper transactionCodeWrapper) {
+            final TaxGroupRepositoryWrapper taxGroupRepository ,final TransactionCodeWrapper transactionCodeWrapper ,final ChargePropertiesRepository chargePropertiesRepository) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.dataSource = dataSource;
@@ -89,6 +92,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         this.gLAccountRepository = glAccountRepository;
         this.taxGroupRepository = taxGroupRepository;
         this.transactionCodeWrapper = transactionCodeWrapper;
+        this.chargePropertiesRepository =chargePropertiesRepository;
     }
 
     @Transactional
@@ -124,7 +128,16 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
                 transactionCode[0] = this.transactionCodeWrapper.findOneWithNotFoundException(transactionCodeId);
             });
 
-            final Charge charge = Charge.fromJson(command, glAccount, taxGroup ,transactionCode[0]);
+
+            final ChargeProperties chargeProperties = ChargeProperties.fromJson(command);
+
+
+            System.err.println("-----------------charge commission has value "+chargeProperties.isCommissionedCharge());
+            this.chargePropertiesRepository.saveAndFlush(chargeProperties);
+
+            System.err.println("---------------------can you get charge id ? "+chargeProperties.getId());
+
+            final Charge charge = Charge.fromJson(command, glAccount, taxGroup ,transactionCode[0],chargeProperties);
             this.chargeRepository.save(charge);
 
             // check if the office specific products are enabled. If yes, then

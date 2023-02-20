@@ -425,7 +425,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
                                 .getId(), true);
             }
             accountTransfer.reverse();
-            System.out.println("-------------------done reversing ");
+            //System.out.println("-------------------done reversing ");
             this.accountTransferRepository.save(accountTransfer);
         }
     }

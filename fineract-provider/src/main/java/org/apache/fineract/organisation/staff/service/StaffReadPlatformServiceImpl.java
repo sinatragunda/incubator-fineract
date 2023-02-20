@@ -63,7 +63,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
     private static final class StaffMapper implements RowMapper<StaffData> {
 
         public String schema() {
-            return " s.id as id,s.office_id as officeId, o.name as officeName, s.firstname as firstname, s.lastname as lastname,"
+            return " s.id as id,s.office_id as officeId, o.name as officeName, s.is_agent as isAgent, s.firstname as firstname, s.lastname as lastname,"
                     + " s.display_name as displayName, s.is_loan_officer as isLoanOfficer, s.external_id as externalId, s.mobile_no as mobileNo,"
             		+ " s.is_active as isActive, s.joining_date as joiningDate from m_staff s "
                     + " join m_office o on o.id = s.office_id";
@@ -83,9 +83,10 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
             final String mobileNo = rs.getString("mobileNo");
             final boolean isActive = rs.getBoolean("isActive");
             final LocalDate joiningDate = JdbcSupport.getLocalDate(rs, "joiningDate");
+            final boolean isAgent = rs.getBoolean("isAgent");
 
             return StaffData.instance(id, firstname, lastname, displayName, officeId, officeName, isLoanOfficer, externalId, mobileNo,
-                    isActive, joiningDate);
+                    isActive, joiningDate, isAgent);
         }
     }
 
@@ -97,6 +98,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
 
             sqlBuilder.append("s.id as id, s.office_id as officeId, ohierarchy.name as officeName,");
             sqlBuilder.append("s.firstname as firstname, s.lastname as lastname,");
+            sqlBuilder.append("s.is_agent as isAgent,");
             sqlBuilder.append("s.display_name as displayName, s.is_loan_officer as isLoanOfficer, s.external_id as externalId, ");
             sqlBuilder.append("s.mobile_no as mobileNo, s.is_active as isActive, s.joining_date as joiningDate ");
             sqlBuilder.append("from m_office o ");
@@ -126,9 +128,10 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
             final String mobileNo = rs.getString("mobileNo");
             final boolean isActive = rs.getBoolean("isActive");
             final LocalDate joiningDate = JdbcSupport.getLocalDate(rs, "joiningDate");
+            final boolean isAgent = rs.getBoolean("isAgent");
 
             return StaffData.instance(id, firstname, lastname, displayName, officeId, officeName, isLoanOfficer, externalId, mobileNo,
-                    isActive, joiningDate);
+                    isActive, joiningDate ,isAgent);
         }
     }
 
@@ -177,6 +180,14 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
         return this.jdbcTemplate.query(sql, this.lookupMapper, new Object[] { defaultOfficeId, hierarchy });
     }
 
+    @Override
+    public Collection<StaffData> retrieveAllAgentsByOffice(final Long officeId) {
+
+        final String sql = "select " + this.lookupMapper.schema() + " where s.office_id = ? and s.is_active=1 and s.is_agent = 1 and o.hierarchy like ? ";
+
+        return this.jdbcTemplate.query(sql, this.lookupMapper, new Object[] {officeId});
+    }
+
     private Long defaultToUsersOfficeIfNull(final Long officeId) {
         Long defaultOfficeId = officeId;
         if (defaultOfficeId == null) {
@@ -190,13 +201,14 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
     	
         //adding the Authorization criteria so that a user cannot see an employee who does not belong to his office or 	a sub office for his office.
         final String hierarchy = this.context.authenticatedUser().getOffice().getHierarchy()+ "%";
-         
-
+        StaffData staffData = null ;
         try {
             final StaffMapper rm = new StaffMapper();
             final String sql = "select " + rm.schema() + " where s.id = ? and o.hierarchy like ? " ;
 
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { staffId, hierarchy });
+            staffData = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { staffId, hierarchy });
+            return staffData;
+
         } catch (final EmptyResultDataAccessException e) {
             throw new StaffNotFoundException(staffId);
         }
@@ -268,6 +280,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
 
         String sql = "select " + this.staffInOfficeHierarchyMapper.schema(loanOfficersOnly);
         sql = sql + " order by s.lastname";
+
         return this.jdbcTemplate.query(sql, this.staffInOfficeHierarchyMapper, new Object[] { officeId });
     }
     

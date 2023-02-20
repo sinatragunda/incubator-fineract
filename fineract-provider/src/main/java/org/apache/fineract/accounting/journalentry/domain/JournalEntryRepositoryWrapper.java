@@ -32,7 +32,7 @@ public class JournalEntryRepositoryWrapper {
     public void reverseEntry(JournalEntry ...entry){
         Arrays.stream(entry).forEach(e->{
             e.setReversed(true);
-            System.err.println("---------------reverse account with id "+e.isReversed());
+            //System.err.println("---------------reverse account with id "+e.isReversed());
             journalEntryRepository.saveAndFlush(e);
         });   
     }

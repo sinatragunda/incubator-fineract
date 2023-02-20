@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.organisation.office.data.OfficeData;
+import org.apache.fineract.portfolio.agentbanking.data.AgentData;
 import org.joda.time.LocalDate;
 
 /**
@@ -46,14 +47,18 @@ public class StaffData {
     private String dateFormat;
     private String locale;
 
+    private Boolean isAgent ;
+
+    private AgentData agentData;
+
     public static StaffData importInstance(String externalId, String firstName, String lastName, String mobileNo, Long officeId, Boolean isLoanOfficer,
-            Boolean isActive, LocalDate joinedOnDate, Integer rowIndex,String locale, String dateFormat){
+            Boolean isActive, LocalDate joinedOnDate, Integer rowIndex,String locale, String dateFormat ,Boolean isAgent){
         return  new StaffData(externalId,firstName,lastName,mobileNo,officeId,isLoanOfficer,isActive,
-                joinedOnDate,rowIndex,locale,dateFormat);
+                joinedOnDate,rowIndex,locale,dateFormat, isAgent);
 
     }
     private StaffData(String externalId, String firstname, String lastname, String mobileNo, Long officeId, Boolean isLoanOfficer,
-            Boolean isActive, LocalDate joiningDate, Integer rowIndex,String locale, String dateFormat) {
+            Boolean isActive, LocalDate joiningDate, Integer rowIndex,String locale, String dateFormat ,Boolean isAgent) {
 
         this.externalId = externalId;
         this.firstname = firstname;
@@ -70,6 +75,11 @@ public class StaffData {
         this.id = null;
         this.officeName = null;
         this.displayName = null;
+        this.isAgent = isAgent;
+    }
+
+    public void setAgentData(AgentData agentData){
+        this.agentData = agentData;
     }
 
     public Integer getRowIndex() {
@@ -81,23 +91,23 @@ public class StaffData {
 
     public static StaffData templateData(final StaffData staff, final Collection<OfficeData> allowedOffices) {
         return new StaffData(staff.id, staff.firstname, staff.lastname, staff.displayName, staff.officeId, staff.officeName,
-                staff.isLoanOfficer, staff.externalId, staff.mobileNo, allowedOffices, staff.isActive, staff.joiningDate);
+                staff.isLoanOfficer, staff.externalId, staff.mobileNo, allowedOffices, staff.isActive, staff.joiningDate ,staff.isAgent);
     }
 
     public static StaffData lookup(final Long id, final String displayName) {
-        return new StaffData(id, null, null, displayName, null, null, null, null, null, null, null, null);
+        return new StaffData(id.toString(), null, null, displayName, null, null, null, null, null, null, null, false);
     }
 
     public static StaffData instance(final Long id, final String firstname, final String lastname, final String displayName,
             final Long officeId, final String officeName, final Boolean isLoanOfficer, final String externalId, final String mobileNo,
-            final boolean isActive, final LocalDate joiningDate) {
+            final boolean isActive, final LocalDate joiningDate ,final Boolean isAgent) {
         return new StaffData(id, firstname, lastname, displayName, officeId, officeName, isLoanOfficer, externalId, mobileNo, null,
-                isActive, joiningDate);
+                isActive, joiningDate ,isAgent);
     }
 
     private StaffData(final Long id, final String firstname, final String lastname, final String displayName, final Long officeId,
             final String officeName, final Boolean isLoanOfficer, final String externalId, final String mobileNo,
-            final Collection<OfficeData> allowedOffices, final Boolean isActive, final LocalDate joiningDate) {
+            final Collection<OfficeData> allowedOffices, final Boolean isActive, final LocalDate joiningDate ,final Boolean isAgent) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -110,6 +120,11 @@ public class StaffData {
         this.allowedOffices = allowedOffices;
         this.isActive = isActive;
         this.joiningDate = joiningDate;
+        this.isAgent = isAgent;
+    }
+
+    public Boolean isAgent() {
+        return isAgent;
     }
 
     public Long getId() {

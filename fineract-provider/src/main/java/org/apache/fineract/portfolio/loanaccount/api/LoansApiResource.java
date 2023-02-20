@@ -90,7 +90,6 @@ import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.collateral.data.CollateralData;
 import org.apache.fineract.portfolio.collateral.service.CollateralReadPlatformService;
-import org.apache.fineract.portfolio.commissions.constants.LoanAgentApiConstants;
 import org.apache.fineract.portfolio.floatingrates.data.InterestRatePeriodData;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
@@ -122,11 +121,16 @@ import org.apache.fineract.portfolio.loanproduct.data.TransactionProcessingStrat
 import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.apache.fineract.portfolio.loanproduct.service.LoanDropdownReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
+import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -187,7 +191,8 @@ public class LoansApiResource {
     private final EntityDatatableChecksReadService entityDatatableChecksReadService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
-
+    private final LocalRefReadPlatformService localRefReadPlatformService;
+    private final LocalRefRecordHelper localRefRecordHelper;
 
     @Autowired
     public LoansApiResource(final PlatformSecurityContext context, final LoanReadPlatformService loanReadPlatformService,
@@ -210,7 +215,9 @@ public class LoansApiResource {
             final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
             final EntityDatatableChecksReadService entityDatatableChecksReadService,
             final BulkImportWorkbookService bulkImportWorkbookService,
-            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService) {
+            final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService,
+            final LocalRefReadPlatformService localRefReadPlatformService,
+            final LocalRefRecordHelper localRefRecordHelper) {
         this.context = context;
         this.loanReadPlatformService = loanReadPlatformService;
         this.loanProductReadPlatformService = loanProductReadPlatformService;
@@ -238,6 +245,8 @@ public class LoansApiResource {
         this.entityDatatableChecksReadService = entityDatatableChecksReadService;
         this.bulkImportWorkbookService=bulkImportWorkbookService;
         this.bulkImportWorkbookPopulatorService=bulkImportWorkbookPopulatorService;
+        this.localRefReadPlatformService = localRefReadPlatformService;
+        this.localRefRecordHelper = localRefRecordHelper;
     }
 
     /*
@@ -279,7 +288,10 @@ public class LoansApiResource {
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
             @DefaultValue("false") @QueryParam("activeOnly") final boolean onlyActive, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+         final AppUser appUser = this.context.authenticatedUser();
+         appUser.validateHasReadPermission(this.resourceNameForPermissions);
+
+         System.err.println("=================load a client template =========");
 
         // template
         final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(onlyActive);
@@ -307,6 +319,11 @@ public class LoansApiResource {
             if (templateType.equals("individual") || templateType.equals("jlg")) {
 
                 if(clientId == null) {
+                    /**
+                     * Modified 16/02/2023 at 0755
+                     * Get office id from app user instead
+                     */
+                    officeId = appUser.getOffice().getId();
                     newLoanAccount = newLoanAccount == null ? LoanAccountData.emptyTemplate() : newLoanAccount;
                 } else {
                     final LoanAccountData loanAccountClientDetails = this.loanReadPlatformService.retrieveClientDetailsTemplate(clientId);
@@ -372,7 +389,13 @@ public class LoansApiResource {
         }
         final List<DatatableData> datatableTemplates = this.entityDatatableChecksReadService
                 .retrieveTemplates(StatusEnum.CREATE.getCode().longValue(), EntityTables.LOAN.getName(), productId);
+        
+        System.err.println("========================set tables template");
         newLoanAccount.setDatatables(datatableTemplates);
+        LocalRefData localRefData = localRefReadPlatformService.template(REF_TABLE.LOAN);
+        newLoanAccount.setLocalRefData(localRefData);
+
+        System.err.println("=========================get local refs template ");
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, newLoanAccount, this.LOAN_DATA_PARAMETERS);
@@ -405,6 +428,7 @@ public class LoansApiResource {
         this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
 
         LoanAccountData loanBasicDetails = this.loanReadPlatformService.retrieveOne(loanId);
+
         if (loanBasicDetails.isInterestRecalculationEnabled()) {
             Collection<CalendarData> interestRecalculationCalendarDatas = this.calendarReadPlatformService
                     .retrieveCalendarsByEntity(loanBasicDetails.getInterestRecalculationDetailId(),
@@ -626,13 +650,19 @@ public class LoansApiResource {
 
         paidInAdvanceTemplate = this.loanReadPlatformService.retrieveTotalPaidInAdvance(loanId);
 
+        final LocalRefData localRefData = localRefReadPlatformService.template(REF_TABLE.LOAN);
+
         final LoanAccountData loanAccount = LoanAccountData.associationsAndTemplate(loanBasicDetails, repaymentSchedule, loanRepayments,
                 charges, collateral, guarantors, meeting, productOptions, loanTermFrequencyTypeOptions, repaymentFrequencyTypeOptions,
                 repaymentFrequencyNthDayTypeOptions, repaymentFrequencyDayOfWeekTypeOptions, repaymentStrategyOptions, 
                 interestRateFrequencyTypeOptions, amortizationTypeOptions, interestTypeOptions, interestCalculationPeriodTypeOptions, 
                 fundOptions, chargeOptions, chargeTemplate, allowedLoanOfficers, loanPurposeOptions, loanCollateralOptions, 
                 calendarOptions, notes, accountLinkingOptions, linkedAccount, disbursementData, emiAmountVariations,
-                overdueCharges, paidInAdvanceTemplate, interestRatesPeriods, clientActiveLoanOptions);
+                overdueCharges, paidInAdvanceTemplate, interestRatesPeriods, clientActiveLoanOptions ,localRefData);
+
+        System.err.println("=================data lost here l guess ");
+        localRefRecordHelper.setRecordData(loanAccount , REF_TABLE.LOAN);
+            
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters(),
                 mandatoryResponseParameters);

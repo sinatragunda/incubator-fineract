@@ -333,6 +333,31 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         setId(id);
     }
 
+
+    public static SavingsAccount minimalCreation(final Client client,final SavingsProduct product,
+                                                                  final LocalDate submittedOnDate, final AppUser submittedBy,final SavingsAccountStatusType status) {
+
+        final AccountType accountType = AccountType.INDIVIDUAL;
+        final Integer interestCompoundingPeriodType =  product.interestCompoundingPeriodType;
+        final SavingsCompoundingInterestPeriodType savingsCompoundingInterestPeriodType = SavingsCompoundingInterestPeriodType.fromInt(interestCompoundingPeriodType);
+        final BigDecimal nomimalAnnualInterestRate = product.nominalAnnualInterestRate;
+        final Integer interestPostingPeriod = product.interestPostingPeriodType;
+        final Integer interestCalculationType = product.interestCalculationType;
+        final BigDecimal overdraftLimit = product.overdraftLimit();
+        final BigDecimal minRequiredOpeningBalance = product.minRequiredOpeningBalance();
+        final SavingsPeriodFrequencyType savingsPeriodFrequencyType = product.lockinPeriodFrequencyType();
+        final Integer lockingPeriodFrequency = product.lockinPeriodFrequency;
+        final SavingsInterestCalculationDaysInYearType savingsInterestCalculationDaysInYearType = product.interestCalculationDaysInYearType();
+        final SavingsInterestCalculationType savingsInterestCalculationType = product.interestCalculationType();
+
+
+        return new SavingsAccount(client, null, product, null, null, null, status, accountType, submittedOnDate,
+                submittedBy, nomimalAnnualInterestRate, savingsCompoundingInterestPeriodType, SavingsPostingInterestPeriodType.fromInt(interestPostingPeriod), savingsInterestCalculationType,
+                savingsInterestCalculationDaysInYearType, minRequiredOpeningBalance, lockingPeriodFrequency, savingsPeriodFrequencyType,
+                true, null , false, overdraftLimit, true,
+                minRequiredOpeningBalance, null, null, false);
+    }
+
     public static SavingsAccount createNewApplicationForSubmittal(final Client client, final Group group, final SavingsProduct product,
             final Staff fieldOfficer, final String accountNo, final String externalId, final AccountType accountType,
             final LocalDate submittedOnDate, final AppUser submittedBy, final BigDecimal interestRate,

@@ -3506,7 +3506,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     private ChangedTransactionDetail reverseLoanTransaction(LoanTransaction newTransactionDetail, LoanLifecycleStateMachine loanLifecycleStateMachine, LoanTransaction transactionForAdjustment, ScheduleGeneratorDTO scheduleGeneratorDTO, AppUser currentUser, ChangedTransactionDetail changedTransactionDetail) {
 
-        System.err.println("=---------------------------reversing loan transaction --------------");
+        //System.err.println("=---------------------------reversing loan transaction --------------");
 
         transactionForAdjustment.reverse();
         transactionForAdjustment.manuallyAdjustedOrReversed();

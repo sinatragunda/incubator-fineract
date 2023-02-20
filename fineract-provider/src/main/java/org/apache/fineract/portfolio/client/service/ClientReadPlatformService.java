@@ -50,5 +50,12 @@ public interface ClientReadPlatformService {
     //Added 03/10/2021
     ClientData retrieveOneByExternalId(String externalId);
 
+    /**
+     * Added 15/02/2023 at 0834
+     */
+    ClientData retrieveByStaff(Long staffId);
+
+     
+
 }
 

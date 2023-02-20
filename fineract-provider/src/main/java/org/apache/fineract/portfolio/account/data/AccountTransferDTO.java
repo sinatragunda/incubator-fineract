@@ -36,9 +36,9 @@ public class AccountTransferDTO {
     private final LocalDate transactionDate;
     private final BigDecimal transactionAmount;
     private final PortfolioAccountType fromAccountType;
-    private final PortfolioAccountType toAccountType;
-    private final Long fromAccountId;
-    private final Long toAccountId;
+    private PortfolioAccountType toAccountType;
+    private Long fromAccountId;
+    private Long toAccountId;
     private final String description;
     private final Locale locale;
     private final DateTimeFormatter fmt;
@@ -49,7 +49,7 @@ public class AccountTransferDTO {
     private final Integer loanInstallmentNumber;
     private final Integer transferType;
     private final AccountTransferDetails accountTransferDetails;
-    private final String noteText;
+    private String noteText;
     private final String txnExternalId;
     private final Loan loan;
     private final Loan fromLoan;
@@ -58,6 +58,7 @@ public class AccountTransferDTO {
     private final SavingsAccount fromSavingsAccount;
     private final Boolean isRegularTransaction;
     private final Boolean isExceptionForBalanceCheck;
+    private Long officeId = 1L;
 
 
     //added 31/01/2022
@@ -180,7 +181,27 @@ public class AccountTransferDTO {
         AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate ,amount ,fromPortfolioAccountType ,toPortfolioAccountType ,fromAccountId ,toAccountId ,description ,locale ,dateTimeFormatter ,fromTransferType ,toTransferType ,null ,fromLoan ,toLoan);
         return accountTransferDTO;
 
-    }  
+    }
+
+    /**
+     * Added 17/02/2023 at 0410
+     */
+    public void setToAccountId(Long id){
+        this.toAccountId = id;
+    } 
+
+    public void setFromAccountId(Long id){
+        this.fromAccountId = id;
+    }
+
+    public void setToAccountType(PortfolioAccountType toAccountType){
+        this.toAccountType = toAccountType;
+    } 
+
+
+    public void setNoteText(String text){
+        this.noteText = text ;
+    }   
 
     public LocalDate getTransactionDate() {
         return this.transactionDate;
@@ -286,4 +307,40 @@ public class AccountTransferDTO {
         return this.toShareAccount ;
     }
 
+    public Long officeId(){
+        return this.officeId;
+    }
+
+    @Override
+    public String toString() {
+        return "AccountTransferDTO{" +
+                "transactionDate=" + transactionDate +
+                ", transactionAmount=" + transactionAmount +
+                ", fromAccountType=" + fromAccountType +
+                ", toAccountType=" + toAccountType +
+                ", fromAccountId=" + fromAccountId +
+                ", toAccountId=" + toAccountId +
+                ", description='" + description + '\'' +
+                ", locale=" + locale +
+                ", fmt=" + fmt +
+                ", paymentDetail=" + paymentDetail +
+                ", fromTransferType=" + fromTransferType +
+                ", toTransferType=" + toTransferType +
+                ", chargeId=" + chargeId +
+                ", loanInstallmentNumber=" + loanInstallmentNumber +
+                ", transferType=" + transferType +
+                ", accountTransferDetails=" + accountTransferDetails +
+                ", noteText='" + noteText + '\'' +
+                ", txnExternalId='" + txnExternalId + '\'' +
+                ", loan=" + loan +
+                ", fromLoan=" + fromLoan +
+                ", toLoan=" + toLoan +
+                ", toSavingsAccount=" + toSavingsAccount +
+                ", fromSavingsAccount=" + fromSavingsAccount +
+                ", isRegularTransaction=" + isRegularTransaction +
+                ", isExceptionForBalanceCheck=" + isExceptionForBalanceCheck +
+                ", officeId=" + officeId +
+                ", toShareAccount=" + toShareAccount +
+                '}';
+    }
 }

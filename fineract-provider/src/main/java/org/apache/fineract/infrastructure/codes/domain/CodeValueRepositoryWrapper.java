@@ -62,5 +62,11 @@ public class CodeValueRepositoryWrapper {
         if (codeValue == null) { throw new CodeValueNotFoundException(codeName, label); }
         return codeValue;
     }
+
+    public CodeValue findOneByLabel(final String label) {
+        final CodeValue codeValue = this.repository.findByLabel(label);
+        if (codeValue == null) { throw new CodeValueNotFoundException(label, label); }
+        return codeValue;
+    }
     
 }

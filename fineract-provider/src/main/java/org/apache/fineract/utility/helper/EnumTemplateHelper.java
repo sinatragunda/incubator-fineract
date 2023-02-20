@@ -45,4 +45,17 @@ public class EnumTemplateHelper {
         }
         return null ;
     }
+
+    /**
+     * Added 18/02/2023 at 0608
+     * Provision for nulls ,reserves first ordinal for values that can have default values
+     */  
+    public static IEnum fromStringEx(IEnum values[], String arg){
+        for(IEnum iEnum : values){
+            if(iEnum.getCode().equalsIgnoreCase(arg)){
+                return iEnum;
+            }
+        }
+        return values[0] ;
+    }
 }

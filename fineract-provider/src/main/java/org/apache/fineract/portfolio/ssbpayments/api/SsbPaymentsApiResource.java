@@ -63,7 +63,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import org.taat.wese.weseaddons.ssb.service.SsbService;
-
+import org.taat.wese.weseaddons.ssb.enumerations.SSB_REPORT_TYPE ;
 
 @Path("/ssbpayments")
 @Component
@@ -121,13 +121,17 @@ public class SsbPaymentsApiResource {
 
     }
 
+    @GET
+    @Path("/trancfile")
+    public String downloadResultsFile(){
+        return ssbService.serializedResults().toString();
+    }
 
     @GET
     @Path("/clear")
     public String clear() {
 
         String response = ssbService.clear().toString();
-
         System.err.println("=--------------------------------clear process "+response);
         return response;
     }
@@ -136,11 +140,13 @@ public class SsbPaymentsApiResource {
     @Path("/status")
     public String status(){
         String response = ssbService.status().toString();
-
         System.err.println("=--------------------------------status  process "+response);
         return response;
     }
-
-
+    @GET
+    @Path("/reporttemplate")
+    public List<String> reportTemplate(){
+        return SSB_REPORT_TYPE.template();
+    }
 
 }

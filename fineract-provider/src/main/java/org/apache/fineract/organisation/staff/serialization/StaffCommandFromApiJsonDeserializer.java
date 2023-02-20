@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.organisation.staff.api.StaffApiConstants;
 import org.apache.fineract.organisation.staff.service.StaffReadPlatformService;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.joda.time.LocalDate;
@@ -48,7 +49,7 @@ public final class StaffCommandFromApiJsonDeserializer {
      * The parameters supported for this command.
      */
     private final Set<String> supportedParameters = new HashSet<>(Arrays.asList("firstname", "lastname", "officeId", "externalId",
-            "mobileNo", "isLoanOfficer", "isActive", "joiningDate", "dateFormat", "locale", "forceStatus"));
+            "mobileNo", "isLoanOfficer", "isActive", "joiningDate", "dateFormat", "locale", "forceStatus" ,"emailAddress","isAgent","username","password","savingsProductId","active"));
 
     private final FromJsonHelper fromApiJsonHelper;
     
@@ -96,6 +97,11 @@ public final class StaffCommandFromApiJsonDeserializer {
         if (this.fromApiJsonHelper.parameterExists("isActive", element)) {
             final Boolean activeFlag = this.fromApiJsonHelper.extractBooleanNamed("isActive", element);
             baseDataValidator.reset().parameter("isActive").value(activeFlag).notNull();
+        }
+
+        if (this.fromApiJsonHelper.parameterExists(StaffApiConstants.isAgentParam, element)) {
+            final Boolean agentFlag = this.fromApiJsonHelper.extractBooleanNamed(StaffApiConstants.isAgentParam, element);
+            baseDataValidator.reset().parameter(StaffApiConstants.isAgentParam).value(agentFlag).notNull();
         }
         
         final LocalDate joiningDate = this.fromApiJsonHelper.extractLocalDateNamed("joiningDate", element);
@@ -151,6 +157,12 @@ public final class StaffCommandFromApiJsonDeserializer {
         if (this.fromApiJsonHelper.parameterExists("isLoanOfficer", element)) {
             final Boolean loanOfficerFlag = this.fromApiJsonHelper.extractBooleanNamed("isLoanOfficer", element);
             baseDataValidator.reset().parameter("isLoanOfficer").value(loanOfficerFlag).notNull();
+        }
+
+
+        if (this.fromApiJsonHelper.parameterExists(StaffApiConstants.isAgentParam, element)) {
+            final Boolean agentFlag = this.fromApiJsonHelper.extractBooleanNamed(StaffApiConstants.isAgentParam, element);
+            baseDataValidator.reset().parameter(StaffApiConstants.isAgentParam).value(agentFlag).notNull();
         }
 
         if (this.fromApiJsonHelper.parameterExists("isActive", element)) {

@@ -13,4 +13,8 @@ public class OptionalHelper {
     public static boolean isPresent(Object object){
         return Optional.ofNullable(object).isPresent();
     }
+
+    public static Object optionalOf(Object object ,Object orValue){
+        return Optional.ofNullable(object).orElse(orValue);
+    }
 }

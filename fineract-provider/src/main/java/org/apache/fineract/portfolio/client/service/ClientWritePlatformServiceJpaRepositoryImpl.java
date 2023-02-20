@@ -244,8 +244,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
 
-        if (realCause.getMessage().contains("external_id")) {
+        //System.err.println("====================get real cause message here son =========="+realCause.getMessage());
 
+        if (realCause.getMessage().contains("external_id")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");
             throw new PlatformDataIntegrityException("error.msg.client.duplicate.externalId", "Client with externalId `" + externalId
                     + "` already exists", "externalId", externalId);
@@ -404,7 +405,9 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
              * Added 10/12/2022 at 0218
              * LocalRef implementation ,add values to local ref value
              */
+            System.err.println("==============function below throws an error ================");
             localRefRecordHelper.create(command ,newClient);
+            System.err.println("=========function prone to throwing error ,was it caught  ?");
 
             if (newClient.isActive()) {
                 this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.CLIENTS_ACTIVATE,
@@ -428,11 +431,6 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                 newClient.updateSavingsAccount(result.getSavingsId());
             }
 
-            /// We should refactor out a lot of other garbage there so that code becomes clean now its too much scatter and so unproffessional
-            /// Can agents be self service users ?
-            /// modified error exist here when no client type is specified
-            CreateClientHelper.createLoanAgent(commandsSourceWritePlatformService , newClient);
-            
             if(isEntity) {
                 extractAndCreateClientNonPerson(newClient, command);
             }
@@ -467,18 +465,23 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     .setRollbackTransaction(result.isRollbackTransaction())//
                     .build();
         }catch (final DataIntegrityViolationException dve) {
-            
-            dve.printStackTrace();
-
-            handleDataIntegrityIssues(command, dve.getMostSpecificCause(), dve);
-            return CommandProcessingResult.empty();
-        }catch(final PersistenceException dve) {
-
-            dve.printStackTrace();
             Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
             handleDataIntegrityIssues(command, throwable, dve);
-         	return CommandProcessingResult.empty();
+            return CommandProcessingResult.empty();
+        }catch(final PersistenceException dve) {
+            Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
+            handleDataIntegrityIssues(command, throwable, dve);
+            return CommandProcessingResult.empty();
         }
+    }
+
+    private CommandProcessingResult handleError(RuntimeException dve ,JsonCommand command){
+
+        System.err.println("------------------should handle this runtime exception here to avoid client getting created either ways ");
+        Throwable throwable = ExceptionUtils.getRootCause(dve.getCause()) ;
+        System.err.println("=====================why cant we get actually message ? "+dve.getMessage());
+        //handleDataIntegrityIssues(command, throwable, dve);
+        return CommandProcessingResult.empty();
     }
     
     /**

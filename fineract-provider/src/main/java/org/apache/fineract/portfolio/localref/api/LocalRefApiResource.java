@@ -36,6 +36,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.PathParam;
 
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,6 +122,22 @@ public class LocalRefApiResource {
         //final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.localRefToApiJsonSerializer.serialize(localRefDataCollection);
     }
+
+    /**
+     * Added 19/02/2023 at 1103
+     */ 
+
+    @GET
+    @Path("{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveOne(@PathParam("id") final Long id) {
+
+        //this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        LocalRefData localRefData = this.localRefReadPlatformService.retrieveOne(id);
+        return this.localRefToApiJsonSerializer.serialize(localRefData);
+    }
+
 
     /**
      * Added 02/02/2023 at 1154

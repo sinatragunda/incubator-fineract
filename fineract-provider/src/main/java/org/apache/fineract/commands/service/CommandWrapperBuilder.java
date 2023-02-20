@@ -3159,8 +3159,9 @@ public class CommandWrapperBuilder {
 
 
     public CommandWrapperBuilder approveAdditionalShares(Long sharesRequestId){
-        this.actionName = "APPLYADDITIONALSHARES";
+        this.actionName = "APPROVEADDITIONALSHARES";
         this.entityName = "SHAREACCOUNT";
+        this.entityId = sharesRequestId;
         this.href = "shareaccount/"+sharesRequestId+"?command=approveadditionalshares";
         return this;
     }

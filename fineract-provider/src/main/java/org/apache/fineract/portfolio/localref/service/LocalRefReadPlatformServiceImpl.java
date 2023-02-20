@@ -79,8 +79,20 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
     public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable, Long recordId) {
 
         final String sql = String.format("select %s where lr.ref_table = ? and lrv.record_id = ? ",localRefValueMapper.schema());
+        
+        System.err.println("-====================record sql is ==========="+sql);
+        
         Collection<LocalRefValueData> localRefValueDataCollection = this.jdbcTemplate.query(sql, this.localRefValueMapper, new Object[] {refTable.ordinal() ,recordId});
         return localRefValueDataCollection ;
+    }
+
+
+    @Override
+    public LocalRefData retrieveOne(Long id) {
+
+        final String sql = String.format("select %s where lr.id = ?",localRefMapper.schema());
+        return this.jdbcTemplate.queryForObject(sql, this.localRefMapper, new Object[] {id});
+
     }
 
     @Override

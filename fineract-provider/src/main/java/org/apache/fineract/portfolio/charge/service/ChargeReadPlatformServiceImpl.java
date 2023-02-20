@@ -37,6 +37,7 @@ import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAcc
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargePropertiesData;
 import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
@@ -364,6 +365,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                     + "tc.code as transactionCode ,"
                     + "tc.name as transactionCodeName ,"
                     + " tc.id as transactionCodeId ,"
+                    +" mcp.commissioned_charge as isCommissionedCharge ,"
+                    +" mcp.id as chargePropertiesId ,"
                     + "c.charge_calculation_enum as chargeCalculation, c.is_penalty as penalty, "
                     + "c.is_active as active, oc.name as currencyName, oc.decimal_places as currencyDecimalPlaces, "
                     + "oc.currency_multiplesof as inMultiplesOf, oc.display_symbol as currencyDisplaySymbol, "
@@ -374,7 +377,9 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                     + "join m_organisation_currency oc on c.currency_code = oc.code "
                     + " LEFT JOIN acc_gl_account acc on acc.id = c.income_or_liability_account_id "
                     + " LEFT JOIN m_transaction_code tc on tc.id = c.transaction_code_id "
+                    + " LEFT JOIN m_charge_properties mcp on mcp.id = c.charge_properties_id "
                     + " LEFT JOIN m_tax_group tg on tg.id = c.tax_group_id ";
+
         }
 
         public String loanProductChargeSchema() {
@@ -459,9 +464,15 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
             List<ChargeTierData> chargeTierDataList = null ;
 
+
+            final Long chargePropertiesId = rs.getLong("chargePropertiesId");
+            final Boolean isCommissionedCharge = rs.getBoolean("isCommissionedCharge");
+            final ChargePropertiesData chargePropertiesData = new ChargePropertiesData(chargePropertiesId ,isCommissionedCharge);
+
+
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
                     chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, glAccountData,
-                    taxGroupData ,transactionCodeData[0] ,chargeTierDataList);
+                    taxGroupData ,transactionCodeData[0] ,chargeTierDataList,chargePropertiesData);
         }
     }
 

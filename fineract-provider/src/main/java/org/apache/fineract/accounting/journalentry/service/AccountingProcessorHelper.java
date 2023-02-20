@@ -473,11 +473,11 @@ public class AccountingProcessorHelper {
             accountTypeToCreditId = accountTypeToBeDebited;
 
 
-            System.err.println("------------------transaction is a reversal transaction --------------");
+            //System.err.println("------------------transaction is a reversal transaction --------------");
 
-            System.err.println("---------------account type to debit ? "+accountTypeToDebitId);
+            //System.err.println("---------------account type to debit ? "+accountTypeToDebitId);
 
-            System.err.println("------------------account type to credit is "+accountTypeToCreditId);
+            //System.err.println("------------------account type to credit is "+accountTypeToCreditId);
 
             boolean isTransactionCodePresent = Optional.ofNullable(transactionCode).isPresent();
 
@@ -487,12 +487,12 @@ public class AccountingProcessorHelper {
              * TransactionCode is sent by calling function ..
              */ 
             if(isTransactionCodePresent){
-                System.err.println("-----------------hold up we checking something here son reverse these accounts ,make credit be debit etc");
+                //System.err.println("-----------------hold up we checking something here son reverse these accounts ,make credit be debit etc");
                 GLAccount debitAccount = transactionCode.getCreditAccount();
                 GLAccount creditAccount = transactionCode.getDebitAccount();
                 TransactionCode transactionCodeReversal = new TransactionCode(transactionCode.getCode() ,transactionCode.getName() ,debitAccount ,creditAccount);
                 transactionCode = transactionCodeReversal;
-                System.err.println("----------------------------------------reverse debit to credit -------");
+                //System.err.println("----------------------------------------reverse debit to credit -------");
             }
         }
         // could we check these if there are null for simplicity ? 

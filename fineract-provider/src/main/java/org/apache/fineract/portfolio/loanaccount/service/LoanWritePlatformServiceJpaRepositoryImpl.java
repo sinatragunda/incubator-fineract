@@ -67,7 +67,7 @@ import org.apache.fineract.portfolio.calendar.domain.Calendar;
 import org.apache.fineract.portfolio.calendar.exception.CalendarParameterUpdateNotSupportedException;
 import org.apache.fineract.portfolio.charge.domain.Charge;
 import org.apache.fineract.portfolio.charge.domain.ChargePaymentMode;
-import org.apache.fineract.portfolio.charge.domain.ChargeRepositoryWrapper;
+import org.apache.fineract.portfolio.charge.repo.ChargeRepositoryWrapper;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.*;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeCannotBeDeletedException.LOAN_CHARGE_CANNOT_BE_DELETED_REASON;
@@ -80,8 +80,8 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulkRepaymentCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleDisbursalCommand;
 import org.apache.fineract.portfolio.collectionsheet.command.SingleRepaymentCommand;
-import org.apache.fineract.portfolio.commissions.helper.CommissionsHelper;
-import org.apache.fineract.portfolio.commissions.helper.CommissionsHelperService;
+import org.apache.fineract.portfolio.commissions.helper.CommissionChargeHelper;
+import org.apache.fineract.portfolio.commissions.service.CommissionsChargeService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
 import org.apache.fineract.portfolio.common.domain.PeriodFrequencyType;
@@ -132,7 +132,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 
 
 ///added 25/05/2021
@@ -147,7 +146,6 @@ import java.util.ArrayList;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.fineract.wese.helper.ObjectNodeHelper;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountWritePlatformService;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -155,10 +153,6 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
-
-
 
 
 @Service
@@ -214,14 +208,13 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     
 
     // added 07/01/2022
-    private final CommissionsHelperService commissionsHelperService ;
+    private final CommissionsChargeService commissionsChargeService;
 
     // added 02/08/2022
     private final SavingsAccountDomainService savingsAccountDomainService ;
 
     // added 12/08/2022
     private final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository;
-
     @Autowired
     public LoanWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final LoanEventApiJsonValidator loanEventApiJsonValidator,
@@ -257,7 +250,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             final SavingsAccountWritePlatformService savingsAccountWritePlatformService ,
             final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer ,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , 
-            final CommissionsHelperService commissionsHelperService,
+            final CommissionsChargeService commissionsChargeService,
             final SavingsAccountDomainService savingsAccountDomainService ,
             final SavingsTransactionTriggerRepository savingsTransactionTriggerRepository) {
         this.context = context;
@@ -308,14 +301,14 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
 
         // added 07/01/2022
-        this.commissionsHelperService = commissionsHelperService ;
+        this.commissionsChargeService = commissionsChargeService;
 
         // added 02/08/2022
         this.savingsAccountDomainService = savingsAccountDomainService ;
 
         // added 12/08/2022
         this.savingsTransactionTriggerRepository = savingsTransactionTriggerRepository ;
-    
+
     }
 
     private LoanLifecycleStateMachine defaultLoanLifecycleStateMachine() {
@@ -323,9 +316,14 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         return new DefaultLoanLifecycleStateMachine(allowedLoanStatuses);
     }
 
+    /**
+     * Default disburse function used
+     */ 
     @Transactional
     @Override
     public CommandProcessingResult disburseLoan(final Long loanId, final JsonCommand command, Boolean isAccountTransfer){
+
+        System.err.println("---------disburse loan -----"+isAccountTransfer);
 
         final AppUser currentUser = getAppUserIfPresent();
 
@@ -470,34 +468,48 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
             postJournalEntries(loan, existingTransactionIds, existingReversedTransactionIds);
 
             // added 07/01/2022 ,apply commission charging here .Since we have dibursed amount here why not use it ?
-            //System.err.println("---------------------disbursement time commission charge -------------------");
-            CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan , ChargeTimeType.DISBURSEMENT);
-
+            System.err.println("---------------------disbursement time commission charge but skipping this one now ,function removed for work purposes -------------------");
+ 
         }
 
         final Set<LoanCharge> loanCharges = loan.charges();
-        final Map<Long, BigDecimal> disBuLoanCharges = new HashMap<>();
+        final Map<LoanCharge, BigDecimal> disBuLoanCharges = new HashMap<>();
+
         for (final LoanCharge loanCharge : loanCharges) {
             if (loanCharge.isDueAtDisbursement() && loanCharge.getChargePaymentMode().isPaymentModeAccountTransfer()
                     && loanCharge.isChargePending()) {
-                disBuLoanCharges.put(loanCharge.getId(), loanCharge.amountOutstanding());
+                disBuLoanCharges.put(loanCharge, loanCharge.amountOutstanding());
             }
         }
 
         final Locale locale = command.extractLocale();
         final DateTimeFormatter fmt = DateTimeFormat.forPattern(command.dateFormat()).withLocale(locale);
-        for (final Map.Entry<Long, BigDecimal> entrySet : disBuLoanCharges.entrySet()) {
+
+        System.err.println("---------handle charges now but should be here ?");
+
+        for (final Map.Entry<LoanCharge, BigDecimal> entrySet : disBuLoanCharges.entrySet()) {
             final PortfolioAccountData savingAccountData = this.accountAssociationsReadPlatformService.retriveLoanLinkedAssociation(loanId);
             final SavingsAccount fromSavingsAccount = null;
             final boolean isRegularTransaction = true;
             final boolean isExceptionForBalanceCheck = false;
+            final Long loanChargeId = entrySet.getKey().getId();
+            
             final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(actualDisbursementDate, entrySet.getValue(),
                     PortfolioAccountType.SAVINGS, PortfolioAccountType.LOAN, savingAccountData.accountId(), loanId, "Loan Charge Payment",
-                    locale, fmt, null, null, LoanTransactionType.REPAYMENT_AT_DISBURSEMENT.getValue(), entrySet.getKey(), null,
+                    locale, fmt, null, null, LoanTransactionType.REPAYMENT_AT_DISBURSEMENT.getValue(), loanChargeId, null,
                     AccountTransferType.CHARGE_PAYMENT.getValue(), null, null, null, null, null, fromSavingsAccount, isRegularTransaction,
                     isExceptionForBalanceCheck);
-            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+
+            // event should be fired from here 
+            System.err.println("-------should remove this function here to avoid money being transfered ,our params are  "+loanId+"--------and "+savingAccountData.accountId());
+
+            validateTransferChargeAgainstAgents(accountTransferDTO ,entrySet.getKey());
+
+            System.err.println("----------if charge belongs to agent then we skip this process");
+
         }
+
+
         
         updateRecurringCalendarDatesForInterestRecalculation(loan);
         this.loanAccountDomainService.recalculateAccruals(loan);
@@ -513,6 +525,25 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 .with(changes) //
                 .build();
     }
+
+    /**
+     * Added 17/02/2023 at 0332
+     * Check if charge is not agent charge and proceed 
+     * Agent charge will be handled in listener events
+     */
+    private void validateTransferChargeAgainstAgents(AccountTransferDTO accountTransferDTO ,LoanCharge loanCharge){
+
+        Charge charge = loanCharge.getCharge();
+        boolean isAgentCharge = charge.isAgentCharge();
+        if(!isAgentCharge){   
+            this.accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
+            return;
+        }
+        System.err.println("==========================================fire up event charger here ======== only when isAgentCharge");
+        this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.FT_CHARGES,
+                constructEntityMap(BUSINESS_ENTITY.FT, accountTransferDTO));
+    }
+
 
 	private void createAndSaveLoanScheduleArchive(final Loan loan, ScheduleGeneratorDTO scheduleGeneratorDTO) {
 		LoanRescheduleRequest loanRescheduleRequest = null;
@@ -1262,7 +1293,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
 
         // added 09/01/2022
-        CommissionsHelper.depositCommissionCharges(commissionsHelperService ,loan ,ChargeTimeType.LOAN_CLOSED);
+        CommissionChargeHelper.depositCommissionCharges(commissionsChargeService,loan ,ChargeTimeType.LOAN_CLOSED);
 
         CommandProcessingResult result = null;
         if (possibleClosingTransaction != null) {
@@ -1781,6 +1812,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         loan.getTopupLoanDetails().setTopupAmount(amount);
     }
 
+
     public void disburseLoanToSavings(final Loan loan, final JsonCommand command, final Money amount, final PaymentDetail paymentDetail) {
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed("actualDisbursementDate");
@@ -1924,6 +1956,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @Override
     @CronTarget(jobName = JobName.TRANSFER_FEE_CHARGE_FOR_LOANS)
     public void transferFeeCharges() throws JobExecutionException {
+
+        System.err.println("----------------------------when are fee charges paid ----------------");
+
         final Collection<LoanChargeData> chargeDatas = this.loanChargeReadPlatformService.retrieveLoanChargesForFeePayment(
                 ChargePaymentMode.ACCOUNT_TRANSFER.getValue(), LoanStatus.ACTIVE.getValue());
         final boolean isRegularTransaction = true;
@@ -2865,6 +2900,8 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 
         LoanTransaction transaction = null;
 
+        System.err.println("----------------------------------disburse loan amount to savings called here ?");
+
         this.loanEventApiJsonValidator.validateChargePaymentTransaction(command.json(), isChargeIdIncludedInJson);
         if (isChargeIdIncludedInJson) {
             loanChargeId = command.longValueOfParameterNamed("chargeId");
@@ -2921,6 +2958,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         final SavingsAccount fromSavingsAccount = null;
         final boolean isRegularTransaction = true;
         final boolean isExceptionForBalanceCheck = false;
+
         final AccountTransferDTO accountTransferDTO = new AccountTransferDTO(transactionDate, amount, PortfolioAccountType.SAVINGS,
                 PortfolioAccountType.LOAN, portfolioAccountData.accountId(), loanId, "Loan Charge Payment", locale, fmt, null, null,
                 LoanTransactionType.CHARGE_PAYMENT.getValue(), loanChargeId, loanInstallmentNumber,

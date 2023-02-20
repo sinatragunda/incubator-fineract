@@ -10,6 +10,9 @@ import org.apache.fineract.utility.service.IEnum;
 public enum DATA_TABLE_CATEGORY implements IEnum{
 
     NORMAL(""),
+    LOAN("m_loan"),
+    CLIENT("m_client"),
+    SAVING("m_saving"),
     APPLICATION("m_application");
     private String code ;
 
@@ -18,7 +21,7 @@ public enum DATA_TABLE_CATEGORY implements IEnum{
     }
 
     public static DATA_TABLE_CATEGORY fromString(String arg){
-        return (DATA_TABLE_CATEGORY)EnumTemplateHelper.fromString(DATA_TABLE_CATEGORY.values() ,arg);
+        return (DATA_TABLE_CATEGORY)EnumTemplateHelper.fromStringEx(DATA_TABLE_CATEGORY.values() ,arg);
     }
 
     @Override

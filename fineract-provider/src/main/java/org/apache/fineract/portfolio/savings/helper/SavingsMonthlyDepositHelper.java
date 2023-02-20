@@ -122,7 +122,7 @@ public class SavingsMonthlyDepositHelper{
 
 		BigDecimal openingBalance = SavingsAccountTransactionHelper.openingBalanceAtSpecificDate(savingsAccount , startDate);
 
-		System.err.println("------------------------opening balance in this month was ------"+startDate);
+		//System.err.println("------------------------opening balance in this month was ------"+startDate);
 
 		SavingsAccountMonthlyDeposit savingsAccountMonthlyDeposit = null;
 		List<SavingsAccountMonthlyDeposit> savingsAccountMonthlyDepositList = repository.findBySavingsAccountId(id);

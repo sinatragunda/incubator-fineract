@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.dataqueries.data;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.utility.domain.Record;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class DatatableData {
 
     private List<EnumOptionData> applicationOptions ;
     private GenericResultsetData genericResultsetData;
+    private List<Record> recordList;
 
     public static DatatableData template(){
         return new DatatableData();
@@ -52,7 +54,6 @@ public class DatatableData {
             final List<ResultsetColumnHeaderData> columnHeaderData) {
         return new DatatableData(applicationTableName, registeredTableName, columnHeaderData);
     }
-
 
     public static DatatableData create(final String applicationTableName, final String registeredTableName,final String prettyName ,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
@@ -89,6 +90,10 @@ public class DatatableData {
         this.applicationOptions = EntityTables.template();
     }
 
+    public void setRecordList(List list){
+        this.recordList = list;
+    }
+
     public boolean hasColumn(final String columnName){
         for(ResultsetColumnHeaderData c : this.columnHeaderData){
             if(c.getColumnName().equals(columnName)) return true;
@@ -102,6 +107,10 @@ public class DatatableData {
 
     public String getRegisteredTableName(){
         return registeredTableName;
+    }
+
+    public String getApplicationTableName(){
+        return this.applicationTableName;
     }
     
 }

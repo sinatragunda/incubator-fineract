@@ -152,6 +152,11 @@ public interface LoanReadPlatformService {
      * Added 06/01/2022 at 1418
      */
     LoanTransactionData retrieveDisbursalToLoanTemplate(Long loanId ,LocalDate transactionDate);
+    
+    /**
+     * Added 15/02/2023 at 0820
+     */
+    List<LoanAccountData> retrieveAllForLoanOfficer(final Long loanOfficerId);  
   
 
 }

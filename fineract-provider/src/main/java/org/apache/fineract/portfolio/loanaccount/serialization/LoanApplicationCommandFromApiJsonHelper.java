@@ -37,8 +37,6 @@ import org.apache.fineract.infrastructure.core.exception.UnsupportedParameterExc
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
-import org.apache.fineract.portfolio.commissions.data.LoanAgentDataBridge;
-import org.apache.fineract.portfolio.commissions.helper.AttachedCommissionChargesHelper;
 import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
@@ -48,6 +46,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.InterestCalculationPerio
 import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.loanproduct.exception.EqualAmortizationUnsupportedFeatureException;
+import org.apache.fineract.portfolio.localref.api.LocalRefApiConstants;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +95,12 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.linkAccountIdParameterName, LoanApiConstants.disbursementDataParameterName,
             LoanApiConstants.emiAmountParameterName, LoanApiConstants.maxOutstandingBalanceParameterName,
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, 
+            LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,
+            LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,
+            LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam,
+            LocalRefApiConstants.localRefsParam
+        ));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -423,30 +427,6 @@ public final class LoanApplicationCommandFromApiJsonHelper {
                 baseDataValidator.reset().parameter(linkAccountIdParameterName).value(linkAccountId).notNull().longGreaterThanZero();
             }
         }
-
-        // added 04/01/2022 .This is for validating agent data for create .If one value of the two is missing then something is wrong
-        final String loanAgentParamName = "agentData";
-        if (element.isJsonObject() && this.fromApiJsonHelper.parameterExists(loanAgentParamName, element)) {
-
-            final JsonObject topLevelJsonElement = element.getAsJsonObject();
-            final JsonObject agentDataJsonObject  = topLevelJsonElement.get(loanAgentParamName).getAsJsonObject();
-
-            final String apiJson = agentDataJsonObject.toString();
-
-            final LoanAgentDataBridge loanAgentDataBridge = LoanAgentDataBridge.fromJson(apiJson);
-            final Boolean isValidEntry = AttachedCommissionChargesHelper.isValidEntry(loanAgentDataBridge);
-
-            System.err.println("------------------is it a valid entry son , ?---------------"+isValidEntry);;
-            
-            int boolInt = isValidEntry ? 1 : 0 ;
-
-            /// this is a hack since have no idea how these work
-            baseDataValidator.reset().parameter(loanAgentParamName).value(boolInt).notNull()
-                    .integerGreaterThanZero();
-
-        }
-
-
         // charges
         final String chargesParameterName = "charges";
         if (element.isJsonObject() && this.fromApiJsonHelper.parameterExists(chargesParameterName, element)) {

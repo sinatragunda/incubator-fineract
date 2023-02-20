@@ -31,6 +31,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToOne;
+
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -46,6 +49,7 @@ import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidati
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.api.ChargesApiConstants;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargePropertiesData;
 import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.exception.ChargeDueAtDisbursementCannotBePenaltyException;
 import org.apache.fineract.portfolio.charge.exception.ChargeMustBePenaltyException;
@@ -130,10 +134,17 @@ public class Charge extends AbstractPersistableCustom<Long> {
      * Added 12/10/2022 at 1407
      */
     @Transient
-    private List<ChargeTier> chargeTierList;   
+    private List<ChargeTier> chargeTierList;
 
+    /**
+     * Added 16/02/2023 at 0225
+     * Charge additional settings .
+     */
+    @OneToOne
+    @JoinColumn(name = "charge_properties_id")
+    private ChargeProperties chargeProperties;
 
-    public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup,final TransactionCode transactionCode) {
+    public static Charge fromJson(final JsonCommand command, final GLAccount account, final TaxGroup taxGroup,final TransactionCode transactionCode ,final ChargeProperties chargeProperties) {
 
         final String name = command.stringValueOfParameterNamed("name");
         final BigDecimal amount = command.bigDecimalValueOfParameterNamed("amount");
@@ -156,7 +167,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         final Integer feeFrequency = command.integerValueOfParameterNamed("feeFrequency");
 
         return new Charge(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculationType, penalty, active, paymentMode,
-                feeOnMonthDay, feeInterval, minCap, maxCap, feeFrequency, account, taxGroup ,transactionCode);
+                feeOnMonthDay, feeInterval, minCap, maxCap, feeFrequency, account, taxGroup ,transactionCode,chargeProperties);
     }
 
     protected Charge() {
@@ -166,7 +177,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     private Charge(final String name, final BigDecimal amount, final String currencyCode, final ChargeAppliesTo chargeAppliesTo,
             final ChargeTimeType chargeTime, final ChargeCalculationType chargeCalculationType, final boolean penalty,
             final boolean active, final ChargePaymentMode paymentMode, final MonthDay feeOnMonthDay, final Integer feeInterval,
-            final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final GLAccount account, final TaxGroup taxGroup ,final TransactionCode transactionCode) {
+            final BigDecimal minCap, final BigDecimal maxCap, final Integer feeFrequency, final GLAccount account, final TaxGroup taxGroup ,final TransactionCode transactionCode,final ChargeProperties chargeProperties) {
         this.name = name;
         this.amount = amount;
         this.currencyCode = currencyCode;
@@ -179,6 +190,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         this.taxGroup = taxGroup;
         this.chargePaymentMode = paymentMode == null ? null : paymentMode.getValue();
         this.transactionCode = transactionCode;
+        this.chargeProperties = chargeProperties;
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("charges");
@@ -593,6 +605,8 @@ public class Charge extends AbstractPersistableCustom<Long> {
             transactionCodeData[0] = TransactionCodeData.looup(transactionCode.getId() ,transactionCode.getCode() ,transactionCode.getName());
         });
 
+        ChargePropertiesData chargePropertiesData = null ;
+
         /**
          * Added 01/11/2022 at 0728
          * Class still under construction ,need to just edit this line of code to make it compile
@@ -602,7 +616,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
         final CurrencyData currency = new CurrencyData(this.currencyCode, null, 0, 0, null, null);
         return ChargeData.instance(getId(), this.name, this.amount, currency, chargeTimeType, chargeAppliesTo, chargeCalculationType,
                 chargePaymentmode, getFeeOnMonthDay(), this.feeInterval, this.penalty, this.active, this.minCap, this.maxCap,
-                feeFrequencyType, accountData, taxGroupData ,transactionCodeData[0] ,chargeTierDataList);
+                feeFrequencyType, accountData, taxGroupData ,transactionCodeData[0] ,chargeTierDataList,chargePropertiesData);
     }
 
     public Integer getChargePaymentMode() {
@@ -685,5 +699,20 @@ public class Charge extends AbstractPersistableCustom<Long> {
 
     public void setChargeTier(List<ChargeTier> chargeTierList){
         this.chargeTierList = chargeTierList;
+    }
+
+    public ChargeProperties getChargeProperties(){
+        return this.chargeProperties;
+    }
+
+    public boolean isAgentCharge(){
+        // this for old classes without properties set at start
+        boolean hasProperties = Optional.ofNullable(this.chargeProperties).isPresent();
+        //System.err.println("------------get charge properties for charge "+this.name+"------------- hasProperties "+hasProperties);
+
+        if(hasProperties){
+            hasProperties = this.chargeProperties.isCommissionedCharge();    
+        }
+        return hasProperties;
     }
 }

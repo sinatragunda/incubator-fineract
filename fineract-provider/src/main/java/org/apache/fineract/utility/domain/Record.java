@@ -16,5 +16,9 @@ public abstract class Record {
         this.localRefValueDataCollection = localRefValueData;
     }
 
+    public Collection<LocalRefValueData> localRefValueDataCollection(){
+        return this.localRefValueDataCollection;
+    }
+
     public abstract Long getId();
 }

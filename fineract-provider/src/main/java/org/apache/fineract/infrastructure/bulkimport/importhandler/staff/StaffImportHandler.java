@@ -84,9 +84,10 @@ public class StaffImportHandler implements ImportHandler {
         LocalDate joinedOnDate=ImportHandlerUtils.readAsDate(StaffConstants.JOINED_ON_COL,row);
         String externalId=ImportHandlerUtils.readAsString(StaffConstants.EXTERNAL_ID_COL,row);
         Boolean isActive=ImportHandlerUtils.readAsBoolean(StaffConstants.IS_ACTIVE_COL,row);
+        Boolean isAgent = false ;
 
         return StaffData.importInstance(externalId,firstName,lastName,mobileNo,officeId,isLoanOfficer,isActive,
-                joinedOnDate,row.getRowNum(),locale,dateFormat);
+                joinedOnDate,row.getRowNum(),locale,dateFormat ,isAgent);
     }
 
     public Count importEntity(String dateFormat) {

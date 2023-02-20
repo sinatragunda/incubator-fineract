@@ -102,6 +102,9 @@ public class AccountTransfersDataValidator {
     }
 
     private void throwExceptionIfValidationWarningsExist(final List<ApiParameterError> dataValidationErrors) {
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) { 
+             System.err.println("-----------------------get message to "+dataValidationErrors.get(0).getDeveloperMessage());   
+             throw new PlatformApiDataValidationException(dataValidationErrors); 
+        }
     }
 }

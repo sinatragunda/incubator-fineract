@@ -34,6 +34,8 @@ import org.apache.fineract.organisation.staff.domain.Staff;
 import org.apache.fineract.organisation.staff.domain.StaffRepository;
 import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.organisation.staff.serialization.StaffCommandFromApiJsonDeserializer;
+import org.apache.fineract.portfolio.agentbanking.domain.Agent;
+import org.apache.fineract.portfolio.agentbanking.helper.AgentCreationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +51,15 @@ public class StaffWritePlatformServiceJpaRepositoryImpl implements StaffWritePla
     private final StaffCommandFromApiJsonDeserializer fromApiJsonDeserializer;
     private final StaffRepository staffRepository;
     private final OfficeRepositoryWrapper officeRepositoryWrapper;
+    private final AgentCreationHelper agentCreationHelper;
 
     @Autowired
     public StaffWritePlatformServiceJpaRepositoryImpl(final StaffCommandFromApiJsonDeserializer fromApiJsonDeserializer,
-            final StaffRepository staffRepository, final OfficeRepositoryWrapper officeRepositoryWrapper) {
+            final StaffRepository staffRepository, final OfficeRepositoryWrapper officeRepositoryWrapper ,final AgentCreationHelper agentCreationHelper) {
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.staffRepository = staffRepository;
         this.officeRepositoryWrapper = officeRepositoryWrapper;
+        this.agentCreationHelper = agentCreationHelper;
     }
 
     @Transactional
@@ -71,6 +75,10 @@ public class StaffWritePlatformServiceJpaRepositoryImpl implements StaffWritePla
             final Staff staff = Staff.fromJson(staffOffice, command);
 
             this.staffRepository.save(staff);
+
+            //AgentHelper.create(staff ,command);
+
+            agentCreationHelper.createAgent(staff,command);
 
             return new CommandProcessingResultBuilder() //
                     .withCommandId(command.commandId()) //

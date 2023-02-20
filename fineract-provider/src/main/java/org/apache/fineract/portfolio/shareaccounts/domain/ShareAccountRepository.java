@@ -32,4 +32,8 @@ public interface ShareAccountRepository extends JpaRepository<ShareAccount, Long
     @Query("select sh from ShareAccount sh where sh.client.id= :clientId")
     List<ShareAccount> findAllByClientId(@Param("clientId")Long clientId);
 
+
+    @Query("select sh from ShareAccount sh where sh.id = :id")
+    ShareAccount findOneById(@Param("id")Long id);
+
 }

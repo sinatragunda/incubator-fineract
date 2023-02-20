@@ -228,7 +228,7 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
             this.columnValidator.validateSqlInjection(sqlBuilder.toString(), parameters.limitSql());
         }
 
-        logger.info("sql: " + sqlBuilder.toString());
+        //logger.info("sql: " + sqlBuilder.toString());
 
         final String sqlCountRows = "SELECT FOUND_ROWS()";
         return this.paginationHelper.fetchPage(this.jdbcTemplate, sqlCountRows, sqlBuilder.toString(), new Object[] {}, rm);
@@ -275,8 +275,9 @@ public class AuditReadPlatformServiceImpl implements AuditReadPlatformService {
         sql += extraCriteria;
         if(isExtraCritereaIncluded){
         	this.columnValidator.validateSqlInjection(sql, extraCriteria);
-        }        
-        logger.info("sql: " + sql);
+        }
+
+        //logger.info("sql: " + sql);
 
         return this.jdbcTemplate.query(sql, rm, new Object[] {});
     }

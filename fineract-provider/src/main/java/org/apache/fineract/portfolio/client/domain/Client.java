@@ -302,6 +302,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
         return new Client(currentUser, status, clientOffice, clientParentGroup, accountNo, firstname, middlename, lastname, fullname,
                 activationDate, officeJoiningDate, externalId, mobileNo, emailAddress, staff, submittedOnDate, savingsProductId, savingsAccountId, dataOfBirth,
                 gender, clientType, clientClassification, legalForm, isStaff ,shareProductId ,shareAccountId ,tag);
+    
     }
 
     protected Client() {
@@ -403,6 +404,29 @@ public final class Client extends AbstractPersistableCustom<Long> {
         deriveDisplayName();
         validate();
     }
+
+
+    public static Client agent(final AppUser currentUser,final Staff staff ,final String emailAddress,final String mobileNo,
+            final Long savingsProductId,
+            final CodeValue clientType,final Boolean isStaff,final String tag ,final Boolean isActive){
+
+            String firstname = staff.getFirstname();
+            String lastname = staff.getLastname();
+            String externalId = staff.getExternalId();
+            Office office = staff.office();
+            LocalDate submittedOnDate = DateUtils.toLocalDate(staff.getJoiningDate());
+
+            ClientStatus clientStatus = ClientStatus.PENDING;
+            if(isActive){
+                clientStatus = ClientStatus.ACTIVE;
+            }
+
+            return new Client(currentUser, clientStatus, office, null,null, firstname,null,lastname,null
+                    ,submittedOnDate, submittedOnDate, externalId, mobileNo, emailAddress,staff,submittedOnDate,savingsProductId, null,
+            null, null, clientType,null, null, isStaff,null ,null,tag);
+
+    }
+
 
     private void validate() {
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -1136,6 +1160,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     public void setTag(String tag){
         this.tag = tag ;
     }
+
 
     @Override
     public String toString() {

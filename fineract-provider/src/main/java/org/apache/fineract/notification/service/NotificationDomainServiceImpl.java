@@ -27,7 +27,11 @@ import org.apache.fineract.notification.data.TopicSubscriberData;
 import org.apache.fineract.notification.eventandlistener.NotificationEventService;
 import org.apache.fineract.notification.eventandlistener.SpringEventPublisher;
 import org.apache.fineract.organisation.office.domain.OfficeRepository;
+import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
+import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.client.domain.Client;
+import org.apache.fineract.portfolio.commissions.helper.CommissionChargeHelper;
+import org.apache.fineract.portfolio.commissions.service.CommissionsChargeService;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
@@ -67,13 +71,14 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 
 	// added 25/08/2022
 	private final NotificationEventServiceEx notificationEventServiceEx;
+	private final CommissionsChargeService commissionsChargeService;
 	
 	@Autowired
 	public NotificationDomainServiceImpl(final BusinessEventNotifierService businessEventNotifierService,
 			final PlatformSecurityContext context, final RoleRepository roleRepository,
 			final TopicSubscriberReadPlatformService topicSubscriberReadPlatformService,
 			final OfficeRepository officeRepository, final NotificationEventService notificationEvent,
-			final SpringEventPublisher springEventPublisher ,final NotificationEventServiceEx notificationEventServiceEx) {
+			final SpringEventPublisher springEventPublisher ,final NotificationEventServiceEx notificationEventServiceEx ,final CommissionsChargeService commissionsChargeService) {
 		
 		this.businessEventNotifierService = businessEventNotifierService;
 		this.context = context;
@@ -83,6 +88,7 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 		this.notificationEvent = notificationEvent;
 		this.springEventPublisher = springEventPublisher;
 		this.notificationEventServiceEx =notificationEventServiceEx ;
+		this.commissionsChargeService = commissionsChargeService;
 	}
 	
 	@PostConstruct
@@ -128,6 +134,14 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 
 		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
 				new SavingsAccountWithdrawListener());
+
+		/**
+		 * Added 16/02/2023 at 1743
+		 * New listeners
+		 */
+		//businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.LOAN_DISBURSAL ,new CommissisonChargeableEventListener());
+		businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.FT_CHARGES ,new FtCommissisonChargesEventListener());
+
 	}
 	
 	private abstract class NotificationBusinessEventAdapter implements BusinessEventListner {
@@ -201,7 +215,54 @@ public class NotificationDomainServiceImpl implements NotificationDomainService 
 			}
 		}
 	}
-	
+
+	private class CommissisonChargeableEventListener extends  NotificationBusinessEventAdapter {
+
+		@Override
+		public void businessEventWasExecuted(Map<BusinessEventNotificationConstants.BUSINESS_ENTITY, Object> businessEventEntity) {
+
+			System.err.println("-----------------------------do commissions son ,charge this event ");
+			Loan loan = null;
+			Object entity = businessEventEntity.get(BUSINESS_ENTITY.LOAN);
+			if (entity != null) {
+				loan = (Loan)entity;
+				buildNotification("ACTIVATE_LOAN", "loan", loan.getId(), "Loan Disbursed",
+						"created",
+						context.authenticatedUser().getId(),
+						loan.getOfficeId(),
+						BUSINESS_EVENTS.LOAN_DISBURSAL
+				);
+
+				System.err.println("-----------------------lets execute this event listener ------------------------");
+				CommissionChargeHelper.depositCommissionCharges(commissionsChargeService ,loan , ChargeTimeType.DISBURSEMENT);
+			}
+		}
+	}
+
+	private class FtCommissisonChargesEventListener extends  NotificationBusinessEventAdapter {
+
+		@Override
+		public void businessEventWasExecuted(Map<BusinessEventNotificationConstants.BUSINESS_ENTITY, Object> businessEventEntity) {
+
+			System.err.println("-----------------------------funds transferred event for loans ");
+			AccountTransferDTO accountTransferDTO = null ;
+			Object entity = businessEventEntity.get(BUSINESS_ENTITY.FT);
+			if (entity != null) {
+				accountTransferDTO = (AccountTransferDTO) entity;
+				buildNotification("ACTIVATE_LOAN", "loan", accountTransferDTO.getFromAccountId(), "Loan Disbursed",
+						"created",
+						context.authenticatedUser().getId(),
+						accountTransferDTO.officeId(),
+						BUSINESS_EVENTS.LOAN_DISBURSAL
+				);
+
+				System.err.println("-----------------------lets execute this event listener ------------------------");
+
+				//CommissionChargeHelper.depositCommissionCharges(commissionsChargeService ,loan , ChargeTimeType.DISBURSEMENT);
+				CommissionChargeHelper.ftCommissionCharges(commissionsChargeService ,accountTransferDTO ,ChargeTimeType.DISBURSEMENT);
+			}
+		}
+	}
 	private class SavingsAccountDepositListener extends  NotificationBusinessEventAdapter {
 		
 		@Override

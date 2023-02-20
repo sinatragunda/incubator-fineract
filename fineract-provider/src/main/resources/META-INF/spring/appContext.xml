@@ -67,6 +67,7 @@
 										  org.apache.fineract.components.*,
 										  com.wese.component.defaults.*,
 										  org.apache.fineract.portfolio.remittance.*,
+										  org.apache.fineract.portfolio.agentbanking.*,
 										  org.taat.wese.weseaddons.ssb.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
@@ -110,6 +111,10 @@
 
 	<!-- Added 13/02/2023 at 0326 -->
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.dataqueries.repo"/>
+
+	<!-- Added 16/02/2023 at 0353 -->
+	<jpa:repositories base-package="org.apache.fineract.portfolio.charge.repo"/>
+
 
 
 

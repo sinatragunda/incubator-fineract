@@ -39,4 +39,10 @@ public interface StaffReadPlatformService {
     Collection<StaffData> retrieveAllStaff(String sqlSearch, Long officeId, boolean loanOfficersOnly, String status);
     
     Object[] hasAssociatedItems(final Long staffId);
+
+    /**
+     * Added 14/02/2023 at 1304
+     */
+    Collection<StaffData> retrieveAllAgentsByOffice(final Long officeId);
+
 }

@@ -38,13 +38,16 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.documentmanagement.domain.Image;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.organisation.staff.api.StaffApiConstants;
+import org.apache.fineract.portfolio.agentbanking.domain.Agent;
+import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.joda.time.LocalDate;
 
 @Entity
 @Table(name = "m_staff", uniqueConstraints = { @UniqueConstraint(columnNames = { "display_name" }, name = "display_name"),
         @UniqueConstraint(columnNames = { "external_id" }, name = "external_id_UNIQUE"),
         @UniqueConstraint(columnNames = { "mobile_no" }, name = "mobile_no_UNIQUE") })
-public class Staff extends AbstractPersistableCustom<Long> {
+public class Staff extends AbstractPersistableCustom<Long> implements Agent {
 
     @Column(name = "firstname", length = 50)
     private String firstname;
@@ -89,6 +92,12 @@ public class Staff extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "image_id", nullable = true)
     private Image image;
 
+    /**
+     * Added 14/02/2023 at 1247
+    */
+    @Column(name = "is_agent",nullable = true)
+    private boolean isAgent;
+
     public static Staff fromJson(final Office staffOffice, final JsonCommand command) {
 
         final String firstnameParamName = "firstname";
@@ -109,6 +118,10 @@ public class Staff extends AbstractPersistableCustom<Long> {
         final String isActiveParamName = "isActive";
         final Boolean isActive = command.booleanObjectValueOfParameterNamed(isActiveParamName);
 
+        final String emailAddress = command.stringValueOfParameterNamed(ClientApiConstants.emailAddressParamName);
+
+        final Boolean isLoanAgent = command.booleanObjectValueOfParameterNamed(StaffApiConstants.isAgentParam);
+
         LocalDate joiningDate = null;
 
         final String joiningDateParamName = "joiningDate";
@@ -116,7 +129,7 @@ public class Staff extends AbstractPersistableCustom<Long> {
             joiningDate = command.localDateValueOfParameterNamed(joiningDateParamName);
         }
 
-        return new Staff(staffOffice, firstname, lastname, externalId, mobileNo, isLoanOfficer, isActive, joiningDate);
+        return new Staff(staffOffice, firstname, lastname, externalId, mobileNo, isLoanOfficer, isActive, joiningDate ,isLoanAgent ,emailAddress);
     }
 
     protected Staff() {
@@ -124,7 +137,7 @@ public class Staff extends AbstractPersistableCustom<Long> {
     }
 
     private Staff(final Office staffOffice, final String firstname, final String lastname, final String externalId, final String mobileNo,
-            final boolean isLoanOfficer, final Boolean isActive, final LocalDate joiningDate) {
+            final boolean isLoanOfficer, final Boolean isActive, final LocalDate joiningDate ,final Boolean isLoanAgent ,String emailAddress) {
         this.office = staffOffice;
         this.firstname = StringUtils.defaultIfEmpty(firstname, null);
         this.lastname = StringUtils.defaultIfEmpty(lastname, null);
@@ -136,6 +149,8 @@ public class Staff extends AbstractPersistableCustom<Long> {
         if (joiningDate != null) {
             this.joiningDate = joiningDate.toDateTimeAtStartOfDay().toDate();
         }
+        this.isAgent = isLoanAgent;
+        this.emailAddress = emailAddress;
     }
 
     public EnumOptionData organisationalRoleData() {
@@ -203,6 +218,12 @@ public class Staff extends AbstractPersistableCustom<Long> {
             this.loanOfficer = newValue;
         }
 
+        if (command.isChangeInBooleanParameterNamed(StaffApiConstants.isAgentParam, this.isAgent)) {
+            final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(StaffApiConstants.isAgentParam);
+            actualChanges.put(StaffApiConstants.isAgentParam, newValue);
+            this.isAgent = newValue;
+        }
+
         final String isActiveParamName = "isActive";
         if (command.isChangeInBooleanParameterNamed(isActiveParamName, this.active)) {
             final boolean newValue = command.booleanPrimitiveValueOfParameterNamed(isActiveParamName);
@@ -245,6 +266,22 @@ public class Staff extends AbstractPersistableCustom<Long> {
         }
     }
 
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public Date getJoiningDate() {
+        return joiningDate;
+    }
+
     public boolean identifiedBy(final Staff staff) {
         return getId().equals(staff.getId());
     }
@@ -275,5 +312,9 @@ public class Staff extends AbstractPersistableCustom<Long> {
 
     public Image getImage() {
         return this.image;
+    }
+
+    public Boolean isAgent(){
+        return isAgent ;
     }
 }

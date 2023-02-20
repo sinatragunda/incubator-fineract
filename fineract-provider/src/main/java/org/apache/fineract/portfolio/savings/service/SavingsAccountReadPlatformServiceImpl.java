@@ -154,6 +154,18 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     }
 
     @Override
+    public Collection<SavingsAccountData> findByCurrency(final Long clientId ,String ccy){
+
+        final StringBuilder sqlBuilder = new StringBuilder("select " + this.savingAccountMapper.schema());
+        sqlBuilder.append(" where sa.client_id = ? and sa.status_enum = 300 and sa.currency_code = ? ");
+
+        final Object[] queryParameters = new Object[] { clientId  ,ccy};
+        return this.jdbcTemplate.query(sqlBuilder.toString(), this.savingAccountMapper, queryParameters);
+    }
+
+
+
+    @Override
     public Collection<SavingsAccountData> retrieveActiveForLookup(final Long clientId, DepositAccountType depositAccountType) {
 
         final StringBuilder sqlBuilder = new StringBuilder("select " + this.savingAccountMapper.schema());

@@ -533,7 +533,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
     }
 
     public Long getTotalApprovedShares() {
-        return this.totalSharesApproved ;
+        return Optional.ofNullable(this.totalSharesApproved).orElse(0L) ;
     }
     
     public void removePendingShares(Long totalShares) {

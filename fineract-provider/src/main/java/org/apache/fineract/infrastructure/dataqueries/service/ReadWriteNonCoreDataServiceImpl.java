@@ -54,7 +54,11 @@ import org.apache.fineract.infrastructure.dataqueries.repo.ApplicationRecordRepo
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.domain.Record;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -135,9 +139,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         this.columnValidator = columnValidator;
         // this.configurationWriteService = configurationWriteService;
         this.applicationRecordRepositoryWrapper = applicationRecordRepositoryWrapper;
+
     }
-
-
     @Override
     public DatatableData template() {
         final DatatableData datatables = DatatableData.template();
@@ -204,6 +207,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
                     .fillResultsetColumnHeaders(registeredDatatableName);
 
             datatableData = DatatableData.create(appTableName, registeredDatatableName,prettyName, columnHeaderData);
+            //templateRecords(datatableData ,appTableName);
+            System.err.println("---------set data record tempalte here son ");
         }
 
         return datatableData;
@@ -223,7 +228,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         final String permissionSql = this._getPermissionSql(strippedDatatableName);
 
-        System.err.println("-------------------permission sql "+permissionSql);
+        //System.err.println("-------------------permission sql "+permissionSql);
 
         this._registerDataTable(applicationTableName, dataTableName, category, permissionSql);
 
@@ -1495,6 +1500,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         switch(tableCategory){
             case APPLICATION:
                 appTableId = applicationRecordRepositoryWrapper.save(new ApplicationRecord());
+                break;
+            default:
                 break;
         }
 

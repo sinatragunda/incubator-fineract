@@ -56,7 +56,8 @@ public final class ChargeDefinitionCommandFromApiJsonDeserializer {
     private final Set<String> supportedParameters = new HashSet<>(Arrays.asList("name", "amount", "locale", "currencyCode",
             "currencyOptions", "chargeAppliesTo", "chargeTimeType", "chargeCalculationType", "chargeCalculationTypeOptions", "penalty",
             "active", "chargePaymentMode", "feeOnMonthDay", "feeInterval", "monthDayFormat", "minCap", "maxCap", "feeFrequency",
-            ChargesApiConstants.glAccountIdParamName, ChargesApiConstants.taxGroupIdParamName ,ChargesApiConstants.transactionCodeIdParamName));
+            ChargesApiConstants.glAccountIdParamName, ChargesApiConstants.taxGroupIdParamName ,ChargesApiConstants.transactionCodeIdParamName ,ChargesApiConstants.commissionedChargeParam));
+
 
     private final FromJsonHelper fromApiJsonHelper;
 
@@ -216,6 +217,11 @@ public final class ChargeDefinitionCommandFromApiJsonDeserializer {
             baseDataValidator.reset().parameter("active").value(active).notNull();
         }
 
+        if (this.fromApiJsonHelper.parameterExists(ChargesApiConstants.commissionedChargeParam, element)) {
+            final Boolean isCommissionedCharge = this.fromApiJsonHelper.extractBooleanNamed(ChargesApiConstants.commissionedChargeParam, element);
+            baseDataValidator.reset().parameter(ChargesApiConstants.commissionedChargeParam).value(isCommissionedCharge).notNull();
+        }
+
         if (this.fromApiJsonHelper.parameterExists("minCap", element)) {
             final BigDecimal minCap = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed("minCap", element.getAsJsonObject());
             baseDataValidator.reset().parameter("minCap").value(minCap).notNull().positiveAmount();
@@ -278,6 +284,11 @@ public final class ChargeDefinitionCommandFromApiJsonDeserializer {
             final Integer chargeAppliesTo = this.fromApiJsonHelper.extractIntegerSansLocaleNamed("chargeAppliesTo", element);
             baseDataValidator.reset().parameter("chargeAppliesTo").value(chargeAppliesTo).notNull()
                     .isOneOfTheseValues(ChargeAppliesTo.validValues());
+        }
+
+        if (this.fromApiJsonHelper.parameterExists(ChargesApiConstants.taxGroupIdParamName, element)) {
+            final Long taxGroupId = this.fromApiJsonHelper.extractLongNamed(ChargesApiConstants.taxGroupIdParamName, element);
+            baseDataValidator.reset().parameter(ChargesApiConstants.taxGroupIdParamName).value(taxGroupId).notNull().longGreaterThanZero();
         }
 
         if (this.fromApiJsonHelper.parameterExists("chargeTimeType", element)) {

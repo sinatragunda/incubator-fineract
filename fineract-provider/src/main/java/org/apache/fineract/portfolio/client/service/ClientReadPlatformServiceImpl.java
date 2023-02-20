@@ -374,6 +374,13 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
     }
 
     @Override
+    public ClientData retrieveByStaff(final Long staffId) {
+
+        final String sql = "select " + this.lookupMapper.schema() + " where c.staff_id = ? and c.status_enum != ?";
+        return this.jdbcTemplate.queryForObject(sql, this.lookupMapper, new Object[] { staffId ,ClientStatus.CLOSED.getValue()});
+    }
+
+    @Override
     public Collection<ClientData> retrieveClientMembersOfGroup(final Long groupId) {
 
         final AppUser currentUser = this.context.authenticatedUser();

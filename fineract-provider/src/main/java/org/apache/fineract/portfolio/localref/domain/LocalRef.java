@@ -5,6 +5,7 @@
 package org.apache.fineract.portfolio.localref.domain;
 
 import jdk.nashorn.internal.ir.annotations.Immutable;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.codes.domain.Code;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
@@ -27,6 +28,7 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.*;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Table(name ="m_local_ref")
 @Entity
@@ -75,5 +77,13 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
         this.submittedDate = submittedDate;
         this.office = office;
         this.isMandatory = isMandatory;
+    }
+
+    public Boolean isMandatory() {
+        return (Boolean)OptionalHelper.optionalOf(this.isMandatory ,false);
+    }
+
+    public String getName(){
+        return this.name;
     }
 }

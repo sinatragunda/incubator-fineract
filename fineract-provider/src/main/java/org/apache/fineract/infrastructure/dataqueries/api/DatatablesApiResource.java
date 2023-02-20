@@ -42,9 +42,14 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuild
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
+import org.apache.fineract.infrastructure.dataqueries.helper.TemplateRecordHelper;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadWriteNonCoreDataService;
+import org.apache.fineract.infrastructure.dataqueries.service.ServiceAdapter;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -67,17 +72,19 @@ public class DatatablesApiResource {
     private final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(DatatablesApiResource.class);
+    private final ServiceAdapter serviceAdapter;
 
     @Autowired
     public DatatablesApiResource(final PlatformSecurityContext context, final GenericDataService genericDataService,
             final ReadWriteNonCoreDataService readWriteNonCoreDataService,
             final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService) {
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final ServiceAdapter serviceAdapter) {
         this.context = context;
         this.genericDataService = genericDataService;
         this.readWriteNonCoreDataService = readWriteNonCoreDataService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.serviceAdapter = serviceAdapter;
     }
 
     @GET
@@ -100,6 +107,7 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String template(@Context final UriInfo uriInfo) {
 
+        System.err.println("-----------template for reading or writing ?B");
         final DatatableData result = this.readWriteNonCoreDataService.template();
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
@@ -175,7 +183,10 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getDatatable(@PathParam("datatable") final String datatable, @Context final UriInfo uriInfo) {
 
-      final DatatableData result = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
+        System.err.println("===============================get datatable details =======");
+        
+        final DatatableData result = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
+        TemplateRecordHelper.templateRecords(serviceAdapter ,result);
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serializePretty(prettyPrint, result);

@@ -107,6 +107,9 @@ import org.apache.fineract.portfolio.loanproduct.domain.InterestMethod;
 import org.apache.fineract.portfolio.loanproduct.service.LoanDropdownReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
 import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
@@ -152,6 +155,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     private final ConfigurationDomainService configurationDomainService;
     private final AccountDetailsReadPlatformService accountDetailsReadPlatformService;
     private final ColumnValidator columnValidator;
+    private final LocalRefRecordHelper localRefRecordHelper ;
 
     @Autowired
     public LoanReadPlatformServiceImpl(final PlatformSecurityContext context, final ApplicationCurrencyRepositoryWrapper applicationCurrencyRepository,
@@ -165,7 +169,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final FloatingRatesReadPlatformService floatingRatesReadPlatformService, final LoanUtilService loanUtilService,
             final ConfigurationDomainService configurationDomainService,
             final AccountDetailsReadPlatformService accountDetailsReadPlatformService,
-            final LoanRepositoryWrapper loanRepositoryWrapper, final ColumnValidator columnValidator) {
+            final LoanRepositoryWrapper loanRepositoryWrapper, final ColumnValidator columnValidator ,final LocalRefRecordHelper localRefRecordHelper) {
         this.context = context;
         this.loanRepositoryWrapper = loanRepositoryWrapper ;
         this.applicationCurrencyRepository = applicationCurrencyRepository;
@@ -187,6 +191,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         this.configurationDomainService = configurationDomainService;
         this.accountDetailsReadPlatformService = accountDetailsReadPlatformService;
         this.columnValidator = columnValidator;
+        this.localRefRecordHelper = localRefRecordHelper;
     }
 
     @Override
@@ -206,8 +211,14 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             sqlBuilder.append(" left join m_office transferToOffice on transferToOffice.id = c.transfer_to_office_id ");
             sqlBuilder.append(" where l.id=? and ( o.hierarchy like ? or transferToOffice.hierarchy like ?)");
 
-            return this.jdbcTemplate.queryForObject(sqlBuilder.toString(), rm, new Object[] { loanId, hierarchySearchString,
+            LoanAccountData loanAccountData = this.jdbcTemplate.queryForObject(sqlBuilder.toString(), rm, new Object[] { loanId, hierarchySearchString,
                     hierarchySearchString });
+
+            //System.err.println("=====================set record data for loan localref===========");
+            //localRefRecordHelper.setRecordData(loanAccountData , REF_TABLE.LOAN);
+            //System.err.println("================return local data "+loanAccountData.localRefValueDataCollection().size());
+            return loanAccountData;
+            
         } catch (final EmptyResultDataAccessException e) {
             throw new LoanNotFoundException(loanId);
         }
@@ -258,6 +269,19 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final LoanMapper rm = new LoanMapper();
         String sql="select "+rm.loanSchema()+" where hp.id is not null";
         return this.jdbcTemplate.query(sql, rm);
+
+    }
+
+    /**
+     * Added 15/02/2023 at 0825
+     * Retrieve all loans for an agent
+     */
+     @Override
+    public List<LoanAccountData> retrieveAllForLoanOfficer(final Long loanOfficerId){
+
+        final LoanMapper rm = new LoanMapper();
+        String sql="select "+rm.loanSchema()+" where l.loan_officer_id  = ?";
+        return this.jdbcTemplate.query(sql, rm ,new Object[]{loanOfficerId});
 
     }
 
@@ -387,6 +411,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     public LoanAccountData retrieveTemplateWithClientAndProductDetails(final Long clientId, final Long productId) {
 
         this.context.authenticatedUser();
+
+        System.err.println("-------------load loan template ---------------------");
 
         final ClientData clientAccount = this.clientReadPlatformService.retrieveOne(clientId);
         final LocalDate expectedDisbursementDate = DateUtils.getLocalDateOfTenant();
@@ -1062,6 +1088,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                 hirePurchaseData[0] = new HirePurchaseData(hirePurchaseItem ,null);
             });
 
+            LocalRefData localRefData = null ;
+
             LoanAccountData loanAccountData = LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
                     isLoanProductLinkedToFloatingRate, fundId, fundName, loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName,
@@ -1075,7 +1103,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     loanProductCounter, multiDisburseLoan, canDefineInstallmentAmount, fixedEmiAmount, outstandingLoanBalance, inArrears,
                     graceOnArrearsAgeing, isNPA, daysInMonthType, daysInYearType, isInterestRecalculationEnabled,
                     interestRecalculationData, createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap,
-                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData[0]);
+                    maximumGap, loanSubStatus, canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId ,hirePurchaseData[0] ,localRefData);
 
 
             return loanAccountData ;
@@ -1582,6 +1610,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
     @Override
     public Collection<StaffData> retrieveAllowedLoanOfficers(final Long selectedOfficeId, final boolean staffInSelectedOfficeOnly) {
+        
         if (selectedOfficeId == null) { return null; }
 
         Collection<StaffData> allowedLoanOfficers = null;
@@ -1707,7 +1736,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     @Override
     public Collection<LoanScheduleAccrualData> retriveScheduleAccrualData() {
 
-        System.err.println("--------------------non perfomiring assets are totally excluded at first now -----------------------");
+        //System.err.println("--------------------non perfomiring assets are totally excluded at first now -----------------------");
 
         LoanScheduleAccrualMapper mapper = new LoanScheduleAccrualMapper();
         Date organisationStartDate = this.configurationDomainService.retrieveOrganisationStartDate();
