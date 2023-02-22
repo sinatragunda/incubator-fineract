@@ -668,7 +668,7 @@ public class ShareAccountDataSerializer {
         if (!dataValidationErrors.isEmpty()) { 
 
             for(ApiParameterError e : dataValidationErrors){
-                System.err.println("-------------error is ---------"+e.getDeveloperMessage());
+                System.err.println("-------------when processing purchase error is ---------"+e.getDeveloperMessage());
             }            
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
@@ -742,6 +742,8 @@ public class ShareAccountDataSerializer {
 
         final BigDecimal unitPrice = shareProduct.deriveMarketPrice(requestedDate.toDate());
 
+        System.err.println("======================unit price is ====="+unitPrice+"====================sharesRequested ========="+sharesRequested);
+
         ShareAccountTransaction purchaseTransaction = new ShareAccountTransaction(requestedDate.toDate(), sharesRequested, unitPrice);
 
         boolean isAccount = Optional.ofNullable(account).isPresent();
@@ -754,7 +756,7 @@ public class ShareAccountDataSerializer {
         }
         handleAdditionalSharesChargeTransactions(account, purchaseTransaction);
 
-        //System.err.println("----------------done handling additional shares charge transactions------");
+        System.err.println("----------------done handling additional shares charge transactions------");
         actualChanges.put(ShareAccountApiConstants.additionalshares_paramname, purchaseTransaction);
         return actualChanges;
     }

@@ -45,14 +45,15 @@ public class LocalRefRecordHelper {
         this.localRefReadPlatformService = localRefReadPlatformService;
     }
 
-    public void create(JsonCommand command ,AbstractPersistableCustom abstractPersistableCustom){
+    public void create(JsonCommand command ,AbstractPersistableCustom abstractPersistableCustom ,REF_TABLE refTable){
         Long recordId = abstractPersistableCustom.getId();
-        create(command ,recordId);
+        create(command ,recordId,refTable);
     }
 
-    public void create(JsonCommand command, Long recordId){
+    public void create(JsonCommand command, Long recordId ,REF_TABLE refTable){
 
         List<LocalRefValue> localRefValueList = new ArrayList<>();
+        
         JsonElement jsonElement = command.parsedJson();
 
         /**
@@ -61,12 +62,17 @@ public class LocalRefRecordHelper {
          */
         boolean hasParameter  = command.parameterExists("localrefs");
 
+
         if(!hasParameter){
+            validateIfMandatoryLocalRefsEntriesExists(refTable);
             return ;
         } 
 
         JsonObject jsonObject = fromJsonHelper.extractJsonObjectNamed("localrefs" ,jsonElement);
         Set<Map.Entry<String ,JsonElement>> set = jsonObject.entrySet();
+
+        List<Long> availableLocalRefsId = new ArrayList<>();
+        
         for(Map.Entry<String ,JsonElement> entry : set){
 
             JsonElement element = entry.getValue();
@@ -93,6 +99,7 @@ public class LocalRefRecordHelper {
                 /**
                  * Consumer to populate localrefvalue
                  */
+                availableLocalRefsId.add(localRefId);
                 Consumer consumer = (e)->{
                     LocalRef localRef = localRefRepositoryWrapper.findOneWithoutNotFoundDetection(localRefId);
                     validateEntry(localRef ,value);
@@ -106,8 +113,53 @@ public class LocalRefRecordHelper {
 
         }
 
+        validateIfMandatoryLocalRefsEntriesExists(availableLocalRefsId ,refTable);
+
         Consumer<LocalRefValue> saveConsumer = (e)->localRefValueRepositoryWrapper.save(e);
         localRefValueList.forEach(saveConsumer);
+    }
+
+    private void validateIfMandatoryLocalRefsEntriesExists(REF_TABLE refTable){
+
+        Collection<LocalRef> localRefList = localRefRepositoryWrapper.findByRefTable(refTable);
+
+        System.err.println("=====================local refs found ARE "+localRefList.size());
+        Consumer<LocalRef> consumer = (e)->{
+            boolean isMandatory = e.isMandatory();
+            if(isMandatory){
+                String name = e.getName();
+                throw new LocalRefValueMandatoryException(name);
+            }
+        };
+        localRefList.stream().forEach(consumer);
+    }
+
+
+    private void validateIfMandatoryLocalRefsEntriesExists(List<Long> availableLocalRefsIdsList ,REF_TABLE refTable){
+
+        Collection<LocalRef> localRefList = localRefRepositoryWrapper.findByRefTable(refTable);
+
+        System.err.println("=====================compare available refs ids with these present "+availableLocalRefsIdsList.size());
+
+        Consumer<LocalRef> consumer = (e)->{
+            boolean isMandatory = e.isMandatory();
+            String name = e.getName();
+            if(isMandatory){
+
+                boolean exist[] = {false} ;
+                availableLocalRefsIdsList.stream().forEach(l->{
+                    boolean sameItem = l.equals(e.getId());
+                    if(sameItem){
+                        exist[0] = true ;
+                    }
+                });
+                if(!exist[0]){
+                    throw new LocalRefValueMandatoryException(name);
+                }
+            }
+        };
+
+        localRefList.stream().forEach(consumer);
     }
 
     public Long localRefId(String value){
@@ -140,8 +192,12 @@ public class LocalRefRecordHelper {
         boolean isMandatory = localRef.isMandatory();
         String key = localRef.getName();
 
-        //System.err.println("-------------is mandatory "+isMandatory);
+        System.err.println("-------------is mandatory "+isMandatory+"=============for key "+key);
+        
         if(isMandatory){
+            
+            System.err.println("=====================is mandatory throw one of the many errors "+isPresent);
+
             if(isPresent){
                 // check if string is not blank here ,need another efficient method but this is just temp
                 int l = entry.length();

@@ -147,7 +147,7 @@ public class ImportHandlerUtils {
                     res = trimEmptyDecimalPortion(val.getStringValue());
                 }
                 catch (NullPointerException n){
-                    System.err.println("------------------readAsString threw null pointer exception -");
+                    System.err.println("------------------readAsString threw null pointer exception -"+n.getMessage());
                     //n.printStackTrace();
                 }
                 if (res!=null) {

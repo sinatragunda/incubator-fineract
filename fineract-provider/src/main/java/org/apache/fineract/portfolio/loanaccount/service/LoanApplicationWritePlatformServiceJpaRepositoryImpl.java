@@ -98,6 +98,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.*;
 import org.apache.fineract.portfolio.loanproduct.exception.LinkedAccountRequiredException;
 import org.apache.fineract.portfolio.loanproduct.exception.LoanProductNotFoundException;
 import org.apache.fineract.portfolio.loanproduct.serialization.LoanProductDataValidator;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
@@ -463,7 +464,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              * Added 19/02/2023 at 2349
              * Create value for local ref
              */
-            localRefRecordHelper.create(command ,newLoanApplication);  
+            localRefRecordHelper.create(command ,newLoanApplication , REF_TABLE.LOAN);
             System.err.println("===============will it reverse the loan transaction ?=======");
 
             // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists

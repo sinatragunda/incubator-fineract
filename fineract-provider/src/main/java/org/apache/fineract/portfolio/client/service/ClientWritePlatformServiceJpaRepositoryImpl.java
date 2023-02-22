@@ -73,6 +73,7 @@ import org.apache.fineract.portfolio.group.exception.GroupMemberCountNotInPermis
 import org.apache.fineract.portfolio.group.exception.GroupNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.localref.helper.LocalRefRecordHelper;
 import org.apache.fineract.portfolio.localref.service.LocalRefWritePlatformService;
 import org.apache.fineract.portfolio.note.domain.Note;
@@ -406,7 +407,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
              * LocalRef implementation ,add values to local ref value
              */
             System.err.println("==============function below throws an error ================");
-            localRefRecordHelper.create(command ,newClient);
+            localRefRecordHelper.create(command ,newClient , REF_TABLE.CLIENT);
             System.err.println("=========function prone to throwing error ,was it caught  ?");
 
             if (newClient.isActive()) {

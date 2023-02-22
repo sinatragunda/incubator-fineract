@@ -4,10 +4,12 @@
  */
 package org.apache.fineract.portfolio.localref.repo;
 import org.apache.fineract.portfolio.localref.domain.LocalRef;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.localref.exception.LocalRefNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -27,5 +29,9 @@ public class LocalRefRepositoryWrapper {
         Supplier error = ()-> new LocalRefNotFoundException(id);
         Optional.ofNullable(localRef).orElseThrow(error);
         return localRef;
+    }
+
+    public Collection<LocalRef> findByRefTable(REF_TABLE refTable){
+        return localRefRepository.findByRefTable(refTable);
     }
 }

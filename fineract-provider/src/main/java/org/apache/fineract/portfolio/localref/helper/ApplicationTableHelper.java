@@ -15,9 +15,11 @@ public class ApplicationTableHelper {
     public static DatatableData getTable(ReadWriteNonCoreDataService readWriteNonCoreDataService , String table , APPLICATION_ACTION applicationAction){
 
         applicationAction = Optional.ofNullable(applicationAction).orElse(APPLICATION_ACTION.LIST);
+        
         DatatableData datatableData = null ;
 
-        System.err.println("===================when is this called when creatonmg new app record ?");
+        System.err.println("===================when is this called when creating new app record ?"+applicationAction+"=====for table =============="+table);
+        
         switch (applicationAction){
             default:
                 datatableData = readWriteNonCoreDataService.retrieveDatatable(table);

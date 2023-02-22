@@ -223,7 +223,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     public CommandProcessingResult applyAddtionalShares(final Long accountId, JsonCommand jsonCommand) {
         try{
 
-            System.err.println("---------------------why are we coming here again ? with id "+accountId);
+            System.err.println("---------------------apply additional shares for account "+accountId);
 
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);

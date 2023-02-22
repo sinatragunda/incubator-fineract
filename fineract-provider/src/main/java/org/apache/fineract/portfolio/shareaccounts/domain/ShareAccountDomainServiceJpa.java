@@ -133,7 +133,7 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         Map<String ,Object> changes = commandProcessingResult.getChanges();
 
-        System.err.println("--------------------command changes -------------"+changes.size());
+        //System.err.println("--------------------command changes -------------"+changes.size());
 
         if(!changes.isEmpty()){
             
@@ -141,7 +141,7 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
             String strVal = String.valueOf(val);
             transactionId[0] = Long.parseLong(strVal);
 
-            System.err.println("---------------------------transaction id -------------------"+val);
+            //System.err.println("---------------------------transaction id -------------------"+val);
         }
 
 
@@ -149,7 +149,7 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
                 .withOfficeId(commandProcessingResult.getOfficeId()) //
                 .withClientId(commandProcessingResult.getClientId()) ;
 
-        System.err.println("---------------------------what is share account transaction ------------------------------"+transactionId[0]);
+        //System.err.println("---------------------------what is share account transaction ------------------------------"+transactionId[0]);
 
         ShareAccountTransaction shareAccountTransaction[] = {null} ;
 
