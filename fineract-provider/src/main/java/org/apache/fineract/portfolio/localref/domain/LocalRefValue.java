@@ -38,4 +38,8 @@ public class LocalRefValue  extends AbstractPersistableCustom {
         this.value = value;
         this.localRef = localRef;
     }
+
+    public LocalRef getLocalRef(){
+        return this.localRef;
+    }
 }

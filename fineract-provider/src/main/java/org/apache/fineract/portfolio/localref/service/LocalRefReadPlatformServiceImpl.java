@@ -5,8 +5,10 @@
 package org.apache.fineract.portfolio.localref.service;
 
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.codes.data.CodeData;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.infrastructure.codes.domain.Code;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
@@ -19,8 +21,12 @@ import org.apache.fineract.portfolio.client.domain.ClientEnumerations;
 import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.localref.data.LocalRefValueData;
+import org.apache.fineract.portfolio.localref.domain.LocalRef;
+import org.apache.fineract.portfolio.localref.domain.LocalRefValue;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.localref.enumerations.REF_VALUE_TYPE;
+import org.apache.fineract.portfolio.localref.repo.LocalRefValueRepository;
+import org.apache.fineract.portfolio.localref.repo.LocalRefValueRepositoryWrapper;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.Permission;
 import org.apache.fineract.useradministration.service.PermissionReadPlatformServiceImpl;
@@ -49,13 +55,15 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
     private final LocalRefValueMapper localRefValueMapper = new LocalRefValueMapper();
     private final JdbcTemplate jdbcTemplate ;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
+    private final LocalRefValueRepositoryWrapper localRefValueRepositoryWrapper;
 
     @Autowired
-    public LocalRefReadPlatformServiceImpl(PermissionReadPlatformServiceImpl permissionReadPlatformService ,CodeReadPlatformService codeReadPlatformService ,RoutingDataSource routingDataSource ,CodeValueReadPlatformService codeValueReadPlatformService){
+    public LocalRefReadPlatformServiceImpl(PermissionReadPlatformServiceImpl permissionReadPlatformService ,CodeReadPlatformService codeReadPlatformService ,RoutingDataSource routingDataSource ,CodeValueReadPlatformService codeValueReadPlatformService ,LocalRefValueRepositoryWrapper localRefValueRepositoryWrapper){
         this.permissionReadPlatformService = permissionReadPlatformService;
         this.codeReadPlatformService = codeReadPlatformService ;
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
         this.codeValueReadPlatformService = codeValueReadPlatformService;
+        this.localRefValueRepositoryWrapper = localRefValueRepositoryWrapper;
 
     }
 
@@ -76,14 +84,42 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
     }
 
     @Override
-    public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable, Long recordId) {
+    public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable, Long recordId){
 
-        final String sql = String.format("select %s where lr.ref_table = ? and lrv.record_id = ? ",localRefValueMapper.schema());
+        String sqlTemp  = localRefValueMapper.schema();
+        //boolean isCodePresent = trickFunctionToSqlCode(refTable ,recordId);
+        
+        //if(isCodePresent){
+           // sqlTemp = localRefValueMapper.schemaForCode();
+        //}
+
+        final String sql = String.format("select %s where lr.ref_table = ? and lrv.record_id = ? ",sqlTemp);
         
         System.err.println("-====================record sql is ==========="+sql);
         
         Collection<LocalRefValueData> localRefValueDataCollection = this.jdbcTemplate.query(sql, this.localRefValueMapper, new Object[] {refTable.ordinal() ,recordId});
         return localRefValueDataCollection ;
+    }
+
+    private boolean trickFunctionToSqlCode(REF_TABLE refTable ,Long recordId){
+
+        // which schema do we take here ? 
+//        Collection<LocalRefValue> localRefValue = localRefValueRepositoryWrapper.findByRecordId(recordId);
+//
+//        boolean hasValue = OptionalHelper.isPresent(localRefValue);
+//
+//        if(hasValue){
+//
+//            LocalRef localRef = localRefValue.getLocalRef();
+//            Code code = localRef.getCode();
+//            boolean isCodePresent = OptionalHelper.isPresent(code);
+//            return isCodePresent;
+//        }
+//
+//        return hasValue;
+
+        return true ;
+
     }
 
 
@@ -188,6 +224,19 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
             builder.append("lrv.id as id, ");
             builder.append("lr.name as columnName, ");
+            builder.append("ifnull(lrv.value,'') as value, ");
+            builder.append("lrv.record_id as recordId ");
+            builder.append("from m_local_ref_value lrv ");
+            builder.append("join m_local_ref lr on lr.id = lrv.local_ref_id ");
+            this.schema = builder.toString();
+        }
+
+        public String schemaForCode(){
+
+            final StringBuilder builder = new StringBuilder(400);
+
+            builder.append("lrv.id as id, ");
+            builder.append("lr.name as columnName, ");
             builder.append("ifnull(mcv.code_value ,lrv.value) as value, ");
             builder.append("mcv.code_value as codeValue, ");
             builder.append("lrv.record_id as recordId ");
@@ -195,7 +244,7 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
             builder.append("join m_local_ref lr on lr.id = lrv.local_ref_id ");
             builder.append("left join m_code mc on mc.id = lr.code_id ");
             builder.append("left join m_code_value mcv on mcv.id = lrv.value ");
-            this.schema = builder.toString();
+            return builder.toString();
         }
 
         public String schema() {

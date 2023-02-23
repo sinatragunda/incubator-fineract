@@ -86,4 +86,8 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
     public String getName(){
         return this.name;
     }
+
+    public Code getCode(){
+        return (Code)OptionalHelper.optionalOf(this.code ,null);
+    }
 }

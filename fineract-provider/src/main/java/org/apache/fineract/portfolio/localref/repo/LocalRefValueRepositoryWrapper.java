@@ -5,9 +5,12 @@
 package org.apache.fineract.portfolio.localref.repo;
 
 import org.apache.fineract.portfolio.localref.domain.LocalRefValue;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
 
 @Service
 public class LocalRefValueRepositoryWrapper {
@@ -20,6 +23,12 @@ public class LocalRefValueRepositoryWrapper {
     }
 
     public void save(LocalRefValue localRefValue){
-        localRefValueRepository.save(localRefValue);
+        this.localRefValueRepository.save(localRefValue);
     }
+
+    public Collection<LocalRefValue> findByRecordId(Long recordId){
+        return this.localRefValueRepository.findByRecordId(recordId); 
+    }
+
+
 }
