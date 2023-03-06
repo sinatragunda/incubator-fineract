@@ -19,6 +19,7 @@
 package org.apache.fineract.infrastructure.core.service;
 
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
+import org.apache.fineract.infrastructure.security.helper.RequestState;
 import org.springframework.util.Assert;
 
 /**
@@ -33,10 +34,23 @@ public class ThreadLocalContextUtil {
     private static final ThreadLocal<FineractPlatformTenant> tenantcontext = new ThreadLocal<>();
     
     private static final ThreadLocal<String> authTokenContext = new ThreadLocal<>();
+
+    private static final ThreadLocal<RequestState> requestStateContext = new ThreadLocal<>();
     
     public static void setTenant(final FineractPlatformTenant tenant) {
         Assert.notNull(tenant, "tenant cannot be null");
         tenantcontext.set(tenant);
+    }
+
+    /**
+     * Added 05/03/2023 at 0444
+     * Timestamp data ,this is test not final solution
+     */ 
+    public static ThreadLocal<RequestState> getRequestState() {
+        return requestStateContext;
+    }
+    public static void setRequestState(RequestState requestState){
+        requestStateContext.set(requestState);
     }
 
     public static FineractPlatformTenant getTenant() {
@@ -66,5 +80,6 @@ public class ThreadLocalContextUtil {
     public static String getAuthToken() {
         return authTokenContext.get();
     }
+
 
 }

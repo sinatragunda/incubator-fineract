@@ -49,6 +49,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.JsonParserHelper;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.apache.fineract.infrastructure.security.helper.OverrideHelper;
 import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerator;
 import org.apache.fineract.organisation.holiday.domain.Holiday;
 import org.apache.fineract.organisation.holiday.service.HolidayUtil;
@@ -3060,10 +3061,21 @@ public class Loan extends AbstractPersistableCustom<Long> {
                     loanTransactionDate, getDisbursementDate());
         }
 
+        boolean override = OverrideHelper.override();
+
+        System.err.println("=====================error being thrown here now ,override this error ,override it ?"+override);
+
         if (loanTransactionDate.isAfter(DateUtils.getLocalDateOfTenant())) {
 
+            System.err.println("=====================transanction date error here , validation only ");
+
             final String errorMessage = "The transaction date cannot be in the future.";
-            throw new InvalidLoanStateTransitionException("transaction", "cannot.be.a.future.date", errorMessage, loanTransactionDate);
+
+            if(!override) {
+
+                final String overrideMessage = "This transaction is future dated ,do you wish to override this validation instead ?";
+                throw new InvalidLoanStateTransitionException("transaction", "cannot.be.a.future.date", errorMessage,overrideMessage, loanTransactionDate);
+            }
         }
 
         if (loanTransaction.isInterestWaiver()) {
@@ -3087,7 +3099,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
             }
         }
 
-        //System.err.println("---------------------do we get out of here ? -------------");
+        System.err.println("---------------------do we get out of here ? -------------");
 
         final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = this.transactionProcessorFactory
                 .determineProcessor(this.transactionProcessingStrategy);
@@ -6384,18 +6396,19 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         LoanEvent event = LoanEvent.LOAN_FORECLOSURE;
 
-        //System.err.println("----------------------foreclosure event ,-----------"+event);
+        System.err.println("----------------------foreclosure event ,-----------"+event);
 
         //System.err.println("----------------------loan status before validation is ,has status changed already ? "+this.loanStatus);
 
         validateAccountStatus(event);
 
+        System.err.println("-----------------show we then do that stuff here ? ");
 
         validateForForeclosure(repaymentTransaction.getTransactionDate());
         this.loanSubStatus = LoanSubStatus.FORECLOSED.getValue();
         applyAccurals(appUser);
 
-        //System.err.println("--------------------handling foreclosure event ,we intend to give it own status ");
+        System.err.println("--------------------handling foreclosure event ,we intend to give it own status ");
         return handleRepaymentOrRecoveryOrWaiverTransaction(repaymentTransaction, loanLifecycleStateMachine, null, scheduleGeneratorDTO,
                 appUser);
     }
@@ -6427,9 +6440,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateForForeclosure(final LocalDate transactionDate) {
 
-        //System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
+        System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
 
-        //System.err.println("--------------validate class with trans date-----------"+transactionDate);
+        System.err.println("--------------validate class with trans date-----------"+transactionDate);
 
         if (isInterestRecalculationEnabledForProduct()) {
             final String defaultUserMessage = "The loan with interest recalculation enabled cannot be foreclosed.";
@@ -6439,15 +6452,18 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         LocalDate lastUserTransactionDate = getLastUserTransactionDate();
 
+        System.err.println("=========================we skipping this error now and see how it goes ");
+
         if (DateUtils.isDateInTheFuture(transactionDate)) {
             final String defaultUserMessage = "The transactionDate cannot be in the future.";
-            throw new LoanForeclosureException("loan.foreclosure.transaction.date.is.in.future", defaultUserMessage, transactionDate);
+            //throw new LoanForeclosureException("loan.foreclosure.transaction.date.is.in.future", defaultUserMessage, transactionDate);
         }
 
+        System.err.println("=========================we skipping this error now and see how it goes ");
         if (lastUserTransactionDate.isAfter(transactionDate)) {
             final String defaultUserMessage = "The transactionDate cannot be in the future.";
-            throw new LoanForeclosureException("loan.foreclosure.transaction.date.cannot.before.the.last.transaction.date",
-                    defaultUserMessage, transactionDate);
+            //throw new LoanForeclosureException("loan.foreclosure.transaction.date.cannot.before.the.last.transaction.date",
+              //      defaultUserMessage, transactionDate);
         }
     }
 

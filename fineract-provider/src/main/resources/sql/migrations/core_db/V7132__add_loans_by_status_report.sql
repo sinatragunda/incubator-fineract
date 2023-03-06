@@ -65,5 +65,5 @@ INSERT INTO `stretchy_report_parameter` (`report_id`, `parameter_id`, `report_pa
 
   INSERT INTO `stretchy_report_parameter` (`report_id`, `parameter_id`, `report_parameter_name`) VALUES
  ((select sr.id from stretchy_report sr where sr.report_name='Loans By Status'), 
- (select sp.id from stretchy_parameter sp where sp.parameter_variable='loansStatusId'), 
+ (select sp.id from stretchy_parameter sp where sp.parameter_variable='loanStatusId'), 
   'loanStatusId');

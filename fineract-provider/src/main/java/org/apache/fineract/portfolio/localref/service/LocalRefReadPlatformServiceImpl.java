@@ -41,8 +41,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Service
@@ -76,50 +75,65 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
         Collection existingRefs = retrieveEmptyLocalRefs(refTable);
 
-        System.err.println("--------------------existing local refs "+existingRefs.size());
+        //System.err.println("--------------------existing local refs "+existingRefs.size());
 
         localRefData.setExistingLocalRefs(existingRefs);
         return localRefData;
 
     }
 
+    /**
+     * Added 24/02/2023 at 1146
+     * Retrieve record from LocalRefValues 
+     */  
     @Override
     public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable, Long recordId){
 
         String sqlTemp  = localRefValueMapper.schema();
-        //boolean isCodePresent = trickFunctionToSqlCode(refTable ,recordId);
         
-        //if(isCodePresent){
-           // sqlTemp = localRefValueMapper.schemaForCode();
-        //}
-
         final String sql = String.format("select %s where lr.ref_table = ? and lrv.record_id = ? ",sqlTemp);
         
-        System.err.println("-====================record sql is ==========="+sql);
+        //System.err.println("-====================record sql is ==========="+sql);
         
-        Collection<LocalRefValueData> localRefValueDataCollection = this.jdbcTemplate.query(sql, this.localRefValueMapper, new Object[] {refTable.ordinal() ,recordId});
-        return localRefValueDataCollection ;
+        Collection<LocalRefValueData> localRefValueDataCollection = this.jdbcTemplate.query(sql, this.localRefValueMapper, new Object[] {refTable.ordinal() ,recordId ,refTable.ordinal() ,recordId});
+
+        //System.err.println("=======================before data filtering duplicates "+localRefValueDataCollection.size());
+
+        localRefValueDataCollection = filterDuplicate(localRefValueDataCollection);
+
+        //System.err.println("=======================total records found are ,after filtering duplicates "+localRefValueDataCollection.size());
+        return localRefValueDataCollection;
     }
 
-    private boolean trickFunctionToSqlCode(REF_TABLE refTable ,Long recordId){
+    /**
+     * Added 24/02/2023 at 1253
+     * Nees to be removed here and put into seperate function
+     */
+    private Collection<LocalRefValueData> filterDuplicate(Collection<LocalRefValueData> localRefValueDataCollection){
 
-        // which schema do we take here ? 
-//        Collection<LocalRefValue> localRefValue = localRefValueRepositoryWrapper.findByRecordId(recordId);
-//
-//        boolean hasValue = OptionalHelper.isPresent(localRefValue);
-//
-//        if(hasValue){
-//
-//            LocalRef localRef = localRefValue.getLocalRef();
-//            Code code = localRef.getCode();
-//            boolean isCodePresent = OptionalHelper.isPresent(code);
-//            return isCodePresent;
-//        }
-//
-//        return hasValue;
+        Set<Long> idsSet = new HashSet<>();
+        Map<Long ,LocalRefValueData> longLocalRefValueDataMap = new HashMap<>();
 
-        return true ;
+        Consumer<LocalRefValueData> duplicateCheckConsumer = (e)->{
+            Long id = e.getId();
+            boolean hasInserted = idsSet.add(id);
 
+            //System.err.println("==================has inserted value ============="+hasInserted);
+            if(!hasInserted){
+                // this is a duplicate check where
+                boolean hasCodeValue = OptionalHelper.isPresent(e.getCodeValue());
+                if(hasCodeValue){
+                    //System.err.println("------------------=============== has code value ,replace with that with actual value ");
+                    longLocalRefValueDataMap.replace(id ,e);
+                }
+            }
+            else{
+                longLocalRefValueDataMap.put(id ,e);
+            }
+        };
+
+        localRefValueDataCollection.stream().forEach(duplicateCheckConsumer);
+        return longLocalRefValueDataMap.values();
     }
 
 
@@ -224,29 +238,26 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
             builder.append("lrv.id as id, ");
             builder.append("lr.name as columnName, ");
-            builder.append("ifnull(lrv.value,'') as value, ");
+            builder.append("lrv.value as value, ");
+            builder.append("null as codeValue, ");
             builder.append("lrv.record_id as recordId ");
             builder.append("from m_local_ref_value lrv ");
             builder.append("join m_local_ref lr on lr.id = lrv.local_ref_id ");
-            this.schema = builder.toString();
-        }
-
-        public String schemaForCode(){
-
-            final StringBuilder builder = new StringBuilder(400);
-
+            builder.append("where lr.ref_table = ? and lrv.record_id = ? ");
+            builder.append("union ");
+            builder.append("select ");
             builder.append("lrv.id as id, ");
             builder.append("lr.name as columnName, ");
-            builder.append("ifnull(mcv.code_value ,lrv.value) as value, ");
+            builder.append("mcv.code_value as value, ");
             builder.append("mcv.code_value as codeValue, ");
             builder.append("lrv.record_id as recordId ");
             builder.append("from m_local_ref_value lrv ");
             builder.append("join m_local_ref lr on lr.id = lrv.local_ref_id ");
-            builder.append("left join m_code mc on mc.id = lr.code_id ");
-            builder.append("left join m_code_value mcv on mcv.id = lrv.value ");
-            return builder.toString();
-        }
+            builder.append("join m_code mc on mc.id = lr.code_id ");
+            builder.append("join m_code_value mcv on mcv.id = lrv.value ");
 
+            this.schema = builder.toString();
+        }
         public String schema() {
             return this.schema;
         }
@@ -258,8 +269,9 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
             final String value = rs.getString("value");
             final Long id = rs.getLong("id");
             final Long recordId = rs.getLong("recordId");
+            final String codeValue = rs.getString("codeValue");
 
-            LocalRefValueData localRefDataValue = new LocalRefValueData(id ,recordId ,value ,columnName);
+            LocalRefValueData localRefDataValue = new LocalRefValueData(id ,recordId ,value ,columnName ,codeValue);
             return localRefDataValue;
         }
     }

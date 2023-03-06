@@ -376,23 +376,23 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             Consumer<AccountTransferData> findAccountTransferRecord = (e)->{
                 Long id = e.getId();
                 
-                System.err.println("-----------------------------------we have found id of record ----"+id);
+                //System.err.println("-----------------------------------we have found id of record ----"+id);
                 AccountTransferTransaction accountTransferTransaction = this.accountTransferRepository.findOne(id);
 
-                System.out.println("-----------------------we have record ? "+ Optional.of(accountTransferTransaction).isPresent());
+                //System.out.println("-----------------------we have record ? "+ Optional.of(accountTransferTransaction).isPresent());
 
                 acccountTransfers.add(accountTransferTransaction);
             };
 
 
-            System.err.println("------------------------------------------- value here is "+accountTransferDataList.size());
+            //System.err.println("------------------------------------------- value here is "+accountTransferDataList.size());
 
             accountTransferDataList.stream().forEach(findAccountTransferRecord);
             //acccountTransfers = this.accountTransferRepository.findAllByLoanId(accountId);
         }
 
         if(!acccountTransfers.isEmpty()){
-            System.out.println("------------------------------undo all transactions -------------------");
+            //System.out.println("------------------------------undo all transactions -------------------");
             undoTransactions(acccountTransfers);
         }
     }
@@ -403,23 +403,23 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     private void undoTransactions(final List<AccountTransferTransaction> acccountTransfers) {
         for (final AccountTransferTransaction accountTransfer : acccountTransfers) {
 
-            System.out.println("=--------------------reverse the transaction ---------"+accountTransfer);
+            //System.out.println("=--------------------reverse the transaction ---------"+accountTransfer);
 
             if (accountTransfer.getFromLoanTransaction() != null) {
-                System.out.println("---------------------from loan transaction not null--------------");
+                //System.out.println("---------------------from loan transaction not null--------------");
                 this.loanAccountDomainService.reverseTransfer(accountTransfer.getFromLoanTransaction());
             }
             if (accountTransfer.getToLoanTransaction() != null) {
-                System.out.println("---------------------get to loan transaction not null--------------");
+                //System.out.println("---------------------get to loan transaction not null--------------");
                 this.loanAccountDomainService.reverseTransfer(accountTransfer.getToLoanTransaction());
             }
             if (accountTransfer.getFromTransaction() != null) {
-                System.out.println("---------------------get from transaction not null--------------");
+                //System.out.println("---------------------get from transaction not null--------------");
                 this.savingsAccountWritePlatformService.undoTransaction(accountTransfer.accountTransferDetails().fromSavingsAccount()
                         .getId(), accountTransfer.getFromTransaction().getId(), true);
             }
             if (accountTransfer.getToSavingsTransaction() != null) {
-                System.out.println("---------------------get to savings transaction not null--------------");
+                //System.out.println("---------------------get to savings transaction not null--------------");
                 this.savingsAccountWritePlatformService.undoTransaction(
                         accountTransfer.accountTransferDetails().toSavingsAccount().getId(), accountTransfer.getToSavingsTransaction()
                                 .getId(), true);

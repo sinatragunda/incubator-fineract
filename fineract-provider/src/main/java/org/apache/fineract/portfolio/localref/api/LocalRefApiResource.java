@@ -98,6 +98,23 @@ public class LocalRefApiResource {
         return this.localRefToApiJsonSerializer.serialize(result);
     }
 
+    @PUT
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String create(@QueryParam("id")Long id , final String apiRequestBodyAsJson) {
+
+        System.err.println("=============================edit this shit now =========");
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder() //
+                .updateLocalRef(id) //
+                .withJson(apiRequestBodyAsJson) //
+                .build(); //
+
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.localRefToApiJsonSerializer.serialize(result);
+    }
+
     
     @GET
     @Path("template")

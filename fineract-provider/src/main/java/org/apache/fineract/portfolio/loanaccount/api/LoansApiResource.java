@@ -29,6 +29,7 @@ import static org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -67,6 +68,7 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
@@ -131,6 +133,7 @@ import org.apache.fineract.portfolio.note.service.NoteReadPlatformServiceImpl;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -716,6 +719,8 @@ public class LoansApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String calculateLoanScheduleOrSubmitLoanApplication(@QueryParam("command") final String commandParam,
             @Context final UriInfo uriInfo, final String apiRequestBodyAsJson) {
+
+        System.err.println("=====================================tramsaction timestamp is "+ThreadLocalContextUtil.getRequestState().get().getTimestamp());
 
         if (is(commandParam, "calculateLoanSchedule")) {
 

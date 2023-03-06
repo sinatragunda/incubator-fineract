@@ -13,6 +13,6 @@ public class LocalRefValueMandatoryException extends AbstractPlatformResourceNot
     }
 
     public LocalRefValueMandatoryException(String key){
-        super("Local Ref marked with requirement for mandatory value is missing a value ",String.format("Local Ref marked marked mandatory ,is missing a value :%s",key) ,key);
+        super("Local Ref marked with requirement for mandatory value is missing a value ",String.format("Local Reference %s is marked mandatory ,is missing a value",key) ,key);
     }
 }

@@ -22,6 +22,7 @@ import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
+import org.apache.fineract.infrastructure.security.helper.OverrideHelper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
@@ -111,6 +112,11 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
             final SavingsTransactionBooleanValues transactionBooleanValues ,final TransactionCode transactionCode) {
 
+        System.err.println("------------------handle withdrawal -------------------------");
+
+        boolean overrideRequest = OverrideHelper.override();
+
+        System.err.println("===========this is an override request ?------- "+overrideRequest);
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -147,7 +153,6 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             catch (NullPointerException n){
                 n.printStackTrace();
             }
-
         }
         List<DepositAccountOnHoldTransaction> depositAccountOnHoldTransactions = null;
         if (account.getOnHoldFunds().compareTo(BigDecimal.ZERO) == 1) {
@@ -160,9 +165,19 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         SavingsProduct savingsProduct = account.savingsProduct();
         boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
 
+        System.err.println("==============================is overdraft account here ? "+isOverdraftAccount+"===========and override that shit ?"+overrideRequest);
+
         if(!isOverdraftAccount) {
-            account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
-                    depositAccountOnHoldTransactions);
+
+            /**
+             * Added 06/03/2023 at 0922
+             * This is used to override a requests .If user accepts to override the transaction
+             */
+            if(!overrideRequest) {
+
+                account.validateAccountBalanceDoesNotBecomeNegative(transactionAmount, transactionBooleanValues.isExceptionForBalanceCheck(),
+                        depositAccountOnHoldTransactions);
+            }
 
         }
 

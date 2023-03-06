@@ -83,7 +83,8 @@ public class BusinessEventNotificationConstants {
         FT_CHARGES("loan_charge_payment" ,"Funds Transfer Charges"),
         RX_SEND("rx_send","Rx Deal Send"),
         RX_RECEIVE("rx_out" ,"Rx Deal Receive"),
-        RX_UPDATE("rx_update","Rx Deal Update");
+        RX_UPDATE("rx_update","Rx Deal Update"),
+        APPLICATION("application" ,"Application Events");
         
         
         private final String value;
@@ -124,9 +125,21 @@ public class BusinessEventNotificationConstants {
     }
 
     public static enum BUSINESS_ENTITY {
-        LOAN("loan"), LOAN_TRANSACTION("loan_transaction"), LOAN_CHARGE("loan_charge"), LOAN_ADJUSTED_TRANSACTION(
-        "loan_adjusted_transaction"), SAVING("saving"), CLIENT("client"), SAVINGS_TRANSACTION("Savings Transaction"), GROUP("group"),
-        SHARE_ACCOUNT("share_account"), SHARE_PRODUCT("share_product"), DEPOSIT_ACCOUNT("deposit_account"), LOAN_PRODUCT("loan_product"),FT("Funds Transfer"),RX("Remittances");
+        LOAN("loan"), 
+        LOAN_TRANSACTION("loan_transaction"), 
+        LOAN_CHARGE("loan_charge"), 
+        LOAN_ADJUSTED_TRANSACTION("loan_adjusted_transaction"), 
+        SAVING("saving"), 
+        CLIENT("client"), 
+        SAVINGS_TRANSACTION("Savings Transaction"), 
+        GROUP("group"),
+        SHARE_ACCOUNT("share_account"), 
+        SHARE_PRODUCT("share_product"), 
+        DEPOSIT_ACCOUNT("deposit_account"), 
+        LOAN_PRODUCT("loan_product"),
+        FT("Funds Transfer"),
+        APPLICATION("Application"),
+        RX("Remittances");
 
         private final String value;
 

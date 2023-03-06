@@ -28,4 +28,9 @@ public class StaffNotFoundException extends AbstractPlatformResourceNotFoundExce
     public StaffNotFoundException(final Long id) {
         super("error.msg.staff.id.invalid", "Staff with identifier " + id + " does not exist", id);
     }
+
+    public StaffNotFoundException(boolean isAgent){
+        super("Loan has commission charge but no corresponding Agent attached to it  with identifier", "Loan has commission charge but no corresponding Agent attached to it  with identifier");
+
+    }
 }

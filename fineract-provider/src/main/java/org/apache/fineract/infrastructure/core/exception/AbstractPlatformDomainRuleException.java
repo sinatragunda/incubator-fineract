@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.core.exception;
 
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+
 /**
  * A {@link RuntimeException} thrown when valid api request end up violating
  * some domain rule.
@@ -25,14 +27,41 @@ package org.apache.fineract.infrastructure.core.exception;
 public abstract class AbstractPlatformDomainRuleException extends RuntimeException {
 
     private final String globalisationMessageCode;
-    private final String defaultUserMessage;
+    private final String defaultUserMessage; // also used as override message 
     private final Object[] defaultUserMessageArgs;
+    private final Long timestamp ;
+    private final Boolean repeatableTransaction;
+    private final String overrideMessage ;
 
     public AbstractPlatformDomainRuleException(final String globalisationMessageCode, final String defaultUserMessage,
             final Object... defaultUserMessageArgs) {
         this.globalisationMessageCode = globalisationMessageCode;
         this.defaultUserMessage = defaultUserMessage;
         this.defaultUserMessageArgs = defaultUserMessageArgs;
+        this.timestamp = ThreadLocalContextUtil.getRequestState().get().getTimestamp();
+        this.repeatableTransaction = false ;
+        this.overrideMessage= null ;
+    }
+    public AbstractPlatformDomainRuleException(final String globalisationMessageCode, final String defaultUserMessage,final String overrideMessage, final Boolean repeatableTransaction ,
+                                               final Object... defaultUserMessageArgs) {
+        this.globalisationMessageCode = globalisationMessageCode;
+        this.defaultUserMessage = defaultUserMessage;
+        this.defaultUserMessageArgs = defaultUserMessageArgs;
+        this.timestamp = ThreadLocalContextUtil.getRequestState().get().getTimestamp();
+        this.repeatableTransaction = repeatableTransaction;
+        this.overrideMessage = overrideMessage;
+    }
+
+    public String getOverrideMessage() {
+        return overrideMessage;
+    }
+
+    public Boolean isRepeatableTransaction() {
+        return this.repeatableTransaction;
+    }
+
+    public Long getTimestamp() {
+        return this.timestamp;
     }
 
     public String getGlobalisationMessageCode() {

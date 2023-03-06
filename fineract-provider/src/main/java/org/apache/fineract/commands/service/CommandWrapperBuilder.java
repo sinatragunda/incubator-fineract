@@ -3295,6 +3295,19 @@ public class CommandWrapperBuilder {
     }
 
     /**
+     * Added 01/02/2023 at 2351
+     */
+
+    public CommandWrapperBuilder updateLocalRef(final Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "LOCAL_REF";
+        this.entityId = id;
+        this.href = "/localref/" + id;
+        return this;
+    }
+  
+
+    /**
      * Added 22/12/2022 at 0524
      */
     public CommandWrapperBuilder updateTransactionCode(Long id) {

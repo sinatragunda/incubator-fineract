@@ -6,7 +6,9 @@
 */
 package org.apache.fineract.portfolio.commissions.service;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.organisation.staff.domain.Staff;
+import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.data.AccountTransferDTO;
 import org.apache.fineract.portfolio.account.service.AccountTransfersWritePlatformService;
@@ -97,6 +99,13 @@ public class CommissionsChargeService {
         //Charge charge = chargeRepositoryWrapper.findOneWithNotFoundDetection(chargeId);
         Staff staff = loan.getLoanOfficer();
 
+        boolean hasStuff = OptionalHelper.isPresent(staff);
+
+        if(!hasStuff){
+            System.err.println("=========================no stuff ================");
+            throw new StaffNotFoundException(true);
+        }
+
         System.err.println("---------------------transfer funds to staff with name "+staff.displayName());
 
         Long staffId = staff.getId();
@@ -123,11 +132,9 @@ public class CommissionsChargeService {
         Predicate<Charge> isAgentChargePredicate = (e)-> e.isAgentCharge();
 
         Consumer<Charge> forCharges = (e)->{
-
             System.err.println("------------------post transaction for this  charge ----------------");
             BigDecimal amount =  CommissionChargeHelper.calculateCommission(loan ,e ,chargeTimeType);
             accountTransfersWritePlatformService.transferFunds(accountTransferDTO);
-
         };
 
         List<Charge> chargesList = Arrays.asList(charge);
@@ -158,7 +165,7 @@ public class CommissionsChargeService {
 
         Consumer<Charge> forCharges = (e)->{
 
-            BigDecimal amount =  CommissionChargeHelper.calculateCommission(loan ,e ,chargeTimeType);
+            BigDecimal amount = CommissionChargeHelper.calculateCommission(loan ,e ,chargeTimeType);
 
             System.err.println("----------------------------------------commission of ,paid  "+amount);
 
@@ -178,12 +185,11 @@ public class CommissionsChargeService {
 
         Collection<SavingsAccountData> clientAccounts = savingsAccountReadPlatformService.findByCurrency(clientId ,ccy);
         boolean hasAccount = clientAccounts.stream().findFirst().isPresent();
+
         if(!hasAccount){
             throw new SavingsAccountNotFoundException(clientId);
         }
-
         return clientAccounts.stream().findFirst().get();
-
     }
 
     private boolean currencyValidator(String currencyCode , SavingsAccountData savingsAccountData){

@@ -31,7 +31,7 @@ public class InsufficientAccountBalanceException extends AbstractPlatformDomainR
     public InsufficientAccountBalanceException(final String paramName, final BigDecimal accountBalance, final BigDecimal withdrawalFee,
             final BigDecimal transactionAmount) {
         super(withdrawalFee != null ? "error.msg.savingsaccount.transaction.insufficient.account.balance.withdraw"
-                : "error.msg.savingsaccount.transaction.insufficient.account.balance", "Insufficient account balance.", paramName,
+                : "error.msg.savingsaccount.transaction.insufficient.account.balance ? ", "Insufficient account balance.", "Accept to overdraw this account ? ",true ,paramName,
                 accountBalance, withdrawalFee, transactionAmount);
     }
 }

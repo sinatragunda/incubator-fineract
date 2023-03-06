@@ -5,6 +5,5 @@
 package org.apache.fineract.portfolio.localref.api;
 
 public class LocalRefApiConstants {
-
     public static String localRefsParam = "localrefs";
 }

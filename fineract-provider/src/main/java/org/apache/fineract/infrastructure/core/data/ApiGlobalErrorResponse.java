@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.core.data;
 
+import org.apache.fineract.helper.OptionalHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +61,16 @@ public class ApiGlobalErrorResponse {
      */
     private List<ApiParameterError> errors = new ArrayList<>();
 
+
+    /**
+     * Added 05/03/2023 a 0530
+     * Transaction timestamp ID 
+     * To be used for identifying transactions ,each transaction sends a unique timestamp 
+     */
+    private Long timestamp ;
+    private Boolean repeatableRequest = false ;
+    private String overrideMessage ;
+
     public static ApiGlobalErrorResponse unAuthenticated() {
 
         final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
@@ -96,29 +108,38 @@ public class ApiGlobalErrorResponse {
         return globalErrorResponse;
     }
 
-    public static ApiGlobalErrorResponse domainRuleViolation(final String globalisationMessageCode, final String defaultUserMessage,
-            final Object... defaultUserMessageArgs) {
+    public static ApiGlobalErrorResponse domainRuleViolation(final String globalisationMessageCode, final String defaultUserMessage,Long timestampId
+            ,final String overrideMessage, final Boolean isRepeatableRequest ,final Object... defaultUserMessageArgs) {
         final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
         globalErrorResponse.setHttpStatusCode("403");
         globalErrorResponse.setDeveloperMessage("Request was understood but caused a domain rule violation.");
         globalErrorResponse.setUserMessageGlobalisationCode("validation.msg.domain.rule.violation");
         globalErrorResponse.setDefaultUserMessage("Errors contain reason for domain rule violation.");
+        globalErrorResponse.setTimestamp(timestampId);
+        globalErrorResponse.setRepeatableRequest(isRepeatableRequest);
+
+        boolean hasOverrideMessage = OptionalHelper.isPresent(overrideMessage);
+
+        if(hasOverrideMessage){
+            globalErrorResponse.setOverrideMessage(overrideMessage);
+        }
 
         final List<ApiParameterError> errors = new ArrayList<>();
-        errors.add(ApiParameterError.generalError(globalisationMessageCode, defaultUserMessage, defaultUserMessageArgs));
+        errors.add(ApiParameterError.generalError(globalisationMessageCode, defaultUserMessage,overrideMessage,defaultUserMessageArgs));
         globalErrorResponse.setErrors(errors);
 
         return globalErrorResponse;
     }
 
     public static ApiGlobalErrorResponse notFound(final String globalisationMessageCode, final String defaultUserMessage,
-            final Object... defaultUserMessageArgs) {
+                                                  final Long timestampId, final Object... defaultUserMessageArgs) {
 
         final ApiGlobalErrorResponse globalErrorResponse = new ApiGlobalErrorResponse();
         globalErrorResponse.setHttpStatusCode("404");
         globalErrorResponse.setDeveloperMessage("The requested resource is not available.");
         globalErrorResponse.setUserMessageGlobalisationCode("error.msg.resource.not.found");
         globalErrorResponse.setDefaultUserMessage("The requested resource is not available.");
+        globalErrorResponse.setTimestamp(timestampId);
 
         final List<ApiParameterError> errors = new ArrayList<>();
         errors.add(ApiParameterError.resourceIdentifierNotFound(globalisationMessageCode, defaultUserMessage, defaultUserMessageArgs));
@@ -208,6 +229,10 @@ public class ApiGlobalErrorResponse {
         this.errors = errors;
     }
 
+    public void setTimestamp(Long timestampId){
+        this.timestamp = timestampId;
+    }
+
     public String getDeveloperMessage() {
         return this.developerMessage;
     }
@@ -238,5 +263,24 @@ public class ApiGlobalErrorResponse {
 
     public void setUserMessageGlobalisationCode(final String userMessageGlobalisationCode) {
         this.userMessageGlobalisationCode = userMessageGlobalisationCode;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public Boolean isRepeatableRequest() {
+        return this.repeatableRequest;
+    }
+    public void setRepeatableRequest(Boolean repeatableRequest) {
+        this.repeatableRequest = repeatableRequest;
+    }
+
+    public void setOverrideMessage(String overrideMessage) {
+        this.overrideMessage = overrideMessage;
+    }
+
+    public String getOverrideMessage() {
+        return overrideMessage;
     }
 }

@@ -38,10 +38,13 @@ import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentiferException;
+import org.apache.fineract.infrastructure.security.helper.RequestState;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
 import org.apache.fineract.notification.service.NotificationReadPlatformService;
+import org.apache.fineract.portfolio.loanproduct.domain.LoanProduct;
 import org.apache.fineract.portfolio.products.helper.ProductHelper;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +112,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
         final StopWatch task = new StopWatch();
         task.start();
 
+        LogHelper.log("Is there even filtering son ? ");
+
         try {
 
             if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -138,6 +143,18 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                 ThreadLocalContextUtil.setTenant(tenant);
 
                 String authToken = request.getHeader("Authorization");
+                String timestamp = request.getHeader("timestamp");
+                String isRepeatStr  = request.getHeader("isRepeat");
+
+                Boolean isRepeat = Boolean.valueOf(isRepeatStr);
+
+                System.err.println("======================is this anyhow called or ,boolean value is ?"+isRepeat);
+
+                RequestState requestState = new RequestState(request);
+
+                ThreadLocalContextUtil.setRequestState(requestState);
+
+                System.err.println("===============transaction timestamp is =========="+ThreadLocalContextUtil.getRequestState().get().getTimestamp());
 
                 if (authToken != null && authToken.startsWith("Basic ")) {
                     ThreadLocalContextUtil.setAuthToken(authToken.replaceFirst("Basic ", ""));
@@ -166,6 +183,8 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
             task.stop();
             final PlatformRequestLog log = PlatformRequestLog.from(task, request);
             logger.info(this.toApiJsonSerializer.serialize(log));
+            logger.info("=============================finally has been called ==========");
+            LogHelper.log("no idea what shit is going through here ");
         }
     }
     

@@ -18,6 +18,10 @@
  */
 package org.apache.fineract.infrastructure.core.exception;
 
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
+import org.apache.fineract.infrastructure.security.helper.OverrideHelper;
+import org.apache.fineract.utility.helper.LogHelper;
+
 /**
  * A {@link RuntimeException} thrown when resources that are queried for are not
  * found.
@@ -27,12 +31,14 @@ public abstract class AbstractPlatformResourceNotFoundException extends RuntimeE
     private final String globalisationMessageCode;
     private final String defaultUserMessage;
     private final Object[] defaultUserMessageArgs;
+    private final Long timestamp ;
 
     public AbstractPlatformResourceNotFoundException(final String globalisationMessageCode, final String defaultUserMessage,
             final Object... defaultUserMessageArgs) {
         this.globalisationMessageCode = globalisationMessageCode;
         this.defaultUserMessage = defaultUserMessage;
         this.defaultUserMessageArgs = defaultUserMessageArgs;
+        this.timestamp = OverrideHelper.timestamp();
     }
 
     public String getGlobalisationMessageCode() {
@@ -45,5 +51,9 @@ public abstract class AbstractPlatformResourceNotFoundException extends RuntimeE
 
     public Object[] getDefaultUserMessageArgs() {
         return this.defaultUserMessageArgs;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
     }
 }

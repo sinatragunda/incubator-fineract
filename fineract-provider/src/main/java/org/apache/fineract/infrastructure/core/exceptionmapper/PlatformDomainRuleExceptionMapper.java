@@ -45,7 +45,7 @@ public class PlatformDomainRuleExceptionMapper implements ExceptionMapper<Abstra
     public Response toResponse(final AbstractPlatformDomainRuleException exception) {
 
         final ApiGlobalErrorResponse notFoundErrorResponse = ApiGlobalErrorResponse.domainRuleViolation(
-                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(), exception.getDefaultUserMessageArgs());
+                exception.getGlobalisationMessageCode(), exception.getDefaultUserMessage(),exception.getTimestamp(),exception.getOverrideMessage(), exception.isRepeatableTransaction(),exception.getDefaultUserMessageArgs());
         // request understood but not carried out due to it violating some
         // domain/business logic
         return Response.status(Status.FORBIDDEN).entity(notFoundErrorResponse).type(MediaType.APPLICATION_JSON).build();

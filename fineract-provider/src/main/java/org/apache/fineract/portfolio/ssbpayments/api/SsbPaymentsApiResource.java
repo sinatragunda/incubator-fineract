@@ -111,14 +111,11 @@ public class SsbPaymentsApiResource {
         return response;
 
     }
-
     @GET
     @Path("/reverse")
     public String reverseFinancialTransactions(@QueryParam("type") String type) {
-
         String response = ssbService.reverseFinancialTransactions(type).toString();
         return response;
-
     }
 
     @GET
@@ -149,4 +146,9 @@ public class SsbPaymentsApiResource {
         return SSB_REPORT_TYPE.template();
     }
 
+    @GET
+    @Path("/report")
+    public String reportTemplate(@QueryParam("type") String type){
+        return ssbService.report(type).toString();
+    }
 }

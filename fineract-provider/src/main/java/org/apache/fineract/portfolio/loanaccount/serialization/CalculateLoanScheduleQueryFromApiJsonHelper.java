@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
+import org.apache.fineract.portfolio.localref.api.LocalRefApiConstants;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,7 +71,11 @@ public final class CalculateLoanScheduleQueryFromApiJsonHelper {
             LoanProductConstants.graceOnArrearsAgeingParameterName, LoanApiConstants.createStandingInstructionAtDisbursementParameterName,
             LoanApiConstants.isFloatingInterestRateParameterName, LoanApiConstants.interestRateDifferentialParameterName,
             LoanApiConstants.repaymentFrequencyNthDayTypeParameterName, LoanApiConstants.repaymentFrequencyDayOfWeekTypeParameterName,
-            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam , HirePurchaseConstants.hirePurchaseParam));
+            LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose,
+            LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,
+            LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,
+            LoanApiConstants.loanFactorAccountIdParam , HirePurchaseConstants.hirePurchaseParam ,
+            LocalRefApiConstants.localRefsParam));
 
     private final FromJsonHelper fromApiJsonHelper;
 

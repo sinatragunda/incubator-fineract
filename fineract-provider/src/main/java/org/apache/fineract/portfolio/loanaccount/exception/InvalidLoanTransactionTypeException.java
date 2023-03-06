@@ -30,4 +30,10 @@ public class InvalidLoanTransactionTypeException extends AbstractPlatformDomainR
             final Object... defaultUserMessageArgs) {
         super("error.msg.loan." + action + "." + postFix, defaultUserMessage, defaultUserMessageArgs);
     }
+
+
+    public InvalidLoanTransactionTypeException(final String action, final String postFix, final String defaultUserMessage,String overrideMessage,
+            final Object... defaultUserMessageArgs) {
+        super("error.msg.loan." + action + "." + postFix, defaultUserMessage,overrideMessage ,true , defaultUserMessageArgs);
+    }
 }

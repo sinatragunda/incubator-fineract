@@ -59,11 +59,22 @@ public class ApiParameterError {
      */
     private List<ApiErrorMessageArg> args = new ArrayList<>();
 
+    /**
+     * Added 06/03/2023 at 0841
+     */
+    private String overrideMessage ;
+
     private final transient SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public static ApiParameterError generalError(final String globalisationMessageCode, final String defaultUserMessage,
             final Object... defaultUserMessageArgs) {
         return new ApiParameterError(globalisationMessageCode, defaultUserMessage, defaultUserMessageArgs);
+    }
+
+
+    public static ApiParameterError generalError(final String globalisationMessageCode, final String defaultUserMessage,
+            String overrideMessage ,final Object... defaultUserMessageArgs) {
+        return new ApiParameterError(globalisationMessageCode, defaultUserMessage,overrideMessage ,defaultUserMessageArgs);
     }
 
     public static ApiParameterError resourceIdentifierNotFound(final String globalisationMessageCode, final String defaultUserMessage,
@@ -99,8 +110,23 @@ public class ApiParameterError {
             }
         }
         this.args = messageArgs;
-
         this.parameterName = "id";
+
+    }
+
+    private ApiParameterError(final String globalisationMessageCode, final String defaultUserMessage,String overrideMessage , final Object[] defaultUserMessageArgs) {
+         this(globalisationMessageCode,defaultUserMessage,defaultUserMessageArgs);
+         this.overrideMessage = overrideMessage;
+
+    }
+
+
+    public void setOverrideMessage(String message){
+        this.overrideMessage = message ;
+    }
+
+    public String getOverrideMessage(){
+        return this.overrideMessage;
     }
 
     public String getDeveloperMessage() {

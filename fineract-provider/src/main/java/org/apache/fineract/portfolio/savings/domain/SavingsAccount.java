@@ -69,6 +69,7 @@ import org.apache.fineract.infrastructure.core.domain.LocalDateInterval;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.infrastructure.security.helper.OverrideHelper;
 import org.apache.fineract.infrastructure.security.service.RandomPasswordGenerator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
@@ -1394,7 +1395,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
 
-            //System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
+            System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
 
 
 
@@ -1402,6 +1403,9 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             // enforceMinRequiredBalance
             if (!isException && transaction.canProcessBalanceCheck() && !isOverdraft()) {
                 if (runningBalance.minus(minRequiredBalance).isLessThanZero()){
+
+                    System.err.println("==================is exception being thrown here or not ,should we override here ? ");
+                    System.err.println("================lets try to skip this validation at the caller source instead ");
                     throw new InsufficientAccountBalanceException(
                         "transactionAmount", getAccountBalance(), withdrawalFee, transactionAmount); }
             }
@@ -1414,7 +1418,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         //System.err.println("--------------------checking that overdraft error thing --------------------"+isOverdraft());
 
         if(isOverdraft()) {
-               // System.err.println("----------------------balance check for 0 when in overdraft ---------");
+                System.err.println("----------------------balance check for 0 when in overdraft ---------");
 	        	if (runningBalance.minus(minRequiredBalance).isLessThanZero()) { throw new InsufficientAccountBalanceException(
 	                    "transactionAmount", getAccountBalance(), withdrawalFee, transactionAmount); }
         }
@@ -1430,13 +1434,15 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     public void validateAccountBalanceDoesNotBecomeNegative(final String transactionAction,
             final List<DepositAccountOnHoldTransaction> depositAccountOnHoldTransactions) {
 
+        System.err.println("========middle function called ,override or ?  "+ OverrideHelper.override());
+
         final List<SavingsAccountTransaction> transactionsSortedByDate = retreiveListOfTransactions();
         Money runningBalance = Money.zero(this.currency);
         Money minRequiredBalance = minRequiredBalanceDerived(getCurrency());
         LocalDate lastSavingsDate = null;
         Money accountBalance = Money.of(this.currency ,getAccountBalance());
 
-        //System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
+        System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
 
         
         for (final SavingsAccountTransaction transaction : transactionsSortedByDate) {
@@ -1469,7 +1475,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
             // enforceMinRequiredBalance
-            //System.err.println("----------------------bring back this mean balance violation rule thing -------------------"+getAccountBalance());
+            System.err.println("----------------------bring back this mean balance violation rule thing -------------------"+getAccountBalance());
 
             if (transaction.canProcessBalanceCheck()) {
                

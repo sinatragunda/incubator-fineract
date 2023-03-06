@@ -37,14 +37,14 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentiferException;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.fineract.utility.helper.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.GenericFilterBean;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * 
  * This filter is responsible for extracting multi-tenant from the request and
@@ -95,12 +95,16 @@ public class TenantAwareTenantIdentifierFilter extends GenericFilterBean {
 
         try {
 
+            LogHelper.log("thread id is "+Thread.currentThread().getId());
+
             // allows for Cross-Origin
             // Requests (CORs) to be performed against the platform API.
-
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             final String reqHead = request.getHeader("Access-Control-Request-Headers");
+            final String timestamp = request.getHeader("timestamp");
+
+            LogHelper.log("Timestamp is "+timestamp);
 
             if (null != reqHead && !reqHead.isEmpty()) {
                 response.setHeader("Access-Control-Allow-Headers", reqHead);

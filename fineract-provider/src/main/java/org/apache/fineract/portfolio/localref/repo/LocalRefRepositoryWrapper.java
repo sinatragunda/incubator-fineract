@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -28,10 +29,16 @@ public class LocalRefRepositoryWrapper {
         LocalRef localRef = localRefRepository.findOne(id);
         Supplier error = ()-> new LocalRefNotFoundException(id);
         Optional.ofNullable(localRef).orElseThrow(error);
+        System.err.println("===========returning local ref now son =====");
         return localRef;
     }
 
     public Collection<LocalRef> findByRefTable(REF_TABLE refTable){
         return localRefRepository.findByRefTable(refTable);
+    }
+
+    public LocalRef save(LocalRef localRef){
+        localRefRepository.saveAndFlush(localRef);
+        return  localRef;
     }
 }

@@ -10,4 +10,5 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 public interface LocalRefWritePlatformService {
 
     public CommandProcessingResult create(JsonCommand jsonCommand);
+    public CommandProcessingResult update(Long id ,JsonCommand jsonCommand);
 }

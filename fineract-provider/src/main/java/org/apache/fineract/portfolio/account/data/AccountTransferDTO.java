@@ -39,7 +39,7 @@ public class AccountTransferDTO {
     private PortfolioAccountType toAccountType;
     private Long fromAccountId;
     private Long toAccountId;
-    private final String description;
+    private String description;
     private final Locale locale;
     private final DateTimeFormatter fmt;
     private final PaymentDetail paymentDetail;
@@ -201,6 +201,7 @@ public class AccountTransferDTO {
 
     public void setNoteText(String text){
         this.noteText = text ;
+        this.description = text;
     }   
 
     public LocalDate getTransactionDate() {
