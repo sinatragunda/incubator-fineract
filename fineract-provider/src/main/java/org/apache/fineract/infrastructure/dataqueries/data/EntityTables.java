@@ -55,7 +55,7 @@ public enum EntityTables implements IEnum {
 	APPLICATION("m_application",
 			new Integer[]{StatusEnum.CREATE.getCode(),
 					StatusEnum.ACTIVATE.getCode()},
-			"m_application_id" ,"Application"),;
+			"m_application_id" ,"Hybrid"),;
 
 	private static final Map<String, EntityTables> lookup = new HashMap<String, EntityTables>();
 	static {
@@ -81,10 +81,10 @@ public enum EntityTables implements IEnum {
 
 		List<String> data = new ArrayList<String>();
 
-		for (EntityTables entity : EntityTables.values()) {
+		for (EntityTables entity : EntityTables.values()){
+			System.err.println("=================what are we pushing here ? "+entity.name);
 			data.add(entity.name);
 		}
-
 		return data;
 
 	}
@@ -121,6 +121,7 @@ public enum EntityTables implements IEnum {
 		List<EnumOptionData> enumOptionDataList = new ArrayList<>();
 		EntityTables[] entityTables = EntityTables.values();
 		for(EntityTables e : entityTables){
+			System.err.println("-=================do we even get here son ? ");
 			EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.name ,e.portfolioName);
 			enumOptionDataList.add(enumOptionData);
 		}
@@ -130,5 +131,12 @@ public enum EntityTables implements IEnum {
 	@Override
 	public String getCode() {
 		return getName();
+	}
+
+
+	public static boolean isApplicationTable(String applicationTableName){
+		String entityTableName = EntityTables.APPLICATION.getName();
+		boolean is = entityTableName.equalsIgnoreCase(applicationTableName);
+		return is ;
 	}
 }

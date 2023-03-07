@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class DatatableData {
 
+    private final Long id ;
     @SuppressWarnings("unused")
     private final String applicationTableName;
     @SuppressWarnings("unused")
@@ -50,33 +51,35 @@ public class DatatableData {
     }
 
 
-    public static DatatableData create(final String applicationTableName, final String registeredTableName,
+    public static DatatableData create(final Long id ,final String applicationTableName, final String registeredTableName,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
-        return new DatatableData(applicationTableName, registeredTableName, columnHeaderData);
+        return new DatatableData(id ,applicationTableName, registeredTableName, columnHeaderData);
     }
 
-    public static DatatableData create(final String applicationTableName, final String registeredTableName,final String prettyName ,
+    public static DatatableData create(final Long id ,final String applicationTableName, final String registeredTableName,final String prettyName ,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
-        return new DatatableData(applicationTableName, registeredTableName,prettyName, columnHeaderData);
+        return new DatatableData(id ,applicationTableName, registeredTableName,prettyName, columnHeaderData);
     }
 
-    private DatatableData(final String applicationTableName, final String registeredTableName,
+    private DatatableData(final Long id ,final String applicationTableName, final String registeredTableName,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
         this.applicationTableName = applicationTableName;
         this.registeredTableName = registeredTableName;
         this.columnHeaderData = columnHeaderData;
         this.portfolioName = EntityTables.portfolioName(applicationTableName);
         this.prettyName = null ;
+        this.id = id ;
     }
 
 
-    private DatatableData(final String applicationTableName, final String registeredTableName,String prettyName ,
+    private DatatableData(final Long id ,final String applicationTableName, final String registeredTableName,String prettyName ,
             final List<ResultsetColumnHeaderData> columnHeaderData) {
         this.applicationTableName = applicationTableName;
         this.registeredTableName = registeredTableName;
         this.columnHeaderData = columnHeaderData;
         this.prettyName = prettyName;
         this.portfolioName = EntityTables.portfolioName(applicationTableName);
+        this.id = id ;
     }
 
 
@@ -88,6 +91,11 @@ public class DatatableData {
         this.portfolioName = null;
         this.prettyName = null ;
         this.applicationOptions = EntityTables.template();
+        this.id = null ;
+    }
+
+    public Long getId(){
+        return this.id ;
     }
 
     public void setRecordList(List list){

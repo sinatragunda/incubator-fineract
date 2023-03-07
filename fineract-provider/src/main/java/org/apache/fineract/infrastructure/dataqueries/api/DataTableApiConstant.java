@@ -35,6 +35,7 @@ public class DataTableApiConstant {
     public static final String categoryParamName ="category";
     public static final String localParamName = "locale";
     public static final String DATATABLE_RESOURCE_NAME ="dataTables";
+    public static final String primaryIdentifierParam = "primaryIdentifier";
 
     public static final Set<String> supportedTables = new HashSet<>(Arrays.asList( "m_loan", "m_savings_account", "m_client", "m_group", "m_center", "m_office",
             "m_savings_product", "m_product_loan" ,"m_application"));

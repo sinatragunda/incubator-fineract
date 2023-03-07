@@ -46,11 +46,13 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.infrastructure.dataqueries.data.*;
 import org.apache.fineract.infrastructure.dataqueries.domain.ApplicationRecord;
+import org.apache.fineract.infrastructure.dataqueries.domain.XRegisteredTable;
 import org.apache.fineract.infrastructure.dataqueries.enumerations.DATA_TABLE_CATEGORY;
 import org.apache.fineract.infrastructure.dataqueries.exception.DatatableEntryRequiredException;
 import org.apache.fineract.infrastructure.dataqueries.exception.DatatableNotFoundException;
 import org.apache.fineract.infrastructure.dataqueries.exception.DatatableSystemErrorException;
 import org.apache.fineract.infrastructure.dataqueries.repo.ApplicationRecordRepository;
+import org.apache.fineract.infrastructure.dataqueries.repo.XRegisteredTableRepositoryWrapper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
 import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
@@ -119,13 +121,14 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     // private final GlobalConfigurationWritePlatformServiceJpaRepositoryImpl
     // configurationWriteService;
     private final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper;
+    private final XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper;
 
     @Autowired(required = true)
     public ReadWriteNonCoreDataServiceImpl(final RoutingDataSource dataSource, final PlatformSecurityContext context,
                                            final FromJsonHelper fromJsonHelper, final GenericDataService genericDataService,
                                            final DatatableCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeReadPlatformService codeReadPlatformService,
                                            final ConfigurationDomainService configurationDomainService, final DataTableValidator dataTableValidator,
-                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper) {
+                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper) {
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
         this.context = context;
@@ -139,6 +142,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         this.columnValidator = columnValidator;
         // this.configurationWriteService = configurationWriteService;
         this.applicationRecordRepositoryWrapper = applicationRecordRepositoryWrapper;
+        this.xRegisteredTableRepositoryWrapper = xRegisteredTableRepositoryWrapper;
 
     }
     @Override
@@ -159,7 +163,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         }
 
         // PERMITTED datatables
-        final String sql = "select application_table_name, pretty_name , registered_table_name" + " from x_registered_table " + " where exists"
+        final String sql = "select id as id ,application_table_name, pretty_name , registered_table_name" + " from x_registered_table " + " where exists"
                 + " (select 'f'" + " from m_appuser_role ur " + " join m_role r on r.id = ur.role_id"
                 + " left join m_role_permission rp on rp.role_id = r.id" + " left join m_permission p on p.id = rp.permission_id"
                 + " where ur.appuser_id = " + this.context.authenticatedUser().getId()
@@ -170,6 +174,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         final List<DatatableData> datatables = new ArrayList<>();
         while (rs.next()) {
+            final Long id = rs.getLong("id");
             final String appTableName = rs.getString("application_table_name");
             final String registeredDatatableName = rs.getString("registered_table_name");
             final String prettyName = rs.getString("pretty_name");
@@ -177,7 +182,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
                     .fillResultsetColumnHeaders(registeredDatatableName);
 
-            datatables.add(DatatableData.create(appTableName, registeredDatatableName,prettyName,columnHeaderData));
+            datatables.add(DatatableData.create(id ,appTableName, registeredDatatableName,prettyName,columnHeaderData));
         }
 
         return datatables;
@@ -188,7 +193,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         // PERMITTED datatables
     	SQLInjectionValidator.validateSQLInput(datatable);
-        final String sql = "select application_table_name, pretty_name ,registered_table_name" + " from x_registered_table " + " where exists"
+        final String sql = "select id ,application_table_name, pretty_name ,registered_table_name" + " from x_registered_table " + " where exists"
                 + " (select 'f'" + " from m_appuser_role ur " + " join m_role r on r.id = ur.role_id"
                 + " left join m_role_permission rp on rp.role_id = r.id" + " left join m_permission p on p.id = rp.permission_id"
                 + " where ur.appuser_id = " + this.context.authenticatedUser().getId() + " and registered_table_name='" + datatable + "'"
@@ -199,14 +204,14 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         DatatableData datatableData = null;
         while (rs.next()) {
+            final Long id = rs.getLong("id");
             final String appTableName = rs.getString("application_table_name");
             final String registeredDatatableName = rs.getString("registered_table_name");
             final String prettyName = rs.getString("pretty_name");
-
             final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
                     .fillResultsetColumnHeaders(registeredDatatableName);
 
-            datatableData = DatatableData.create(appTableName, registeredDatatableName,prettyName, columnHeaderData);
+            datatableData = DatatableData.create(id ,appTableName, registeredDatatableName,prettyName, columnHeaderData);
             //templateRecords(datatableData ,appTableName);
             System.err.println("---------set data record tempalte here son ");
         }
@@ -286,11 +291,9 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         final String registerDatatableSql = "insert into x_registered_table (registered_table_name, application_table_name,category ,pretty_name) values ('"
                 + dataTableNameEx + "', '" + applicationTableName + "', '" + category + "', '" + prettyName + "')";
 
-
-        System.err.println("---------------------------------------"+registerDatatableSql);        
+        System.err.println("---------------------------------------"+registerDatatableSql);
 
         try {
-
             final String[] sqlArray = { registerDatatableSql, permissionsSql };
             this.jdbcTemplate.batchUpdate(sqlArray);
 
@@ -298,7 +301,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             if (this.isSurveyCategory(category)) {
                 this.jdbcTemplate.execute("insert into c_configuration (name, value, enabled ) values('" + dataTableNameEx + "', '0','0')");
             }
-
         }
         catch (final DataIntegrityViolationException dve) {
             final Throwable cause = dve.getCause() ;
@@ -307,7 +309,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             // show duplicate datatable error msg
             if (realCause.getMessage()
                     .contains("Duplicate entry") || cause.getMessage()
-                    .contains("Duplicate entry")) { 
+                    .contains("Duplicate entry")) {
             	throw new PlatformDataIntegrityException("error.msg.datatable.registered",
                             "Datatable `" + dataTableName + "` is already registered against an application table.", "dataTableName",
                             dataTableName); }
@@ -317,7 +319,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         }catch (final PersistenceException dve) {
         	final Throwable cause = dve.getCause() ;
         	if (cause.getMessage()
-                    .contains("Duplicate entry")) { 
+                    .contains("Duplicate entry")) {
         		throw new PlatformDataIntegrityException("error.msg.datatable.registered",
                             "Datatable `" + dataTableName + "` is already registered against an application table.", "dataTableName",
                             dataTableName); }
@@ -404,13 +406,16 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     @Transactional
     @Override
-    public CommandProcessingResult createNewDatatableEntry(final String dataTableName, final Long appTableId, final String json) {
-        try {
+    public CommandProcessingResult createNewDatatableEntry(final String dataTableName ,final Long appTableId, final String json) {
 
-            System.err.println("---------------create new entry ---------");
+        try{
+
+            //final String primaryIdentifier = command.stringValueOfParameterNamed("primaryIdentifier");
 
             final String appTable = queryForApplicationTableName(dataTableName);
-                
+
+            System.err.println("---------------create new entry ---------"+dataTableName);
+
             final CommandProcessingResult commandProcessingResult = checkMainResourceExistsWithinScope(appTable, appTableId);
 
             final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
@@ -419,8 +424,24 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
             final Map<String, String> dataParams = this.fromJsonHelper.extractDataMap(typeOfMap, json);
 
-            // if table is m_application should we create new entry in application ? 
-            Long recordId  = dynamicTableId(appTable,appTableId);
+            System.err.println("=================dataparams======"+dataParams);
+
+            // if table is m_application should we create new entry in application ?
+            String primaryIdentifier = null ;
+
+            boolean hasPrimaryIdentifier = dataParams.containsKey(DataTableApiConstant.primaryIdentifierParam);
+
+            System.err.println("=================has primary identifier ? "+hasPrimaryIdentifier);
+
+            if(hasPrimaryIdentifier){
+                System.err.println("==========has primary identifier here =============");
+                primaryIdentifier = dataParams.get(DataTableApiConstant.primaryIdentifierParam);
+                dataParams.remove(DataTableApiConstant.primaryIdentifierParam);
+            }
+
+            Long recordId  = dynamicTableId(appTable,dataTableName ,primaryIdentifier,appTableId);
+
+            System.err.println("==============has record id "+recordId+"================appTable ? "+appTable);
 
             final String sql = getAddSql(columnHeaders, dataTableName, getFKField(appTable), recordId, dataParams);
 
@@ -467,11 +488,13 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         try {
             final String appTable = queryForApplicationTableName(dataTableName);
+
             final CommandProcessingResult commandProcessingResult = checkMainResourceExistsWithinScope(appTable, appTableId);
 
             final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
 
             final Type typeOfMap = new TypeToken<Map<String, String>>() {}.getType();
+
             final Map<String, String> dataParams = this.fromJsonHelper.extractDataMap(typeOfMap, command.json());
 
             final String sql = getAddSqlWithScore(columnHeaders, dataTableName, getFKField(appTable), appTableId, dataParams);
@@ -523,8 +546,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     }
 
     private void validateDatatableName(final String name) {
-
-        System.err.println("---------------------data length is -------"+name.length());
 
         if (name == null || name.isEmpty()) {
             throw new PlatformDataIntegrityException("error.msg.datatables.datatable.null.name", "Data table name must not be blank.");
@@ -607,7 +628,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             /***
              * In cases of tables storing hierarchical entities (like m_group),
              * different entities would end up being stored in the same table.
-             * 
+             *
              * Ex: Centers are a specific type of group, add abstractions for
              * the same
              ***/
@@ -624,7 +645,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             System.err.println("----------------------------DATA TABLE NAME "+datatableName+"-----------and the stripped is "+strippedDatatableName);
 
             validateDatatableName(strippedDatatableName);
-            
+
             validateAppTable(apptableName);
 
             final boolean isConstraintApproach = this.configurationDomainService.isConstraintApproachEnabledForDatatables();
@@ -669,7 +690,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             sqlBuilder = sqlBuilder.append(") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 
             System.err.println("---------------final query is "+sqlBuilder.toString());
-            
+
             this.jdbcTemplate.execute(sqlBuilder.toString());
 
             registerDatatable(datatableName, apptableName);
@@ -903,7 +924,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     /**
      * Update data table, set column value to empty string where current value
      * is NULL. Run update SQL only if the "mandatory" property is set to true
-     * 
+     *
      * @param datatableName
      *            Name of data table
      * @param column
@@ -1141,7 +1162,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         if (rowCount != 0) { throw new GeneralPlatformDomainRuleException("error.msg.non.empty.datatable.cannot.be.deleted",
                 "Non-empty datatable cannot be deleted."); }
     }
-    
+
     private int getRowCount(final String datatableName){
     	final String sql = "select count(*) from `" + datatableName + "`";
         return this.jdbcTemplate.queryForObject(sql, Integer.class);
@@ -1285,20 +1306,22 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         // id only used for reading a specific entry in a one to many datatable
         // (when updating)
         sql = "select * from `" + dataTableName + "` where id = " + id;
-        
+
         if (id == null) {
         	String whereClause = getFKField(appTable) + " = " + appTableId;
 
         	SQLInjectionValidator.validateSQLInput(whereClause);
             //sql = null;
             sql ="select * from `" + dataTableName + "` where " + whereClause;
-        } 
+        }
 
-        
+
         if (StringUtils.isNotBlank(order)) {
             this.columnValidator.validateSqlInjection(sql, order);
             sql = sql + " order by " + order;
         }
+
+        System.err.println("=====================result set row data sql here is "+sql);
 
         final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
         return new GenericResultsetData(columnHeaders, result);
@@ -1423,7 +1446,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
                     + appTable + " as p WHERE p.id = " + appTableId;
         }
 
-        
+
         if (scopedSQL == null) { throw new PlatformDataIntegrityException("error.msg.invalid.dataScopeCriteria",
                 "Application Table: " + appTable + " not catered for in data Scoping"); }
 
@@ -1451,6 +1474,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private List<ResultsetRowData> fillDatatableResultSetDataRows(final String sql) {
 
+        System.err.println("--------fill datatable result set sql  ? "+sql);
+
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
 
         final List<ResultsetRowData> resultsetDataRows = new ArrayList<>();
@@ -1461,6 +1486,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             final List<String> columnValues = new ArrayList<>();
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
                 final String columnName = rsmd.getColumnName(i + 1);
+                System.err.println("===============what is column name ? "+columnName);
                 final String columnValue = rs.getString(columnName);
                 columnValues.add(columnValue);
             }
@@ -1473,7 +1499,10 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     }
 
     private String queryForApplicationTableName(final String datatable) {
-    	SQLInjectionValidator.validateSQLInput(datatable);
+
+        System.err.println("===========injecting datatable "+datatable);
+
+        SQLInjectionValidator.validateSQLInput(datatable);
 
         final String sql = "SELECT application_table_name FROM x_registered_table where registered_table_name = '" + datatable + "'";
 
@@ -1486,39 +1515,60 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             throw new DatatableNotFoundException(datatable);
         }
 
+        System.err.println("==============================found from queryforapplicationtable name "+applicationTableName);
+
         return applicationTableName;
     }
     /**
-     * Added 13/02/2023 at 1242 
-     * Only to be used when application table is application 
-     */ 
-    private Long dynamicTableId(final String applicationTableName ,Long id) {
-        
+     * Added 13/02/2023 at 1242
+     * Only to be used when application table is application
+     * Modified 07/03/2023 at 0227
+     * Table needs to reference x_registered_table id now
+     */
+    private Long dynamicTableId(final String applicationTableName ,String datatableName ,String primaryIdentifier , Long id) {
+
+        System.err.println("==========fetch for dynamic table id ");
+
         DATA_TABLE_CATEGORY tableCategory =  DATA_TABLE_CATEGORY.fromString(applicationTableName);
-        
+
+        System.err.println("============what is this application table name ?+"+applicationTableName+"===================category is "+tableCategory);
+
+        XRegisteredTable xRegisteredTable = xRegisteredTableRepositoryWrapper.findByRegisteredTableNameWithNotFoundDetection(datatableName);
+
+        System.err.println("==================does it exist ? "+Optional.ofNullable(xRegisteredTable).isPresent());
+
         Long appTableId = id ;
+
         switch(tableCategory){
             case APPLICATION:
-                appTableId = applicationRecordRepositoryWrapper.save(new ApplicationRecord());
+                System.err.println("===================================xRegistered table id "+xRegisteredTable.getId());
+                ApplicationRecord applicationRecord = new ApplicationRecord(xRegisteredTable ,primaryIdentifier);
+                appTableId = applicationRecordRepositoryWrapper.save(applicationRecord);
                 break;
             default:
                 break;
         }
-
-        System.err.println("----------------------record with id "+appTableId);
+        System.err.println("----------------------record with id  ,where is it coming from ? ,is it registered table or "+appTableId);
         return appTableId;
     }
 
 
     private String getFKField(final String applicationTableName) {
+        System.err.println("=====================intended primary table is "+applicationTableName);
+        String fk = applicationTableName.substring(2) + "_id";
+        System.err.println("=======================foreign key is "+fk);
+        return fk ;
 
-        return applicationTableName.substring(2) + "_id";
     }
 
     private String getAddSql(final List<ResultsetColumnHeaderData> columnHeaders, final String datatable, final String fkName,
             final Long appTableId, final Map<String, String> queryParams) {
 
         final Map<String, String> affectedColumns = getAffectedColumns(columnHeaders, queryParams, fkName);
+
+        System.err.println("====================affected tables are "+affectedColumns);
+
+        System.err.println("===========fk table name is "+fkName);
 
         String pValueWrite = "";
         String addSql = "";
@@ -1528,6 +1578,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         String selectColumns = "";
         String columnName = "";
         String pValue = null;
+
         for (final ResultsetColumnHeaderData pColumnHeader : columnHeaders) {
             final String key = pColumnHeader.getColumnName();
             if (affectedColumns.containsKey(key)) {
@@ -1552,6 +1603,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         addSql = "insert into `" + datatable + "` (`" + fkName + "` " + insertColumns + ")" + " select " + appTableId + " as id"
                 + selectColumns;
 
+        System.err.println("===========================add sql "+addSql);
+
         logger.info(addSql);
 
         return addSql;
@@ -1560,7 +1613,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     /**
      * This method is used special for ppi cases Where the score need to be
      * computed
-     * 
+     *
      * @param columnHeaders
      * @param datatable
      * @param fkName

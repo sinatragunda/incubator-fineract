@@ -21,13 +21,9 @@ public class RequestState {
         String timestampL = httpServletRequest.getHeader("timestamp");
         String repeatStr = httpServletRequest.getHeader("repeat");
 
-        System.err.println("====================string timestamp is ==========="+timestampL);
-
         this.timestamp = Long.valueOf(timestampL);
-
         this.repeat = Boolean.valueOf(repeatStr);
 
-        System.err.println("=========================do we get value here or "+this.repeat+"=========and timestamp "+timestamp);
     }
 
     public Boolean isRepeat() {

@@ -11,7 +11,7 @@ import org.apache.fineract.utility.service.IEnum;
 import java.util.List;
 
 public enum REF_TABLE implements IEnum {
-    UNSPECIFIED("Unspecified"),
+    HYBRID("Hybrid"),
     CLIENT("Client"),
     LOAN("Loan"),
     SHARE("Share"),

@@ -30,13 +30,7 @@ import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.dataqueries.data.DatatableCheckStatusData;
-import org.apache.fineract.infrastructure.dataqueries.data.DatatableChecksData;
-import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
-import org.apache.fineract.infrastructure.dataqueries.data.EntityDataTableChecksData;
-import org.apache.fineract.infrastructure.dataqueries.data.EntityDataTableChecksTemplateData;
-import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
-import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
+import org.apache.fineract.infrastructure.dataqueries.data.*;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecks;
 import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecksRepository;
 import org.apache.fineract.infrastructure.dataqueries.helper.TemplateRecordHelper;
@@ -120,10 +114,10 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     @Override
     public List<DatatableData> retrieveTemplates(final Long status, final String entity, final Long productId) {
 
-
         System.err.println("-----------------template for table in entity checks ");
 
         List<EntityDatatableChecks> tableRequiredBeforeAction = null;
+
         if (productId != null) {
             tableRequiredBeforeAction = this.entityDatatableChecksRepository.findByEntityStatusAndProduct(entity, status, productId);
         }
@@ -134,10 +128,13 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         if (tableRequiredBeforeAction != null && tableRequiredBeforeAction.size() > 0) {
             List<DatatableData> ret = new ArrayList<>();
             for (EntityDatatableChecks t : tableRequiredBeforeAction){
+
                 System.err.println("---------------------set records list here son ========"+t.getEntity());
 
                 DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(t.getDatatableName());
-                //TemplateRecordHelper.templateRecords(null ,loanReadPlatformService ,datatableData ,t.getEntity());
+
+                setEntries(datatableData);
+                /// if datatable is m_application ,can we get linking data  ?   
                 ret.add(datatableData);
             }
             return ret;
@@ -145,8 +142,31 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         return null;
     }
 
+    /**
+     * Added 0703/2023 at 0617
+     * Attach datatable entries ,call at template 
+     * Data entries should be available to enable client to select from dropdown 
+     */  
+    private void setEntries(DatatableData datatableData){
+
+        String applicationTableName = datatableData.getApplicationTableName();
+
+        System.err.println("---------------application table name "+applicationTableName);
+        boolean isApplicationTable = EntityTables.isApplicationTable(applicationTableName);
+
+        if(isApplicationTable){
+
+            String tableName = datatableData.getRegisteredTableName();
+            System.err.println("================record template beign set now ");
+            GenericResultsetData genericResultSet = this.readWriteNonCoreDataService.retrieveAllTableEntries(tableName ,null);
+            datatableData.setGenericResultsetData(genericResultSet);
+        }
+    }
+
     @Override
     public EntityDataTableChecksTemplateData retrieveTemplate() {
+
+        System.err.println("=========================entity checks========");
 
         List<DatatableChecksData> dataTables = getDataTables();
         List<String> entities = EntityTables.getEntitiesList();
@@ -174,7 +194,8 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
         return ret;
     }
 
-    private List<DatatableChecksData> getDataTables() {
+    private List<DatatableChecksData> getDataTables(){
+
         final String sql = "select " + this.registerDataTableMapper.schema();
 
         return this.jdbcTemplate.query(sql, this.registerDataTableMapper);
@@ -187,13 +208,14 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
 
             final String entity = rs.getString("entity");
             final String tableName = rs.getString("tableName");
+            final String prettyName = rs.getString("prettyName");
 
-            return new DatatableChecksData(entity, tableName);
+            return new DatatableChecksData(entity, tableName ,prettyName);
         }
 
         public String schema() {
-            return " t.application_table_name as entity, t.registered_table_name as tableName " + " from x_registered_table t "
-                    + " where application_table_name IN( 'm_client','m_group','m_savings_account','m_loan')";
+            return " t.application_table_name as entity,t.pretty_name as prettyName , t.registered_table_name as tableName " + " from x_registered_table t "
+                    + " where application_table_name IN( 'm_client','m_group','m_savings_account','m_loan' ,'m_application')";
         }
     }
 
@@ -214,15 +236,18 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
             final Long productId = JdbcSupport.getLong(rs, "productId");
             final String productName = rs.getString("productName");
 
-            return new EntityDataTableChecksData(id, entity, statusEnum, datatableName, systemDefined, productId, productName);
+            final String prettyName = rs.getString("prettyName");
+
+            return new EntityDataTableChecksData(id, entity, statusEnum, datatableName, systemDefined, productId, productName ,prettyName);
         }
 
         public String schema() {
             return " t.id as id, " + "t.application_table_name as entity, " + "t.status_enum as status,  "
-                    + "t.system_defined as systemDefined,  " + "t.x_registered_table_name as datatableName,  "
+                    + "t.system_defined as systemDefined,  " + "t.x_registered_table_name as datatableName, x.pretty_name as prettyName ,"
                     + "t.product_id as productId,  " + "(CASE t.application_table_name " + "WHEN 'm_loan' THEN lp.name "
                     + "WHEN 'm_savings_account' THEN sp.name " + "ELSE NULL  " + "END) as productName "
                     + "from m_entity_datatable_check as t  "
+                    +" left join x_registered_table x on x.registered_table_name = t.x_registered_table_name "
                     + "left join m_product_loan lp on lp.id = t.product_id and t.application_table_name = 'm_loan' "
                     + "left join m_savings_product sp on sp.id = t.product_id and t.application_table_name = 'm_savings_account' ";
         }

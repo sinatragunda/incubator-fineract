@@ -89,6 +89,9 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     public CommandProcessingResult createCheck(final JsonCommand command) {
 
         try {
+
+            System.err.println("===============create check son ");
+
             this.context.authenticatedUser();
 
             this.fromApiJsonDeserializer.validateForCreate(command.json());
@@ -96,6 +99,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
             // check if the datatable is linked to the entity
 
             String datatableName = command.stringValueOfParameterNamed("datatableName");
+
             DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(datatableName);
 
             if (datatableData == null) { throw new DatatableNotFoundException(datatableName); }
@@ -104,9 +108,18 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
             final String foreignKeyColumnName = EntityTables.getForeignKeyColumnNameOnDatatable(entity);
             final boolean columnExist = datatableData.hasColumn(foreignKeyColumnName);
 
+            String applicationTableName = datatableData.getApplicationTableName();
+
+
+            System.err.println("===================entity is "+entity+"===========app table is "+applicationTableName);
+
+            
+
             logger.info(datatableData.getRegisteredTableName() + "has column " + foreignKeyColumnName + " ? " + columnExist);
 
-            if (!columnExist) { throw new EntityDatatableCheckNotSupportedException(datatableData.getRegisteredTableName(), entity); }
+            System.err.println("===============we should edit this shit now ,force create either ways only when entity is already application ");
+
+            //if (!columnExist) { throw new EntityDatatableCheckNotSupportedException(datatableData.getRegisteredTableName(), entity); }
 
             final Long productId = command.longValueOfParameterNamed("productId");
             final Long status = command.longValueOfParameterNamed("status");

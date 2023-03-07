@@ -123,7 +123,7 @@ public class LocalRefApiResource {
     public String retrieveTemplate(@Context final UriInfo uriInfo, @QueryParam("officeId") final Long officeId) {
 
         //this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
-        final LocalRefData localRefData = this.localRefReadPlatformService.template(REF_TABLE.UNSPECIFIED);
+        final LocalRefData localRefData = this.localRefReadPlatformService.template(REF_TABLE.HYBRID);
         //final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.localRefToApiJsonSerializer.serialize(localRefData);
     }
