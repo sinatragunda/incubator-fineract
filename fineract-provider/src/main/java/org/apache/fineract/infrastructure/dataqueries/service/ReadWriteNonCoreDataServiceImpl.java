@@ -1456,7 +1456,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private void validateAppTable(final String appTable) {
 
-
         Set<String> set = DataTableApiConstant.supportedTables;
         for(String table : set){
             if(table.equalsIgnoreCase(appTable)){
@@ -1490,7 +1489,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
                 final String columnValue = rs.getString(columnName);
                 columnValues.add(columnValue);
             }
-
             final ResultsetRowData resultsetDataRow = ResultsetRowData.create(columnValues);
             resultsetDataRows.add(resultsetDataRow);
         }
