@@ -12,8 +12,6 @@ package org.apache.fineract.components.screen.api;
 
 */
 
-import com.wese.component.screen.repo.ScreenElementRepository;
-import com.wese.component.screen.repo.ScreenObjectRepository;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
