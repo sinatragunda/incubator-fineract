@@ -426,12 +426,14 @@ configurations.driver.each {File file ->
 
 task fatJar(type: Jar) {
     classifier = 'all'
+    zip64 = true
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
     manifest {
         attributes 'Main-Class': 'org.apache.fineract.ServerApplication'
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 task createDB<<{

@@ -20,6 +20,8 @@ package org.apache.fineract.infrastructure.dataqueries.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 
@@ -29,16 +31,18 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
-import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecks;
-import org.apache.fineract.infrastructure.dataqueries.domain.EntityDatatableChecksRepository;
+import org.apache.fineract.infrastructure.dataqueries.domain.*;
 import org.apache.fineract.infrastructure.dataqueries.exception.*;
+import org.apache.fineract.infrastructure.dataqueries.repo.XRegisteredTableRepositoryWrapper;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.slf4j.Logger;
@@ -65,6 +69,9 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
     private final SavingsProductReadPlatformService savingsProductReadPlatformService;
     private final FromJsonHelper fromApiJsonHelper;
     private final ConfigurationDomainService configurationDomainService;
+    private final XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper;
+    private final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper;
+    private final HybridTableEntityRepositoryWrapper hybridTableEntityRepositoryWrapper;
 
     @Autowired
     public EntityDatatableChecksWritePlatformServiceImpl(final PlatformSecurityContext context,
@@ -73,7 +80,7 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
             final ReadWriteNonCoreDataService readWriteNonCoreDataService,
             final LoanProductReadPlatformService loanProductReadPlatformService,
             final SavingsProductReadPlatformService savingsProductReadPlatformService, final FromJsonHelper fromApiJsonHelper,
-            final ConfigurationDomainService configurationDomainService) {
+            final ConfigurationDomainService configurationDomainService ,final XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper ,final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  HybridTableEntityRepositoryWrapper hybridTableEntityRepositoryWrapper) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.entityDatatableChecksRepository = entityDatatableChecksRepository;
@@ -82,6 +89,9 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
         this.savingsProductReadPlatformService = savingsProductReadPlatformService;
         this.fromApiJsonHelper = fromApiJsonHelper;
         this.configurationDomainService = configurationDomainService;
+        this.xRegisteredTableRepositoryWrapper = xRegisteredTableRepositoryWrapper ;
+        this.hybridTableEntityRepositoryWrapper = hybridTableEntityRepositoryWrapper;
+        this.applicationRecordRepositoryWrapper = applicationRecordRepositoryWrapper;
     }
 
     @Transactional
@@ -112,8 +122,6 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
 
 
             System.err.println("===================entity is "+entity+"===========app table is "+applicationTableName);
-
-            
 
             logger.info(datatableData.getRegisteredTableName() + "has column " + foreignKeyColumnName + " ? " + columnExist);
 
@@ -196,9 +204,18 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
         }
         if (tableRequiredBeforAction != null) {
             List<String> reqDatatables = new ArrayList<>();
+
             for (EntityDatatableChecks t : tableRequiredBeforAction) {
 
                 final String datatableName = t.getDatatableName();
+
+                Boolean isApplicationTable =  isApplicationTable(datatableName);
+
+                System.err.println("===================is Application Table ? "+isApplicationTable+"=========if not skip");
+                if(isApplicationTable){
+                    continue;
+                }
+
                 final Long countEntries = readWriteNonCoreDataService.countDatatableEntries(datatableName, entityId, foreignKeyColumn);
 
                 logger.info("The are " + countEntries + " entries in the table " + datatableName);
@@ -211,16 +228,74 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
 
     }
 
+    /**
+     * Added 08/03/2023 at 0801 
+     * Create for all hybrid entries .Hybrid is a mix of loan and custom tables 
+     */ 
+    @Transactional
+    @Override
+    public boolean saveHybridDataTables(final REF_TABLE refTable,final Long entityId, final AbstractPersistableCustom abstractPersistibleCustom
+            ,final JsonElement jsonElement){
+        
+        final AppUser user = this.context.authenticatedUser();
+        boolean isMakerCheckerEnabled = false;
+
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        Set<String> keys = jsonObject.keySet();
+
+        System.err.println("------------------keyset size is "+keys.size());
+
+        for(String key : keys){
+
+            System.err.println("============================key value is "+key);
+
+            JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+            Iterator<JsonElement> it = jsonArray.iterator();
+            
+            while(it.hasNext()){
+                JsonElement element = it.next();
+
+                System.err.println("================jsonelement here is "+element);
+
+                Long applicationId = this.fromApiJsonHelper.extractLongNamed("applicationId" ,element);
+
+                System.err.println("===========================application id to insert here is "+applicationId);
+
+                ApplicationRecord applicationRecord = applicationRecordRepositoryWrapper.findOneWithNotFoundDetection(applicationId);
+                HybridTableEntity hybridTableEntity = new HybridTableEntity(refTable ,applicationRecord ,abstractPersistibleCustom);
+                hybridTableEntityRepositoryWrapper.save(hybridTableEntity);
+            }
+
+        }
+        return isMakerCheckerEnabled;
+    }
+
     @Transactional
     @Override
     public boolean saveDatatables(final Long status, final String entity, final Long entityId, final Long productId,
             final JsonArray datatableDatas) {
+
         final AppUser user = this.context.authenticatedUser();
         boolean isMakerCheckerEnabled = false;
+        
         if (datatableDatas != null && datatableDatas.size() > 0) {
+            
             for (JsonElement element : datatableDatas) {
                 final String datatableName = this.fromApiJsonHelper.extractStringNamed("registeredTableName", element);
                 final JsonObject datatableData = this.fromApiJsonHelper.extractJsonObjectNamed("data", element);
+
+                System.err.println("===================datatableName from array value is "+datatableName);
+
+                boolean hasXRegisterTable = xRegisteredTableRepositoryWrapper.hasTable(datatableName);
+
+                System.err.println("====================table with numbers should not come back here ,our table found "+hasXRegisterTable);
+                
+                if(!hasXRegisterTable){
+                    System.err.println("------------------------continue");
+                    continue;
+                }
+
+                boolean isApplicationTable = isApplicationTable(datatableName);
 
                 if (datatableName == null || datatableData == null) {
                     final ApiParameterError error = ApiParameterError.generalError(
@@ -230,14 +305,26 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
                     errors.add(error);
                     throw new PlatformApiDataValidationException(errors);
                 }
-                final String taskPermissionName = "CREATE_" + datatableName;
-                user.validateHasPermissionTo(taskPermissionName);
-                if (this.configurationDomainService.isMakerCheckerEnabledForTask(taskPermissionName)) {
-                    isMakerCheckerEnabled = true;
-                }
+                
                 try {
-                    this.readWriteNonCoreDataService.createNewDatatableEntry(datatableName, entityId, datatableData.toString());
-                } catch (PlatformApiDataValidationException e) {
+                    /**
+                     * For tables of non hybrid type that is table who application table is m_application
+                     */
+                    if(!isApplicationTable){
+
+                        final String taskPermissionName = "CREATE_" + datatableName;
+                        user.validateHasPermissionTo(taskPermissionName);
+
+                        if (this.configurationDomainService.isMakerCheckerEnabledForTask(taskPermissionName)) {
+                            isMakerCheckerEnabled = true;
+                        }
+
+                        System.err.println("==============================create table after finding out its application table  ,entity id being "+entityId+"======= and main record being "+datatableData.toString());
+                        System.err.println("===================create dataentry from loan function with data "+datatableData.toString());
+                        this.readWriteNonCoreDataService.createNewDatatableEntry(datatableName, entityId, datatableData.toString());
+                    }
+                }
+                catch (PlatformApiDataValidationException e) {
                     List<ApiParameterError> errors = e.getErrors();
                     for (ApiParameterError error : e.getErrors()) {
                         error.setParameterName("datatables." + datatableName + "." + error.getParameterName());
@@ -247,6 +334,18 @@ public class EntityDatatableChecksWritePlatformServiceImpl implements EntityData
             }
         }
         return isMakerCheckerEnabled;
+    }
+
+    /**
+     * Added 08/03/2023 at 0856
+     * Use to filter if table is an application application table so as to skip
+     */  
+    private Boolean isApplicationTable(String datatableName){
+        System.err.println("---------------------------does it run into any problems now ? ,throws error  ");
+        XRegisteredTable xRegisteredTable = xRegisteredTableRepositoryWrapper.findByRegisteredTableNameWithNotFoundDetection(datatableName);
+        System.err.println("-----------------------error caught here ");
+        String applicationName = xRegisteredTable.getApplicationTableName();
+        return applicationName.equalsIgnoreCase("m_application");
     }
 
     private List<String> getDatatableNames(Long status, String entity, Long productId) {

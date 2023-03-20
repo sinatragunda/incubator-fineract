@@ -77,10 +77,12 @@ public class GenericDataServiceImpl implements GenericDataService {
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
                 final String columnName = rsmd.getColumnName(i + 1);
                 final String columnValue = rs.getString(columnName);
+
+                //System.err.println("=======================what data is presented here ? "+columnName+"==========and "+columnValue);
                 columnValues.add(columnValue);
             }
 
-            final ResultsetRowData resultsetDataRow = ResultsetRowData.create(columnValues);
+            final ResultsetRowData resultsetDataRow = ResultsetRowData.create(columnValues ,0L,"First");
             resultsetDataRows.add(resultsetDataRow);
         }
 
@@ -194,13 +196,14 @@ public class GenericDataServiceImpl implements GenericDataService {
     @Override
     public List<ResultsetColumnHeaderData> fillResultsetColumnHeaders(final String datatable) {
 
-        logger.debug("::3 Was inside the fill ResultSetColumnHeader");
+        logger.debug("==============::3 Was inside the fill ResultSetColumnHeader ================="+datatable);
 
         final SqlRowSet columnDefinitions = getDatatableMetaData(datatable);
 
         final List<ResultsetColumnHeaderData> columnHeaders = new ArrayList<>();
 
         columnDefinitions.beforeFirst();
+
         while (columnDefinitions.next()) {
             final String columnName = columnDefinitions.getString("COLUMN_NAME");
             final String isNullable = columnDefinitions.getString("IS_NULLABLE");
@@ -211,14 +214,17 @@ public class GenericDataServiceImpl implements GenericDataService {
             final boolean columnNullable = "YES".equalsIgnoreCase(isNullable);
             final boolean columnIsPrimaryKey = "PRI".equalsIgnoreCase(isPrimaryKey);
 
+            //System.err.println("--------------column name "+columnName);
+
             List<ResultsetColumnValueData> columnValues = new ArrayList<>();
             String codeName = null;
+
             if ("varchar".equalsIgnoreCase(columnType)) {
 
                 final int codePosition = columnName.indexOf("_cv");
                 if (codePosition > 0) {
-                    codeName = columnName.substring(0, codePosition);
 
+                    codeName = columnName.substring(0, codePosition);
                     columnValues = retreiveColumnValues(codeName);
                 }
 
@@ -227,19 +233,26 @@ public class GenericDataServiceImpl implements GenericDataService {
                 final int codePosition = columnName.indexOf("_cd");
                 if (codePosition > 0) {
                     codeName = columnName.substring(0, codePosition);
+                    //System.err.println("========================retrieve by codename "+codeName);
                     columnValues = retreiveColumnValues(codeName);
+                    //System.err.println("========================columnValue with cd "+columnValues);
                 }
             }
             if (codeName == null) {
                 final SqlRowSet rsValues = getDatatableCodeData(datatable, columnName);
                 Integer codeId = null;
+
                 while (rsValues.next()) {
+                    //System.err.println("=============next shit ");
                     codeId = rsValues.getInt("id");
                     codeName = rsValues.getString("code_name");
                 }
+
+                //System.err.println("=====================retrieve codeId "+codeId);
                 columnValues = retreiveColumnValues(codeId);
 
             }
+
 
             final ResultsetColumnHeaderData rsch = ResultsetColumnHeaderData.detailed(columnName, columnType, columnLength, columnNullable,
                     columnIsPrimaryKey, columnValues, codeName);
@@ -256,6 +269,7 @@ public class GenericDataServiceImpl implements GenericDataService {
      */
     private List<ResultsetColumnValueData> retreiveColumnValues(final String codeName) {
 
+    
         final List<ResultsetColumnValueData> columnValues = new ArrayList<>();
 
         final String sql = "select v.id, v.code_score, v.code_value from m_code m " + " join m_code_value v on v.code_id = m.id "
@@ -269,6 +283,8 @@ public class GenericDataServiceImpl implements GenericDataService {
             final String codeValue = rsValues.getString("code_value");
             final Integer score = rsValues.getInt("code_score");
 
+            //System.err.println("-------------------------insert here where there is score "+codeValue+"==============and id"+id);
+
             columnValues.add(new ResultsetColumnValueData(id, codeValue, score));
         }
 
@@ -276,6 +292,8 @@ public class GenericDataServiceImpl implements GenericDataService {
     }
 
     private List<ResultsetColumnValueData> retreiveColumnValues(final Integer codeId) {
+
+        //System.err.println("-------------------------values ---------"+codeId);
 
         final List<ResultsetColumnValueData> columnValues = new ArrayList<>();
         if (codeId != null) {
@@ -286,6 +304,8 @@ public class GenericDataServiceImpl implements GenericDataService {
             while (rsValues.next()) {
                 final Integer id = rsValues.getInt("id");
                 final String codeValue = rsValues.getString("code_value");
+
+                //System.err.println("---------------------insert this shit "+id+"-----------------code value "+codeValue);
                 columnValues.add(new ResultsetColumnValueData(id, codeValue));
             }
         }

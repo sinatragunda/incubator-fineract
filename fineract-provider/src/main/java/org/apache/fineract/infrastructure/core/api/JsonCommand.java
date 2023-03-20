@@ -188,6 +188,11 @@ public final class JsonCommand {
         }
         return null;
     }
+
+     public JsonElement jsonElementOfParamNamed(final String paramName) {
+        return jsonElement(paramName);
+    }
+    
     
     public String jsonFragment(final String paramName) {
         String jsonFragment = null;

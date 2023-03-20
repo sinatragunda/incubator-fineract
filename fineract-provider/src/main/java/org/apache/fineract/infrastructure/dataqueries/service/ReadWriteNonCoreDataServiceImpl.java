@@ -28,7 +28,11 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.fineract.helper.OptionalHelper;
+import org.apache.fineract.infrastructure.codes.data.CodeData;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.service.CodeReadPlatformService;
+import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -122,13 +126,14 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     // configurationWriteService;
     private final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper;
     private final XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper;
+    private final CodeValueReadPlatformService codeValueReadPlatformService;
 
     @Autowired(required = true)
     public ReadWriteNonCoreDataServiceImpl(final RoutingDataSource dataSource, final PlatformSecurityContext context,
                                            final FromJsonHelper fromJsonHelper, final GenericDataService genericDataService,
                                            final DatatableCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeReadPlatformService codeReadPlatformService,
                                            final ConfigurationDomainService configurationDomainService, final DataTableValidator dataTableValidator,
-                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper) {
+                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper ,final CodeValueReadPlatformService codeValueReadPlatformService) {
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
         this.context = context;
@@ -143,6 +148,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         // this.configurationWriteService = configurationWriteService;
         this.applicationRecordRepositoryWrapper = applicationRecordRepositoryWrapper;
         this.xRegisteredTableRepositoryWrapper = xRegisteredTableRepositoryWrapper;
+        this.codeValueReadPlatformService = codeValueReadPlatformService;
 
     }
     @Override
@@ -208,12 +214,13 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             final String appTableName = rs.getString("application_table_name");
             final String registeredDatatableName = rs.getString("registered_table_name");
             final String prettyName = rs.getString("pretty_name");
+            
             final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
                     .fillResultsetColumnHeaders(registeredDatatableName);
 
             datatableData = DatatableData.create(id ,appTableName, registeredDatatableName,prettyName, columnHeaderData);
             //templateRecords(datatableData ,appTableName);
-            System.err.println("---------set data record tempalte here son ");
+            System.err.println("---------set data record tempalte here son ===============");
         }
 
         return datatableData;
@@ -410,8 +417,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         try{
 
-            //final String primaryIdentifier = command.stringValueOfParameterNamed("primaryIdentifier");
-
             final String appTable = queryForApplicationTableName(dataTableName);
 
             System.err.println("---------------create new entry ---------"+dataTableName);
@@ -424,32 +429,32 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
             final Map<String, String> dataParams = this.fromJsonHelper.extractDataMap(typeOfMap, json);
 
-            System.err.println("=================dataparams======"+dataParams);
-
             // if table is m_application should we create new entry in application ?
             String primaryIdentifier = null ;
 
             boolean hasPrimaryIdentifier = dataParams.containsKey(DataTableApiConstant.primaryIdentifierParam);
 
-            System.err.println("=================has primary identifier ? "+hasPrimaryIdentifier);
-
             if(hasPrimaryIdentifier){
-                System.err.println("==========has primary identifier here =============");
                 primaryIdentifier = dataParams.get(DataTableApiConstant.primaryIdentifierParam);
                 dataParams.remove(DataTableApiConstant.primaryIdentifierParam);
             }
 
             Long recordId  = dynamicTableId(appTable,dataTableName ,primaryIdentifier,appTableId);
 
+            System.err.println("=================has primary identifier ? "+hasPrimaryIdentifier+"===========and record id is "+recordId);
+
             System.err.println("==============has record id "+recordId+"================appTable ? "+appTable);
 
             final String sql = getAddSql(columnHeaders, dataTableName, getFKField(appTable), recordId, dataParams);
 
-            System.err.println("---------------------------sql record is "+sql);
+            //System.err.println("---------------------------sql record is "+sql);
 
+            /**
+             * I dont usually like leaving hanging functions that return a value like this
+             */
             this.jdbcTemplate.update(sql);
 
-            return commandProcessingResult; //
+            return new CommandProcessingResultBuilder().withEntityId(recordId).build(); //
 
         } catch (final DataAccessException dve) {
             final Throwable cause = dve.getCause() ;
@@ -641,9 +646,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
             strippedDatatableName = datatableName.replaceAll(" ","");
 
-
-            System.err.println("----------------------------DATA TABLE NAME "+datatableName+"-----------and the stripped is "+strippedDatatableName);
-
             validateDatatableName(strippedDatatableName);
 
             validateAppTable(apptableName);
@@ -656,7 +658,6 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             final StringBuilder constrainBuilder = new StringBuilder();
             final Map<String, Long> codeMappings = new HashMap<>();
 
-            System.err.println("-----------------------------stripped datatable name "+strippedDatatableName);
 
             sqlBuilder = sqlBuilder.append("CREATE TABLE `" + strippedDatatableName + "` (");
 
@@ -689,14 +690,9 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
             sqlBuilder = sqlBuilder.append(") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 
-            System.err.println("---------------final query is "+sqlBuilder.toString());
-
             this.jdbcTemplate.execute(sqlBuilder.toString());
 
             registerDatatable(datatableName, apptableName);
-
-            System.err.println("-----------------not registering table name l see ? ");
-
             registerColumnCodeMapping(codeMappings);
         } catch (final DataIntegrityViolationException e) {
             final Throwable realCause = e.getCause();
@@ -1278,13 +1274,14 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         //SQLInjectionValidator.validateSQLInput(sql);
 
-        System.err.println("---------------------validate sql ? ");
+        System.err.println("---------------------retrieve all tables entries son ,skip nothing  ");
 
         if(StringUtils.isNotBlank(order)) {
             this.columnValidator.validateSqlInjection(sql, order);
             sql = String.format("%s order by %s ",sql ,order);
         }
 
+        System.err.println("------------------------listing result set row now ");
         final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
         return new GenericResultsetData(columnHeaders, result);
     }
@@ -1473,27 +1470,103 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
     private List<ResultsetRowData> fillDatatableResultSetDataRows(final String sql) {
 
-        System.err.println("--------fill datatable result set sql  ? "+sql);
+        System.err.println("--------fill datatable result set function ");
 
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
 
         final List<ResultsetRowData> resultsetDataRows = new ArrayList<>();
 
         final SqlRowSetMetaData rsmd = rs.getMetaData();
+        String primaryIdentifier = null ;
+        Long applicationId[] = {null} ;
 
         while (rs.next()) {
+
             final List<String> columnValues = new ArrayList<>();
+            
             for (int i = 0; i < rsmd.getColumnCount(); i++) {
                 final String columnName = rsmd.getColumnName(i + 1);
-                System.err.println("===============what is column name ? "+columnName);
-                final String columnValue = rs.getString(columnName);
+                //System.err.println("===============what is column name ? "+columnName+"=============does it contain cd ? ");
+
+                String columnValue = rs.getString(columnName);
+                //System.err.println("--------------------column value is "+columnValue);
+
+                /**
+                 * This is a long and unprofessional way of doing it ,need a more efficient way
+                 */ 
+                String pi = primaryIdentifierCheatCode(columnName ,columnValue ,applicationId);
+                boolean hasPrimaryIdentifier = OptionalHelper.isPresent(pi);
+                
+                if(hasPrimaryIdentifier){
+                    primaryIdentifier = pi ;
+                    System.err.println("-----------------primary identifier set to "+primaryIdentifier+"=======applicationId ===="+applicationId[0]);
+                }
+
+                columnValue = codeValueCheatCode(columnName ,columnValue);
                 columnValues.add(columnValue);
             }
-            final ResultsetRowData resultsetDataRow = ResultsetRowData.create(columnValues);
+
+            System.err.println("=======================do we create row here ,obviously yes  ,setting second value ?"+primaryIdentifier);
+
+            final ResultsetRowData resultsetDataRow = ResultsetRowData.create(columnValues ,applicationId[0] ,primaryIdentifier);
             resultsetDataRows.add(resultsetDataRow);
         }
 
+        System.err.println("=================why is not showign our primary keys ?");
+
         return resultsetDataRows;
+    }
+
+    /**
+     * Added 08/03/2023 at 0008
+     * A bunch of functions added to cheat system functionality 
+     * Due to design limitations and break in code this is the only way to achieve certain functionality 
+     * This specific one gets primary identifier ,used in custom tables as the string value of the record
+     */
+    private String primaryIdentifierCheatCode(String columnName ,String columnValue ,Long applicationId[]){
+
+        boolean isApplicationIdColumn = columnName.equalsIgnoreCase("application_id");
+        
+        if(isApplicationIdColumn){
+            applicationId[0]  = Long.valueOf(columnValue);
+            ApplicationRecord applicationRecord = applicationRecordRepositoryWrapper.findOneWithNotFoundDetection(applicationId[0]);
+            String primaryIdentifier = applicationRecord.getPrimaryIdentifier(); 
+            System.err.println("=============we have set primary identifier of id "+applicationId[0]+"===========with value "+primaryIdentifier);
+            return primaryIdentifier;   
+        }
+        return null ;
+
+    }
+
+    /**
+     * Added 07/03/2023 at 1700
+     * Intended to cheat its way through problem of code value coming yp as id instead of the string value 
+     */ 
+    private String codeValueCheatCode(String cd ,String columnValue){
+
+        Integer index = cd.indexOf("_cd");
+       
+        if(index >= 0 && OptionalHelper.isPresent(columnValue)) {
+            String code = cd.substring(0, index);
+            Long id = Long.valueOf(columnValue);
+            CodeValueData codeValueData = codeValueReadPlatformService.retrieveCodeValue(id);
+            return codeValueData.getName();
+        }
+        return columnValue;
+    }
+
+
+    private String cheatColumnName(String cd){
+
+        Integer index = cd.indexOf("cd_");
+        System.err.println("==============index is "+index);
+
+        if(Optional.ofNullable(index).isPresent()) {
+            String columnName = cd.substring(index, cd.length());
+            System.err.println("=======================column nme " + columnName);
+            return columnName;
+        }
+        return cd;
     }
 
     private String queryForApplicationTableName(final String datatable) {

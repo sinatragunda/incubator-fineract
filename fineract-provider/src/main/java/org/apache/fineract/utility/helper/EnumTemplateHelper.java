@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.utility.helper;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.utility.service.IEnum;
 
@@ -58,4 +59,18 @@ public class EnumTemplateHelper {
         }
         return values[0] ;
     }
+
+    /**
+     * Added 13/03/2023 at 0912
+     * 
+     */
+    public static IEnum fromIntEx(IEnum values[] ,int arg){
+        IEnum iEnum = fromInt(values ,arg);
+        boolean isPresent = OptionalHelper.isPresent(iEnum);
+        if(!isPresent){
+            return values[0];
+        }
+        return iEnum;
+    }
+
 }

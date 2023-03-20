@@ -35,8 +35,10 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
 import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.FIELD_TYPE;
+import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
@@ -66,7 +68,9 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
 
-    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Office" ,group = COMPARISON_GROUP.INTERGER)
+
+    @AttributeList(beanLoader = BEAN_LOADER.OFFICE)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Office" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -88,7 +92,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_status", nullable = true)
     private CodeValue subStatus;
-    
+
+    @AttributeRef(name = "activationDate" ,type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.DATE)
     @Column(name = "activation_date", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date activationDate;
@@ -114,15 +119,16 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "fullname", length = 100, nullable = true)
     private String fullname;
 
+    @AttributeRef(name="displayName" ,group = COMPARISON_GROUP.STRING  ,type = FIELD_TYPE.OPTIONAL)
     @Column(name = "display_name", length = 100, nullable = false)
     private String displayName;
 
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Mobile Number" ,group = COMPARISON_GROUP.INTERGER)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Mobile Number" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "mobile_no", length = 50, nullable = false, unique = true)
     private String mobileNo;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Email Address" ,group = COMPARISON_GROUP.STRING)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Email Address" ,group = COMPARISON_GROUP.PATTERN)
 	@Column(name = "email_address", length = 50, unique = true)
     private String emailAddress;
 
@@ -144,6 +150,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
 
     @ManyToOne
     @JoinColumn(name = "staff_id")
+    @AttributeList(beanLoader =  BEAN_LOADER.STAFF)
+    @AttributeRef(name ="loanAgent" ,type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.STRING)
     private Staff staff;
 
     @ManyToMany(fetch=FetchType.LAZY)
@@ -199,6 +207,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
 
     @Column(name = "submittedon_date", nullable = true)
     @Temporal(TemporalType.DATE)
+    @AttributeRef(name="Created Date" ,group = COMPARISON_GROUP.DATE ,type = FIELD_TYPE.OPTIONAL)
     private Date submittedOnDate;
 
     @ManyToOne(optional = true, fetch=FetchType.EAGER)
@@ -223,7 +232,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "default_savings_account", nullable = true)
     private Long savingsAccountId;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Client Type",group = COMPARISON_GROUP.ALL)
+
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Client Type",group = COMPARISON_GROUP.GENERIC)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_type_cv_id", nullable = true)
     private CodeValue clientType;

@@ -114,7 +114,7 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     @Override
     public List<DatatableData> retrieveTemplates(final Long status, final String entity, final Long productId) {
 
-        System.err.println("-----------------template for table in entity checks ");
+        System.err.println("-----------------template for table in entity checks, investigative======== ");
 
         List<EntityDatatableChecks> tableRequiredBeforeAction = null;
 
@@ -126,13 +126,12 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
             tableRequiredBeforeAction = this.entityDatatableChecksRepository.findByEntityStatusAndNoProduct(entity, status);
         }
         if (tableRequiredBeforeAction != null && tableRequiredBeforeAction.size() > 0) {
+
             List<DatatableData> ret = new ArrayList<>();
             for (EntityDatatableChecks t : tableRequiredBeforeAction){
-
-                System.err.println("---------------------set records list here son ========"+t.getEntity());
-
+                //System.err.println("---------------------set records list here son ========"+t.getEntity());
                 DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(t.getDatatableName());
-
+                
                 setEntries(datatableData);
                 /// if datatable is m_application ,can we get linking data  ?   
                 ret.add(datatableData);
@@ -150,14 +149,13 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     private void setEntries(DatatableData datatableData){
 
         String applicationTableName = datatableData.getApplicationTableName();
-
-        System.err.println("---------------application table name "+applicationTableName);
+        //System.err.println("---------------application table name "+applicationTableName);
         boolean isApplicationTable = EntityTables.isApplicationTable(applicationTableName);
 
         if(isApplicationTable){
 
             String tableName = datatableData.getRegisteredTableName();
-            System.err.println("================record template beign set now ");
+            System.err.println("================record template begin set now ");
             GenericResultsetData genericResultSet = this.readWriteNonCoreDataService.retrieveAllTableEntries(tableName ,null);
             datatableData.setGenericResultsetData(genericResultSet);
         }

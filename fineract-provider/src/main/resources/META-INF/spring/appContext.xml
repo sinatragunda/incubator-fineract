@@ -66,6 +66,7 @@
 										  org.apache.fineract.portfolio.products.*,
 										  org.apache.fineract.components.*,
 										  com.wese.component.defaults.*,
+										  com.wese.component.screen.*,
 										  org.apache.fineract.portfolio.remittance.*,
 										  org.apache.fineract.portfolio.agentbanking.*,
 										  org.taat.wese.weseaddons.ssb.*">
@@ -108,15 +109,14 @@
 	<!-- Added 04/11/2022 at 0326 -->
 	<jpa:repositories base-package="org.apache.fineract.portfolio.remittance.repo"/>
 
-
 	<!-- Added 13/02/2023 at 0326 -->
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.dataqueries.repo"/>
 
 	<!-- Added 16/02/2023 at 0353 -->
 	<jpa:repositories base-package="org.apache.fineract.portfolio.charge.repo"/>
 
-
-
+	<!-- Added 13/03/2023 at 1045 -->
+	<jpa:repositories base-package="com.wese.component.screen.repo.*"/>
 
 	<import resource="infrastructure.xml" />
 

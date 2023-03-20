@@ -248,12 +248,14 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getDatatableEntries(@PathParam("datatable") final String datatable,@QueryParam("order") final String order, @Context final UriInfo uriInfo) {
 
-        logger.debug("--------------------get entries for datatable -------------");
+        logger.debug("--------------------get entries for datatable ------------now-");
 
         this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
 
         final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveAllTableEntries(datatable,order);
+        
         final DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
+        
         datatableData.setGenericResultsetData(results);
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
@@ -269,7 +271,6 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String createDatatableEntry(@PathParam("datatable") final String datatable, @PathParam("apptableId") final Long apptableId,
             final String apiRequestBodyAsJson) {
-
 
 
         System.err.println("--------------create new entry database ------------------");

@@ -19,7 +19,9 @@
 package org.apache.fineract.organisation.staff.service;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 
 public interface StaffReadPlatformService {
@@ -44,5 +46,7 @@ public interface StaffReadPlatformService {
      * Added 14/02/2023 at 1304
      */
     Collection<StaffData> retrieveAllAgentsByOffice(final Long officeId);
+
+    List<EnumOptionData> getDropdownData();
 
 }

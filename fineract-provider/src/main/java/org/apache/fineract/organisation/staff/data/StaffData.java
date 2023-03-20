@@ -23,12 +23,13 @@ import java.util.Collection;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.portfolio.agentbanking.data.AgentData;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
  * Immutable data object representing staff data.
  */
-public class StaffData {
+public class StaffData implements EnumeratedData {
 
     private final Long id;
     private final String externalId;
@@ -76,6 +77,11 @@ public class StaffData {
         this.officeName = null;
         this.displayName = null;
         this.isAgent = isAgent;
+    }
+
+
+    public String getName(){
+        return this.displayName;
     }
 
     public void setAgentData(AgentData agentData){

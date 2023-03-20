@@ -23,7 +23,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
@@ -35,6 +37,8 @@ import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.data.OfficeTransactionData;
 import org.apache.fineract.organisation.office.exception.OfficeNotFoundException;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.DataEnumerationService;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,7 +48,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService {
+public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService ,DataEnumerationService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
@@ -262,6 +266,12 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         final Collection<CurrencyData> currencyOptions = this.currencyReadPlatformService.retrieveAllowedCurrencies();
 
         return OfficeTransactionData.template(new LocalDate(), parentLookups, currencyOptions);
+    }
+
+    @Override
+    public List<EnumOptionData> getDropdownData() {
+        List<OfficeData> officeDataList = (List<OfficeData>)retrieveAllOffices(true ,null);
+        return EnumeratedDataHelper.enumeratedData(officeDataList);
     }
 
     public PlatformSecurityContext getContext() {

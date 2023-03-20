@@ -23,12 +23,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
  * Immutable data object for office data.
  */
-public class OfficeData implements Serializable {
+public class OfficeData implements Serializable ,EnumeratedData{
 
     private final Long id;
     private final String name;
@@ -69,6 +70,10 @@ public class OfficeData implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName(){
+        return name ;
     }
 
     public static OfficeData dropdown(final Long id, final String name, final String nameDecorated) {

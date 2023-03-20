@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.api;
 
+import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
 import org.apache.fineract.portfolio.hirepurchase.domain.HirePurchase;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
@@ -45,7 +46,7 @@ public interface LoanApiConstants {
             "syncDisbursementWithMeeting", "loanCounter", "loanProductCounter", "notes", "accountLinkingOptions", "linkedAccount",
             "interestRateDifferential", "isFloatingInterestRate", "interestRatesPeriods", LoanApiConstants.canUseForTopup,
             LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.topupAmount, LoanApiConstants.clientActiveLoanOptions,
-            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam));
+            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam , DataTableApiConstant.tableDataParam));
 
 
     public static final String emiAmountParameterName = "fixedEmiAmount";

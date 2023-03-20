@@ -31,6 +31,7 @@ import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanproduct.LoanProductConstants;
@@ -75,7 +76,7 @@ public final class CalculateLoanScheduleQueryFromApiJsonHelper {
             LoanApiConstants.datatables, LoanApiConstants.isEqualAmortizationParam ,
             LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName ,
             LoanApiConstants.loanFactorAccountIdParam , HirePurchaseConstants.hirePurchaseParam ,
-            LocalRefApiConstants.localRefsParam));
+            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam));
 
     private final FromJsonHelper fromApiJsonHelper;
 

@@ -18,6 +18,11 @@
  */
 package org.apache.fineract.infrastructure.core.boot;
 
+import com.wese.component.screen.domain.ScreenElement;
+import com.wese.component.screen.domain.ScreenObject;
+import com.wese.component.screen.repo.ScreenElementRepository;
+import com.wese.component.screen.repo.ScreenObjectRepository;
+import org.apache.fineract.infrastructure.campaigns.email.data.ScheduledEmailEnumerations;
 import org.apache.fineract.notification.config.MessagingConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
@@ -28,6 +33,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
+
+import org.springframework.data.jpa.repository.config.*;
 
 /**
  * Base Spring Configuration with what's common to all Configuration subclasses.
@@ -49,6 +58,8 @@ import org.springframework.context.annotation.PropertySource;
 		HibernateJpaAutoConfiguration.class,
 		DataSourceTransactionManagerAutoConfiguration.class,
 		FlywayAutoConfiguration.class })
+@EnableJpaRepositories(basePackageClasses = {ScreenElementRepository.class , ScreenObjectRepository.class})
+@ComponentScan(basePackageClasses = {ScreenElement.class , ScreenObject.class})
 public abstract class AbstractApplicationConfiguration {
 
 }

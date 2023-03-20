@@ -42,6 +42,7 @@ import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRu
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksWritePlatformService;
@@ -535,6 +536,17 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 this.entityDatatableChecksWritePlatformService.saveDatatables(StatusEnum.CREATE.getCode().longValue(),
                         EntityTables.LOAN.getName(), newLoanApplication.getId(), newLoanApplication.productId(),
                         command.arrayOfParameterNamed(LoanApiConstants.datatables));
+            }
+
+            /**
+             * Added 08/03/2023 at 0744 
+             * Save HybridDataTable
+             * It will be hard work to link these together but will get to it
+             */ 
+            if(command.parameterExists(DataTableApiConstant.tableDataParam)){
+                this.entityDatatableChecksWritePlatformService.saveHybridDataTables(REF_TABLE.LOAN,
+                        newLoanApplication.getId(),newLoanApplication,
+                        command.jsonElementOfParamNamed(DataTableApiConstant.tableDataParam));
             }
 
             this.entityDatatableChecksWritePlatformService.runTheCheckForProduct(newLoanApplication.getId(),

@@ -35,6 +35,7 @@ import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.exception.UnsupportedParameterException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
+import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.calendar.service.CalendarUtils;
 import org.apache.fineract.portfolio.hirepurchase.api.HirePurchaseConstants;
@@ -99,7 +100,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,
             LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,
             LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam,
-            LocalRefApiConstants.localRefsParam
+            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam
         ));
 
     private final FromJsonHelper fromApiJsonHelper;
@@ -115,6 +116,8 @@ public final class LoanApplicationCommandFromApiJsonHelper {
     public void validateForCreate(final String json, final boolean isMeetingMandatoryForJLGLoans, final LoanProduct loanProduct) {
 
         if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+
+        System.err.println("============table data validation =========="+DataTableApiConstant.tableDataParam);
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.supportedParameters);
@@ -528,6 +531,17 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             final JsonArray datatables = this.fromApiJsonHelper.extractJsonArrayNamed(LoanApiConstants.datatables, element);
             baseDataValidator.reset().parameter(LoanApiConstants.datatables).value(datatables).notNull().jsonArrayNotEmpty();
         }
+
+        /**
+         * Added 08/03/2023 at 0728
+         * Add support for saving hybrid tables data
+         * Remember these will just map an already existing record to a loan / table kind of reference
+         */
+        if(this.fromApiJsonHelper.parameterExists(DataTableApiConstant.tableDataParam, element)){
+            final JsonArray datatables = this.fromApiJsonHelper.extractJsonArrayNamed(LoanApiConstants.datatables, element);
+            baseDataValidator.reset().parameter(LoanApiConstants.datatables).value(datatables).notNull().jsonArrayNotEmpty();
+        }
+
 
         validateLoanMultiDisbursementdate(element, baseDataValidator, expectedDisbursementDate, principal);
         validatePartialPeriodSupport(interestCalculationPeriodType, baseDataValidator, element, loanProduct);

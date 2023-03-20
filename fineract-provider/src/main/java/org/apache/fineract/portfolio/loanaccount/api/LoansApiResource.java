@@ -398,8 +398,6 @@ public class LoansApiResource {
         LocalRefData localRefData = localRefReadPlatformService.template(REF_TABLE.LOAN);
         newLoanAccount.setLocalRefData(localRefData);
 
-        System.err.println("=========================get local refs template ");
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, newLoanAccount, this.LOAN_DATA_PARAMETERS);
     }

@@ -22,11 +22,14 @@ import com.google.gson.JsonArray;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
+import org.apache.fineract.infrastructure.core.exception.DataValidationException;
 import org.joda.time.LocalDate;
 import org.quartz.CronExpression;
 import org.springframework.util.ObjectUtils;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,6 +45,20 @@ public class DataValidatorBuilder {
     private Integer arrayIndex;
     private Object value;
     private boolean ignoreNullValue = false;
+
+    /**
+     * Added 10/03/2023 at 0144 
+     * With parameter
+     */
+     public DataValidatorBuilder(String parameter){
+        this.dataValidationErrors = new ArrayList<>();
+        this.parameter = parameter;
+    }
+
+    public DataValidatorBuilder(final List<ApiParameterError> dataValidationErrors ,String parameter){
+        this.dataValidationErrors = dataValidationErrors;
+        this.parameter = parameter;
+    }   
 
     public DataValidatorBuilder(final List<ApiParameterError> dataValidationErrors) {
         this.dataValidationErrors = dataValidationErrors;
@@ -1050,6 +1067,16 @@ public class DataValidatorBuilder {
         return this;
     }
 
+    /**
+     * Added 10/03/2023 at 0124 
+     * Purpose is to throw an error imediately after its added to apiparametererror list 
+     */
 
+     public void onError(){
+        if(!dataValidationErrors.isEmpty()){
+            String message = dataValidationErrors.stream().findFirst().get().getDeveloperMessage();
+            throw new DataValidationException(message);
+        }
+     } 
 
 }

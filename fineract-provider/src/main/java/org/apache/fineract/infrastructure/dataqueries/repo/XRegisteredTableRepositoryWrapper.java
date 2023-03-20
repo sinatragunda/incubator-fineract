@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.repo;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.dataqueries.domain.Report;
 import org.apache.fineract.infrastructure.dataqueries.domain.ReportRepository;
 import org.apache.fineract.infrastructure.dataqueries.domain.XRegisteredTable;
@@ -44,5 +45,16 @@ public class XRegisteredTableRepositoryWrapper {
             throw new DatatableNotFoundException(tableName ,null);
         }
         return xRegisteredTable;
+    }
+
+    public XRegisteredTable findByRegisteredTableName(final String tableName) {
+
+        final XRegisteredTable xRegisteredTable = this.xRegisteredTableRepository.findByRegisteredTableName(tableName);
+        return xRegisteredTable;
+    }
+
+    public boolean hasTable(String tableName){
+        XRegisteredTable table = findByRegisteredTableName(tableName);
+        return OptionalHelper.isPresent(table);
     }
 }

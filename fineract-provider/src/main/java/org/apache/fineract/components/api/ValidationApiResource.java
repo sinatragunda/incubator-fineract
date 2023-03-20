@@ -47,7 +47,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import com.wese.component.defaults.data.ValidationData;
-import com.wese.component.defaults.service.ValidationReadPlatformService;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.components.ComponentsApiConstants;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -72,18 +71,18 @@ public class ValidationApiResource {
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private static final Set<String> VALIDATION_RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("validationType","fieldType","name"));
 
-    private final ValidationReadPlatformService validationReadPlatformService ;
+    //private final ValidationReadPlatformService validationReadPlatformService ;
 
     @Autowired
     public ValidationApiResource(final org.apache.fineract.infrastructure.security.service.PlatformSecurityContext context,
                                            final ToApiJsonSerializer<ValidationData> toApiJsonSerializer,
                                            final ApiRequestParameterHelper apiRequestParameterHelper,
-                                           final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final ValidationReadPlatformService validationReadPlatformService) {
+                                           final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService /*,final ValidationReadPlatformService validationReadPlatformService*/) {
         this.context = context;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
-        this.validationReadPlatformService = validationReadPlatformService;
+     //   this.validationReadPlatformService = validationReadPlatformService;
     }
 
     @GET
@@ -94,7 +93,7 @@ public class ValidationApiResource {
 
         this.context.authenticatedUser().validateHasReadPermission(ComponentsApiConstants.ENTITY_NAME);
 
-        ValidationData validationData = this.validationReadPlatformService.template();
+        ValidationData validationData = null ; //this.validationReadPlatformService.template();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings,validationData ,

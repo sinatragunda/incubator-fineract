@@ -27,21 +27,28 @@ import java.sql.Struct;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.context.ApplicationContext;
+
+
+import org.springframework.context.annotation.*;
 
 @Path("/component")
 @Component
 @Scope("singleton")
+@ComponentScan(value="com.wese.component.*")
 public class ComponentApiResource {
 
+    private final ApplicationContext applicationContext;
     private final PlatformSecurityContext context ;
     private final ApiRequestParameterHelper apiRequestParameterHelper ;
     private ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer;
 
     @Autowired
-    public ComponentApiResource(PlatformSecurityContext context, ApiRequestParameterHelper apiRequestParameterHelper, ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer) {
+    public ComponentApiResource(PlatformSecurityContext context, ApiRequestParameterHelper apiRequestParameterHelper, ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer ,ApplicationContext applicationContext) {
         this.context = context;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.fieldValidationDataToApiJsonSerializer = fieldValidationDataToApiJsonSerializer;
+        this.applicationContext = applicationContext;
 
     }
 
@@ -70,7 +77,7 @@ public class ComponentApiResource {
             c.printStackTrace();
         }
 
-        Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl);
+        Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl,applicationContext);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationDataList, FieldConstants.allowedParams);

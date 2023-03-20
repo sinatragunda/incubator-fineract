@@ -19,8 +19,11 @@
 package org.apache.fineract.infrastructure.dataqueries.service;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 
 public interface EntityDatatableChecksWritePlatformService {
 
@@ -31,4 +34,9 @@ public interface EntityDatatableChecksWritePlatformService {
 			String foreignKeyColumn, long productLoanId);
 	boolean saveDatatables(Long status, String entity, Long entityId, Long productId, JsonArray data);
 
+    /**
+     * Added 08/03/2023 at 0834 
+     */
+    boolean saveHybridDataTables(REF_TABLE refTable, Long entityId, AbstractPersistableCustom abstractPersistibleCustom , JsonElement data);
+ 
 }

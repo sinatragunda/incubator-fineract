@@ -3274,6 +3274,44 @@ public class CommandWrapperBuilder {
     }
 
     /**
+     * Added 13/03/2023 at 1034 
+     */
+    public CommandWrapperBuilder createScreen() {
+        this.actionName = "CREATE";
+        this.entityName = "SCREEN";
+        this.href = "/screen/";
+        return this;
+    }
+
+    public CommandWrapperBuilder updateScreen(Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "SCREEN";
+        this.href = "/screen/"+id;
+        this.entityId = id ;
+        return this;
+    }
+
+
+    public CommandWrapperBuilder deleteScreen(Long id) {
+        this.actionName = "DELETE";
+        this.entityName = "SCREEN";
+        this.href = "/screen/"+id;
+        this.entityId = id ;
+        return this;
+    }
+
+
+    public CommandWrapperBuilder viewScreen(Long id) {
+        this.actionName = "READ";
+        this.entityName = "SCREEN";
+        this.href = "/screen/"+id;
+        this.entityId = id ;
+        return this;
+    }
+  
+
+
+    /**
      * Added 06/11/2022 at 0407
      */ 
     public CommandWrapperBuilder updateRxDeal(final Long id) {

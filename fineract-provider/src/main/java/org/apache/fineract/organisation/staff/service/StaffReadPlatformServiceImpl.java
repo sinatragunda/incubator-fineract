@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
@@ -36,6 +37,8 @@ import org.apache.fineract.organisation.staff.exception.StaffNotFoundException;
 import org.apache.fineract.portfolio.client.domain.ClientStatus;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanStatus;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountStatusType;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.DataEnumerationService;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -44,7 +47,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
+public class StaffReadPlatformServiceImpl implements StaffReadPlatformService ,DataEnumerationService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
@@ -323,5 +326,11 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService {
         }
         return params.toArray();
         
+    }
+
+    public List<EnumOptionData> getDropdownData(){
+
+        List<StaffData> stuffDataList = (List<StaffData>)retrieveAllStaffForDropdown(1L);
+        return EnumeratedDataHelper.enumeratedData(stuffDataList);
     }
 }

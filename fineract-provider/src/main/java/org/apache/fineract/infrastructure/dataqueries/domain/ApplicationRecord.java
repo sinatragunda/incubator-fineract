@@ -29,7 +29,7 @@ import javax.persistence.Column;
 @Table(name ="m_application")
 public class ApplicationRecord extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="x_registered_table_id")
     private XRegisteredTable xRegisteredTable;
 

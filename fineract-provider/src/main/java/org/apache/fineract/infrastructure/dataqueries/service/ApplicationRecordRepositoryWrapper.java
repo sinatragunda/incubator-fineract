@@ -5,7 +5,9 @@
 package org.apache.fineract.infrastructure.dataqueries.service;
 
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.dataqueries.domain.ApplicationRecord;
+import org.apache.fineract.infrastructure.dataqueries.exception.ApplicationRecordNotFoundException;
 import org.apache.fineract.infrastructure.dataqueries.repo.ApplicationRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +24,16 @@ public class ApplicationRecordRepositoryWrapper {
     public Long save(ApplicationRecord applicationRecord){
 
         applicationRecord = this.applicationRecordRepository.saveAndFlush(applicationRecord);
-
-        System.err.println("-----------------record id is "+applicationRecord.getId());
         return applicationRecord.getId() ;
+    }
+
+    public ApplicationRecord findOneWithNotFoundDetection(Long id){
+
+        ApplicationRecord applicationRecord = applicationRecordRepository.findOne(id);
+        boolean isPresent = OptionalHelper.isPresent(applicationRecord);
+        if(!isPresent){
+            throw new ApplicationRecordNotFoundException(id);
+        }
+        return applicationRecord;
     }
 }

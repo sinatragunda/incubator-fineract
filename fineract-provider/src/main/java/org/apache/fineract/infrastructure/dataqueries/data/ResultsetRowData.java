@@ -23,16 +23,28 @@ import java.util.List;
 public class ResultsetRowData {
 
     private final List<String> row;
+    private final Long applicationId ;
+    private final String primaryIdentifier;
 
-    public static ResultsetRowData create(final List<String> rowValues) {
-        return new ResultsetRowData(rowValues);
+    public static ResultsetRowData create(final List<String> rowValues ,final Long applicationId ,final String primaryIdentifier) {
+        return new ResultsetRowData(rowValues ,applicationId, primaryIdentifier);
     }
 
-    private ResultsetRowData(final List<String> rowValues) {
+    private ResultsetRowData(final List<String> rowValues ,Long applicationId ,String primaryIdentifier) {
         this.row = rowValues;
+        this.primaryIdentifier = primaryIdentifier;
+        this.applicationId = applicationId;
     }
 
     public List<String> getRow() {
         return this.row;
+    }
+
+    public String getPrimaryIdentifier(){
+        return this.primaryIdentifier;
+    }
+
+    public Long getApplicationId() {
+        return applicationId;
     }
 }

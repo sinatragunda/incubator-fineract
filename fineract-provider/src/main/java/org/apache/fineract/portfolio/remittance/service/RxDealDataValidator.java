@@ -63,12 +63,10 @@ public class RxDealDataValidator {
 
         final Boolean isCreateNewClientTemp = this.fromApiJsonHelper.extractBooleanNamed(RxDealConstants.createNewClientParam ,element);
 
-        System.err.println("---------------------value here is ? "+isCreateNewClientTemp);
+        //System.err.println("---------------------value here is ? "+isCreateNewClientTemp);
 
         boolean isCreateNewClient = Optional.ofNullable(isCreateNewClientTemp).orElse(false);
-
-
-        System.err.println("----------isCreateClient -----------------"+isCreateNewClient);
+        //System.err.println("----------isCreateClient -----------------"+isCreateNewClient);
 
         final Long clientId  = this.fromApiJsonHelper.extractLongNamed(ClientApiConstants.clientIdParamName, element);
         if(!isCreateNewClient){

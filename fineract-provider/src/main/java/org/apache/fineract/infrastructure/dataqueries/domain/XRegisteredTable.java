@@ -31,13 +31,22 @@ public class XRegisteredTable extends AbstractPersistableCustom<Long> {
     private String registeredTableName ;
 
 
+    @Column(name="application_table_name")
+    private String applicationTableName ;
+
+
     protected  XRegisteredTable(){}
 
-    public XRegisteredTable(String registeredTableName) {
+    public XRegisteredTable(String registeredTableName ,String applicationTableName) {
         this.registeredTableName = registeredTableName;
+        this.applicationTableName = applicationTableName;
     }
 
     public String getRegisteredTableName() {
         return registeredTableName;
+    }
+
+    public String getApplicationTableName(){
+        return this.applicationTableName;
     }
 }
