@@ -131,11 +131,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
 
             final ChargeProperties chargeProperties = ChargeProperties.fromJson(command);
 
-
-            System.err.println("-----------------charge commission has value "+chargeProperties.isCommissionedCharge());
             this.chargePropertiesRepository.saveAndFlush(chargeProperties);
-
-            System.err.println("---------------------can you get charge id ? "+chargeProperties.getId());
 
             final Charge charge = Charge.fromJson(command, glAccount, taxGroup ,transactionCode[0],chargeProperties);
             this.chargeRepository.save(charge);

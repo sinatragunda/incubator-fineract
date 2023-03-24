@@ -68,6 +68,7 @@ import org.apache.fineract.portfolio.savings.SavingsInterestCalculationType;
 import org.apache.fineract.portfolio.savings.SavingsPostingInterestPeriodType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.portfolio.savings.data.SavingsProductPropertiesData;
 import org.apache.fineract.portfolio.savings.domain.*;
 
 import org.apache.fineract.portfolio.savings.enumerations.SAVINGS_TOTAL_CALC_CRITERIA;
@@ -122,6 +123,7 @@ public class SavingsProductsApiResource {
     private final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository;
     private final SavingsAccountAssembler savingsAccountAssembler;
     private final SavingsAccountServiceWrapper savingsAccountServiceWrapper;
+    private final SavingsProductPropertiesReadPlatformService savingsProductPropertiesReadPlatformService;
 
     @Autowired
     public SavingsProductsApiResource(final SavingsProductReadPlatformService savingProductReadPlatformService,
@@ -133,7 +135,7 @@ public class SavingsProductsApiResource {
             final AccountingDropdownReadPlatformService accountingDropdownReadPlatformService,
             final ProductToGLAccountMappingReadPlatformService accountMappingReadPlatformService,
             final ChargeReadPlatformService chargeReadPlatformService, PaymentTypeReadPlatformService paymentTypeReadPlatformService,
-            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository ,final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final SavingsAccountServiceWrapper savingsAccountServiceWrapper) {
+            final TaxReadPlatformService taxReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService ,final FromJsonHelper fromJsonHelper , final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository,final SavingsAccountDomainService savingsAccountDomainService ,final  EquityGrowthDividendsRepository equityGrowthDividendsRepository ,final EquityGrowthOnSavingsAccountRepository equityGrowthOnSavingsAccountRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final SavingsAccountServiceWrapper savingsAccountServiceWrapper ,final SavingsProductPropertiesReadPlatformService savingsProductPropertiesReadPlatformService) {
         this.savingProductReadPlatformService = savingProductReadPlatformService;
         this.dropdownReadPlatformService = dropdownReadPlatformService;
         this.currencyReadPlatformService = currencyReadPlatformService;
@@ -154,6 +156,7 @@ public class SavingsProductsApiResource {
         this.equityGrowthOnSavingsAccountRepository = equityGrowthOnSavingsAccountRepository ;
         this.savingsAccountAssembler = savingsAccountAssembler;
         this.savingsAccountServiceWrapper = savingsAccountServiceWrapper;
+        this.savingsProductPropertiesReadPlatformService = savingsProductPropertiesReadPlatformService;
     }
 
     @POST
@@ -333,9 +336,11 @@ public class SavingsProductsApiResource {
             savingProductData = SavingsProductData.withAccountingDetails(savingProductData, accountingMappings,
                     paymentChannelToFundSourceMappings, feeToGLAccountMappings, penaltyToGLAccountMappings);
         }
-
         if (settings.isTemplate()) {
+
+            System.err.println("=================return with template or ?");
             savingProductData = handleTemplateRelatedData(savingProductData);
+            System.err.println("====================with template now ?");
         }
 
 		return this.toApiJsonSerializer.serialize(settings, savingProductData,
@@ -358,6 +363,8 @@ public class SavingsProductsApiResource {
     }
 
     private SavingsProductData handleTemplateRelatedData(final SavingsProductData savingsProduct) {
+
+        //Long officeId  = savingsProduct.
 
         final EnumOptionData interestCompoundingPeriodType = SavingsEnumerations
                 .compoundingInterestPeriodType(SavingsCompoundingInterestPeriodType.DAILY);
@@ -412,17 +419,19 @@ public class SavingsProductsApiResource {
         penaltyOptions = CollectionUtils.isEmpty(penaltyOptions) ? null : penaltyOptions;
         final Collection<TaxGroupData> taxGroupOptions = this.taxReadPlatformService.retrieveTaxGroupsForLookUp();
         SavingsProductData savingsProductToReturn = null;
+        SavingsProductPropertiesData savingsProductPropertiesData = savingsProductPropertiesReadPlatformService.template(-1L);
+
         if (savingsProduct != null) {
             savingsProductToReturn = SavingsProductData.withTemplate(savingsProduct, currencyOptions, interestCompoundingPeriodTypeOptions,
                     interestPostingPeriodTypeOptions, interestCalculationTypeOptions, interestCalculationDaysInYearTypeOptions,
                     lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions, paymentTypeOptions, accountingRuleOptions,
-                    accountingMappingOptions, chargeOptions, penaltyOptions, taxGroupOptions);
+                    accountingMappingOptions, chargeOptions, penaltyOptions, taxGroupOptions,savingsProductPropertiesData);
         } else {
             savingsProductToReturn = SavingsProductData.template(currency, interestCompoundingPeriodType, interestPostingPeriodType,
                     interestCalculationType, interestCalculationDaysInYearType, accountingRule, currencyOptions,
                     interestCompoundingPeriodTypeOptions, interestPostingPeriodTypeOptions, interestCalculationTypeOptions,
                     interestCalculationDaysInYearTypeOptions, lockinPeriodFrequencyTypeOptions, withdrawalFeeTypeOptions,
-                    paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, taxGroupOptions);
+                    paymentTypeOptions, accountingRuleOptions, accountingMappingOptions, chargeOptions, penaltyOptions, taxGroupOptions ,savingsProductPropertiesData);
         }
 
         return savingsProductToReturn;

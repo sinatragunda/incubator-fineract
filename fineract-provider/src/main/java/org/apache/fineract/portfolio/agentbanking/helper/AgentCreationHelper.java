@@ -16,7 +16,7 @@ import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.service.ClientWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.*;
-import org.apache.fineract.portfolio.savings.service.SavingsProductRepositoryWrapper;
+import org.apache.fineract.portfolio.savings.repo.SavingsProductRepositoryWrapper;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.service.AppUserWritePlatformService;
 import org.springframework.beans.factory.annotation.Autowired;

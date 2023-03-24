@@ -157,6 +157,12 @@ public interface LoanReadPlatformService {
      * Added 15/02/2023 at 0820
      */
     List<LoanAccountData> retrieveAllForLoanOfficer(final Long loanOfficerId);  
+
+    /**
+     * Added 22/03/2023 at 1321
+     */
+    List<LoanAccountData> retrieveAllForClientAndProduct(Long clientId, Long productId);
+  
   
 
 }

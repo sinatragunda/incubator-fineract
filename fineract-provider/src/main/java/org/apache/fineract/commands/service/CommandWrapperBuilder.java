@@ -3356,4 +3356,22 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 21/03/2023 at 1028
+     */
+    public CommandWrapperBuilder createPaymentRule() {
+        this.actionName = "CREATE";
+        this.entityName = "PAYMENTRULE";
+        this.href = "/paymentrules";
+        return this;
+    }
+
+     public CommandWrapperBuilder updatePaymentRule(Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "PAYMENTRULE";
+        this.href = "/paymentrules";
+        this.entityId = id ;
+        return this;
+    }
+
 }

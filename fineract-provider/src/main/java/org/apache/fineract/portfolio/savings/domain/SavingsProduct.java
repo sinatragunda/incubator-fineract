@@ -70,6 +70,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import javax.persistence.CascadeType;
 
 
 import org.apache.fineract.accounting.common.AccountingRuleType;
@@ -213,6 +214,13 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
     @Transient
     protected Product product;
 
+
+    /**
+     * Added 21/03/2023 at 1003
+     */
+    @OneToOne(cascade = CascadeType.ALL ,mappedBy="savingsProduct")
+    private SavingsProductProperties savingsProductProperties;
+
     public static SavingsProduct createNew(final String name, final String shortName, final String description,
             final MonetaryCurrency currency, final BigDecimal interestRate,
             final SavingsCompoundingInterestPeriodType interestCompoundingPeriodType,
@@ -224,14 +232,14 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final BigDecimal minRequiredBalance, final BigDecimal minBalanceForInterestCalculation,
             final BigDecimal nominalAnnualInterestRateOverdraft, final BigDecimal minOverdraftForInterestCalculation,
             boolean withHoldTax, TaxGroup taxGroup, 
-            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final Product product) {
+            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final Product product ,final SavingsProductProperties savingsProductProperties) {
 
         return new SavingsProduct(name, shortName, description, currency, interestRate, interestCompoundingPeriodType,
                 interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance,
                 lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, charges,
                 allowOverdraft, overdraftLimit, enforceMinRequiredBalance, minRequiredBalance, minBalanceForInterestCalculation,
                 nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax, taxGroup,
-                isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,product);
+                isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,product ,savingsProductProperties);
     }
 
     protected SavingsProduct() {
@@ -250,7 +258,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
         this(name, shortName, description, currency, interestRate, interestCompoundingPeriodType, interestPostingPeriodType,
                 interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance, lockinPeriodFrequency,
                 lockinPeriodFrequencyType, withdrawalFeeApplicableForTransfer, accountingRuleType, charges, allowOverdraft, overdraftLimit,
-                false, null, minBalanceForInterestCalculation, null, null, withHoldTax, taxGroup, null, null, null, null,null);
+                false, null, minBalanceForInterestCalculation, null, null, withHoldTax, taxGroup, null, null, null, null,null ,null);
     }
 
     protected SavingsProduct(final String name, final String shortName, final String description, final MonetaryCurrency currency,
@@ -263,7 +271,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
             final BigDecimal minRequiredBalance, BigDecimal minBalanceForInterestCalculation,
             final BigDecimal nominalAnnualInterestRateOverdraft, final BigDecimal minOverdraftForInterestCalculation,
             final boolean withHoldTax, final TaxGroup taxGroup,
-            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final Product product) {
+            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final Product product ,final SavingsProductProperties savingsProductProperties) {
 
         this.name = name;
         this.shortName = shortName;
@@ -321,6 +329,7 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 
         // Added 18/12/2021
         this.product = product ;
+        this.savingsProductProperties = savingsProductProperties;
     }
 
     /**
@@ -782,6 +791,13 @@ public class SavingsProduct extends AbstractPersistableCustom<Long> {
 
      public Set<Charge> getCharges(){
         return charges();
-     } 
+     }
 
+     public SavingsProductProperties savingsProductProperties(){
+        return this.savingsProductProperties;
+     }
+
+    public void setSavingsProductProperties(SavingsProductProperties savingsProductProperties) {
+        this.savingsProductProperties = savingsProductProperties;
+    }
 }

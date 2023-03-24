@@ -211,5 +211,12 @@ public class SavingsApiConstants {
     public static final String accountPrototypeParam = "accountPrototype";  
 
 
+    /**
+     * Added 21/03/2023 at 1034
+     */
+    public static final String paymentRuleIdParam = "paymentRuleId";
+    public static final String savingsProductPropertiesParam = "savingsProductProperties";  
+
+
 
 }

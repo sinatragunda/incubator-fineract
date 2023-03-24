@@ -22,8 +22,10 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.apache.fineract.accounting.common.AccountingEnumerations;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
@@ -31,6 +33,7 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityType
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
@@ -39,7 +42,12 @@ import org.apache.fineract.portfolio.products.service.ProductReadPlatformService
 import org.apache.fineract.portfolio.products.service.ProductWritePlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.portfolio.savings.data.SavingsProductPropertiesData;
+import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
+import org.apache.fineract.portfolio.savings.domain.SavingsProductProperties;
+import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
+import org.apache.fineract.portfolio.savings.repo.SavingsProductPropertiesRepository;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -59,13 +67,19 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
     // Added 18/12/2021
     private final ProductWritePlatformService productWritePlatformService;
 
+    private final SavingsProductPropertiesReadPlatformService savingsProductPropertiesReadPlatformService;
+    private final SavingsProductRepository savingsProductRepository;
+    private final SavingsProductPropertiesRepository savingsProductPropertiesRepository;
     @Autowired
     public SavingsProductReadPlatformServiceImpl(final PlatformSecurityContext context, final RoutingDataSource dataSource,
-            final FineractEntityAccessUtil fineractEntityAccessUtil ,final ProductWritePlatformService productWritePlatformService) {
+            final FineractEntityAccessUtil fineractEntityAccessUtil ,final ProductWritePlatformService productWritePlatformService ,final SavingsProductPropertiesReadPlatformService savingsProductPropertiesReadPlatformService ,final SavingsProductRepository savingsProductRepository ,final SavingsProductPropertiesRepository savingsProductPropertiesRepository) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
         this.productWritePlatformService = productWritePlatformService;
+        this.savingsProductPropertiesReadPlatformService = savingsProductPropertiesReadPlatformService;
+        this.savingsProductRepository = savingsProductRepository;
+        this.savingsProductPropertiesRepository = savingsProductPropertiesRepository;
     }
 
     @Override
@@ -116,10 +130,30 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         try {
             this.context.authenticatedUser();
             final String sql = "select " + this.savingsProductRowMapper.schema() + " where sp.id = ? and sp.deposit_type_enum = ?";
-            return this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper, new Object[] { savingProductId,
+            SavingsProductData savingsProductData =  this.jdbcTemplate.queryForObject(sql, this.savingsProductRowMapper, new Object[] { savingProductId,
                     DepositAccountType.SAVINGS_DEPOSIT.getValue()});
-        } catch (final EmptyResultDataAccessException e) {
+            setProductProperties(savingsProductData);
+            return savingsProductData;
+        } catch (final EmptyResultDataAccessException e){
+            e.printStackTrace();
             throw new SavingsProductNotFoundException(savingProductId);
+        }
+    }
+
+    private void setProductProperties(SavingsProductData savingsProduct){
+        SavingsProductPropertiesData savingsProductPropertiesData = null;
+        try {
+            savingsProductPropertiesData = this.savingsProductPropertiesReadPlatformService.retrieveOne(savingsProduct.getId());
+            savingsProduct.setSavingsProductPropertiesData(savingsProductPropertiesData);
+        }
+        catch (final EmptyResultDataAccessException e){
+            // create record if it doesnt exists better option now
+            SavingsProduct a = savingsProductRepository.findOne(savingsProduct.getId());
+            SavingsProductProperties savingsProductProperties = new SavingsProductProperties(a ,null);
+            savingsProductPropertiesRepository.save(savingsProductProperties);
+
+            savingsProductPropertiesData = this.savingsProductPropertiesReadPlatformService.retrieveOne(savingsProduct.getId());
+            savingsProduct.setSavingsProductPropertiesData(savingsProductPropertiesData);
         }
     }
 
@@ -273,13 +307,13 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
             final Long daysToInactive = JdbcSupport.getLong(rs, "daysToInactive");
             final Long daysToDormancy = JdbcSupport.getLong(rs, "daysToDormancy");
             final Long daysToEscheat = JdbcSupport.getLong(rs, "daysToEscheat");
-            
+            final SavingsProductPropertiesData savingsProductPropertiesData = null;
             return SavingsProductData.instance(id, name, shortName, description, currency, nominalAnnualInterestRate,
                     compoundingInterestPeriodType, interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType,
                     minRequiredOpeningBalance, lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers,
                     accountingRuleType, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                     minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,productData);
+                    taxGroupData, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat ,productData ,savingsProductPropertiesData);
         }
     }
 

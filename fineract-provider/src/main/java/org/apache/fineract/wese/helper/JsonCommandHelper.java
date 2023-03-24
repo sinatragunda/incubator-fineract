@@ -12,6 +12,7 @@ import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonElement ;
@@ -35,7 +36,15 @@ public class JsonCommandHelper {
         JsonCommand jsonCommand = JsonCommand.fromJsonElement(0L ,jsonElement ,fromJsonHelper);
         return jsonCommand;
         
-    } 
+    }
+
+    /**
+     * Added 22/03/2023
+     */
+    public static JsonElement toJsonElement(String payload){
+        JsonElement jsonElement = new Gson().fromJson(payload ,JsonElement.class);
+        return jsonElement;
+    }   
 
     /**
      * Added 01/11/2022 at 1810

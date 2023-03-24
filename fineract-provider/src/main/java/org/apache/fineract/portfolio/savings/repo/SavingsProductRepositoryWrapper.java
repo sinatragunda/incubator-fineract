@@ -16,13 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.portfolio.savings.service;
+package org.apache.fineract.portfolio.savings.repo;
 
 import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +45,15 @@ public class SavingsProductRepositoryWrapper {
             throw new SavingsProductNotFoundException(id);
         }
         return product;
+    }
+
+    
+    public void save(SavingsProduct savingsProduct){
+        this.savingsProductRepository.saveAndFlush(savingsProduct);
+    }
+
+    public void delete(SavingsProduct savingsProduct){
+        this.savingsProductRepository.delete(savingsProduct);
     }
     
 }

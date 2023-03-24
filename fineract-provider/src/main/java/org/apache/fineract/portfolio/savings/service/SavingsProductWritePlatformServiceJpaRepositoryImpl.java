@@ -26,7 +26,6 @@ import static org.apache.fineract.portfolio.savings.SavingsApiConstants.taxGroup
 import java.util.*;
 
 import javax.persistence.PersistenceException;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fineract.accounting.producttoaccountmapping.service.ProductToGLAccountMappingWritePlatformService;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -40,15 +39,21 @@ import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAcce
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.domain.Charge;
+import org.apache.fineract.portfolio.paymentrules.domain.PaymentRule;
+import org.apache.fineract.portfolio.paymentrules.repo.PaymentRuleRepository;
 import org.apache.fineract.portfolio.products.domain.Product;
 import org.apache.fineract.portfolio.products.repo.ProductRepository;
 import org.apache.fineract.portfolio.products.enumerations.PRODUCT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
+import org.apache.fineract.portfolio.savings.SavingsApiConstants;
 import org.apache.fineract.portfolio.savings.data.SavingsProductDataValidator;
 import org.apache.fineract.portfolio.savings.domain.SavingsProduct;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductAssembler;
+import org.apache.fineract.portfolio.savings.domain.SavingsProductProperties;
 import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
+import org.apache.fineract.portfolio.savings.repo.SavingsProductPropertiesRepository;
+import org.apache.fineract.portfolio.savings.repo.SavingsProductRepositoryWrapper;
 import org.apache.fineract.portfolio.tax.domain.TaxGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,27 +67,32 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
 
     private final Logger logger;
     private final PlatformSecurityContext context;
-    private final SavingsProductRepository savingProductRepository;
+    private final SavingsProductRepositoryWrapper savingsProductRepositoryWrapper;
     private final SavingsProductDataValidator fromApiJsonDataValidator;
     private final SavingsProductAssembler savingsProductAssembler;
     private final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService;
     private final FineractEntityAccessUtil fineractEntityAccessUtil;
     private final ProductRepository productRepository;
+    private final SavingsProductPropertiesRepository savingsProductPropertiesRepository;
+    private final PaymentRuleRepository paymentRuleRepository;
+
 
     @Autowired
     public SavingsProductWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
-            final SavingsProductRepository savingProductRepository, final SavingsProductDataValidator fromApiJsonDataValidator,
+            final SavingsProductRepositoryWrapper savingsProductRepositoryWrapper, final SavingsProductDataValidator fromApiJsonDataValidator,
             final SavingsProductAssembler savingsProductAssembler,
             final ProductToGLAccountMappingWritePlatformService accountMappingWritePlatformService,
-            final FineractEntityAccessUtil fineractEntityAccessUtil ,final ProductRepository productRepository) {
+            final FineractEntityAccessUtil fineractEntityAccessUtil ,final ProductRepository productRepository ,final SavingsProductPropertiesRepository savingsProductPropertiesRepository ,final PaymentRuleRepository paymentRuleRepository) {
         this.context = context;
-        this.savingProductRepository = savingProductRepository;
+        this.savingsProductRepositoryWrapper = savingsProductRepositoryWrapper;
         this.fromApiJsonDataValidator = fromApiJsonDataValidator;
         this.savingsProductAssembler = savingsProductAssembler;
         this.logger = LoggerFactory.getLogger(SavingsProductWritePlatformServiceJpaRepositoryImpl.class);
         this.accountMappingWritePlatformService = accountMappingWritePlatformService;
         this.fineractEntityAccessUtil = fineractEntityAccessUtil;
         this.productRepository = productRepository;
+        this.savingsProductPropertiesRepository = savingsProductPropertiesRepository;
+        this.paymentRuleRepository = paymentRuleRepository;
     }
 
     /*
@@ -120,8 +130,12 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             this.fromApiJsonDataValidator.validateForCreate(command.json());
 
             final SavingsProduct product = this.savingsProductAssembler.assemble(command);
+            
+            //final SavingsProductProperties savingsProductProperties = product.savingsProductProperties();
+            //this.savingsProductPropertiesRepository.save(savingsProductProperties);
 
-            this.savingProductRepository.save(product);
+            this.savingsProductRepositoryWrapper.save(product);
+
 
             Product productSettings = product.productSettings();
 
@@ -159,18 +173,21 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
 
         try {
             this.context.authenticatedUser();
-            final SavingsProduct savingsProduct = this.savingProductRepository.findOne(productId);
+            
+            final SavingsProduct savingsProduct = this.savingsProductRepositoryWrapper.findOneWithNotFoundDetection(productId);
+
+            final SavingsProductProperties savingsProductProperties = savingsProduct.savingsProductProperties();
 
             final Product product = this.productRepository.findOneByProductTypeAndProductId(PRODUCT_TYPE.SAVINGS ,savingsProduct.getId());
-
-            if (savingsProduct == null) { throw new SavingsProductNotFoundException(productId); }
 
             this.fromApiJsonDataValidator.validateForUpdate(command.json(), savingsProduct);
 
             final Map<String, Object> changes = savingsProduct.update(command);
             final Map<String ,Object> productSettingsChanges = product.update(command);
+            final Map<String ,Object> productPropertiesChanges = savingsProductProperties.update(command);
 
             changes.putAll(productSettingsChanges);
+            changes.putAll(productPropertiesChanges);
 
             if (changes.containsKey(chargesParamName)) {
                 final Set<Charge> savingsProductCharges = this.savingsProductAssembler.assembleListOfSavingsProductCharges(command,savingsProduct
@@ -179,6 +196,13 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
                 if (!updated) {
                     changes.remove(chargesParamName);
                 }
+            }
+
+            if(changes.containsKey(SavingsApiConstants.paymentRuleIdParam)){
+                Long id = command.longValueOfParameterNamed(SavingsApiConstants.paymentRuleIdParam);
+                final PaymentRule paymentRule = paymentRuleRepository.findOne(id);
+                savingsProductProperties.setPaymentRule(paymentRule);
+                savingsProduct.setSavingsProductProperties(savingsProductProperties);
             }
 
             if (changes.containsKey(taxGroupIdParamName)) {
@@ -202,7 +226,7 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
             changes.putAll(accountingMappingChanges);
 
             if (!changes.isEmpty()) {
-                this.savingProductRepository.saveAndFlush(savingsProduct);
+                this.savingsProductRepositoryWrapper.save(savingsProduct);
             }
 
             if(!productSettingsChanges.isEmpty()){
@@ -227,10 +251,10 @@ public class SavingsProductWritePlatformServiceJpaRepositoryImpl implements Savi
     public CommandProcessingResult delete(final Long productId) {
 
         this.context.authenticatedUser();
-        final SavingsProduct product = this.savingProductRepository.findOne(productId);
+        final SavingsProduct product = this.savingsProductRepositoryWrapper.findOneWithNotFoundDetection(productId);
         if (product == null) { throw new SavingsProductNotFoundException(productId); }
 
-        this.savingProductRepository.delete(product);
+        this.savingsProductRepositoryWrapper.delete(product);
 
         return new CommandProcessingResultBuilder() //
                 .withEntityId(product.getId()) //

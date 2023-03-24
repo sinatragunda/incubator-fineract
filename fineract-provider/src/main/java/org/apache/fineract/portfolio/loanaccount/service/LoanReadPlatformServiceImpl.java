@@ -146,6 +146,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
     private final StaffReadPlatformService staffReadPlatformService;
     private final PaginationHelper<LoanAccountData> paginationHelper = new PaginationHelper<>();
     private final LoanMapper loaanLoanMapper = new LoanMapper();
+    private final LoanMapper loanMapper = new LoanMapper();
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
     private final PaymentTypeReadPlatformService paymentTypeReadPlatformService;
@@ -1648,6 +1649,11 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
         return this.jdbcTemplate.query(sqlBuilder.toString(), rm, new Object[] { penaltyWaitPeriod, penaltyWaitPeriod });
 
+    }
+
+    public List<LoanAccountData> retrieveAllForClientAndProduct(final Long clientId, Long productId) {
+        final String sql = "select from m_loan l where l.client_id = ? and l.product_id=?";
+        return this.jdbcTemplate.query(sql ,this.loanMapper , new Object[]{clientId, productId});
     }
 
     @SuppressWarnings("deprecation")

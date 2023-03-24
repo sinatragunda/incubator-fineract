@@ -24,8 +24,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 public interface SavingsProductWritePlatformService {
 
     CommandProcessingResult create(JsonCommand command);
-
     CommandProcessingResult update(Long productId, JsonCommand command);
-
     CommandProcessingResult delete(Long productId);
 }

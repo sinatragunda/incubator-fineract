@@ -99,7 +99,12 @@ public class SavingsProductData {
     /**
      * Added 03/10/2022 at 1001
      */
-     private ProductData productData;
+    private ProductData productData;
+
+    /**
+     * Added 23/03/2023 at 1004
+     */
+    private SavingsProductPropertiesData savingsProductPropertiesData;
 
 
     public static SavingsProductData template(final CurrencyData currency, final EnumOptionData interestCompoundingPeriodType,
@@ -112,7 +117,7 @@ public class SavingsProductData {
             final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, final Collection<EnumOptionData> withdrawalFeeTypeOptions,
             final Collection<PaymentTypeData> paymentTypeOptions, final Collection<EnumOptionData> accountingRuleOptions,
             final Map<String, List<GLAccountData>> accountingMappingOptions, final Collection<ChargeData> chargeOptions,
-            final Collection<ChargeData> penaltyOptions, final Collection<TaxGroupData> taxGroupOptions) {
+            final Collection<ChargeData> penaltyOptions, final Collection<TaxGroupData> taxGroupOptions ,SavingsProductPropertiesData savingsProductPropertiesData) {
 
         final Long id = null;
         final String name = null;
@@ -152,7 +157,7 @@ public class SavingsProductData {
                 accountingMappingOptions, charges, chargeOptions, penaltyOptions, feeToIncomeAccountMappings,
                 penaltyToIncomeAccountMappings, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData);
+                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData ,savingsProductPropertiesData);
     }
 
     public static SavingsProductData withCharges(final SavingsProductData product, final Collection<ChargeData> charges) {
@@ -169,7 +174,7 @@ public class SavingsProductData {
                 product.minRequiredBalance, product.enforceMinRequiredBalance, product.minBalanceForInterestCalculation,
                 product.nominalAnnualInterestRateOverdraft, product.minOverdraftForInterestCalculation, product.withHoldTax,
                 product.taxGroup, product.taxGroupOptions, product.isDormancyTrackingActive, product.daysToInactive, 
-                product.daysToDormancy, product.daysToEscheat ,product.productData);
+                product.daysToDormancy, product.daysToEscheat ,product.productData ,product.savingsProductPropertiesData);
     }
 
     /**
@@ -187,9 +192,9 @@ public class SavingsProductData {
             final Collection<EnumOptionData> lockinPeriodFrequencyTypeOptions, final Collection<EnumOptionData> withdrawalFeeTypeOptions,
             final Collection<PaymentTypeData> paymentTypeOptions, final Collection<EnumOptionData> accountingRuleOptions,
             final Map<String, List<GLAccountData>> accountingMappingOptions, final Collection<ChargeData> chargeOptions,
-            final Collection<ChargeData> penaltyOptions, Collection<TaxGroupData> taxGroupOptions) {
-            //System.err.println("----------------calling function with template though ");
-
+            final Collection<ChargeData> penaltyOptions, Collection<TaxGroupData> taxGroupOptions ,SavingsProductPropertiesData savingsProductPropertiesData) {
+            System.err.println("----------------,what if its null though ,then we must make sure every function has properties information right ?  ");
+            existingProduct.savingsProductPropertiesData.setTemplate(savingsProductPropertiesData);
         return new SavingsProductData(existingProduct.id, existingProduct.name, existingProduct.shortName, existingProduct.description,
                 existingProduct.currency, existingProduct.nominalAnnualInterestRate, existingProduct.interestCompoundingPeriodType,
                 existingProduct.interestPostingPeriodType, existingProduct.interestCalculationType,
@@ -204,7 +209,7 @@ public class SavingsProductData {
                 existingProduct.overdraftLimit, existingProduct.minRequiredBalance, existingProduct.enforceMinRequiredBalance,
                 existingProduct.minBalanceForInterestCalculation, existingProduct.nominalAnnualInterestRateOverdraft,
                 existingProduct.minOverdraftForInterestCalculation, existingProduct.withHoldTax, existingProduct.taxGroup, taxGroupOptions, 
-                existingProduct.isDormancyTrackingActive, existingProduct.daysToInactive, existingProduct.daysToDormancy, existingProduct.daysToEscheat ,existingProduct.productData);
+                existingProduct.isDormancyTrackingActive, existingProduct.daysToInactive, existingProduct.daysToDormancy, existingProduct.daysToEscheat ,existingProduct.productData ,existingProduct.savingsProductPropertiesData);
     }
 
     public static SavingsProductData withAccountingDetails(final SavingsProductData existingProduct,
@@ -241,7 +246,7 @@ public class SavingsProductData {
                 existingProduct.minBalanceForInterestCalculation, existingProduct.nominalAnnualInterestRateOverdraft,
                 existingProduct.minOverdraftForInterestCalculation, existingProduct.withHoldTax, existingProduct.taxGroup,
                 existingProduct.taxGroupOptions, existingProduct.isDormancyTrackingActive, existingProduct.daysToInactive, 
-                existingProduct.daysToDormancy, existingProduct.daysToEscheat ,existingProduct.productData);
+                existingProduct.daysToDormancy, existingProduct.daysToEscheat ,existingProduct.productData ,existingProduct.savingsProductPropertiesData);
     }
 
     public static SavingsProductData instance(final Long id, final String name, final String shortName, final String description,
@@ -253,7 +258,7 @@ public class SavingsProductData {
             final BigDecimal minRequiredBalance, final boolean enforceMinRequiredBalance,
             final BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
             final BigDecimal minOverdraftForInterestCalculation, final boolean withHoldTax, final TaxGroupData taxGroup, 
-            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final ProductData productData) {
+            final Boolean isDormancyTrackingActive, final Long daysToInactive, final Long daysToDormancy, final Long daysToEscheat ,final ProductData productData ,final SavingsProductPropertiesData savingsProductPropertiesData) {
 
         final Map<String, Object> accountingMappings = null;
         final Collection<PaymentTypeToGLAccountMapper> paymentChannelToFundSourceMappings = null;
@@ -284,7 +289,7 @@ public class SavingsProductData {
                 accountingMappingOptions, charges, chargeOptions, penaltyOptions, feeToIncomeAccountMappings,
                 penaltyToIncomeAccountMappings, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData);
+                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData ,savingsProductPropertiesData);
     }
 
     public static SavingsProductData lookup(final Long id, final String name) {
@@ -336,6 +341,7 @@ public class SavingsProductData {
         final Long daysToEscheat = null;
 
         final ProductData productData =null ;
+        final SavingsProductPropertiesData savingsProductPropertiesData = null ;
 
         return new SavingsProductData(id, name, shortName, description, currency, nominalAnnualInterestRate, interestCompoundingPeriodType,
                 interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance,
@@ -346,7 +352,7 @@ public class SavingsProductData {
                 accountingMappingOptions, charges, chargeOptions, penaltyOptions, feeToIncomeAccountMappings,
                 penaltyToIncomeAccountMappings, allowOverdraft, overdraftLimit, minRequiredBalance, enforceMinRequiredBalance,
                 minBalanceForInterestCalculation, nominalAnnualInterestRateOverdraft, minOverdraftForInterestCalculation, withHoldTax,
-                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData);
+                taxGroup, taxGroupOptions, isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat , productData ,savingsProductPropertiesData);
     }
 
     private SavingsProductData(final Long id, final String name, final String shortName, final String description,
@@ -370,7 +376,7 @@ public class SavingsProductData {
             final BigDecimal minBalanceForInterestCalculation, final BigDecimal nominalAnnualInterestRateOverdraft,
             final BigDecimal minOverdraftForInterestCalculation, final boolean withHoldTax, final TaxGroupData taxGroup,
             final Collection<TaxGroupData> taxGroupOptions, final Boolean isDormancyTrackingActive, final Long daysToInactive, 
-            final Long daysToDormancy, final Long daysToEscheat ,final ProductData productData) {
+            final Long daysToDormancy, final Long daysToEscheat ,final ProductData productData ,final SavingsProductPropertiesData savingsProductPropertiesData) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -430,6 +436,7 @@ public class SavingsProductData {
         // put something here to calculate portfolio balance
         this.portfolioBalance = null;
         this.productData = productData;
+        this.savingsProductPropertiesData = savingsProductPropertiesData;
     }
 
     public boolean hasAccountingEnabled() {
@@ -530,5 +537,13 @@ public class SavingsProductData {
 
     public ProductData productDataSettings(){
         return this.productData;
+    }
+
+    public void setSavingsProductPropertiesData(SavingsProductPropertiesData savingsProductPropertiesData) {
+        this.savingsProductPropertiesData = savingsProductPropertiesData;
+    }
+
+    public SavingsProductPropertiesData getSavingsProductPropertiesData() {
+        return savingsProductPropertiesData;
     }
 }
