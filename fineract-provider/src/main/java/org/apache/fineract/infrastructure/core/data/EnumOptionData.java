@@ -44,6 +44,13 @@ public class EnumOptionData {
     }
 
 
+    public EnumOptionData(final Long id, final String code) {
+        this.id = new Long(id);
+        this.code = code;
+        this.value = code;
+    }
+
+
     public Long getId() {
         return this.id;
     }

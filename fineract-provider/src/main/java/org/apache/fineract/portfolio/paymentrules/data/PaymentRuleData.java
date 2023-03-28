@@ -5,16 +5,25 @@
 package org.apache.fineract.portfolio.paymentrules.data;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.paymentrules.domain.PaymentSequence;
 import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.apache.fineract.utility.service.IEnum;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PaymentRuleData {
 
@@ -27,10 +36,37 @@ public class PaymentRuleData {
     private List<SavingsProductData> savingsProductData;
     private List<LoanProductData> loanProductData;
     private List<ShareAccountData> shareAccountData;
+    private Map<String ,List<EnumOptionData>> paymentSequenceParams;
 
     public static PaymentRuleData template(){
         List paymentCodes = EnumTemplateHelper.template(PAYMENT_CODE.values());
         return new PaymentRuleData(paymentCodes);
+    }
+
+    public static PaymentRuleData template(LoanProductReadPlatformService loanProductReadPlatformService , SavingsProductReadPlatformService savingsProductReadPlatformService){
+
+        Map<String ,List<EnumOptionData>> params = new HashMap<>();
+        Collection<? extends EnumeratedData> enumeratedDataCollection = null ;
+        for (PAYMENT_CODE paymentCode: PAYMENT_CODE.values()) {
+
+            switch (paymentCode.getRefTable()){
+                case LOAN:
+                    enumeratedDataCollection = (Collection<? extends EnumeratedData>) loanProductReadPlatformService.retrieveAllLoanProducts();
+                    break;
+                case ACCOUNT:
+                    enumeratedDataCollection = (Collection<? extends EnumeratedData>) savingsProductReadPlatformService.retrieveAll();
+                    break;
+
+            }
+            List<EnumeratedData> enumeratedDataList = enumeratedDataCollection.stream().collect(Collectors.toList());
+            List<EnumOptionData> enumOptionDataList = EnumTemplateHelper.fromEnumeratedList(enumeratedDataList);
+            params.put(paymentCode.getCode() ,enumOptionDataList);
+        }
+        return new PaymentRuleData(params);
+    }
+
+    public PaymentRuleData(Map<String, List<EnumOptionData>> paymentSequenceParams) {
+        this.paymentSequenceParams = paymentSequenceParams;
     }
 
     public PaymentRuleData(List<EnumOptionData> paymentCodesOptions) {

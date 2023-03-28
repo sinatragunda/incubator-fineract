@@ -28,12 +28,15 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
 import org.apache.fineract.portfolio.note.service.NoteReadPlatformService;
 import org.apache.fineract.portfolio.paymentrules.data.PaymentRuleData;
 import org.apache.fineract.portfolio.paymentrules.service.PaymentRulesReadService;
+import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
+import org.apache.fineract.portfolio.shareproducts.service.ShareProductReadPlatformServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -53,17 +56,24 @@ public class PaymentRulesApiResource {
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final PaymentRulesReadService paymentRulesReadService;
+    private final LoanProductReadPlatformService loanProductReadPlatformService;
+    private final SavingsProductReadPlatformService savingsProductReadPlatformService;
+    private final ShareProductReadPlatformServiceImpl shareProductReadPlatformService;
 
     @Autowired
     public PaymentRulesApiResource(final PlatformSecurityContext context, final NoteReadPlatformService readPlatformService,
                             final DefaultToApiJsonSerializer<PaymentRuleData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-                            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final PaymentRulesReadService paymentRulesReadService) {
+                            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService ,final PaymentRulesReadService paymentRulesReadService ,
+                                   final LoanProductReadPlatformService loanProductReadPlatformService ,final SavingsProductReadPlatformService savingsProductReadPlatformService ,final ShareProductReadPlatformServiceImpl shareProductReadPlatformService) {
         this.context = context;
         this.readPlatformService = readPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.paymentRulesReadService = paymentRulesReadService;
+        this.loanProductReadPlatformService = loanProductReadPlatformService;
+        this.savingsProductReadPlatformService = savingsProductReadPlatformService;
+        this.shareProductReadPlatformService = shareProductReadPlatformService;
     }
 
     @Path("/template")
@@ -72,7 +82,8 @@ public class PaymentRulesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String template(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
 
-        final PaymentRuleData paymentRuleData = paymentRulesReadService.template();
+        //final PaymentRuleData paymentRuleData = paymentRulesReadService.template(loanProductReadPlatformService ,savingsProductReadPlatformService,shareProductReadPlatformService);
+        final  PaymentRuleData paymentRuleData = PaymentRuleData.template(loanProductReadPlatformService ,savingsProductReadPlatformService);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, paymentRuleData);

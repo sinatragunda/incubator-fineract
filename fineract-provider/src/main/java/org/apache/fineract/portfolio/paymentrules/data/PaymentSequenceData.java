@@ -4,8 +4,11 @@
  */
 package org.apache.fineract.portfolio.paymentrules.data;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
+
+import java.util.List;
 
 public class PaymentSequenceData {
 
@@ -15,6 +18,8 @@ public class PaymentSequenceData {
     private REF_TABLE refTable ;
     private PAYMENT_CODE paymentCode;
     private String paymentCodeValue;
+
+    private List<EnumOptionData> paramValues ;
 
     public PaymentSequenceData(Long id, Integer sequenceNumber, String value, REF_TABLE refTable, PAYMENT_CODE paymentCode) {
         this.id = id;

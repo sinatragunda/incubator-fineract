@@ -48,6 +48,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProductConfigurableA
 import org.apache.fineract.portfolio.loanproduct.enumerations.LOAN_FACTOR_SOURCE_ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.loanproduct.service.LoanEnumerations;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 import org.springframework.util.CollectionUtils;
 
@@ -56,7 +57,7 @@ import org.apache.fineract.wese.enumerations.SACCO_LOAN_LOCK ;
 /**
  * Immutable data object to represent loan products.
  */
-public class LoanProductData {
+public class LoanProductData implements EnumeratedData {
 
     private final Long id;
     private final String name;

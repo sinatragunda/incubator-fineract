@@ -10,7 +10,6 @@ import org.apache.fineract.utility.service.IEnum;
 
 public enum PAYMENT_CODE implements IEnum {
 
-    NA("Non Applicable" , null),
     LOAN_EARLY_REPAYMENT("Loan Early Repayment" ,REF_TABLE.LOAN),
     LOAN_DUE_REPAYMENT("Loan Due Repayment" ,REF_TABLE.LOAN),
     LOAN_NPA_REPAYMENT("Loans NPA Repayment",REF_TABLE.LOAN),

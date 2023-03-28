@@ -6,6 +6,7 @@ package org.apache.fineract.utility.helper;
 
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.apache.fineract.utility.service.IEnum;
 
 import java.util.ArrayList;
@@ -71,6 +72,17 @@ public class EnumTemplateHelper {
             return values[0];
         }
         return iEnum;
+    }
+
+    public static List<EnumOptionData> fromEnumeratedList(List<? extends EnumeratedData> genericList){
+
+        List<EnumOptionData> enumOptionDataList = new ArrayList<>();
+
+        for(EnumeratedData enumeratedData : genericList){
+            EnumOptionData enumOptionData = new EnumOptionData(enumeratedData.getId(), enumeratedData.getName());
+            enumOptionDataList.add(enumOptionData);
+        }
+        return enumOptionDataList;
     }
 
 }

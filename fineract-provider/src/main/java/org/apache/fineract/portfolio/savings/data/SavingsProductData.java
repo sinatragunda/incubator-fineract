@@ -33,11 +33,12 @@ import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
+import org.apache.fineract.utility.service.EnumeratedData;
 
 /**
  * Immutable data object represent a savings product.
  */
-public class SavingsProductData {
+public class SavingsProductData implements EnumeratedData {
 
     private final Long id;
     private final String name;

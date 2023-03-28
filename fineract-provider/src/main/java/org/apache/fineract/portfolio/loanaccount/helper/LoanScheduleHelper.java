@@ -14,6 +14,8 @@ import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,7 +33,7 @@ public class LoanScheduleHelper {
         this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
     }
 
-    public LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment(Loan loan , LocalDate transactionDate , PAYMENT_CODE paymentCode){
+    public LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment(Loan loan , Date transactionDate , PAYMENT_CODE paymentCode){
 
         Long loanId = loan.getId();
 
@@ -67,7 +69,7 @@ public class LoanScheduleHelper {
     }
 
 
-    public LoanRepaymentScheduleInstallment activeSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList ,LocalDate transactionDate ,boolean allowEarlyRepayments){
+    public LoanRepaymentScheduleInstallment activeSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList , Date transactionDate , boolean allowEarlyRepayments){
 
         for(LoanRepaymentScheduleInstallment loanRepaymentSchedule : loanRepaymentScheduleList){
 
