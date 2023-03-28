@@ -11,4 +11,5 @@ import java.math.BigDecimal;
 public interface LoanTransactionReadPlatformService {
 
     public BigDecimal interestAccrued(LoanReadPlatformService loanReadPlatformService, final Long loanId);
+    public LoanTransactionData retrieveOne(Long loanTransactionId);
 }

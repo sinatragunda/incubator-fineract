@@ -144,4 +144,10 @@ public class TemplatePopulateImportConstants {
     //Loan Account/Loan repayment Client External Id
     public static final Boolean CONTAINS_CLIENT_EXTERNAL_ID=true;
 
+    /**
+     * Added 28/03/2023 at 1150
+     */
+    public static final int ID_NAME_COL = 0;//A
+      
+
 }

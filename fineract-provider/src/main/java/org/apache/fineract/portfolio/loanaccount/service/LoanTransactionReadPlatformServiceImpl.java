@@ -33,4 +33,10 @@ public class LoanTransactionReadPlatformServiceImpl implements LoanTransactionRe
 
         return totalAccrued;
     }
+
+
+    @Override
+    public LoanTransactionData retrieveOne(Long loanTransactionId) {
+        return loanReadPlatformService.retrieveLoanTransactionWithoutLoanId(loanTransactionId);
+    }
 }
