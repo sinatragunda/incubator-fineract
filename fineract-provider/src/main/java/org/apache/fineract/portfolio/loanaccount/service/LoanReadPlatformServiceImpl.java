@@ -1403,6 +1403,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     + " tr.overpayment_portion_derived as overpayment, tr.outstanding_loan_balance_derived as outstandingLoanBalance, "
                     + " tr.unrecognized_income_portion as unrecognizedIncome,"
                     + " tr.submitted_on_date as submittedOnDate, "
+                    + " tr.is_reversed as reversed, "
                     + " tr.manually_adjusted_or_reversed as manuallyReversed, "
                     + " pd.payment_type_id as paymentType,pd.account_number as accountNumber,pd.check_number as checkNumber, "
                     + " pd.receipt_number as receiptNumber, pd.bank_number as bankNumber,pd.routing_code as routingCode, "
@@ -1439,7 +1440,16 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final String officeName = rs.getString("officeName");
             final int transactionTypeInt = JdbcSupport.getInteger(rs, "transactionType");
             final LoanTransactionEnumData transactionType = LoanEnumerations.transactionType(transactionTypeInt);
-            final boolean manuallyReversed = rs.getBoolean("manuallyReversed");
+            
+            final boolean manuallyReversedTemp = rs.getBoolean("manuallyReversed") ;
+
+            /**
+             * Added 30/03/2023 at 0133
+             * Get value of reversal status on ui
+             * Make manuallyRerversed an OR gate so that it returns true if one is true 
+             */ 
+            final boolean reversed = rs.getBoolean("reversed");
+            final boolean manuallyReversed = manuallyReversedTemp || reversed ;
 
             PaymentDetailData paymentDetailData = null;
 

@@ -28,7 +28,13 @@ public enum ImportFormatType {
 
     /// added 24/08/2021
     XLS_NEW("xls"),
-    XLSX_NEW("xlsx");
+    XLSX_NEW("xlsx"),
+
+    /**
+     * Modified 29/09/2023 at 1317
+     * Added to support csv format  
+     */
+    CSV("csv");  
 
 
     private final String format;

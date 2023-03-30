@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 02/02/2023 0231PM
 
-CREATE TABLE `m_application` (
+CREATE TABLE IF NOT EXISTS `m_application` (
 	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (`id`) USING BTREE
 )

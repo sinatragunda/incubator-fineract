@@ -19,7 +19,7 @@
 -- Created 13/03/2023 1018PM
 
 
-CREATE TABLE `m_screen_object` (
+CREATE TABLE IF NOT EXISTS `m_screen_object` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(50) NOT NULL DEFAULT '0',
 	`office_id` BIGINT NOT NULL DEFAULT 0,

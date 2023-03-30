@@ -74,7 +74,6 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
                 currentUser = (AppUser) auth.getPrincipal();
             }
         }
-
         if (currentUser == null) {
             System.err.println("---------------why----we getting such error ?-------------- ");
             boolean raiseCheat = ThreadCheat.isRaise();
@@ -84,10 +83,9 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
                 currentUser = ThreadCheat.getStolenUser();
                 return currentUser;
             }
-
+            System.err.println("==================throw exception un authenticated user ");
             throw new UnAuthenticatedUserException();
         }
-
         if (this.doesPasswordHasToBeRenewed(currentUser)) { throw new ResetPasswordException(currentUser.getId()); }
 
         return currentUser;

@@ -70,6 +70,8 @@ public class TemplatePopulateImportConstants {
     public final static String STATUS_DISBURSAL_FAILED="Disbursal failed";
     public final static String STATUS_DISBURSAL_REPAYMENT_FAILED="Repayment failed";
     public final static String STATUS_COLUMN_HEADER="Status";
+    public final static String STATUS_CELL_REVERSED="Reversed";
+    
 
     //Frequency Calender
     public static final String FREQUENCY_DAILY="Daily";

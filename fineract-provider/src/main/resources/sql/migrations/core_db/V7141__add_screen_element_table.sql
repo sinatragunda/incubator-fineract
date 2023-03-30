@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 13/03/2023 1027PM
 
-CREATE TABLE `m_screen_element` (
+CREATE TABLE IF NOT EXISTS `m_screen_element` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(50) NOT NULL DEFAULT '0',
 	`model_name` VARCHAR(100) NOT NULL DEFAULT '0',

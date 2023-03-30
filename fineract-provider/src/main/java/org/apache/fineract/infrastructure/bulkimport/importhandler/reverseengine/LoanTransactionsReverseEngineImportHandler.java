@@ -3,31 +3,12 @@
  * on 28 March 2023 at 11:46
  */
 package org.apache.fineract.infrastructure.bulkimport.importhandler.reverseengine;
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package org.apache.fineract.infrastructure.bulkimport.importhandler.loanrepayment;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.bulkimport.constants.LoanRepaymentConstants;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.bulkimport.data.Count;
@@ -35,8 +16,14 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandler
 import org.apache.fineract.infrastructure.bulkimport.importhandler.ImportHandlerUtils;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSerializer;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.*;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.repo.LoanTransactionRepositoryWrapper;
+import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionReadPlatformService;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,18 +32,28 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 @Service
-public class LoanRepaymentImportHandler implements ImportHandler {
+public class LoanTransactionsReverseEngineImportHandler implements ImportHandler {
     
     private Workbook workbook;
     private List<LoanTransactionData> loanTransactions;
-    private 
-
+    private final LoanAccountDomainService loanAccountDomainService;
+    private final LoanTransactionReadPlatformService loanTransactionReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+    private final LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper;
+    private final LoanReadPlatformService loanReadPlatformService;
     @Autowired
-    public LoanRepaymentImportHandler(final PortfolioCommandSourceWritePlatformService
-                                              commandsSourceWritePlatformService) {
+    public LoanTransactionsReverseEngineImportHandler(final PortfolioCommandSourceWritePlatformService
+                                              commandsSourceWritePlatformService ,LoanTransactionReadPlatformService loanTransactionReadPlatformService ,LoanAccountDomainService loanAccountDomainService ,final  LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper ,final LoanReadPlatformService loanReadPlatformService) {
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
+        this.loanAccountDomainService = loanAccountDomainService;
+        this.loanTransactionReadPlatformService = loanTransactionReadPlatformService;
+        this.loanTransactionRepositoryWrapper = loanTransactionRepositoryWrapper;
+        this.loanReadPlatformService = loanReadPlatformService;
     }
 
     @Override
@@ -69,36 +66,39 @@ public class LoanRepaymentImportHandler implements ImportHandler {
 
     public void readExcelFile(String locale, String dateFormat) {
         
-        Sheet loanTransactionSheet = workbook.getSheet(0);
+        Sheet loanTransactionsSheet = workbook.getSheetAt(0);
         
-        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanRepaymentSheet, LoanRepaymentConstants.AMOUNT_COL);
-        
+        Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanTransactionsSheet,TemplatePopulateImportConstants.ID_NAME_COL);
+
+        System.err.println("--------------number of entries are ==============="+noOfEntries);
+
         for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
             Row row = loanTransactionsSheet.getRow(rowIndex);
             LoanTransactionData loanTransactionData = readLoanTransaction(row ,locale ,dateFormat);
             boolean has = OptionalHelper.isPresent(loanTransactionData);
             if(has){
-                loanTransactions.add(readLoanTransaction(row,locale,dateFormat));
+                System.err.println("====================has entry transaction "+rowIndex+"=======other is "+row.getRowNum());
+                loanTransactionData.setRowIndex(rowIndex);
+                loanTransactions.add(loanTransactionData);
             }
         }
     }
-
     private LoanTransactionData readLoanTransaction(Row row,String locale, String dateFormat) {
         
-        Long transactionId = ImportHandlerUtils.readAsLong(TemplatePopulateImportConstants.ID_NAME_COL);
+        Long transactionId = ImportHandlerUtils.readAsLong(TemplatePopulateImportConstants.ID_NAME_COL ,row);
         boolean has = OptionalHelper.isPresent(transactionId);
-
         if(!has){
             return null ;
         }
-        LoanTransactionData loanTransactionData = loanTransactionReadPlatformService.retrieveOne(transactionId);
+        System.err.println("==============percieved transaction id is "+transactionId+"-------has value ----"+has);
+        LoanTransactionData loanTransactionData = loanTransactionReadPlatformService.retrieveOne(loanReadPlatformService,transactionId);
         return loanTransactionData;
     }
 
 
     public Count reverse(String dateFormat){
 
-        Sheet loanRepaymentSheet = workbook.getSheet(0);
+        Sheet loanTransactionsSheet = workbook.getSheetAt(0);
         int successCount=0;
         int errorCount=0;
         String errorMessage="";
@@ -109,30 +109,26 @@ public class LoanRepaymentImportHandler implements ImportHandler {
         for (LoanTransactionData loanTransactionData : loanTransactions) {
             try {
 
-                JsonObject loanTransactionJsonob=gsonBuilder.create().toJsonTree(loanTransactionData).getAsJsonObject();
-                String payload=loanRepaymentJsonob.toString();
-                
-                final CommandWrapper commandRequest = new CommandWrapperBuilder() //
-                        .loanRepaymentTransaction(loanRepayment.getAccountId().longValue()) //
-                        .withJson(payload) //
-                        .build(); //
-                final CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+                System.err.println("==================================reversing transactions now "+loanTransactionData.getId());
+                Long transactionId = loanTransactionData.getId();
+                LoanTransaction loanTransaction = loanTransactionRepositoryWrapper.findOneWithNotFoundDetection(transactionId) ;
+                loanAccountDomainService.reverseTransfer(loanTransaction);
+                final CommandProcessingResult result = new CommandProcessingResultBuilder().withEntityId(loanTransaction.getId()).build();
                 successCount++;
-                Cell statusCell = loanRepaymentSheet.getRow(loanRepayment.getRowIndex()).createCell(LoanRepaymentConstants.STATUS_COL);
-                statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
+                Cell statusCell = loanTransactionsSheet.getRow(loanTransactionData.getRowIndex()).createCell(LoanRepaymentConstants.STATUS_COL);
+                statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_REVERSED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
             }catch (RuntimeException ex){
                 errorCount++;
                 ex.printStackTrace();
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);
-                ImportHandlerUtils.writeErrorMessage(loanTransactionSheet,loanTransaction.getRowIndex(),errorMessage,LoanRepaymentConstants.STATUS_COL);
+                ImportHandlerUtils.writeErrorMessage(loanTransactionsSheet,loanTransactionData.getRowIndex(),errorMessage,LoanRepaymentConstants.STATUS_COL);
             }
-
         }
 
-        loanTransactionSheet.setColumnWidth(LoanRepaymentConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
+        loanTransactionsSheet.setColumnWidth(LoanRepaymentConstants.STATUS_COL, TemplatePopulateImportConstants.SMALL_COL_SIZE);
         ImportHandlerUtils.writeString(LoanRepaymentConstants.STATUS_COL,
-                loanRepaymentSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
+                loanTransactionsSheet.getRow(TemplatePopulateImportConstants.ROWHEADER_INDEX),
                 TemplatePopulateImportConstants.STATUS_COL_REPORT_HEADER);
         return Count.instance(successCount,errorCount);
     }

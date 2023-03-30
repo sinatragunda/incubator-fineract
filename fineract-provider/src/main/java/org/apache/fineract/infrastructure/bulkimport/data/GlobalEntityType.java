@@ -65,8 +65,12 @@ public enum GlobalEntityType {
     SHARE_ACCOUNTS_TRANSACTIONS(33,"shareaccountstransactions"),
 
     // added 15/12/2021
-    SSB_PAYMENTS(34 ,"ssbpayments");
+    SSB_PAYMENTS(34 ,"ssbpayments"),
     
+    /**
+     * Added 28/03/2023 at 1348
+     */
+    LOAN_TRANSACTIONS_REVERSE(35 ,"loanstransactionsreverse");   
 
     private final Integer value;
     private final String code;

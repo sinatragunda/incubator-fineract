@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 23/03/2023 1752
 
-CREATE TABLE `m_payment_rule` (
+CREATE TABLE IF NOT EXISTS `m_payment_rule` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(200) NOT NULL DEFAULT '0',
 	`office_id` BIGINT NOT NULL DEFAULT 0,

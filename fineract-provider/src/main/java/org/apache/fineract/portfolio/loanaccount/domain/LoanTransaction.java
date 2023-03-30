@@ -364,6 +364,7 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
 
     public void reverse() {
         this.reversed = true;
+        this.manuallyAdjustedOrReversed = true ;
         this.loanTransactionToRepaymentScheduleMappings.clear();
     }
 

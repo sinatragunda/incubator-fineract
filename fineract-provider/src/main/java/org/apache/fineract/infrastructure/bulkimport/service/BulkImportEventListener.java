@@ -143,6 +143,13 @@ public class BulkImportEventListener implements ApplicationListener<BulkImportEv
             case SSB_PAYMENTS:
                 importHandler = this.applicationContext.getBean("ssbPaymentsImportHandler" ,ImportHandler.class);
                 break;
+            /**
+             * Added 28/03/2023 at 1444
+             */ 
+            case LOAN_TRANSACTIONS_REVERSE:
+                System.err.println("--------------reverse bulk transactions here ");
+                importHandler = this.applicationContext.getBean("loanTransactionsReverseEngineImportHandler" ,ImportHandler.class);
+                break;    
 
             default : throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
                     "Unable to find requested resource");

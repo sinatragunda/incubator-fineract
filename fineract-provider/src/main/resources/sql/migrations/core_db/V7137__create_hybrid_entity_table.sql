@@ -18,7 +18,7 @@
 -- Created 08/03/2023 ,time 0849
 
 
-CREATE TABLE `m_hybrid_entity_table` (
+CREATE TABLE IF NOT EXISTS `m_hybrid_entity_table` (
 	`id` BIGINT NOT NULL DEFAULT 0,
 	`ref_table` INT NOT NULL DEFAULT 0,
 	`x_registered_table_id` BIGINT NOT NULL DEFAULT 0,

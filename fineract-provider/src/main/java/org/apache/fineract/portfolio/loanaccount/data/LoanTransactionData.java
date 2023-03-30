@@ -175,12 +175,19 @@ public class LoanTransactionData {
         this.writeOffReasonOptions = null;
     }
 
+    public Long getId(){
+        return id ;
+    }
+
     public Integer getAccountId() {
         return accountId;
     }
 
     public Integer getRowIndex() {
         return rowIndex;
+    }
+    public void setRowIndex(int arg) {
+        rowIndex = arg;
     }
 
     public static LoanTransactionData templateOnTop(final LoanTransactionData loanTransactionData,

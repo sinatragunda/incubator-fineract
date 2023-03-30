@@ -91,17 +91,21 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
     public Long importWorkbook(String entity, InputStream inputStream, FormDataContentDisposition fileDetail,
             final String locale, final String dateFormat) {
         try {
-            if (entity !=null && inputStream!=null &&fileDetail!=null&&locale!=null&&dateFormat!=null) {
+
+            if(entity !=null && inputStream!=null &&fileDetail!=null&&locale!=null&&dateFormat!=null) {
 
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 IOUtils.copy(inputStream, baos);
                 final byte[] bytes = baos.toByteArray();
                 InputStream clonedInputStream = new ByteArrayInputStream(bytes);
-                InputStream clonedInputStreamWorkbook =new ByteArrayInputStream(bytes);
+                InputStream clonedInputStreamWorkbook = new ByteArrayInputStream(bytes);
                 final Tika tika = new Tika();
                 final TikaInputStream tikaInputStream = TikaInputStream.get(clonedInputStream);
+                
                 final String fileType = tika.detect(tikaInputStream);
+                
                 final String fileExtension = Files.getFileExtension(fileDetail.getFileName()).toLowerCase();
+
                 ImportFormatType format = ImportFormatType.of(fileExtension);
 
                 if(fileType==null){
@@ -202,10 +206,17 @@ public class BulkImportWorkbookServiceImpl implements BulkImportWorkbookService 
                     primaryColumn = 0;
                 }
 
+                else if(entity.trim().equalsIgnoreCase(GlobalEntityType.LOAN_TRANSACTIONS_REVERSE.toString())){
+                    entityType = GlobalEntityType.LOAN_TRANSACTIONS_REVERSE;
+                    primaryColumn = 0;
+                }
+
                 else{
                     throw new GeneralPlatformDomainRuleException("error.msg.unable.to.find.resource",
                             "Unable to find requested resource");
                 }
+
+                System.err.println("========where do we go from here ?");
                 return publishEvent(primaryColumn, fileDetail, clonedInputStreamWorkbook, entityType,
                         workbook, locale, dateFormat);
             }else {

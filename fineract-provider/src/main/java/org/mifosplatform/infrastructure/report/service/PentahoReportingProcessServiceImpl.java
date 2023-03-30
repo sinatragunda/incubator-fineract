@@ -141,7 +141,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 return file ;
             }
         } catch (final ResourceException e) {
-            System.err.println("-----------------------reporting error ?");
+            System.err.println("-----------------------reporting error ?"+e.getMessage());
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         }
         throw new PlatformDataIntegrityException("error.msg.invalid.outputType", "No matching Output Type: " + outputType);
@@ -255,10 +255,14 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 
                 final String paramName = paramDefEntry.getName();
 
+                System.err.println("----------param name is ?"+paramName);
+
                 if (!((paramName.equals("tenantUrl")) || (paramName.equals("userhierarchy") || (paramName.equals("username")) || (paramName
                         .equals("password") || (paramName.equals("userid")))))) {
                     logger.info("paramName:" + paramName);
                     final String pValue = queryParams.get(paramName);
+
+                    System.err.println("------------------------pValue is "+pValue);
                     if (StringUtils.isBlank(pValue)) { throw new PlatformDataIntegrityException("error.msg.reporting.error",
                             "Pentaho Parameter: " + paramName + " - not Provided"); }
 

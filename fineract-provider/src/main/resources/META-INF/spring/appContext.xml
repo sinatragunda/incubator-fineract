@@ -121,6 +121,9 @@
 	<!-- Added 23/03/2023 at 1827 -->
 	<jpa:repositories base-package="org.apache.fineract.portfolio.paymentrules.repo.*"/>
 
+	<!-- Added 28/03/2023 at 1329 -->
+	<jpa:repositories base-package="org.apache.fineract.portfolio.loanaccount.repo.*"/>
+
 	<import resource="infrastructure.xml" />
 
 	<import resource="securityContext.xml" />

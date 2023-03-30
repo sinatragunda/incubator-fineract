@@ -142,7 +142,6 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
 
                 String authToken = request.getHeader("Authorization");
 
-
                 RequestState requestState = new RequestState(request);
                 ThreadLocalContextUtil.setRequestState(requestState);
 

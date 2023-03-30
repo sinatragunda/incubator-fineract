@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.api;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,14 +40,20 @@ import org.apache.fineract.accounting.journalentry.api.DateParam;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
+import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
+import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.repo.LoanTransactionRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
@@ -54,6 +61,11 @@ import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
+import org.apache.commons.lang.StringUtils;
+
 
 @Path("/loans/{loanId}/transactions")
 @Component
@@ -71,19 +83,25 @@ public class LoanTransactionsApiResource {
     private final DefaultToApiJsonSerializer<LoanTransactionData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final PaymentTypeReadPlatformService paymentTypeReadPlatformService;
+    private final LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper;
+    private final LoanAccountDomainService loanAccountDomainService;
+    private final BulkImportWorkbookService bulkImportWorkbookService;
 
     @Autowired
     public LoanTransactionsApiResource(final PlatformSecurityContext context, final LoanReadPlatformService loanReadPlatformService,
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final DefaultToApiJsonSerializer<LoanTransactionData> toApiJsonSerializer,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            PaymentTypeReadPlatformService paymentTypeReadPlatformService) {
+            PaymentTypeReadPlatformService paymentTypeReadPlatformService ,final LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper ,final LoanAccountDomainService loanAccountDomainService ,final BulkImportWorkbookService bulkImportWorkbookService) {
         this.context = context;
         this.loanReadPlatformService = loanReadPlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
         this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
+        this.loanAccountDomainService = loanAccountDomainService;
+        this.loanTransactionRepositoryWrapper = loanTransactionRepositoryWrapper;
+        this.bulkImportWorkbookService = bulkImportWorkbookService;
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -195,18 +213,23 @@ public class LoanTransactionsApiResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String executeLoanTransaction(@PathParam("loanId") final Long loanId, @QueryParam("command") final String commandParam,
+    public String executeLoanTransaction(@PathParam("loanId") final Long loanId, @PathParam("transactionId") final Long transactionId ,@QueryParam("command") final String commandParam,
             final String apiRequestBodyAsJson) {
 
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
-        //LoanTransaction loanTransaction = loanTransactionRepository.findOne()
 
         CommandProcessingResult result = null;
         if (is(commandParam, "repayment")) {
             final CommandWrapper commandRequest = builder.loanRepaymentTransaction(loanId).build();
             result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
-        } else if (is(commandParam, "waiveinterest")) {
+        }
+        else if (is(commandParam, "undo")) {
+            LoanTransaction loanTransaction = loanTransactionRepositoryWrapper.findOneWithNotFoundDetection(transactionId);
+            loanAccountDomainService.reverseTransfer(loanTransaction);
+            result = new CommandProcessingResultBuilder().withEntityId(loanTransaction.getId()).build();
+        }
+        else if (is(commandParam, "waiveinterest")) {
             final CommandWrapper commandRequest = builder.waiveInterestPortionTransaction(loanId).build();
             result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         } else if (is(commandParam, "writeoff")) {
@@ -250,6 +273,26 @@ public class LoanTransactionsApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
+    }
+
+
+    /**
+     * Added 28/03/2023 at 1409 
+     * The first column is the only value validated and should contain transaction id 
+     */ 
+    @POST
+    @Path("reverseengine")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public String bulkReverseLoanTransactions(@FormDataParam("file") InputStream uploadedInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail,
+            @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat){
+        
+        System.err.println("------------import document ----------------------");
+        final Long importDocumentId = this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_TRANSACTIONS_REVERSE.toString(), uploadedInputStream,fileDetail,locale,dateFormat);
+        
+        System.err.println("===============why import id always "+importDocumentId);
+
+        return this.toApiJsonSerializer.serialize(importDocumentId);
     }
 
 }

@@ -13,11 +13,13 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoanTransactionReadPlatformServiceImpl implements LoanTransactionReadPlatformService{
+
 
     
     public LoanTransactionReadPlatformServiceImpl(){}
@@ -36,7 +38,7 @@ public class LoanTransactionReadPlatformServiceImpl implements LoanTransactionRe
 
 
     @Override
-    public LoanTransactionData retrieveOne(Long loanTransactionId) {
+    public LoanTransactionData retrieveOne(LoanReadPlatformService loanReadPlatformService , Long loanTransactionId) {
         return loanReadPlatformService.retrieveLoanTransactionWithoutLoanId(loanTransactionId);
     }
 }
