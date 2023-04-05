@@ -24,4 +24,9 @@ public class ChargesApiConstants {
     public static final String taxGroupIdParamName = "taxGroupId";
     public static final String transactionCodeIdParamName = "transactionCodeId";
     public static final String commissionedChargeParam  = "isCommissionedCharge";
+    public static final String chargeTiersParam = "tiers";
+    public static final String minTierParam = "minTier";
+    public static final String maxTierParam = "maxTier";
+    public static final String overlappingParam = "overlapping";
+    public static final String tierTypeParam = "tierType";
 }

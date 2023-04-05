@@ -56,7 +56,7 @@ public final class ChargeDefinitionCommandFromApiJsonDeserializer {
     private final Set<String> supportedParameters = new HashSet<>(Arrays.asList("name", "amount", "locale", "currencyCode",
             "currencyOptions", "chargeAppliesTo", "chargeTimeType", "chargeCalculationType", "chargeCalculationTypeOptions", "penalty",
             "active", "chargePaymentMode", "feeOnMonthDay", "feeInterval", "monthDayFormat", "minCap", "maxCap", "feeFrequency",
-            ChargesApiConstants.glAccountIdParamName, ChargesApiConstants.taxGroupIdParamName ,ChargesApiConstants.transactionCodeIdParamName ,ChargesApiConstants.commissionedChargeParam));
+            ChargesApiConstants.glAccountIdParamName, ChargesApiConstants.taxGroupIdParamName ,ChargesApiConstants.transactionCodeIdParamName ,ChargesApiConstants.commissionedChargeParam ,ChargesApiConstants.chargeTiersParam));
 
 
     private final FromJsonHelper fromApiJsonHelper;

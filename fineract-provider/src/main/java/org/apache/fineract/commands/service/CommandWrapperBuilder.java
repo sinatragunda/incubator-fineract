@@ -3374,4 +3374,22 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 30/03/2023 at 1722
+     */ 
+    public CommandWrapperBuilder createMenuItem() {
+        this.actionName = "CREATE";
+        this.entityName = "MENUITEM";
+        this.href = "/menu/menuitem";
+        return this;
+    }
+
+
+    public CommandWrapperBuilder createMenu() {
+        this.actionName = "CREATE";
+        this.entityName = "MENU";
+        this.href = "/menu";
+        return this;
+    }
+
 }

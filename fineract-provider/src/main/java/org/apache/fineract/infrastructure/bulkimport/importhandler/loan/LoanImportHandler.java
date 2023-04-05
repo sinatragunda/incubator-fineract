@@ -156,6 +156,8 @@ public class LoanImportHandler implements ImportHandler {
 
         String repaymentType = ImportHandlerUtils.readAsString(LoanConstants.REPAYMENT_TYPE_COL, row);
 
+        System.err.println("----------------------repayment type is "+repaymentType);
+
         boolean isRepaymentTypePresent = Optional.of(repaymentType).isPresent();
 
         if(!isRepaymentTypePresent){
@@ -258,13 +260,11 @@ public class LoanImportHandler implements ImportHandler {
             loanTermFrequencyEnum = new EnumOptionData(null, null, loanTermFrequencyId);
         }
 
-        System.err.println("---------------start to adjust for loan "+externalId);
-
         // loan adjustments here 
-        int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan(adjustDate ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
+        //int newNumberOfRepayments = NkwaziLoanAdjustmentsHelper.adjustLoan(adjustDate ,submittedOnDate ,numberOfRepayments,loanTermFrequency);
 
         /// nkwazi adjustments to be removed 
-        if(newNumberOfRepayments <= 0){
+        /*if(newNumberOfRepayments <= 0){
             System.err.println("--------------------skipping loan "+externalId);
             System.err.println("--------------------skipping loan "+externalId);
             String message = String.format("Loan is past due as of %s ,Process skipped" ,adjustDate);
@@ -274,7 +274,7 @@ public class LoanImportHandler implements ImportHandler {
 
         submittedOnDate = DateUtils.parseLocalDate(adjustDate ,"dd/MM/YYYY");
 
-        numberOfRepayments = newNumberOfRepayments;
+        numberOfRepayments = newNumberOfRepayments;*/
 
         BigDecimal nominalInterestRate = null;
         if ( ImportHandlerUtils.readAsDouble(LoanConstants.NOMINAL_INTEREST_RATE_COL, row) != null)
@@ -387,9 +387,6 @@ public class LoanImportHandler implements ImportHandler {
             }
         }
 
-
-        System.err.println("------------------------------loan added somewhere is error ----------------");
-
         /// bulk imports dont work for revolving accounts 
         /// added 21/08/2021  ,loanfactoring doesnt work at this stage maybe in the later versions it will work
         
@@ -401,13 +398,17 @@ public class LoanImportHandler implements ImportHandler {
 
                 // returns 0L if value of clientId is null ,so we must search using client external id
                 // check if client exist first by using client external id . 
+
+                System.err.println("-------------------external id is "+externalId);
                 Long clientId = ImportHandlerUtils.getIdByExternalId(clientReadPlatformService ,clientExternalId);
 
                 Boolean notValidClientId = ComparatorUtility.isLongZero(clientId);
-
+                //Boolean notValidClientId = true ;
                 // if client id is null again lets skip but will have problem in finding out which loans failed or succedded
-                if(notValidClientId){           
+                if(notValidClientId){
+                    System.err.println("============client name is "+clientOrGroupName);           
                     clientId =  ImportHandlerUtils.getIdByName(workbook.getSheet(TemplatePopulateImportConstants.CLIENT_SHEET_NAME), clientOrGroupName);
+                    System.err.println("---------------------------do we get client id ? "+clientId);
                 }
 
                 return LoanAccountData.importInstanceIndividual(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId[0],

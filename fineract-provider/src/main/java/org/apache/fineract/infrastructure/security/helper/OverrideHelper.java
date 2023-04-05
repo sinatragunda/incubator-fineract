@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.infrastructure.security.helper;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 
 public class OverrideHelper {
@@ -16,9 +17,18 @@ public class OverrideHelper {
 
     /**
      * Added 06/03/2023 at 0930
-     *
      */
     public static Long timestamp(){
-        return ThreadLocalContextUtil.getRequestState().get().getTimestamp();
+
+        RequestState requestState = ThreadLocalContextUtil.getRequestState().get();
+        boolean hasState = OptionalHelper.isPresent(requestState);
+
+        if(hasState){
+            return requestState.getTimestamp();
+        }
+
+        requestState = new RequestState();
+        ThreadLocalContextUtil.setRequestState(requestState);
+        return requestState.getTimestamp();
     }
 }

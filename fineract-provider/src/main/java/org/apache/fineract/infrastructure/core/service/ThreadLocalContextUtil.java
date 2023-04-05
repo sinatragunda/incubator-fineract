@@ -18,9 +18,12 @@
  */
 package org.apache.fineract.infrastructure.core.service;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.security.helper.RequestState;
 import org.springframework.util.Assert;
+
+import java.util.Optional;
 
 /**
  *
@@ -46,7 +49,14 @@ public class ThreadLocalContextUtil {
      * Added 05/03/2023 at 0444
      * Timestamp data ,this is test not final solution
      */ 
-    public static ThreadLocal<RequestState> getRequestState() {
+    public static ThreadLocal<RequestState> getRequestState(){
+        RequestState requestState = requestStateContext.get();
+
+        boolean hasState = OptionalHelper.isPresent(requestState);
+        if(!hasState){
+            System.err.println("===================has no state create new state ");
+            requestStateContext.set(new RequestState());
+        }
         return requestStateContext;
     }
     public static void setRequestState(RequestState requestState){

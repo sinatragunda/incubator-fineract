@@ -245,7 +245,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
      */
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {
 
-        //System.err.println("====================get real cause message here son =========="+realCause.getMessage());
+        System.err.println("====================get real cause message here son =========="+realCause.getMessage());
 
         if (realCause.getMessage().contains("external_id")) {
             final String externalId = command.stringValueOfParameterNamed("externalId");

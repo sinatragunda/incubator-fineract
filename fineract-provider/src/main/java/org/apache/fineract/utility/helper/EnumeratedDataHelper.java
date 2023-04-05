@@ -25,4 +25,14 @@ public class EnumeratedDataHelper {
 
         return enumOptionDataList;
     }
+
+    /**
+     * Added 30/03/2023 at 2050
+     */
+
+    public static EnumOptionData enumOptionData(EnumeratedData e){
+        
+        EnumOptionData enumOptionData = new EnumOptionData(e.getId() ,e.getName(),e.getName());
+        return enumOptionData;
+    }  
 }

@@ -13,6 +13,7 @@ package org.apache.fineract.portfolio.localref.api;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -38,6 +39,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.PathParam;
 
+import org.apache.fineract.presentation.menu.domain.ShortcutEntry;
+import org.apache.fineract.presentation.menu.helper.CommandShortcutHelper;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -70,9 +73,10 @@ public class LocalRefApiResource {
     private final LocalRefReadPlatformService localRefReadPlatformService;
     private final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer;
     private final ReadWriteNonCoreDataService readWriteNonCoreDataService;
+    private final CommandShortcutHelper commandShortcutHelper;
 
     @Autowired
-    public LocalRefApiResource(PlatformSecurityContext platformSecurityContext, FromJsonHelper fromJsonHelper, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, ToApiJsonSerializer<LocalRef> localRefToApiJsonSerializer, ApiRequestParameterHelper apiRequestParameterHelper, LocalRefReadPlatformService localRefReadPlatformService ,ToApiJsonSerializer toApiJsonSerializer ,ReadWriteNonCoreDataService readWriteNonCoreDataService) {
+    public LocalRefApiResource(PlatformSecurityContext platformSecurityContext, FromJsonHelper fromJsonHelper, PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService, ToApiJsonSerializer<LocalRef> localRefToApiJsonSerializer, ApiRequestParameterHelper apiRequestParameterHelper, LocalRefReadPlatformService localRefReadPlatformService ,ToApiJsonSerializer toApiJsonSerializer ,ReadWriteNonCoreDataService readWriteNonCoreDataService ,final CommandShortcutHelper commandShortcutHelper) {
         this.platformSecurityContext = platformSecurityContext;
         this.fromJsonHelper = fromJsonHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
@@ -81,6 +85,7 @@ public class LocalRefApiResource {
         this.localRefReadPlatformService = localRefReadPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer ;
         this.readWriteNonCoreDataService = readWriteNonCoreDataService;
+        this.commandShortcutHelper = commandShortcutHelper;
     }
 
     @POST
@@ -160,21 +165,34 @@ public class LocalRefApiResource {
      * Added 02/02/2023 at 1154
      * Returns application table template and data
      * If application is view ,we expert an id etc if list we list all data right .If create new we return template 
+     * Modified 31/03/2023 at 0256
+     * Function should also handle shortcut .
+     * Function will handle shortcut firsts then fall to handle application table entries if shortcut link not found
+     * If command is a shortcut command then route to corresponding link else throw error  
      */ 
     @Path("application")
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String application(@Context final UriInfo uriInfo, @QueryParam("table") String table ,@QueryParam("action") String action) {
+    public String application(@Context final UriInfo uriInfo, @QueryParam("table") String tableOrShortcut ,@QueryParam("action") String action) {
 
-        System.err.println("------------------------------------table name is "+table+"-----------and action is "+action);
+        System.err.println("------------------------------------table name is "+tableOrShortcut+"-----------and action is "+action);
         //this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
 
-        APPLICATION_ACTION applicationAction = (APPLICATION_ACTION) EnumTemplateHelper.fromString(APPLICATION_ACTION.values(),action);
+        final ShortcutEntry shortcutEntry = this.commandShortcutHelper.shortcutEntry(tableOrShortcut);
+        boolean isShortcut = OptionalHelper.isPresent(shortcutEntry);
 
-        DatatableData result = ApplicationTableHelper.getTable(readWriteNonCoreDataService , table ,applicationAction);
-
+        /**
+         * Added 31/03/2023 at 0320
+         * Function to be modified to remove excess ifs 
+         */
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
+        if(isShortcut){
+            return this.toApiJsonSerializer.serializePretty(prettyPrint ,shortcutEntry);
+        }
+
+        APPLICATION_ACTION applicationAction = (APPLICATION_ACTION) EnumTemplateHelper.fromString(APPLICATION_ACTION.values(),action);
+        DatatableData result = ApplicationTableHelper.getTable(readWriteNonCoreDataService , tableOrShortcut ,applicationAction);
 
         return this.toApiJsonSerializer.serializePretty(prettyPrint, result);
     

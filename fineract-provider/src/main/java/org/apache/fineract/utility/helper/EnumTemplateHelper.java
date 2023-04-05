@@ -30,6 +30,18 @@ public class EnumTemplateHelper {
         return enumOptionData;
     }
 
+    /**
+     * Added 31/03/2023 at 0049
+     */
+    public static EnumOptionData fromIntToTemplate(IEnum iEnum[], int arg){
+        
+        IEnum value = fromInt(iEnum ,arg);
+        EnumOptionData enumOptionData = new EnumOptionData(value.ordinal() ,value.getCode());
+        return enumOptionData;
+    }
+  
+
+
     public static IEnum fromInt(IEnum values[], int arg){
         for(IEnum iEnum : values){
             if(iEnum.ordinal() == arg){
@@ -38,6 +50,8 @@ public class EnumTemplateHelper {
         }
         return null ;
     }
+
+
 
     public static IEnum fromString(IEnum values[], String arg){
         for(IEnum iEnum : values){

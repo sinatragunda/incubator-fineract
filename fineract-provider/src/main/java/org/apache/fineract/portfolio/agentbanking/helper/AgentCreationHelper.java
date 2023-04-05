@@ -88,10 +88,9 @@ public class AgentCreationHelper {
         final Boolean isActive = command.booleanObjectValueOfParameterNamed(ClientApiConstants.activeParamName);
 
         CodeValue clientType = codeValueRepositoryWrapper.findOneByLabel("DDAC");
-        boolean isStaff = true ;
         String tag = "#Agent";
 
-        Client client = Client.agent(createByUser, staff ,emailAddress ,mobileNo ,savingsProductId ,clientType ,isStaff ,tag,isActive);
+        Client client = Client.agent(createByUser, staff ,emailAddress ,mobileNo ,savingsProductId ,clientType,tag,isActive);
         clientRepositoryWrapper.save(client);
         return client;
     }

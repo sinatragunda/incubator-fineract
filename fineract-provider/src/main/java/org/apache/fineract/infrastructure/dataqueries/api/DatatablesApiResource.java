@@ -248,20 +248,15 @@ public class DatatablesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getDatatableEntries(@PathParam("datatable") final String datatable,@QueryParam("order") final String order, @Context final UriInfo uriInfo) {
 
-        logger.debug("--------------------get entries for datatable ------------now-");
 
         this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
-
         final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveAllTableEntries(datatable,order);
         
         final DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(datatable);
-        
         datatableData.setGenericResultsetData(results);
 
         final boolean prettyPrint = ApiParameterHelper.prettyPrint(uriInfo.getQueryParameters());
         String json = this.toApiJsonSerializer.serializePretty(prettyPrint, datatableData);
-
-        System.err.println("-------------------------response is "+json);
         return json;
     }
 

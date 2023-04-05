@@ -28,6 +28,18 @@ public class JsonCommandHelper {
         return jsonCommand;
 
     }
+    /**
+     * Added 05/04/2023 at 0241
+     */
+    public static JsonCommand jsonCommand(FromJsonHelper fromJsonHelper ,JsonObject jsonObject){
+        
+        String payload = jsonObject.toString();
+        JsonElement jsonElement = fromJsonHelper.parse(payload);
+        JsonCommand jsonCommand = JsonCommand.fromJsonElement(0L ,jsonElement ,fromJsonHelper);
+        return jsonCommand;
+
+    }
+  
 
     /**
      * Added 01/11/2022 at 0911

@@ -73,6 +73,6 @@ public class LoanConstants {
     public static final String LOAN_TYPE_JLG="JLG" ;
 
     public static final int PRINCIPAL_COL = 50;//AY
-    
+    public static final int CLIENT_IDENTIFIER_TYPE = 51;//AZ    
 
 }

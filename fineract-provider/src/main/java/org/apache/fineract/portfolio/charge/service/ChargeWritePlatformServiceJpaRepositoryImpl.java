@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.entityaccess.domain.FineractEntityAccessType;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessUtil;
@@ -75,13 +76,14 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
     private final TaxGroupRepositoryWrapper taxGroupRepository;
     private final TransactionCodeWrapper transactionCodeWrapper;
     private final ChargePropertiesRepository chargePropertiesRepository;
+    private final FromJsonHelper fromJsonHelper;
 
     @Autowired
     public ChargeWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
             final ChargeDefinitionCommandFromApiJsonDeserializer fromApiJsonDeserializer, final ChargeRepository chargeRepository,
             final LoanProductRepository loanProductRepository, final RoutingDataSource dataSource,
             final FineractEntityAccessUtil fineractEntityAccessUtil, final GLAccountRepositoryWrapper glAccountRepository,
-            final TaxGroupRepositoryWrapper taxGroupRepository ,final TransactionCodeWrapper transactionCodeWrapper ,final ChargePropertiesRepository chargePropertiesRepository) {
+            final TaxGroupRepositoryWrapper taxGroupRepository ,final TransactionCodeWrapper transactionCodeWrapper ,final ChargePropertiesRepository chargePropertiesRepository ,final FromJsonHelper fromJsonHelper) {
         this.context = context;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
         this.dataSource = dataSource;
@@ -93,6 +95,7 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
         this.taxGroupRepository = taxGroupRepository;
         this.transactionCodeWrapper = transactionCodeWrapper;
         this.chargePropertiesRepository =chargePropertiesRepository;
+        this.fromJsonHelper = fromJsonHelper;
     }
 
     @Transactional
@@ -128,12 +131,12 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
                 transactionCode[0] = this.transactionCodeWrapper.findOneWithNotFoundException(transactionCodeId);
             });
 
-
             final ChargeProperties chargeProperties = ChargeProperties.fromJson(command);
 
             this.chargePropertiesRepository.saveAndFlush(chargeProperties);
 
-            final Charge charge = Charge.fromJson(command, glAccount, taxGroup ,transactionCode[0],chargeProperties);
+            final Charge charge = Charge.fromJson(fromJsonHelper ,command, glAccount, taxGroup ,transactionCode[0],chargeProperties);
+
             this.chargeRepository.save(charge);
 
             // check if the office specific products are enabled. If yes, then

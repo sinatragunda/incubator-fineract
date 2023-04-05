@@ -11,8 +11,8 @@ import org.apache.fineract.wese.helper.TimeHelper;
 import javax.servlet.http.HttpServletRequest;
 public class RequestState {
 
-    private Long timestamp = TimeHelperEx.now();
-    private Boolean repeat = false;
+    private Long timestamp ;
+    private Boolean repeat;
 
     public RequestState(Long timestamp, Boolean repeat) {
         this.timestamp = timestamp;
@@ -30,6 +30,15 @@ public class RequestState {
             this.repeat = Boolean.valueOf(repeatStr);
             return ;
         }
+
+        System.err.println("---------------------------------this null requeststate init new ");
+        this.timestamp = TimeHelperEx.now();
+        this.repeat = false ;
+    }
+
+    public RequestState(){
+        this.timestamp = TimeHelperEx.now();
+        this.repeat = false;
     }
 
     public Boolean isRepeat() {

@@ -41,11 +41,13 @@ import org.apache.fineract.portfolio.charge.data.ChargePropertiesData;
 import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.domain.ChargeAppliesTo;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
+import org.apache.fineract.portfolio.charge.enumerations.TIER_TYPE;
 import org.apache.fineract.portfolio.charge.exception.ChargeNotFoundException;
 import org.apache.fineract.portfolio.common.service.CommonEnumerations;
 import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.joda.time.MonthDay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -102,8 +104,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {});
-
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
     }
 
     @Override
@@ -111,31 +113,28 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         final ChargeMapper rm = new ChargeMapper();
 
         String sql = "select " + rm.chargeSchema() + " where c.is_deleted=false and c.currency_code= ? ";
-
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {currencyCode});
-        
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
 
     }
 
     @Override
     public ChargeData retrieveCharge(final Long chargeId) {
         try {
+
             final ChargeMapper rm = new ChargeMapper();
-
             String sql = "select " + rm.chargeSchema() + " where c.id = ? and c.is_deleted=false ";
-
             sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
             sql = sql + " ;" ;
             
             ChargeData chargeData = this.jdbcTemplate.queryForObject(sql, rm, new Object[] { chargeId });
-            
-            attachChargeTierData(chargeData);
+            attachChargeTierConsumer.accept(chargeData);
 
             return chargeData;
 
@@ -169,11 +168,12 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 .retrieveSharesCalculationTypes();
         final List<EnumOptionData> shareChargeTimeTypeOptions = this.chargeDropdownReadPlatformService.retrieveSharesCollectionTimeTypes();
         final Collection<TaxGroupData> taxGroupOptions = this.taxReadPlatformService.retrieveTaxGroupsForLookUp();
+        final ChargeTierData chargeTierData = ChargeTierData.template();
         return ChargeData.template(currencyOptions, allowedChargeCalculationTypeOptions, allowedChargeAppliesToOptions,
                 allowedChargeTimeOptions, chargePaymentOptions, loansChargeCalculationTypeOptions, loansChargeTimeTypeOptions,
                 savingsChargeCalculationTypeOptions, savingsChargeTimeTypeOptions, clientChargeCalculationTypeOptions,
                 clientChargeTimeTypeOptions, feeFrequencyOptions, incomeOrLiabilityAccountOptions, taxGroupOptions,
-                shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions);
+                shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions,chargeTierData);
     }
 
     @Override
@@ -185,8 +185,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId });
-
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
     }
 
     @Override
@@ -199,8 +199,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += addInClauseToSQL_toLimitChargesMappedToOffice_ifOfficeSpecificProductsEnabled();
 
         Collection<ChargeData> charges= this.jdbcTemplate.query(sql, rm, new Object[] { loanProductId, chargeTime.getValue() });
-
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
     }
 
     @Override
@@ -213,8 +213,8 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, params);
-
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
     }
 
     @Override
@@ -231,42 +231,32 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.namedParameterJdbcTemplate.query(sql, paramMap, rm);
-
-        return attachChargeTierStream(charges);
+        charges.stream().forEach(attachChargeTierConsumer);
+        return charges;
     }
 
     /**
      * Aded 12/10/2022 at 1440
      * Link charge tier to Charge record
      */
-
-    private Collection<ChargeData> attachChargeTierStream(Collection<ChargeData> collection){
-
-        Consumer<ChargeData> attachChargeTierConsumer = (e)-> attachChargeTierData(e);
-        collection.stream().forEach(attachChargeTierConsumer);
-        return collection;
-    }
+    private Consumer<ChargeData> attachChargeTierConsumer = (e)-> attachChargeTierData(e);
 
     private void attachChargeTierData(ChargeData chargeData){
 
-            Long chargeId = chargeData.getId();
+        Long chargeId = chargeData.getId();
+        ChargeTierMapper mapper = new ChargeTierMapper();
+        String sql = "select "+mapper.chargeTierSchema();
 
-            ChargeTierMapper mapper = new ChargeTierMapper();
+        Object param = new Object[]{chargeId};
 
-            String sql = "select "+mapper.chargeTierSchema();
-            
-            //System.err.println("--------------------sql is "+sql);
+        try{
+            ChargeTierData chargeTierData =  this.jdbcTemplate.queryForObject(sql ,mapper ,param);
+            List chargesList = new ArrayList<>(Arrays.asList(chargeTierData));
+            chargeData.setChargeTierData(chargesList);
+        }
+        catch(EmptyResultDataAccessException n){
 
-            Object param = new Object[]{chargeId};
-            
-            try{
-                ChargeTierData chargeTierData =  this.jdbcTemplate.queryForObject(sql ,mapper ,param);
-                List chargesList = new ArrayList<>(Arrays.asList(chargeTierData));
-                chargeData.setChargeTierData(chargesList);
-            }
-            catch(EmptyResultDataAccessException n){
-
-            }
+        }
      }
 
     /**
@@ -339,19 +329,26 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private static final class ChargeTierMapper implements RowMapper<ChargeTierData> {
 
         public String chargeTierSchema() {
-            return " ct.id as id, ct.amount as amount, ct.upper_limit as uLimit , c.id as chargeId "
-                    + " from m_charge_tier ct "
-                    + " left join m_charge c on c.id = ct.charge_id where c.id = ?";
+            return " ct.id as id, ct.amount as amount, ct.min_tier as minTier ,"
+                    +" ct.max_tier as maxTier , c.id as chargeId , "
+                    +" ct.overlapping as overlapping "
+                    +" from m_charge_tier ct "
+                    +" join m_charge c on c.id = ct.charge_id where c.id = ?";
         }
 
         @Override
         public ChargeTierData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
             final Long id = rs.getLong("id");
-            final BigDecimal limit = rs.getBigDecimal("uLimit");
+            final BigDecimal minTier = rs.getBigDecimal("minTier");
+            final BigDecimal maxTier = rs.getBigDecimal("maxTier");
             final BigDecimal amount = rs.getBigDecimal("amount");
             final Long chargeId = rs.getLong("chargeId");
+            final Boolean overlapping = rs.getBoolean("overlapping");
 
-            return new ChargeTierData(chargeId ,id ,amount ,limit);
+            final int tierTypeInt = rs.getInt("tierType");
+            final TIER_TYPE tierType = (TIER_TYPE) EnumTemplateHelper.fromInt(TIER_TYPE.values(),tierTypeInt);
+
+            return new ChargeTierData(id ,chargeId ,amount ,minTier ,maxTier ,overlapping ,tierType);
         }
     }
 
@@ -462,17 +459,16 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
                 transactionCodeData[0] = transactionCodeReadPlatformService.retrieveOne(transactionCodeId);
             });
 
+            ChargeTierData chargeTierData = ChargeTierData.template();
             List<ChargeTierData> chargeTierDataList = null ;
-
 
             final Long chargePropertiesId = rs.getLong("chargePropertiesId");
             final Boolean isCommissionedCharge = rs.getBoolean("isCommissionedCharge");
             final ChargePropertiesData chargePropertiesData = new ChargePropertiesData(chargePropertiesId ,isCommissionedCharge);
 
-
             return ChargeData.instance(id, name, amount, currency, chargeTimeType, chargeAppliesToType, chargeCalculationType,
                     chargePaymentMode, feeOnMonthDay, feeInterval, penalty, active, minCap, maxCap, feeFrequencyType, glAccountData,
-                    taxGroupData ,transactionCodeData[0] ,chargeTierDataList,chargePropertiesData);
+                    taxGroupData ,transactionCodeData[0] ,chargeTierDataList,chargePropertiesData ,chargeTierData);
         }
     }
 

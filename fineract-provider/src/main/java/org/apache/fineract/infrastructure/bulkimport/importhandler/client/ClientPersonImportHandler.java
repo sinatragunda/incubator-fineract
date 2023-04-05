@@ -41,16 +41,14 @@ import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ClientPersonImportHandler implements ImportHandler {
 
     private Workbook workbook;
     private List<ClientData> clients;
-
+    private Set<String> clientExternalIdsSet = new HashSet<>();
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
    @Autowired
@@ -85,6 +83,7 @@ public class ClientPersonImportHandler implements ImportHandler {
                     });
                 }
         }
+        System.err.println("------------------filtered clients are "+clients.size());
 
     }
 
@@ -196,23 +195,30 @@ public class ClientPersonImportHandler implements ImportHandler {
             return null ;
         }
 
+        Boolean hasAdded = clientExternalIdsSet.add(externalId);
+
+        if(!hasAdded){
+            return null ;
+        }
+
         ClientData clientData = ClientData.importClientPersonInstance(legalFormId,row.getRowNum(),firstName,lastName,middleName,submittedOn,activationDate,active,externalId,
                 officeId,staffId,mobileNo,dob,clientTypeId,genderId,clientClassicationId,isStaff,addressDataObj,locale,dateFormat ,emailAddress ,savingsProductId ,shareProductId ,createSelfService,tag);
 
-        // Optional.ofNullable(tag).ifPresent(e->{
-        //     clientData.setTag(tag);
-        // });
 
         return clientData ;
     }
 
     public Count importEntity(String dateFormat) {
+        
+        System.err.println("------------------start importing entities --------");
+
         Sheet clientSheet=workbook.getSheet(TemplatePopulateImportConstants.CLIENT_PERSON_SHEET_NAME);
         int successCount=0;
         int errorCount=0;
         String errorMessage="";
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new DateSerializer(dateFormat));
+        
         for (ClientData client: clients) {
             try {
                 String payload=gsonBuilder.create().toJson(client);

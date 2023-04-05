@@ -11,12 +11,21 @@ import org.apache.fineract.utility.service.IEnum;
 import java.util.List;
 
 public enum REF_TABLE implements IEnum {
+    
     HYBRID("Hybrid"),
     CLIENT("Client"),
     LOAN("Loan"),
     SHARE("Share"),
-    CHARGE("Charges"),
-    ACCOUNT("Account");
+    CHARGE("Charge"),
+    ACCOUNT("Account"),
+    MENU("Menu"),
+    MENU_ITEM("Menu Item"),
+    TRANSACTION_CODES("Transaction Code"),
+    TELLER("Teller"),
+    LOAN_TRANSACTION("Loan Transaction"),
+    REPORT("Report"),
+    OFFICE("Office");
+
 
     private String code;
 

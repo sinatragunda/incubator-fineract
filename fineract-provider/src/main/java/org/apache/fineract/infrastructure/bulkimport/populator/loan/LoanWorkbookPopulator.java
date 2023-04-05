@@ -363,6 +363,9 @@ public class LoanWorkbookPopulator extends AbstractWorkbookPopulator {
 		writeString(LoanConstants.CHARGE_DUE_DATE_2, rowHeader, "Charged On Date");
 		writeString(LoanConstants.GROUP_ID, rowHeader, "GROUP ID");
 		writeString(LoanConstants.LINK_ACCOUNT_ID, rowHeader, "Linked Account No.");
+		writeString(LoanConstants.CLIENT_IDENTIFIER_TYPE, rowHeader, "Use External Id as Client Identifier ?");
+
+	
 
 		CellStyle borderStyle = worksheet.getWorkbook().createCellStyle();
 		CellStyle doubleBorderStyle = worksheet.getWorkbook().createCellStyle();

@@ -42,6 +42,7 @@ import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.codes.domain.CodeValue;
+import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -418,7 +419,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
 
     public static Client agent(final AppUser currentUser,final Staff staff ,final String emailAddress,final String mobileNo,
             final Long savingsProductId,
-            final CodeValue clientType,final Boolean isStaff,final String tag ,final Boolean isActive){
+            final CodeValue clientType,final String tag ,final Boolean isActive){
 
             String firstname = staff.getFirstname();
             String lastname = staff.getLastname();
@@ -431,6 +432,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
                 clientStatus = ClientStatus.ACTIVE;
             }
 
+            Boolean isStaff = true ;
+            
             return new Client(currentUser, clientStatus, office, null,null, firstname,null,lastname,null
                     ,submittedOnDate, submittedOnDate, externalId, mobileNo, emailAddress,staff,submittedOnDate,savingsProductId, null,
             null, null, clientType,null, null, isStaff,null ,null,tag);
@@ -443,7 +446,11 @@ public final class Client extends AbstractPersistableCustom<Long> {
         validateNameParts(dataValidationErrors);
         validateActivationDate(dataValidationErrors);
 
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) { 
+            ApiParameterHelper.errorMessage(dataValidationErrors);
+            throw new PlatformApiDataValidationException(dataValidationErrors); 
+        }
+    
 
     }
     

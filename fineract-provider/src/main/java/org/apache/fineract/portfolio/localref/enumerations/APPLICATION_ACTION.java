@@ -8,18 +8,26 @@ import org.apache.fineract.utility.service.IEnum;
 
 public enum APPLICATION_ACTION implements IEnum {
 
-    NEW("New"),
-    VIEW("View"),
-    LIST("List"),
-    EDIT("Edit");
+    NEW("New","new"),
+    VIEW("View" ,"view"),
+    LIST("List" ,"list"),
+    EDIT("Edit" ,"edit"),
+    LANDING("Landing" ,"s");
 
-    APPLICATION_ACTION(String code){
+    APPLICATION_ACTION(String code ,String value){
         this.code = code;
+        this.value = value ;
     }
+
+    private String value;
     private String code ;
 
     @Override
     public String getCode() {
         return code;
+    }
+
+    public String getValue(){
+        return this.value;
     }
 }

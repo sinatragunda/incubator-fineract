@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
 import org.apache.fineract.portfolio.charge.service.ChargeEnumerations;
 import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
@@ -160,10 +161,11 @@ public class LoanChargeReadPlatformServiceImpl implements LoanChargeReadPlatform
         final List<EnumOptionData> shareChargeCalculationTypeOptions = null ;
         final List<EnumOptionData> shareChargeTimeTypeOptions = null ;
         final Collection<TaxGroupData> taxGroupOptions = null;
+        final ChargeTierData chargeTierData = ChargeTierData.template();
         return ChargeData.template(null, allowedChargeCalculationTypeOptions, null, allowedChargeTimeOptions, null,
                 loansChargeCalculationTypeOptions, loansChargeTimeTypeOptions, savingsChargeCalculationTypeOptions,
                 savingsChargeTimeTypeOptions, clientChargeCalculationTypeOptions, clientChargeTimeTypeOptions, feeFrequencyOptions,
-                incomeOrLiabilityAccountOptions, taxGroupOptions, shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions);
+                incomeOrLiabilityAccountOptions, taxGroupOptions, shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions,chargeTierData);
     }
 
     @Override

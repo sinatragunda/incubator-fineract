@@ -39,6 +39,7 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.serialization.JsonParserHelper;
 import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
 
@@ -214,5 +215,18 @@ public class ApiParameterHelper {
         }
 
         return map;
+    }
+
+    public static String errorMessage(final List<ApiParameterError> dataValidationErrors){
+        
+        if(!dataValidationErrors.isEmpty()){
+            ApiParameterError api = dataValidationErrors.stream().findFirst().get();
+            String message = api.getDeveloperMessage();
+            System.err.println("-------------------------Developer error message ----------"+message);
+            return message;
+        }
+
+        return new String("No message");
+
     }
 }

@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.codes.domain.CodeValue;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.apache.fineract.infrastructure.configuration.domain.GlobalConfigurationRepositoryWrapper;
+import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.api.JsonQuery;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -370,7 +371,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                 this.loanProductCommandFromApiJsonDeserializer.validateMinMaxConstraints(command.parsedJson(), baseDataValidator,
                         loanProduct);
             }
-            if (!dataValidationErrors.isEmpty()) { 
+            if (!dataValidationErrors.isEmpty()){
+                ApiParameterHelper.errorMessage(dataValidationErrors);
                 throw new PlatformApiDataValidationException(dataValidationErrors);
             }
 

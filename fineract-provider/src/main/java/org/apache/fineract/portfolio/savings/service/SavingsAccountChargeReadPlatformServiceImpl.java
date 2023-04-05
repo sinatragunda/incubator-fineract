@@ -32,6 +32,7 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
+import org.apache.fineract.portfolio.charge.data.ChargeTierData;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.SavingsAccountChargeNotFoundException;
 import org.apache.fineract.portfolio.charge.service.ChargeDropdownReadPlatformService;
@@ -169,11 +170,12 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
         final List<EnumOptionData> shareChargeCalculationTypeOptions = null;
         final List<EnumOptionData> shareChargeTimeTypeOptions = null;
         final Collection<TaxGroupData> taxGroupOptions = null;
+        final ChargeTierData chargeTierData = ChargeTierData.template();
         // TODO AA : revisit for merge conflict - Not sure method signature
         return ChargeData.template(null, allowedChargeCalculationTypeOptions, null, allowedChargeTimeOptions, null,
                 loansChargeCalculationTypeOptions, loansChargeTimeTypeOptions, savingsChargeCalculationTypeOptions,
                 savingsChargeTimeTypeOptions, clientChargeCalculationTypeOptions, clientChargeTimeTypeOptions, feeFrequencyOptions,
-                incomeOrLiabilityAccountOptions, taxGroupOptions, shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions);
+                incomeOrLiabilityAccountOptions, taxGroupOptions, shareChargeCalculationTypeOptions, shareChargeTimeTypeOptions ,chargeTierData);
     }
 
     @Override
@@ -194,10 +196,6 @@ public class SavingsAccountChargeReadPlatformServiceImpl implements SavingsAccou
     @Override
     public Collection<SavingsAccountChargeData> retrieveSavingsAccountCharges(final Long accountId, final String status) {
         this.context.authenticatedUser();
-
-
-        //System.err.println("------------------------this is where this shit transaction starts after all--------"+accountId);
-
 
         final SavingsAccountChargeMapper rm = new SavingsAccountChargeMapper();
         final StringBuilder sqlBuilder = new StringBuilder();
