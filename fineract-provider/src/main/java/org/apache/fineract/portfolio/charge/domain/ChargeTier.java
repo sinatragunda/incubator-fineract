@@ -38,6 +38,7 @@ public class ChargeTier extends AbstractPersistableCustom<Long> {
 
 	@Column(name="overlapping")
 	private Boolean overlapping ;
+
 	@Column(name="amount")
 	private BigDecimal amount ;
 
@@ -63,16 +64,18 @@ public class ChargeTier extends AbstractPersistableCustom<Long> {
 		this.minTier = minTier;
 		this.maxTier = maxTier;
 		this.tierType = tierType;
-		this.charge = charge;
+		//this.charge = charge;
 	}
 
 	public static ChargeTier fromJson(JsonCommand jsonCommand){
 
-		final BigDecimal amount = jsonCommand.bigDecimalValueOfParameterNamed(GenericConstants.amountParam);
-		final BigDecimal minTier = jsonCommand.bigDecimalValueOfParameterNamed(ChargesApiConstants.minTierParam);
-		final BigDecimal maxTier = jsonCommand.bigDecimalValueOfParameterNamed(ChargesApiConstants.maxTierParam);
+		final Locale locale = Locale.UK;
+
+		final BigDecimal amount = jsonCommand.bigDecimalValueOfParameterNamed(GenericConstants.amountParam ,locale);
+		final BigDecimal minTier = jsonCommand.bigDecimalValueOfParameterNamed(ChargesApiConstants.minTierParam,locale);
+		final BigDecimal maxTier = jsonCommand.bigDecimalValueOfParameterNamed(ChargesApiConstants.maxTierParam,locale);
 		final Boolean overlapping = jsonCommand.booleanPrimitiveValueOfParameterNamed(ChargesApiConstants.overlappingParam);
-		final int tierTypeInt = jsonCommand.integerValueOfParameterNamed(ChargesApiConstants.tierTypeParam);
+		final int tierTypeInt = jsonCommand.integerValueOfParameterNamed(ChargesApiConstants.tierTypeParam ,locale);
 
 		final TIER_TYPE tierType = (TIER_TYPE) EnumTemplateHelper.fromInt(TIER_TYPE.values() ,tierTypeInt);
 		ChargeTier chargeTier = new ChargeTier(overlapping,amount ,minTier ,maxTier ,tierType ,null);
@@ -88,7 +91,10 @@ public class ChargeTier extends AbstractPersistableCustom<Long> {
 			chargeTierList.add(chargeTier);
 		}
 		return chargeTierList;
+	}
 
+	public void setCharge(Charge charge) {
+		this.charge = charge;
 	}
 }
 

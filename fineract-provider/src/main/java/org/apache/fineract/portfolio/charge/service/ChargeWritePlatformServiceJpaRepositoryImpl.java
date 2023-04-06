@@ -137,6 +137,8 @@ public class ChargeWritePlatformServiceJpaRepositoryImpl implements ChargeWriteP
 
             final Charge charge = Charge.fromJson(fromJsonHelper ,command, glAccount, taxGroup ,transactionCode[0],chargeProperties);
 
+            charge.update();
+
             this.chargeRepository.save(charge);
 
             // check if the office specific products are enabled. If yes, then

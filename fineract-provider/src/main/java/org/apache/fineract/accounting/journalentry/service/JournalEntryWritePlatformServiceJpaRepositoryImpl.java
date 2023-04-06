@@ -144,7 +144,7 @@ public class JournalEntryWritePlatformServiceJpaRepositoryImpl implements Journa
     public CommandProcessingResult createJournalEntry(final JsonCommand command) {
         try {
 
-            System.err.println("-------------------------create journal entry --------------");
+            //System.err.println("-------------------------create journal entry --------------");
 
             final JournalEntryCommand journalEntryCommand = this.fromApiJsonDeserializer.commandFromApiJson(command.json());
             journalEntryCommand.validateForCreate();

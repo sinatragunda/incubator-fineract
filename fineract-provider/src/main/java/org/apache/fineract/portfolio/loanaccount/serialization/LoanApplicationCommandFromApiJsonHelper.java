@@ -120,6 +120,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
         System.err.println("============table data validation =========="+DataTableApiConstant.tableDataParam);
 
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, this.supportedParameters);
 
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
@@ -536,12 +537,15 @@ public final class LoanApplicationCommandFromApiJsonHelper {
          * Added 08/03/2023 at 0728
          * Add support for saving hybrid tables data
          * Remember these will just map an already existing record to a loan / table kind of reference
+         * This presents a big problem as we later realized ...
+         * Array needs a validation that ignores it if its empty
          */
         if(this.fromApiJsonHelper.parameterExists(DataTableApiConstant.tableDataParam, element)){
             final JsonArray datatables = this.fromApiJsonHelper.extractJsonArrayNamed(LoanApiConstants.datatables, element);
-            baseDataValidator.reset().parameter(LoanApiConstants.datatables).value(datatables).notNull().jsonArrayNotEmpty();
+            //baseDataValidator.reset().parameter(DataTableApiConstant.tableDataParam).value(datatables).j
         }
 
+        //System.err.println("=====================skipping validation here -----------------");
 
         validateLoanMultiDisbursementdate(element, baseDataValidator, expectedDisbursementDate, principal);
         validatePartialPeriodSupport(interestCalculationPeriodType, baseDataValidator, element, loanProduct);

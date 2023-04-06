@@ -20,7 +20,7 @@ package org.apache.fineract.portfolio.charge.domain;
 
 import java.math.BigDecimal;
 import java.util.*;
-
+import java.util.function.Consumer;
 
 
 import javax.persistence.Transient;
@@ -34,7 +34,8 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.CascadeType;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
-
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -135,7 +136,7 @@ public class Charge extends AbstractPersistableCustom<Long> {
     /**
      * Added 12/10/2022 at 1407
      */
-    @OneToMany(mappedBy="charge")
+    @OneToMany(mappedBy="charge" ,cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
     private List<ChargeTier> chargeTierList;
     /**
      * Added 16/02/2023 at 0225
@@ -169,8 +170,20 @@ public class Charge extends AbstractPersistableCustom<Long> {
 
         final List<ChargeTier> chargeTierList = ChargeTier.fromJson(fromJsonHelper ,command);
 
-        return new Charge(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculationType, penalty, active, paymentMode,
+        Charge charge = new Charge(name, amount, currencyCode, chargeAppliesTo, chargeTimeType, chargeCalculationType, penalty, active, paymentMode,
                 feeOnMonthDay, feeInterval, minCap, maxCap, feeFrequency, account, taxGroup ,transactionCode,chargeProperties,chargeTierList);
+
+        return charge;
+
+    }
+
+    /**
+     * Addd 05/04/2023 at 0614
+     * Trying to try tricks to get charge to save chargetier with ids as well linking charge id
+     */
+    public void update(){
+        Consumer<ChargeTier> setChargeConsumer = (e)-> e.setCharge(this);
+        chargeTierList.stream().forEach(setChargeConsumer);
     }
 
     protected Charge() {

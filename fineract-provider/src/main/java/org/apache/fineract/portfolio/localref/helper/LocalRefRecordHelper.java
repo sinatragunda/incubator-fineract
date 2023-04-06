@@ -175,13 +175,12 @@ public class LocalRefRecordHelper {
 
     public void setRecordData(Record record, REF_TABLE refTable){
         Long recordId = record.getId();
-        System.err.println("=========================record id "+recordId);
+        //System.err.println("=========================record id "+recordId);
         Collection<LocalRefValueData> localRefValueDataCollection = localRefReadPlatformService.retrieveRecord(refTable ,recordId);
-
-        System.err.println("======================values collected "+localRefValueDataCollection.size());
+        //System.err.println("======================values collected "+localRefValueDataCollection.size());
         record.setLocalRefValueData(localRefValueDataCollection);
 
-        System.err.println("========================record value set ===========");
+        //System.err.println("========================record value set ===========");
 
     }
 

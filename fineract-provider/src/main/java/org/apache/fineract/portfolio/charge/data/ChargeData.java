@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.charge.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
     private final TransactionCodeData transactionCodeData ;
 
     private final ChargeTierData chargeTierData;
-    private final List<ChargeTierData> chargeTierDataList ;
+    private List<ChargeTierData> chargeTierDataList ;
 
     private final ChargePropertiesData chargePropertiesData;
 
@@ -345,12 +346,16 @@ public class ChargeData implements Comparable<ChargeData>, Serializable {
         return this.transactionCodeData;
     }
 
-    public void setChargeTierData(List<ChargeTierData> chargeTierDataList){
-        if(chargeTierDataList.isEmpty()){
-            chargeTierDataList = chargeTierDataList;
+    public void setChargeTierDataList(List<ChargeTierData> list){
+
+        if(list.isEmpty()){
+            System.err.println("--------charge tier is empty");
+            chargeTierDataList = new ArrayList<>();
             return;
         }
-        chargeTierDataList.addAll(chargeTierDataList);
+        this.chargeTierDataList = list ;
+        System.err.println("-----------set tier with values "+chargeTierDataList.size());
+
     }
 
     public ChargePropertiesData getChargePropertiesData() {

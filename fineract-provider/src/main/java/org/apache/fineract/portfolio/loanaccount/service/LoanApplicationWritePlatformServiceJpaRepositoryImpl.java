@@ -467,11 +467,13 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              * Added 19/02/2023 at 2349
              * Create value for local ref
              */
+            //System.err.println("===============================update record here error for datatables ========");
+            
             localRefRecordHelper.create(command ,newLoanApplication , REF_TABLE.LOAN);
-            System.err.println("===============will it reverse the loan transaction ?=======");
+            //System.err.println("===============will it reverse the loan transaction ?=======");
 
             // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists
-            HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
+            //HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
 
             if (loanProduct.isInterestRecalculationEnabled()) {
                 this.fromApiJsonDeserializer.validateLoanForInterestRecalculation(newLoanApplication);

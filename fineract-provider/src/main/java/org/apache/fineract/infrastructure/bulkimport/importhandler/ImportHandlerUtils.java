@@ -74,18 +74,18 @@ public class ImportHandlerUtils {
     // added to counteract some excel raising error if used with getNumberofRows only 
     public static int getNumberOfRowsWithErrorHandling(Sheet sheet ,int primaryColumn){
 
-        System.err.println("------------------why error not being caught ? -----------------");
+        //System.err.println("------------------why error not being caught ? -----------------");
         
         Integer noOfEntries = 0 ;
         try{
             noOfEntries = getNumberOfRows(sheet ,primaryColumn);
-            System.err.println("---------------------number of entries we got is -----------"+noOfEntries);
+            //System.err.println("---------------------number of entries we got is -----------"+noOfEntries);
         }
 
         catch(NullPointerException n){
             /// if we catch an exception here then use another method
             noOfEntries = getNumberOfRowsEx(sheet ,primaryColumn);
-            System.err.println("----------------exception thrown here we got another error --------"+noOfEntries);
+            //System.err.println("----------------exception thrown here we got another error --------"+noOfEntries);
         }
         return noOfEntries ;
 
@@ -147,7 +147,7 @@ public class ImportHandlerUtils {
                     res = trimEmptyDecimalPortion(val.getStringValue());
                 }
                 catch (NullPointerException n){
-                    System.err.println("------------------readAsString threw null pointer exception -"+n.getMessage());
+                    //System.err.println("------------------readAsString threw null pointer exception -"+n.getMessage());
                     //n.printStackTrace();
                 }
                 if (res!=null) {
@@ -266,7 +266,7 @@ public class ImportHandlerUtils {
                 val = Double.parseDouble(row.getCell(colIndex).getStringCellValue());
             }
             catch(Exception n){  
-                System.err.println("-------------format exception caught son ,but null registered-----------"+n.getMessage());
+                //System.err.println("-------------format exception caught son ,but null registered-----------"+n.getMessage());
             }
             return val ;
         }

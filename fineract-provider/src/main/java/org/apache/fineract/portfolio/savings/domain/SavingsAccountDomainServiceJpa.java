@@ -116,7 +116,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
 
         boolean overrideRequest = OverrideHelper.override();
 
-        System.err.println("===========this is an override request ?------- "+overrideRequest);
+        //System.err.println("===========this is an override request ?------- "+overrideRequest);
 
         AppUser user = getAppUserIfPresent();
         account.validateForAccountBlock();
@@ -165,7 +165,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         SavingsProduct savingsProduct = account.savingsProduct();
         boolean isOverdraftAccount = savingsProduct.isAllowOverdraft();
 
-        System.err.println("==============================is overdraft account here ? "+isOverdraftAccount+"===========and override that shit ?"+overrideRequest);
+        //System.err.println("==============================is overdraft account here ? "+isOverdraftAccount+"===========and override that shit ?"+overrideRequest);
 
         if(!isOverdraftAccount) {
 
@@ -425,7 +425,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
     private void postJournalEntries(final SavingsAccount savingsAccount, final Set<Long> existingTransactionIds,
             final Set<Long> existingReversedTransactionIds, boolean isAccountTransfer ,TransactionCode transactionCode) {
 
-        System.err.println("-------------------------postJournalEntries ---------------");
+        //System.err.println("-------------------------postJournalEntries ---------------");
 
         final MonetaryCurrency currency = savingsAccount.getCurrency();
         final ApplicationCurrency applicationCurrency = this.applicationCurrencyRepositoryWrapper.findOneWithNotFoundDetection(currency);

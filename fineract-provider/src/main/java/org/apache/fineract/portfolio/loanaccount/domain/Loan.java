@@ -3019,7 +3019,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         ChangedTransactionDetail changedTransactionDetail = null;
 
-        System.err.println("---------handle payment for loan ------------");
+        //System.err.println("---------handle payment for loan ------------");
 
         LoanStatus statusEnum = null;
 
@@ -3036,7 +3036,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         this.loanStatus = statusEnum.getValue();
 
-        System.err.println("------------------loan status changed to "+this.loanStatus);
+        //System.err.println("------------------loan status changed to "+this.loanStatus);
 
         loanTransaction.updateLoan(this);
 
@@ -3063,11 +3063,11 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         boolean override = OverrideHelper.override();
 
-        System.err.println("=====================error being thrown here now ,override this error ,override it ?"+override);
+        ///System.err.println("=====================error being thrown here now ,override this error ,override it ?"+override);
 
         if (loanTransactionDate.isAfter(DateUtils.getLocalDateOfTenant())) {
 
-            System.err.println("=====================transanction date error here , validation only ");
+            //System.err.println("=====================transanction date error here , validation only ");
 
             final String errorMessage = "The transaction date cannot be in the future.";
 
@@ -3099,7 +3099,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
             }
         }
 
-        System.err.println("---------------------do we get out of here ? -------------");
+        //System.err.println("---------------------do we get out of here ? -------------");
 
         final LoanRepaymentScheduleTransactionProcessor loanRepaymentScheduleTransactionProcessor = this.transactionProcessorFactory
                 .determineProcessor(this.transactionProcessingStrategy);
@@ -6402,13 +6402,13 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         validateAccountStatus(event);
 
-        System.err.println("-----------------show we then do that stuff here ? ");
+        //System.err.println("-----------------show we then do that stuff here ? ");
 
         validateForForeclosure(repaymentTransaction.getTransactionDate());
         this.loanSubStatus = LoanSubStatus.FORECLOSED.getValue();
         applyAccurals(appUser);
 
-        System.err.println("--------------------handling foreclosure event ,we intend to give it own status ");
+        //System.err.println("--------------------handling foreclosure event ,we intend to give it own status ");
         return handleRepaymentOrRecoveryOrWaiverTransaction(repaymentTransaction, loanLifecycleStateMachine, null, scheduleGeneratorDTO,
                 appUser);
     }
@@ -6440,9 +6440,9 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void validateForForeclosure(final LocalDate transactionDate) {
 
-        System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
+        //System.err.println("----------------------is transaction date valud "+Optional.ofNullable(transactionDate).isPresent());
 
-        System.err.println("--------------validate class with trans date-----------"+transactionDate);
+        //System.err.println("--------------validate class with trans date-----------"+transactionDate);
 
         if (isInterestRecalculationEnabledForProduct()) {
             final String defaultUserMessage = "The loan with interest recalculation enabled cannot be foreclosed.";
@@ -6452,7 +6452,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
         LocalDate lastUserTransactionDate = getLastUserTransactionDate();
 
-        System.err.println("=========================we skipping this error now and see how it goes ");
+        //System.err.println("=========================we skipping this error now and see how it goes ");
 
         if (DateUtils.isDateInTheFuture(transactionDate)) {
             final String defaultUserMessage = "The transactionDate cannot be in the future.";

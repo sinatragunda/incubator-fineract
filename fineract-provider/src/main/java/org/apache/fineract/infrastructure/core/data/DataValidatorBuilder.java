@@ -588,9 +588,13 @@ public class DataValidatorBuilder {
         }
         return this;
     }
+
+
     
     public DataValidatorBuilder arrayNotEmpty() {
         if (this.value == null && this.ignoreNullValue) { return this; }
+
+
 
         final Object[] array = (Object[]) this.value;
         if (ObjectUtils.isEmpty(array)) {

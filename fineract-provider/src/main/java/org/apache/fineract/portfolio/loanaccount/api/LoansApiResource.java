@@ -661,7 +661,7 @@ public class LoansApiResource {
                 calendarOptions, notes, accountLinkingOptions, linkedAccount, disbursementData, emiAmountVariations,
                 overdueCharges, paidInAdvanceTemplate, interestRatesPeriods, clientActiveLoanOptions ,localRefData);
 
-        System.err.println("=================data lost here l guess ");
+        //System.err.println("=================data lost here l guess ");
         localRefRecordHelper.setRecordData(loanAccount , REF_TABLE.LOAN);
             
 
@@ -718,7 +718,7 @@ public class LoansApiResource {
     public String calculateLoanScheduleOrSubmitLoanApplication(@QueryParam("command") final String commandParam,
             @Context final UriInfo uriInfo, final String apiRequestBodyAsJson) {
 
-        System.err.println("=====================================tramsaction timestamp is "+ThreadLocalContextUtil.getRequestState().get().getTimestamp());
+        //System.err.println("=====================================tramsaction timestamp is "+ThreadLocalContextUtil.getRequestState().get().getTimestamp());
 
         if (is(commandParam, "calculateLoanSchedule")) {
 

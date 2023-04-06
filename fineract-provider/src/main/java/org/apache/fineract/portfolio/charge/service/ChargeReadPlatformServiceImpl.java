@@ -48,6 +48,7 @@ import org.apache.fineract.portfolio.common.service.DropdownReadPlatformService;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.helper.ListHelper;
 import org.joda.time.MonthDay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -104,7 +105,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {});
-        charges.stream().forEach(attachChargeTierConsumer);
+        //charges.stream().forEach(attachChargeTierConsumer);
         return charges;
     }
 
@@ -118,7 +119,7 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
         sql += " order by c.name ";
 
         Collection<ChargeData> charges = this.jdbcTemplate.query(sql, rm, new Object[] {currencyCode});
-        charges.stream().forEach(attachChargeTierConsumer);
+        //charges.stream().forEach(attachChargeTierConsumer);
         return charges;
 
     }
@@ -244,18 +245,23 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
     private void attachChargeTierData(ChargeData chargeData){
 
         Long chargeId = chargeData.getId();
-        ChargeTierMapper mapper = new ChargeTierMapper();
-        String sql = "select "+mapper.chargeTierSchema();
 
-        Object param = new Object[]{chargeId};
+        System.err.println("-----------------------find id for record ? "+chargeId);
+
+        ChargeTierMapper mapper = new ChargeTierMapper();
+        String sql = "select "+mapper.schema()+" ORDER BY ct.id";
+
+        System.err.println("---------------------------lets attach charge tiers "+sql);
 
         try{
-            ChargeTierData chargeTierData =  this.jdbcTemplate.queryForObject(sql ,mapper ,param);
-            List chargesList = new ArrayList<>(Arrays.asList(chargeTierData));
-            chargeData.setChargeTierData(chargesList);
+            Collection<ChargeTierData> collection =  this.jdbcTemplate.query(sql ,mapper ,new Object[]{chargeId});
+            System.err.println("-------------records found are "+collection.size());
+            List list = ListHelper.fromCollection(collection);
+            chargeData.setChargeTierDataList(list);
         }
-        catch(EmptyResultDataAccessException n){
 
+        catch(EmptyResultDataAccessException n){
+            System.err.println("--------------we have no links son --------");
         }
      }
 
@@ -328,12 +334,12 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
     private static final class ChargeTierMapper implements RowMapper<ChargeTierData> {
 
-        public String chargeTierSchema() {
-            return " ct.id as id, ct.amount as amount, ct.min_tier as minTier ,"
-                    +" ct.max_tier as maxTier , c.id as chargeId , "
-                    +" ct.overlapping as overlapping "
-                    +" from m_charge_tier ct "
-                    +" join m_charge c on c.id = ct.charge_id where c.id = ?";
+        public String schema() {
+            return "ct.id as id, ct.amount as amount, ct.min_tier as minTier ,"
+                    +"ct.max_tier as maxTier , ct.charge_id as chargeId ,"
+                    +"ct.overlapping as overlapping ,ct.tier_type as tierType "
+                    +"from m_charge_tier ct "
+                    +"join m_charge c on c.id = ct.charge_id where ct.charge_id = ?";
         }
 
         @Override

@@ -188,23 +188,23 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
                 ///
                 Long reversedShares = shareAccountTransaction.getTotalShares();
 
-                System.err.println("----------------reversed shares in this transaction are -----------"+reversedShares);
+                //System.err.println("----------------reversed shares in this transaction are -----------"+reversedShares);
 
                 ShareAccount shareAccount = shareAccountTransaction.getShareAccount();
 
                 Long totalShares = shareAccount.getTotalApprovedShares();
 
-                System.err.println("----------------total shares ----------"+totalShares);
+                //System.err.println("----------------total shares ----------"+totalShares);
 
                 Long balanceShares = totalShares - reversedShares ;
 
-                System.err.println("---------------------------total shares after reversal ------"+balanceShares);
+                //System.err.println("---------------------------total shares after reversal ------"+balanceShares);
 
                 shareAccountTransactionRepository.save(shareAccountTransaction);
                 shareAccount.setTotalSharesApproved(balanceShares);
                 shareAccountRepository.save(shareAccount);
 
-                System.err.println("----------------has share account beeen reversed to a new total of ---------------"+shareAccount.getTotalApprovedShares());
+                //System.err.println("----------------has share account beeen reversed to a new total of ---------------"+shareAccount.getTotalApprovedShares());
             }
             catch(Exception e){
                 /// 

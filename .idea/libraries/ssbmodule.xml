@@ -1,10 +1,9 @@
 <component name="libraryTable">
   <library name="ssbmodule">
     <CLASSES>
-      <root url="file://$USER_HOME$/Desktop/untitled/out/artifacts/untitled_jar" />
+      <root url="jar://$PROJECT_DIR$/fineract-provider/libs/ssbmodule.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
-    <jarDirectory url="file://$USER_HOME$/Desktop/untitled/out/artifacts/untitled_jar" recursive="false" />
   </library>
 </component>

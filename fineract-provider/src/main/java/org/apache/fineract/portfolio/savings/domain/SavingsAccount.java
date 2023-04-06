@@ -1233,7 +1233,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
      private BigDecimal payWithdrawalFee(SavingsAccountTransactionDTO savingsTransactionDTO ,boolean withholdPayingCharges){
 
-           //System.err.println("----------paywithdrawal fee and withold paying charges "+withholdPayingCharges);
+           System.err.println("----------paywithdrawal fee and withold paying charges "+withholdPayingCharges);
+           
            final BigDecimal transactionAmount = savingsTransactionDTO.getTransactionAmount();
            final LocalDate transactionDate = savingsTransactionDTO.getTransactionDate(); 
            final AppUser appUser = savingsTransactionDTO.getAppUser();
@@ -1257,7 +1258,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         BigDecimal totalCharges = BigDecimal.ZERO ;
 
-        //System.err.println("--------tracking charges -------"+transactionDate);
+        System.err.println("--------tracking charges ,this where we need to do a lot of work son -------"+transactionDate);
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
 
@@ -1265,9 +1266,15 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             //System.err.println("-----------what type is this charge though since not withdrawal fee ? "+charge.isDepositFee());
             //System.err.println("---------product apply charges --------- is withdrawal fee and active ? -------"+charge.isWithdrawalFee()+"=============="+charge.isActive());
             
+            /**
+             * Modified  05/04/2023 at 0827 
+             * Attach tier charges helper function 
+            */ 
             if (charge.isWithdrawalFee() && charge.isActive()) {
 
                 //System.err.println("----------------------------charge is fee and active "+charge.isWithdrawalFee()+"------------and amount is "+transactionAmoount);
+
+                //ChargeTierHelper.calculateCharge(charge,transactionAmoount);
 
                 BigDecimal chargeAmount = charge.updateWithdralFeeAmount(transactionAmoount);
 
@@ -1279,6 +1286,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 this.payCharge(charge, charge.getAmountOutstanding(this.getCurrency()), transactionDate, user);
             }
         }
+
         //System.err.println("----------------------total charges amount is -----"+totalCharges);
         return totalCharges;
     }
@@ -1395,8 +1403,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
 
-            System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
-
+            //System.err.println("------------------checking again running balance of --------------------"+runningBalance.getAmount());
 
 
             // deal with potential minRequiredBalance and
@@ -1418,7 +1425,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         //System.err.println("--------------------checking that overdraft error thing --------------------"+isOverdraft());
 
         if(isOverdraft()) {
-                System.err.println("----------------------balance check for 0 when in overdraft ---------");
+                //System.err.println("----------------------balance check for 0 when in overdraft ---------");
 	        	if (runningBalance.minus(minRequiredBalance).isLessThanZero()) { throw new InsufficientAccountBalanceException(
 	                    "transactionAmount", getAccountBalance(), withdrawalFee, transactionAmount); }
         }
@@ -1434,7 +1441,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     public void validateAccountBalanceDoesNotBecomeNegative(final String transactionAction,
             final List<DepositAccountOnHoldTransaction> depositAccountOnHoldTransactions) {
 
-        System.err.println("========middle function called ,override or ?  "+ OverrideHelper.override());
+        //System.err.println("========middle function called ,override or ?  "+ OverrideHelper.override());
 
         final List<SavingsAccountTransaction> transactionsSortedByDate = retreiveListOfTransactions();
         Money runningBalance = Money.zero(this.currency);
@@ -1442,7 +1449,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
         LocalDate lastSavingsDate = null;
         Money accountBalance = Money.of(this.currency ,getAccountBalance());
 
-        System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
+        //System.err.println("--------------------account balance is ---"+accountBalance.getAmount());
 
         
         for (final SavingsAccountTransaction transaction : transactionsSortedByDate) {
@@ -1475,8 +1482,6 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
             }
 
             // enforceMinRequiredBalance
-            System.err.println("----------------------bring back this mean balance violation rule thing -------------------"+getAccountBalance());
-
             if (transaction.canProcessBalanceCheck()) {
                
                //System.err.println("---------------transaction can process balance check ------ ,minRequiredBalance-"+minRequiredBalance+"-------------running balance "+runningBalance);
@@ -2985,7 +2990,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         this.charges = charges();
 
-        Set<Charge> savingsProductCharges  = Optional.ofNullable(product.getCharges()).orElse(new HashSet<Charge>());
+        Set<Charge> savingsProductCharges = Optional.ofNullable(product.getCharges()).orElse(new HashSet<Charge>());
 
         /**
          * Added 05/09/2022 at 1046
@@ -3000,6 +3005,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
                 Charge c = x.getCharge();
                 return c.getId().equals(e.getId());
             };
+
             boolean chargeExist = charges.stream().filter(chargeFilter).findFirst().isPresent();
 
             //System.err.println("---------------charge needs to be update here "+chargeExist);
