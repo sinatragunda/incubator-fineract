@@ -26,6 +26,7 @@ import org.apache.fineract.accounting.journalentry.domain.JournalEntryType;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
@@ -34,7 +35,7 @@ import org.joda.time.LocalDate;
  * Note: no getter/setters required as google will produce json from fields of
  * object.
  */
-public class JournalEntryData {
+public class JournalEntryData implements EnumeratedData {
 
     private final Long id;
     private final Long officeId;
@@ -231,6 +232,11 @@ public class JournalEntryData {
                 transactionDate, entryType, amount, transactionId, manualEntry, entityType, entityId, createdByUserId, createdDate,
                 createdByUserName, comments, reversed, referenceNumber, officeRunningBalance, organizationRunningBalance,
                 runningBalanceComputed, transactionDetailData, currency);
+    }
+
+    @Override
+    public String getName() {
+        return String.format("%d : %s ",id ,glAccountName);
     }
 
     public Long getId() {

@@ -9,7 +9,9 @@ package org.apache.fineract.components.api;
 import com.wese.component.defaults.constants.FieldConstants;
 import com.wese.component.defaults.data.FieldValidationData;
 import com.wese.component.defaults.enumerations.CLASS_LOADER;
+import com.wese.component.defaults.exceptions.BeanLoaderNotFoundException;
 import com.wese.component.defaults.helper.FieldReflectionHelper;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
@@ -66,19 +68,22 @@ public class ComponentApiResource {
         this.context.authenticatedUser();
 
         CLASS_LOADER classLoader = CLASS_LOADER.fromString(className);
+        boolean hasClassLoader = OptionalHelper.isPresent(classLoader);
 
-        String url = classLoader.getUrl();
+        if(!hasClassLoader){
+            throw new BeanLoaderNotFoundException(className);
+        }
+        
         Class cl = null ;
 
         try {
-            cl = Class.forName(url);;
+            cl = classLoader.getCl();
         }
-        catch (ClassNotFoundException c){
+        catch (Exception c){
             c.printStackTrace();
         }
 
         Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl,applicationContext);
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationDataList, FieldConstants.allowedParams);
 

@@ -333,4 +333,8 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService ,D
         List<StaffData> stuffDataList = (List<StaffData>)retrieveAllStaffForDropdown(1L);
         return EnumeratedDataHelper.enumeratedData(stuffDataList);
     }
+
+    public Collection<StaffData> retrieveUsingQuery(String sql){
+        return null ;
+    }
 }

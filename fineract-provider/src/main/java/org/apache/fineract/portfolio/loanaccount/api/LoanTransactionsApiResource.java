@@ -53,8 +53,10 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanAccountDomainService;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanTransactionHelper;
 import org.apache.fineract.portfolio.loanaccount.repo.LoanTransactionRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
+import org.apache.fineract.portfolio.loanaccount.service.LoanTransactionReadPlatformService;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.joda.time.LocalDate;
@@ -78,6 +80,7 @@ public class LoanTransactionsApiResource {
     private final String resourceNameForPermissions = "LOAN";
 
     private final PlatformSecurityContext context;
+    private final LoanTransactionReadPlatformService loanTransactionReadPlatformService;
     private final LoanReadPlatformService loanReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<LoanTransactionData> toApiJsonSerializer;
@@ -92,7 +95,7 @@ public class LoanTransactionsApiResource {
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final DefaultToApiJsonSerializer<LoanTransactionData> toApiJsonSerializer,
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-            PaymentTypeReadPlatformService paymentTypeReadPlatformService ,final LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper ,final LoanAccountDomainService loanAccountDomainService ,final BulkImportWorkbookService bulkImportWorkbookService) {
+            PaymentTypeReadPlatformService paymentTypeReadPlatformService ,final LoanTransactionRepositoryWrapper loanTransactionRepositoryWrapper ,final LoanAccountDomainService loanAccountDomainService ,final BulkImportWorkbookService bulkImportWorkbookService ,final  LoanTransactionReadPlatformService loanTransactionReadPlatformService) {
         this.context = context;
         this.loanReadPlatformService = loanReadPlatformService;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
@@ -102,6 +105,7 @@ public class LoanTransactionsApiResource {
         this.loanAccountDomainService = loanAccountDomainService;
         this.loanTransactionRepositoryWrapper = loanTransactionRepositoryWrapper;
         this.bulkImportWorkbookService = bulkImportWorkbookService;
+        this.loanTransactionReadPlatformService = loanTransactionReadPlatformService;
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -168,6 +172,27 @@ public class LoanTransactionsApiResource {
         return this.toApiJsonSerializer.serialize(settings, transactionData, this.RESPONSE_DATA_PARAMETERS);
     }
 
+    /**
+     * Added 12/04/2023 at 0818
+     * Retrieve All Transactions
+     */
+
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAll(@Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+
+        System.err.println("-----------------------retrieve all transactions --------------- ");
+
+        Collection<LoanTransactionData> loanTransactionDataCollection = this.loanTransactionReadPlatformService.retrieveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        return this.toApiJsonSerializer.serialize(settings, loanTransactionDataCollection, this.RESPONSE_DATA_PARAMETERS);
+    }
+
     @GET
     @Path("{transactionId}")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -218,6 +243,8 @@ public class LoanTransactionsApiResource {
 
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
 
+        System.err.println("--------------------is our request coming here son ? ");
+
 
         CommandProcessingResult result = null;
         if (is(commandParam, "repayment")) {
@@ -225,9 +252,11 @@ public class LoanTransactionsApiResource {
             result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         }
         else if (is(commandParam, "undo")) {
-            LoanTransaction loanTransaction = loanTransactionRepositoryWrapper.findOneWithNotFoundDetection(transactionId);
-            loanAccountDomainService.reverseTransfer(loanTransaction);
-            result = new CommandProcessingResultBuilder().withEntityId(loanTransaction.getId()).build();
+            System.err.println("----------------------same undo request ? ,where do we go wrong now ");
+            LoanTransaction loanTransaction = this.loanTransactionRepositoryWrapper.findOneWithNotFoundDetection(transactionId);
+            String payload = LoanTransactionHelper.buildReverseTransactionJson(loanTransaction);
+            Long id = loanTransaction.getId();
+            return adjustLoanTransaction(id ,transactionId ,payload);
         }
         else if (is(commandParam, "waiveinterest")) {
             final CommandWrapper commandRequest = builder.waiveInterestPortionTransaction(loanId).build();
@@ -267,6 +296,8 @@ public class LoanTransactionsApiResource {
     public String adjustLoanTransaction(@PathParam("loanId") final Long loanId, @PathParam("transactionId") final Long transactionId,
             final String apiRequestBodyAsJson) {
 
+        System.err.println("-----------------what if we are adjusting loan transaction------, now we call as secondary ?");
+
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
         final CommandWrapper commandRequest = builder.adjustTransaction(loanId, transactionId).build();
 
@@ -288,6 +319,7 @@ public class LoanTransactionsApiResource {
             @FormDataParam("locale") final String locale, @FormDataParam("dateFormat") final String dateFormat){
         
         System.err.println("------------import document ----------------------");
+        
         final Long importDocumentId = this.bulkImportWorkbookService.importWorkbook(GlobalEntityType.LOAN_TRANSACTIONS_REVERSE.toString(), uploadedInputStream,fileDetail,locale,dateFormat);
         
         System.err.println("===============why import id always "+importDocumentId);

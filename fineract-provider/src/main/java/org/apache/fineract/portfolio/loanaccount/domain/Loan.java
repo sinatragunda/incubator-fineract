@@ -134,6 +134,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
+import com.wese.component.defaults.enumerations.FIELD_TYPE;
+import com.wese.component.defaults.reflection.AttributeList;
+
 @Entity
 @Component
 @Table(name = "m_loan", uniqueConstraints = { @UniqueConstraint(columnNames = { "account_no" }, name = "loan_account_no_UNIQUE"),
@@ -144,12 +150,16 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Version
     int version;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY , name = "Account Number" ,group=COMPARISON_GROUP.STRING)
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY , name ="External Id" ,group=COMPARISON_GROUP.STRING)
     @Column(name = "external_id")
     private String externalId;
 
+    @AttributeList(beanLoader = BEAN_LOADER.CLIENT)
+    @AttributeRef(type= FIELD_TYPE.MANDATORY ,name="Client" ,group=COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
     private Client client;
@@ -233,6 +243,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Column(name = "expected_disbursedon_date")
     private Date expectedDisbursementDate;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY , name = "Disbursement Date" ,group=COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "disbursedon_date")
     private Date actualDisbursementDate;
@@ -322,6 +333,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Column(name = "principal_amount_proposed", scale = 6, precision = 19, nullable = false)
     private BigDecimal proposedPrincipal;
 
+    @AttributeRef(type = FIELD_TYPE.MANDATORY , name = "Principal" ,group=COMPARISON_GROUP.NUMERIC)
     @Column(name = "approved_principal", scale = 6, precision = 19, nullable = false)
     private BigDecimal approvedPrincipal;
 

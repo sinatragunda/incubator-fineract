@@ -50,6 +50,7 @@ import org.apache.fineract.portfolio.loanproduct.domain.LoanProductValueConditio
 import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.utility.domain.Record;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 import org.springframework.util.CollectionUtils;
 
@@ -57,7 +58,7 @@ import org.springframework.util.CollectionUtils;
  * Immutable data object representing loan account data.
  */
 @SuppressWarnings("unused")
-public class LoanAccountData extends Record {
+public class LoanAccountData extends Record implements EnumeratedData {
 
     // basic loan details
 
@@ -1965,6 +1966,11 @@ public class LoanAccountData extends Record {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String getName() {
+        return String.format("%s : %s",this.clientName ,this.accountNo);
     }
 
     // added 21/01/2022

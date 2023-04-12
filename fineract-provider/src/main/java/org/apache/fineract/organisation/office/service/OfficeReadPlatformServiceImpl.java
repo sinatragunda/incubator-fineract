@@ -274,6 +274,10 @@ public class OfficeReadPlatformServiceImpl implements OfficeReadPlatformService 
         return EnumeratedDataHelper.enumeratedData(officeDataList);
     }
 
+    public Collection<OfficeData> retrieveUsingQuery(String sql){
+        return null ;
+    }
+
     public PlatformSecurityContext getContext() {
         return this.context;
     }

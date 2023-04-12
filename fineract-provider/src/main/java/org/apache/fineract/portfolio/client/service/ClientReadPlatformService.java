@@ -22,9 +22,11 @@ import java.util.Collection;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
+import org.apache.fineract.infrastructure.generic.service.GenericReadPlatformService;
+import org.apache.fineract.infrastructure.generic.service.GenericReadPlatformServiceEx;
 import org.apache.fineract.portfolio.client.data.ClientData;
 
-public interface ClientReadPlatformService {
+public interface ClientReadPlatformService extends GenericReadPlatformServiceEx {
 
     ClientData retrieveTemplate(Long officeId, boolean staffInSelectedOfficeOnly);
 

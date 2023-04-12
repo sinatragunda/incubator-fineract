@@ -1075,12 +1075,12 @@ public class DataValidatorBuilder {
      * Added 10/03/2023 at 0124 
      * Purpose is to throw an error imediately after its added to apiparametererror list 
      */
-
-     public void onError(){
+     public DataValidatorBuilder onError(){
         if(!dataValidationErrors.isEmpty()){
             String message = dataValidationErrors.stream().findFirst().get().getDeveloperMessage();
             throw new DataValidationException(message);
         }
+        return this ;
      } 
 
 }

@@ -40,12 +40,13 @@ import org.apache.fineract.portfolio.localref.data.LocalRefValueData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.utility.domain.Record;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
  * Immutable data object representing client data.
  */
-final public class ClientData extends Record implements Comparable<ClientData> {
+final public class ClientData extends Record implements Comparable<ClientData> , EnumeratedData {
 
     private final Long id;
     private final String accountNo;
@@ -248,6 +249,11 @@ final public class ClientData extends Record implements Comparable<ClientData> {
     }
 
     public Long getId(){return id;}
+
+    @Override
+    public String getName() {
+        return displayName;
+    }
 
     public String getOfficeName() {
         return officeName;

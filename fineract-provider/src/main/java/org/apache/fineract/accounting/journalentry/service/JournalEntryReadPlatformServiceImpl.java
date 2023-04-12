@@ -23,10 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +60,8 @@ import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionEnumData;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -597,5 +596,19 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
         return predicate;
     }
 
+    @Override
+    public List<EnumOptionData> getDropdownData(){
+        Page page = retrieveAll(null ,null ,null ,null ,null ,null ,null ,null);
+        List list = page.getPageItems();
+        return EnumeratedDataHelper.enumeratedData(list);
+    }
 
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String query) {
+
+        GLJournalEntryMapper rm = new GLJournalEntryMapper(null);
+        String sql = String.format("select %s where %s" ,rm.schema() ,query);
+
+        return this.jdbcTemplate.query(sql ,rm);
+    }
 }

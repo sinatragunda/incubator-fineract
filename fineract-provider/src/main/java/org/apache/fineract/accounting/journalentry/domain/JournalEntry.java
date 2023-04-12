@@ -30,9 +30,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
+import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.glaccount.domain.GLAccount;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
+import org.apache.fineract.mix.data.NamespaceData;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.client.domain.ClientTransaction;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
@@ -44,6 +49,8 @@ import org.apache.fineract.useradministration.domain.AppUser;
 @Table(name = "acc_gl_journal_entry")
 public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
 
+    @AttributeList(beanLoader = BEAN_LOADER.OFFICE)
+    @AttributeRef(name = "Office" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -52,6 +59,8 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
     @JoinColumn(name = "payment_details_id", nullable = true)
     private PaymentDetail paymentDetail;
 
+    @AttributeList(beanLoader = BEAN_LOADER.GL_ACCOUNT)
+    @AttributeRef(name = "Ledger Account" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private GLAccount glAccount;
@@ -63,6 +72,7 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
     @JoinColumn(name = "reversal_id")
     private JournalEntry reversalJournalEntry;
 
+    @AttributeRef(name = "Transaction ID" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "transaction_id", nullable = false, length = 50)
     private String transactionId;
 
@@ -81,12 +91,15 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
     @Column(name = "share_transaction_id", nullable = true)
     private Long shareTransactionId;
 
+    @AttributeRef(name = "Is Reversed" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "reversed", nullable = false)
     private boolean reversed = false;
 
+    @AttributeRef(name = "Is Manual Entry" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "manual_entry", nullable = false)
     private boolean manualEntry = false;
 
+    @AttributeRef(name = "Entry Date" ,group = COMPARISON_GROUP.DATE)
     @Column(name = "entry_date")
     @Temporal(TemporalType.DATE)
     private Date transactionDate;
@@ -94,6 +107,7 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
     @Column(name = "type_enum", nullable = false)
     private Integer type;
 
+    @AttributeRef(name = "Amount" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
@@ -106,6 +120,7 @@ public class JournalEntry extends AbstractAuditableCustom<AppUser, Long> {
     @Column(name = "entity_id")
     private Long entityId;
 
+    @AttributeRef(name = "Reference Number" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "ref_num")
     private String referenceNumber;
 

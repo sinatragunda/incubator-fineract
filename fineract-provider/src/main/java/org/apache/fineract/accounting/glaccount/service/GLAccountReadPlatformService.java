@@ -24,8 +24,9 @@ import org.apache.fineract.accounting.glaccount.data.GLAccountData;
 import org.apache.fineract.accounting.glaccount.data.GLAccountDataForLookup;
 import org.apache.fineract.accounting.glaccount.domain.GLAccountType;
 import org.apache.fineract.accounting.journalentry.data.JournalEntryAssociationParametersData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
-public interface GLAccountReadPlatformService {
+public interface GLAccountReadPlatformService extends DataEnumerationService {
 
     List<GLAccountData> retrieveAllGLAccounts(Integer accountClassification, String searchParam, Integer usage,
             Boolean manualTransactionsAllowed, Boolean disabled, JournalEntryAssociationParametersData associationParametersData);

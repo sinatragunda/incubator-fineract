@@ -114,6 +114,7 @@ import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -507,13 +508,14 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final Collection<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
         final BigDecimal outstandingLoanBalance = loanRepaymentScheduleInstallment.getPrincipalOutstanding(currency).getAmount();
         final BigDecimal unrecognizedIncomePortion = null;
+        final String clientName = null ;
         BigDecimal adjustedChargeAmount = adjustPrepayInstallmentCharge(loan, onDate);
         return new LoanTransactionData(null, null, null, transactionType, null, currencyData, earliestUnpaidInstallmentDate,
                 loanRepaymentScheduleInstallment.getTotalOutstanding(currency).getAmount().subtract(adjustedChargeAmount), loanRepaymentScheduleInstallment
                         .getPrincipalOutstanding(currency).getAmount(), loanRepaymentScheduleInstallment.getInterestAccrued(currency)
                         .getAmount(), loanRepaymentScheduleInstallment.getFeeChargesOutstanding(currency).getAmount().subtract(adjustedChargeAmount),
                 loanRepaymentScheduleInstallment.getPenaltyChargesOutstanding(currency).getAmount(), null, unrecognizedIncomePortion,
-                paymentOptions, null, null, null, outstandingLoanBalance, false,loanId);
+                paymentOptions, null, null, null, outstandingLoanBalance, false,loanId ,clientName);
     }
 
 	private BigDecimal adjustPrepayInstallmentCharge(Loan loan, final LocalDate onDate) {
@@ -556,8 +558,10 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final BigDecimal amount = waiveOfInterest.getAmount(currency).getAmount();
         final BigDecimal outstandingLoanBalance = null;
         final BigDecimal unrecognizedIncomePortion = null;
+        final String clientName = null;
+        
         return new LoanTransactionData(null, null, null, transactionType, null, currencyData, waiveOfInterest.getTransactionDate(), amount,
-                null, null, null, null, null, null, null, null, outstandingLoanBalance, unrecognizedIncomePortion, false ,loanId);
+                null, null, null, null, null, null, null, null, outstandingLoanBalance, unrecognizedIncomePortion, false ,loanId ,clientName);
     }
 
     @Override
@@ -567,8 +571,10 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final BigDecimal outstandingLoanBalance = null;
         final LoanTransactionEnumData transactionType = LoanEnumerations.transactionType(LoanTransactionType.WRITEOFF);
         final BigDecimal unrecognizedIncomePortion = null;
+        final Long loanId = null ;
+        final String clientName = null;
         return new LoanTransactionData(null, null, null, transactionType, null, null, DateUtils.getLocalDateOfTenant(), null, null, null,
-                null, null, null, null, null, null, outstandingLoanBalance, unrecognizedIncomePortion, false,null);
+                null, null, null, null, null, null, outstandingLoanBalance, unrecognizedIncomePortion, false,loanId ,clientName);
 
     }
 
@@ -1501,10 +1507,12 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             }
 
             final Long loanId = rs.getLong("loanId");
+            final String clientName = null ;
+
 
             return new LoanTransactionData(id, officeId, officeName, transactionType, paymentDetailData, currencyData, date, totalAmount,
                     principalPortion, interestPortion, feeChargesPortion, penaltyChargesPortion, overPaymentPortion,
-                    unrecognizedIncomePortion, externalId, transfer, null, outstandingLoanBalance, submittedOnDate, manuallyReversed ,loanId);
+                    unrecognizedIncomePortion, externalId, transfer, null, outstandingLoanBalance, submittedOnDate, manuallyReversed ,loanId ,clientName);
         }
     }
 
@@ -1936,8 +1944,10 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final Collection<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
         BigDecimal outstandingLoanBalance = null;
         final BigDecimal unrecognizedIncomePortion = null;
+        final String clientName = null ;
+
         return new LoanTransactionData(null, null, null, transactionType, null, null, null, loan.getTotalWrittenOff(), null, null, null,
-                null, null, unrecognizedIncomePortion, paymentOptions, null, null, null, outstandingLoanBalance, false,null);
+                null, null, unrecognizedIncomePortion, paymentOptions, null, null, null, outstandingLoanBalance, false,null ,clientName);
 
     }
 
@@ -1950,9 +1960,12 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final BigDecimal unrecognizedIncomePortion = null;
         final List<CodeValueData> writeOffReasonOptions = new ArrayList<>(
                 this.codeValueReadPlatformService.retrieveCodeValuesByCode(LoanApiConstants.WRITEOFFREASONS));
+
+        final String clientName = null ;
+
         LoanTransactionData loanTransactionData = new LoanTransactionData(null, null, null, transactionType, null, loan.currency(), DateUtils.getLocalDateOfTenant(),
                 loan.getTotalOutstandingAmount(), null, null, null, null, null, null, null, null, outstandingLoanBalance,
-                unrecognizedIncomePortion, false ,loanId);
+                unrecognizedIncomePortion, false ,loanId ,clientName);
         loanTransactionData.setWriteOffReasonOptions(writeOffReasonOptions);
         return loanTransactionData;
     }
@@ -2048,8 +2061,9 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final BigDecimal unrecognizedIncomePortion = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "unrecognizedIncome");
             final BigDecimal outstandingLoanBalance = JdbcSupport.getBigDecimalDefaultToZeroIfNull(rs, "outstandingLoanBalance");
 
+            final String clientName = null ;
             return new LoanTransactionData(id, transactionType, date, totalAmount, principalPortion, interestPortion, feeChargesPortion,
-                    penaltyChargesPortion, overPaymentPortion, unrecognizedIncomePortion, outstandingLoanBalance, false ,loanId);
+                    penaltyChargesPortion, overPaymentPortion, unrecognizedIncomePortion, outstandingLoanBalance, false ,loanId ,clientName);
         }
     }
 
@@ -2179,11 +2193,14 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
         final LocalDate earliestUnpaidInstallmentDate = new LocalDate();
 
+        final String clientName = null ;
+
+
         final LoanTransactionEnumData transactionType = LoanEnumerations.transactionType(LoanTransactionType.REFUND_FOR_ACTIVE_LOAN);
         final Collection<PaymentTypeData> paymentOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
         return new LoanTransactionData(null, null, null, transactionType, null, currencyData, earliestUnpaidInstallmentDate,
                 retrieveTotalPaidInAdvance(loan.getId()).getPaidInAdvance(), null, null, null, null, null, null, paymentOptions, null,
-                null, null, null, false ,loanId);
+                null, null, null, false ,loanId ,clientName);
     }
 
     @Override
@@ -2275,13 +2292,14 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         final Money outStandingAmount = loanRepaymentScheduleInstallment.getTotalOutstanding(currency);
 
         //System.err.println("---------------------------foreclosure template status "+loan.getLoanStatus());
+        final String clientName = null ;
 
         return new LoanTransactionData(null, null, null, transactionType, null, currencyData, earliestUnpaidInstallmentDate,
                 outStandingAmount.getAmount(), loanRepaymentScheduleInstallment.getPrincipalOutstanding(currency).getAmount(),
                 loanRepaymentScheduleInstallment.getInterestOutstanding(currency).getAmount(), loanRepaymentScheduleInstallment
                         .getFeeChargesOutstanding(currency).getAmount(), loanRepaymentScheduleInstallment.getPenaltyChargesOutstanding(
                         currency).getAmount(), null, unrecognizedIncomePortion, paymentTypeOptions, null, null, null,
-                outstandingLoanBalance, isReversed ,loanId);
+                outstandingLoanBalance, isReversed ,loanId ,clientName);
     }
     
     private static final class CurrencyMapper implements RowMapper<CurrencyData> {
@@ -2351,11 +2369,30 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final String externalId = null;
             final AccountTransferData transfer = null;
             final BigDecimal fixedEmiAmount = null;
+            final Long loanId = null ;
+            final String clientName = null ;
+
             return new LoanTransactionData(id, officeId, officeName, transactionType, paymentDetailData, currencyData, date, totalDue,
                     principalPortion, interestDue, feeDue, penaltyDue, overPaymentPortion, externalId, transfer, fixedEmiAmount,
-                    outstandingLoanBalance, unrecognizedIncomePortion, manuallyReversed,null);
+                    outstandingLoanBalance, unrecognizedIncomePortion, manuallyReversed,loanId ,clientName);
         }
 
     }
-    
+
+    public Collection<LoanAccountData> retrieveUsingQuery(String sql){
+
+        sql = String.format("select %s where %s" ,loanMapper.loanSchema() ,sql);
+
+        System.err.println("---------------final query is "+sql);
+
+        return this.jdbcTemplate.query(sql ,loanMapper) ;
+    }
+
+    @Override
+    public List<EnumOptionData> getDropdownData(){
+        Page page = retrieveAll(null);
+        List loansList = page.getPageItems();
+        List enumOptionDataList = EnumeratedDataHelper.enumeratedData(loansList);
+        return enumOptionDataList;
+    }
 }

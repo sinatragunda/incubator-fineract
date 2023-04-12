@@ -23,8 +23,12 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.commands.domain.CommandWrapper;
+import org.apache.fineract.commands.service.CommandWrapperBuilder;
+import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
+import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.GeneralPlatformDomainRuleException;
@@ -57,6 +61,7 @@ import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.data.HolidayDetailDTO;
 import org.apache.fineract.portfolio.loanaccount.data.LoanScheduleAccrualData;
 import org.apache.fineract.portfolio.loanaccount.data.ScheduleGeneratorDTO;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanTransactionHelper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAccrualPlatformService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanAssembler;
 import org.apache.fineract.portfolio.loanaccount.service.LoanUtilService;
@@ -92,6 +97,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     private final BusinessEventNotifierService businessEventNotifierService;
     private final LoanUtilService loanUtilService;
     private final StandingInstructionRepository standingInstructionRepository;
+    private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
 
     @Autowired
     public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -105,7 +111,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             final LoanRepaymentScheduleInstallmentRepository repaymentScheduleInstallmentRepository,
             final LoanAccrualPlatformService loanAccrualPlatformService, final PlatformSecurityContext context,
             final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, 
-            final StandingInstructionRepository standingInstructionRepository) {
+            final StandingInstructionRepository standingInstructionRepository ,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService) {
         this.loanAccountAssembler = loanAccountAssembler;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanTransactionRepository = loanTransactionRepository;
@@ -123,6 +129,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         this.businessEventNotifierService = businessEventNotifierService;
         this.loanUtilService = loanUtilService;
         this.standingInstructionRepository = standingInstructionRepository;
+        this.commandSourceWritePlatformService = commandSourceWritePlatformService;
     }
 
     @Transactional
@@ -230,13 +237,13 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     private void saveLoanTransactionWithDataIntegrityViolationChecks(LoanTransaction newRepaymentTransaction) {
         try {
-            //System.err.println("------------------------------------------saving loan with integrity checks now son -------");
+            System.err.println("------------------------------------------saving loan with integrity checks now son -------");
             this.loanTransactionRepository.save(newRepaymentTransaction);
-            //System.err.println("-----------------------loan saved ------------");
+            System.err.println("-----------------------loan saved ------------");
 
         } catch (DataIntegrityViolationException e) {
             final Throwable realCause = e.getCause();
-            //System.err.println("-------------------------get cause ------------"+e.getMessage());
+            System.err.println("-------------------------get cause ------------"+e.getMessage());
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan.transaction");
             if (realCause.getMessage().toLowerCase().contains("external_id_unique")) {
@@ -455,15 +462,26 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     @Override
-    public void reverseTransfer(final LoanTransaction loanTransaction) {
+    public void reverseTransfer(final LoanTransaction loanTransaction){
 
         loanTransaction.reverse();
         saveLoanTransactionWithDataIntegrityViolationChecks(loanTransaction);
 
-        System.err.println("------------------recalculate accruals here son  ------------------");
+        System.err.println("------------------recalculate accruals here son ,with new method now  ------------------");
 
         Loan loan = loanTransaction.getLoan();
-        recalculateAccruals(loan);
+
+        Long loanId = loan.getId();
+        Long transactionId = loanTransaction.getId();
+
+        String payload = LoanTransactionHelper.buildReverseTransactionJson(loanTransaction);
+
+        final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(payload);
+        final CommandWrapper commandRequest = builder.adjustTransaction(loanId, transactionId).build();
+
+        final CommandProcessingResult result = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
+
+        //recalculateAccruals(loan);
     }
 
     /*

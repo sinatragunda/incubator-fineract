@@ -20,11 +20,9 @@ package org.apache.fineract.useradministration.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -41,6 +39,8 @@ import org.apache.fineract.useradministration.domain.AppUserClientMapping;
 import org.apache.fineract.useradministration.domain.AppUserRepository;
 import org.apache.fineract.useradministration.domain.Role;
 import org.apache.fineract.useradministration.exception.UserNotFoundException;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -220,5 +220,19 @@ public class AppUserReadPlatformServiceImpl implements AppUserReadPlatformServic
         Integer count = this.jdbcTemplate.queryForObject(sql, params, Integer.class);
         if (count == 0) { return false; }
         return true;
+    }
+
+    /**
+     * Added 12/04/2023 at 1028
+     */
+    @Override
+    public List<EnumOptionData> getDropdownData(){
+        Collection<AppUserData> appUserDataCollection =  retrieveAllUsers();
+        return EnumeratedDataHelper.enumeratedData(appUserDataCollection);
+    }
+
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String sql) {
+        return null;
     }
 }

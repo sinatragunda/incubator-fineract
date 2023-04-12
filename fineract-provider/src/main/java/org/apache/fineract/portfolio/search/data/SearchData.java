@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.search.data;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
 public class SearchData {
-
     private final Long entityId;
     private final String entityAccountNo;
     private final String entityExternalId;

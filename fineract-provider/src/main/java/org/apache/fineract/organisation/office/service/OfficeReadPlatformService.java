@@ -25,8 +25,9 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.data.OfficeTransactionData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
-public interface OfficeReadPlatformService {
+public interface OfficeReadPlatformService extends DataEnumerationService {
 
     Collection<OfficeData> retrieveAllOffices(boolean includeAllOffices, SearchParameters searchParameters);
 
@@ -42,5 +43,4 @@ public interface OfficeReadPlatformService {
 
     OfficeTransactionData retrieveNewOfficeTransactionDetails();
 
-    List<EnumOptionData> getDropdownData();
 }

@@ -40,6 +40,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
+import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
+import com.wese.component.defaults.enumerations.FIELD_TYPE;
+import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -64,10 +70,14 @@ import org.joda.time.LocalDateTime;
 @Table(name = "m_loan_transaction", uniqueConstraints = { @UniqueConstraint(columnNames = { "external_id" }, name = "external_id_UNIQUE") })
 public class LoanTransaction extends AbstractPersistableCustom<Long> {
 
+    @AttributeList(beanLoader = BEAN_LOADER.LOAN)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY, name = "Loan", group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = false)
     @JoinColumn(name = "loan_id", nullable = false)
     private Loan loan;
 
+    @AttributeList(beanLoader = BEAN_LOADER.OFFICE)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY, name = "Office", group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -79,6 +89,7 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
     @Column(name = "transaction_type_enum", nullable = false)
     private Integer typeOf;
 
+    @AttributeRef(name = "Transaction Date" ,group = COMPARISON_GROUP.DATE ,type = FIELD_TYPE.MANDATORY)
     @Temporal(TemporalType.DATE)
     @Column(name = "transaction_date", nullable = false)
     private Date dateOf;
@@ -87,6 +98,7 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
     @Column(name = "submitted_on_date", nullable = false)
     private Date submittedOnDate;
 
+    @AttributeRef(name = "Amount" ,group = COMPARISON_GROUP.NUMERIC ,type = FIELD_TYPE.MANDATORY)
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
@@ -118,6 +130,8 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
     @Column(name = "created_date", nullable = false)
     private Date createdDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Created By" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "appuser_id", nullable = true)
     private AppUser appUser;
@@ -128,6 +142,7 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
     @Column(name = "outstanding_loan_balance_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal outstandingLoanBalance;
 
+    @AttributeRef(name = "Is Manually Adjusted or Reversed" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "manually_adjusted_or_reversed", nullable = false)
     private boolean manuallyAdjustedOrReversed;
 
@@ -605,10 +620,11 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
         if (this.paymentDetail != null) {
             paymentDetailData = this.paymentDetail.toData();
         }
+        final String clientName = null;
         return new LoanTransactionData(getId(), this.office.getId(), this.office.getName(), transactionType, paymentDetailData,
                 currencyData, getTransactionDate(), this.amount, this.principalPortion, this.interestPortion, this.feeChargesPortion,
                 this.penaltyChargesPortion, this.overPaymentPortion, this.externalId, transfer, null, outstandingLoanBalance,
-                this.unrecognizedIncomePortion, this.manuallyAdjustedOrReversed ,this.loan.getId());
+                this.unrecognizedIncomePortion, this.manuallyAdjustedOrReversed ,this.loan.getId() ,clientName);
     }
 
     public Map<String, Object> toMapData(final CurrencyData currencyData) {

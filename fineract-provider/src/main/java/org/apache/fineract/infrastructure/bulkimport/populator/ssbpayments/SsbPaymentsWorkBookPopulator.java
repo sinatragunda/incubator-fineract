@@ -132,21 +132,28 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         ddaFundAccountsGroup.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$D$2:$D$" + (savingsAccountsDataList.size() + 1));
 
         for (int i = 0; i < savingsAccountsDataList.size() ;++i){
+            try{
+                //SavingsAccountData savingsAccountData = savingsAccountsDataList.get(i);
+                //savingsAccountData.is
+                String accountName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");
+                Name accountNameName  = ssbPaymentsWorkbook.createName();
 
-            String accountName = savingsAccountsDataList.get(i).getClientName().replaceAll("[ ]" ,"_");
-            Name accountNameName  = ssbPaymentsWorkbook.createName();
+                accountNameName.setNameName("Fund_Account_Name_"+accountName);
+                accountNameName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
 
-            accountNameName.setNameName("Fund_Account_Name_"+accountName);
-            accountNameName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
-
-            Name currencyName = ssbPaymentsWorkbook.createName();
-            currencyName.setNameName("Currency_"+accountName);
-            currencyName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$C$" + (i + 2));
+                Name currencyName = ssbPaymentsWorkbook.createName();
+                currencyName.setNameName("Currency_"+accountName);
+                currencyName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$C$" + (i + 2));
 
 
-            Name fundAccountIdName = ssbPaymentsWorkbook.createName();
-            fundAccountIdName.setNameName("Fund_Account_Id_"+accountName);
-            fundAccountIdName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
+                Name fundAccountIdName = ssbPaymentsWorkbook.createName();
+                fundAccountIdName.setNameName("Fund_Account_Id_"+accountName);
+                fundAccountIdName.setRefersToFormula(TemplatePopulateImportConstants.SAVINGS_ACCOUNTS_SHEET_NAME+"!$A$" + (i + 2));
+           }
+           catch(Exception e){
+                System.err.println("------------------some error caught but will skip it "+e.getMessage());
+                
+           } 
         }
 
 
@@ -156,17 +163,20 @@ public class SsbPaymentsWorkBookPopulator extends AbstractWorkbookPopulator {
         clientNameGroup.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$A$2:$A$" + (clientDataList.size() + 1));
 
         for (int i = 0; i < clientDataList.size() ;++i){
+            try {
+                String clientName = clientDataList.get(i).displayName().replaceAll("[ ]", "_");
+                Name clientNameName = ssbPaymentsWorkbook.createName();
 
-            String clientName = clientDataList.get(i).displayName().replaceAll("[ ]" ,"_");
-            Name clientNameName  = ssbPaymentsWorkbook.createName();
+                clientNameName.setNameName("Client_Name" + clientName);
+                clientNameName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME + "!$A$" + (i + 2));
 
-            clientNameName.setNameName("Client_Name"+clientName);
-            clientNameName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$A$" + (i + 2));
-
-            Name accountIdName = ssbPaymentsWorkbook.createName();
-            accountIdName.setNameName("Client_Id_"+ clientName);
-            accountIdName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME+"!$B$" + (i + 2));
-
+                Name accountIdName = ssbPaymentsWorkbook.createName();
+                accountIdName.setNameName("Client_Id_" + clientName);
+                accountIdName.setRefersToFormula(TemplatePopulateImportConstants.CLIENT_SHEET_NAME + "!$B$" + (i + 2));
+            }
+            catch (Exception n){
+                System.err.println("=============================duplicate client exception "+n.getMessage());
+            }
         }
     }
 

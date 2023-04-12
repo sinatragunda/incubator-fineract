@@ -24,8 +24,10 @@ public enum REF_TABLE implements IEnum {
     TELLER("Teller"),
     LOAN_TRANSACTION("Loan Transaction"),
     REPORT("Report"),
-    OFFICE("Office");
-
+    OFFICE("Office"),
+    SEARCH("Search"),
+    JOURNAL_ENTRY("Journal Entry"),
+    GL_ACCOUNT("Ledger Account");
 
     private String code;
 

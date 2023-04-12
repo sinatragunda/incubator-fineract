@@ -3384,6 +3384,16 @@ public class CommandWrapperBuilder {
         return this;
     }
 
+    /**
+     * Added 10/04/1930 at 1930
+     */ 
+    public CommandWrapperBuilder createSearch() {
+        this.actionName = "CREATE";
+        this.entityName = "SEARCH";
+        this.href = "/search";
+        return this;
+    }
+
 
     public CommandWrapperBuilder createMenu() {
         this.actionName = "CREATE";

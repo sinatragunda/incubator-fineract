@@ -19,10 +19,11 @@
 package org.apache.fineract.useradministration.service;
 
 import org.apache.fineract.useradministration.data.AppUserData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
 import java.util.Collection;
 
-public interface AppUserReadPlatformService {
+public interface AppUserReadPlatformService extends DataEnumerationService {
 
     Collection<AppUserData> retrieveAllUsers();
 

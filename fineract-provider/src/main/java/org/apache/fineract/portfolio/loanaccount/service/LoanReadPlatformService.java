@@ -39,9 +39,10 @@ import org.apache.fineract.portfolio.loanaccount.data.RepaymentScheduleRelatedLo
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanSchedulePeriodData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.OverdueLoanScheduleData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 import org.joda.time.LocalDate;
 
-public interface LoanReadPlatformService {
+public interface LoanReadPlatformService extends DataEnumerationService {
 
     LoanAccountData retrieveOne(Long loanId);
 

@@ -21,6 +21,7 @@ package org.apache.fineract.accounting.glaccount.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,8 @@ import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -281,5 +284,16 @@ public class GLAccountReadPlatformServiceImpl implements GLAccountReadPlatformSe
             return new GLAccountDataForLookup(id, name, glCode);
         }
 
+    }
+
+    @Override
+    public List<EnumOptionData> getDropdownData(){
+        Collection collection = retrieveAllGLAccounts(null ,null ,null ,null,null ,null);
+        return EnumeratedDataHelper.enumeratedData(collection);
+    }
+
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String sql) {
+        return null;
     }
 }

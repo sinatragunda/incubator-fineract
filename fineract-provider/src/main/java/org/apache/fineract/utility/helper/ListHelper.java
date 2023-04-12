@@ -6,6 +6,7 @@ package org.apache.fineract.utility.helper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ListHelper {
@@ -13,4 +14,11 @@ public class ListHelper {
     public static List fromCollection(Collection collection){
         return (List) collection.stream().collect(Collectors.toList());
     }
+
+    public static List fromSet(Set set){
+        return (List) set.stream().collect(Collectors.toList());
+    }
+
+
+
 }

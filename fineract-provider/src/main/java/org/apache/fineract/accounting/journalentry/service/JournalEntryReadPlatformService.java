@@ -26,8 +26,11 @@ import org.apache.fineract.accounting.journalentry.data.JournalEntryData;
 import org.apache.fineract.accounting.journalentry.data.OfficeOpeningBalancesData;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
-public interface JournalEntryReadPlatformService {
+import javax.xml.crypto.Data;
+
+public interface JournalEntryReadPlatformService extends DataEnumerationService {
 
     JournalEntryData retrieveGLJournalEntryById(long glJournalEntryId, JournalEntryAssociationParametersData associationParametersData);
 

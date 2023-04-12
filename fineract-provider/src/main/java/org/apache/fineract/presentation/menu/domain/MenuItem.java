@@ -44,11 +44,17 @@ public class MenuItem extends AbstractPersistableCustom<Long> {
     @Column(name ="shortcut")
     private String shortcut;
 
+
+    @Column(name ="system_defined")
+    private Boolean sysemDefined;
+
+
     public MenuItem(String name, APPLICATION_ACTION applicationAction, REF_TABLE refTable, String shortcut) {
         this.name = name;
         this.applicationAction = applicationAction;
         this.refTable = refTable;
         this.shortcut = shortcut;
+        this.sysemDefined = false ;
     }
 
     public Map<String ,Object> update(JsonCommand command){

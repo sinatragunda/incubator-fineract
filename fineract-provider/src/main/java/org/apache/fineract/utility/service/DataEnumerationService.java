@@ -7,11 +7,12 @@ package org.apache.fineract.utility.service;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 
 import java.util.List;
-
+import java.util.Collection;
 /**
  * Int
  */
 public interface DataEnumerationService {
 
     public List<EnumOptionData> getDropdownData();
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String sql);
 }

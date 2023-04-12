@@ -19,6 +19,7 @@
 package org.apache.fineract.portfolio.search.api;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -33,15 +34,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
+import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.portfolio.search.SearchConstants.SEARCH_RESPONSE_PARAMETERS;
-import org.apache.fineract.portfolio.search.data.AdHocQueryDataValidator;
-import org.apache.fineract.portfolio.search.data.AdHocQuerySearchConditions;
-import org.apache.fineract.portfolio.search.data.AdHocSearchQueryData;
-import org.apache.fineract.portfolio.search.data.SearchConditions;
-import org.apache.fineract.portfolio.search.data.SearchData;
+import org.apache.fineract.portfolio.search.data.*;
 import org.apache.fineract.portfolio.search.service.SearchReadPlatformService;
+import org.apache.fineract.portfolio.search.service.SearchReadPlatformServiceEx;
+import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -57,16 +58,20 @@ public class SearchApiResource {
     private final ToApiJsonSerializer<Object> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final AdHocQueryDataValidator fromApiJsonDeserializer;
+    private final FromJsonHelper fromJsonHelper ;
+    private final SearchReadPlatformServiceEx searchReadPlatformServiceEx;
 
     @Autowired
     public SearchApiResource(final SearchReadPlatformService searchReadPlatformService,
             final ToApiJsonSerializer<Object> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-            final AdHocQueryDataValidator fromApiJsonDeserializer) {
+            final AdHocQueryDataValidator fromApiJsonDeserializer,final FromJsonHelper fromJsonHelper ,final SearchReadPlatformServiceEx searchReadPlatformServiceEx) {
 
         this.searchReadPlatformService = searchReadPlatformService;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.fromApiJsonDeserializer = fromApiJsonDeserializer;
+        this.searchReadPlatformServiceEx = searchReadPlatformServiceEx;
+        this.fromJsonHelper = fromJsonHelper;
 
     }
 
@@ -109,5 +114,19 @@ public class SearchApiResource {
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, searchResults);
+    }
+
+    /**
+     * Added 11/04/2023 at 0124
+     * New search method with parameters
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String search(String payload){
+        //context.getAuthenticatedUserIfPresent().validateHasReadPermission();
+        JsonCommand jsonCommand = JsonCommandHelper.jsonCommand(fromJsonHelper ,payload);
+        SearchDataEx results = searchReadPlatformServiceEx.search(jsonCommand);
+        return toApiJsonSerializer.serializeResult(results);
     }
 }

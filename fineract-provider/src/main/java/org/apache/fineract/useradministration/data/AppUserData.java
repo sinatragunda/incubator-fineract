@@ -25,11 +25,12 @@ import java.util.Set;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.client.data.ClientData;
+import org.apache.fineract.utility.service.EnumeratedData;
 
 /**
  * Immutable data object for application user data.
  */
-public class AppUserData {
+public class AppUserData implements EnumeratedData {
 
     private final Long id;
     private final String username;
@@ -134,6 +135,16 @@ public class AppUserData {
 
     public String username() {
         return this.username;
+    }
+
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return username();
     }
 
     @Override

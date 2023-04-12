@@ -20,12 +20,10 @@ package org.apache.fineract.portfolio.client.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
 import org.apache.fineract.infrastructure.configuration.data.GlobalConfigurationPropertyData;
@@ -66,6 +64,9 @@ import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformServic
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
 import org.apache.fineract.portfolio.savings.service.SavingsProductReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.helper.ListHelper;
+import org.apache.fineract.utility.service.DataEnumerationService;
 import org.apache.fineract.wese.helper.ExceptionsHelper;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 
 @Service
-public class ClientReadPlatformServiceImpl implements ClientReadPlatformService {
+public class ClientReadPlatformServiceImpl implements ClientReadPlatformService , DataEnumerationService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformSecurityContext context;
@@ -210,7 +211,9 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         sqlBuilder.append(this.clientMapper.schema());
         sqlBuilder.append(" where (o.hierarchy like ? or transferToOffice.hierarchy like ?) ");
 
-        if(searchParameters!=null) {
+        boolean hasSearchParams = OptionalHelper.isPresent(searchParameters);
+
+        if(hasSearchParams) {
             if (searchParameters.isSelfUser()) {
                 sqlBuilder.append(" and c.id in (select umap.client_id from m_selfservice_user_client_mapping as umap where umap.appuser_id = ? ) ");
                 paramList.add(appUserID);
@@ -940,4 +943,16 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         		clientNonPersonConstitutionOptions, clientNonPersonMainBusinessLineOptions, clientLegalFormOptions,null,null,null, null ,localRefData);
     }
 
+    @Override
+    public List<EnumOptionData> getDropdownData() {
+        Page<ClientData> page = retrieveAll(null);
+        List<ClientData> list = page.getPageItems();
+        //System.err.println("======================page items size is ?"+list.size());
+        return EnumeratedDataHelper.enumeratedData(list);
+    }
+
+    public Collection<ClientData> retrieveUsingQuery(String params){
+        String sql = String.format("select %s where %s" ,clientMapper.schema() ,params);
+        return this.jdbcTemplate.query(sql ,clientMapper);
+    }
 }

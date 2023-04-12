@@ -94,7 +94,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "sub_status", nullable = true)
     private CodeValue subStatus;
 
-    @AttributeRef(name = "activationDate" ,type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.DATE)
+    @AttributeRef(name = "Activation Date" ,type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.DATE)
     @Column(name = "activation_date", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date activationDate;
@@ -120,7 +120,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "fullname", length = 100, nullable = true)
     private String fullname;
 
-    @AttributeRef(name="displayName" ,group = COMPARISON_GROUP.STRING  ,type = FIELD_TYPE.OPTIONAL)
+    @AttributeRef(name="Display Name" ,group = COMPARISON_GROUP.STRING  ,type = FIELD_TYPE.OPTIONAL)
     @Column(name = "display_name", length = 100, nullable = false)
     private String displayName;
 
@@ -136,7 +136,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
 	@Column(name = "is_staff", nullable = false)
     private boolean isStaff;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Email Address" ,group = COMPARISON_GROUP.PATTERN)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "External Id" ,group = COMPARISON_GROUP.PATTERN)
     @Column(name = "external_id", length = 100, nullable = true, unique = true)
     private String externalId;
 
