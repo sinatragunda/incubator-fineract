@@ -76,7 +76,7 @@ public class MenuItemReadPlatformServiceImpl implements MenuItemReadPlatformServ
     private static final class MenuItemMapper implements RowMapper<MenuItemData> {
 
         public String schema() {
-            return " mi.id as id, mi.name as name , mi.ref_table as refTable, " +
+            return " mi.id as id, mi.name as name ,mi.param as param ,mi.system_defined as systemDefined , mi.ref_table as refTable, " +
                     "mi.application_action as applicationAction ,mi.shortcut as shortcut " +
                     " from m_menu_item mi";
         }
@@ -87,6 +87,7 @@ public class MenuItemReadPlatformServiceImpl implements MenuItemReadPlatformServ
             final Long id = JdbcSupport.getLong(rs, "id");
             final String name = rs.getString("name");
             final String shortcut = rs.getString("shortcut");
+            final String param = rs.getString("param");
             final Integer refTableInt = JdbcSupport.getInteger(rs ,"refTable");
             final Integer applicationActionInt = JdbcSupport.getInteger(rs ,"applicationAction");
 
@@ -95,7 +96,7 @@ public class MenuItemReadPlatformServiceImpl implements MenuItemReadPlatformServ
 
             final EnumOptionData applicationActionData = EnumTemplateHelper.template(applicationAction);
 
-            return new MenuItemData(id ,name ,shortcut ,applicationActionData ,refTableData);
+            return new MenuItemData(id ,name ,shortcut ,applicationActionData ,refTableData ,param);
         }
     }
 

@@ -44,17 +44,21 @@ public class MenuItem extends AbstractPersistableCustom<Long> {
     @Column(name ="shortcut")
     private String shortcut;
 
+    @Column(name ="param")
+    private String param;
+
 
     @Column(name ="system_defined")
     private Boolean sysemDefined;
 
 
-    public MenuItem(String name, APPLICATION_ACTION applicationAction, REF_TABLE refTable, String shortcut) {
+    public MenuItem(String name, APPLICATION_ACTION applicationAction, REF_TABLE refTable, String shortcut ,String param) {
         this.name = name;
         this.applicationAction = applicationAction;
         this.refTable = refTable;
         this.shortcut = shortcut;
         this.sysemDefined = false ;
+        this.param = param;
     }
 
     public Map<String ,Object> update(JsonCommand command){
@@ -86,6 +90,13 @@ public class MenuItem extends AbstractPersistableCustom<Long> {
             actualChanges.put(MenuConstants.shortcutParam, newValue);
             this.shortcut = newValue ;
         }
+
+        if (command.isChangeInStringParameterNamed(MenuConstants.paramParam,this.param)){
+            final String newValue = command.stringValueOfParameterNamed(MenuConstants.paramParam);
+            actualChanges.put(MenuConstants.paramParam, newValue);
+            this.param = newValue ;
+        }
+
         return actualChanges ;
     }
 
@@ -99,5 +110,9 @@ public class MenuItem extends AbstractPersistableCustom<Long> {
 
     public String getShortcut() {
         return shortcut;
+    }
+
+    public String getParam(){
+        return this.param;
     }
 }

@@ -17,6 +17,7 @@ public class MenuItemData implements EnumeratedData {
     private Long id ;
     private String name ;
     private String shortcut;
+    private String param = null ;
     private REF_TABLE refTable;
     private APPLICATION_ACTION applicationAction;
 
@@ -43,12 +44,13 @@ public class MenuItemData implements EnumeratedData {
         this.applicationAction = applicationAction;
     }
 
-    public MenuItemData(Long id, String name, String shortcut, EnumOptionData applicationActionData, EnumOptionData refTableData) {
+    public MenuItemData(Long id, String name, String shortcut, EnumOptionData applicationActionData, EnumOptionData refTableData ,final String param) {
         this.id = id;
         this.name = name;
         this.shortcut = shortcut;
         this.applicationActionData = applicationActionData;
         this.refTableData = refTableData;
+        this.param = param;
     }
 
     @Override

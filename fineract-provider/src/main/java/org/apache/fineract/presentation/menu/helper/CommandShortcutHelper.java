@@ -76,6 +76,7 @@ public class CommandShortcutHelper {
             }
             return data.get(index);
         }
+
         return null ;
     }
 
@@ -102,14 +103,41 @@ public class CommandShortcutHelper {
                 break;        
         }
 
+        boolean hasDefaultParam = hasDefaultParam(menuItem);
+
+        if(hasDefaultParam){
+
+            String param = menuItem.getParam();
+            stringBuilder = appendParam(param);
+            return stringBuilder.toString();
+        }
+        /**
+         * Modified 12/04/2023 at 1533 
+         * Distinguish between default param and a user inserted param 
+         */
+
+          
         String param = parameters(shortcut);
         boolean hasParam = OptionalHelper.isPresent(param);
 
         if(hasParam){
             System.err.println("---------param is --------"+hasParam);
-            stringBuilder.append("/");
-            stringBuilder.append(param);
-        } 
+            stringBuilder = appendParam(stringBuilder ,param);
+        }
+
         return stringBuilder.toString();
+    
+    }
+
+    public StringBuilder appendParam(StringBuilder stringBuilder ,String param){
+        stringBuilder.append("/");
+        stringBuilder.append(param);
+        return stringBuilder;
+    }
+
+
+    public boolean hasDefaultParam(MenuItem menuItem){
+        boolean hasParam = OptionalHelper.isPresent(menuItem.getParam()); 
+        return hasParam ;
     }
 }

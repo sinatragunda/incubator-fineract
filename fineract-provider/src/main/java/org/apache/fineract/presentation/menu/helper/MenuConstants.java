@@ -6,6 +6,7 @@ package org.apache.fineract.presentation.menu.helper;
 
 public class MenuConstants {
 
+    public static String paramParam = "param";
     public static String shortcutParam = "shortcut";
     public static String applicationActionParam ="applicationActionId";
     public static String menuItemsParam = "menuItems";

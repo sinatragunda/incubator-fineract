@@ -78,12 +78,13 @@ public class MenuAssembler {
 
  		final String name =  command.stringValueOfParameterNamed(GenericConstants.nameParam);
  		final String shortcut = command.stringValueOfParameterNamed(MenuConstants.shortcutParam);
+ 		final String param = command.stringValueOfParameterNamed(MenuConstants.paramParam);
  		final Integer refTableInt = command.integerValueOfParameterNamed(LocalRefConstants.refTableParam ,locale);
  		final Integer applicationActionInt = command.integerValueOfParameterNamed(MenuConstants.applicationActionParam,locale);
 
  		final REF_TABLE refTable = REF_TABLE.fromInt(refTableInt);
  		final APPLICATION_ACTION action = (APPLICATION_ACTION) EnumTemplateHelper.fromInt(APPLICATION_ACTION.values(), applicationActionInt);
- 		MenuItem menuItem = new MenuItem(name ,action ,refTable ,shortcut);
+ 		MenuItem menuItem = new MenuItem(name ,action ,refTable ,shortcut ,param);
  		return menuItem; 
  	}
 
