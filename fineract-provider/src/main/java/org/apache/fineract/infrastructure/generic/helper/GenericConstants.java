@@ -8,4 +8,8 @@ public class GenericConstants {
 
     public static String nameParam ="name";
     public static String amountParam = "amount";
+    public static String dataParam = "data";
+    public static String shortNameParam = "shortName";
+    
+       
 }

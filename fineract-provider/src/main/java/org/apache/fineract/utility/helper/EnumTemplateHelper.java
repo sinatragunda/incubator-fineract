@@ -42,10 +42,15 @@ public class EnumTemplateHelper {
   
 
 
-    public static IEnum fromInt(IEnum values[], int arg){
-        for(IEnum iEnum : values){
-            if(iEnum.ordinal() == arg){
-                return iEnum;
+    public static IEnum fromInt(IEnum values[], Integer arg){
+
+        boolean hasInt = OptionalHelper.isPresent(arg);
+
+        if(hasInt){
+            for(IEnum iEnum : values){
+                if(iEnum.ordinal() == arg){
+                    return iEnum;
+                }
             }
         }
         return null ;
@@ -77,15 +82,17 @@ public class EnumTemplateHelper {
 
     /**
      * Added 13/03/2023 at 0912
+     * Extended version that returns the first value as the default to avoid null
      * 
      */
-    public static IEnum fromIntEx(IEnum values[] ,int arg){
+    public static IEnum fromIntEx(IEnum values[] ,Integer arg){
+
         IEnum iEnum = fromInt(values ,arg);
         boolean isPresent = OptionalHelper.isPresent(iEnum);
-        if(!isPresent){
-            return values[0];
+        if(isPresent){
+            return iEnum;
         }
-        return iEnum;
+        return values[0];
     }
 
     public static List<EnumOptionData> fromEnumeratedList(List<? extends EnumeratedData> genericList){

@@ -108,7 +108,7 @@ public class CommandShortcutHelper {
         if(hasDefaultParam){
 
             String param = menuItem.getParam();
-            stringBuilder = appendParam(param);
+            stringBuilder = appendParam(stringBuilder ,param);
             return stringBuilder.toString();
         }
         /**
@@ -116,7 +116,6 @@ public class CommandShortcutHelper {
          * Distinguish between default param and a user inserted param 
          */
 
-          
         String param = parameters(shortcut);
         boolean hasParam = OptionalHelper.isPresent(param);
 
@@ -129,14 +128,14 @@ public class CommandShortcutHelper {
     
     }
 
-    public StringBuilder appendParam(StringBuilder stringBuilder ,String param){
+    public static StringBuilder appendParam(StringBuilder stringBuilder ,String param){
         stringBuilder.append("/");
         stringBuilder.append(param);
         return stringBuilder;
     }
 
 
-    public boolean hasDefaultParam(MenuItem menuItem){
+    public static boolean hasDefaultParam(MenuItem menuItem){
         boolean hasParam = OptionalHelper.isPresent(menuItem.getParam()); 
         return hasParam ;
     }

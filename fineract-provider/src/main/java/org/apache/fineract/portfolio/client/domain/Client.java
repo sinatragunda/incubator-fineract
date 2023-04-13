@@ -69,9 +69,8 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     private String accountNumber;
 
-
     @AttributeList(beanLoader = BEAN_LOADER.OFFICE)
-    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Office" ,group = COMPARISON_GROUP.LIST)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Office" ,model = "officeId", group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -103,7 +102,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Temporal(TemporalType.DATE)
     private Date officeJoiningDate;
 
-    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Firstname",group =COMPARISON_GROUP.STRING)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,model = "firstname",name = "First name",group =COMPARISON_GROUP.STRING)
     @Column(name = "firstname", length = 50, nullable = true)
     private String firstname;
 
@@ -113,7 +112,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     private String middlename;
 
 
-    @AttributeRef(type = FIELD_TYPE.MANDATORY ,name = "Lastname" ,group = COMPARISON_GROUP.STRING)
+    @AttributeRef(type = FIELD_TYPE.MANDATORY ,model = "lastName", name = "Lastname" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "lastname", length = 50, nullable = true)
     private String lastname;
 
@@ -129,18 +128,18 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "mobile_no", length = 50, nullable = false, unique = true)
     private String mobileNo;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Email Address" ,group = COMPARISON_GROUP.PATTERN)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model = "emailAddress", name = "Email Address" ,group = COMPARISON_GROUP.STRING)
 	@Column(name = "email_address", length = 50, unique = true)
     private String emailAddress;
 
 	@Column(name = "is_staff", nullable = false)
     private boolean isStaff;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "External Id" ,group = COMPARISON_GROUP.PATTERN)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="externalId", name = "External Id" ,group = COMPARISON_GROUP.PATTERN)
     @Column(name = "external_id", length = 100, nullable = true, unique = true)
     private String externalId;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Date of Birth" ,group=COMPARISON_GROUP.DATE)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="dateOfBirth", name = "Date of Birth" ,group=COMPARISON_GROUP.DATE)
     @Column(name = "date_of_birth", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date dateOfBirth;
@@ -152,7 +151,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @ManyToOne
     @JoinColumn(name = "staff_id")
     @AttributeList(beanLoader =  BEAN_LOADER.STAFF)
-    @AttributeRef(name ="loanAgent" ,type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.STRING)
+    @AttributeRef(name ="Loan Agent" ,model="staffId",type = FIELD_TYPE.OPTIONAL ,group = COMPARISON_GROUP.STRING)
     private Staff staff;
 
     @ManyToMany(fetch=FetchType.LAZY)

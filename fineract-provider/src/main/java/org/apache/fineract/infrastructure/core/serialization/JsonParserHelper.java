@@ -55,7 +55,7 @@ public class JsonParserHelper {
     }
 
     public Boolean extractBooleanNamed(final String parameterName, final JsonElement element, final Set<String> requestParamatersDetected) {
-        Boolean value = null;
+        Boolean value = false;
         if (element.isJsonObject()) {
             final JsonObject object = element.getAsJsonObject();
             if (object.has(parameterName) && object.get(parameterName).isJsonPrimitive()) {

@@ -70,6 +70,7 @@
 										  org.apache.fineract.portfolio.agentbanking.*,
 										  org.apache.fineract.portfolio.paymentrules.*,
 										  org.apache.fineract.presentation.menu.*,
+										  org.apache.fineract.presentation.screen.*,
 										  org.taat.wese.weseaddons.ssb.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
@@ -118,6 +119,10 @@
 
 	<!-- Added 13/03/2023 at 1045 -->
 	<!--<jpa:repositories base-package="com.wese.component.screen.repo.*"/>-->
+
+
+	<!-- Added 13/04/2023 at 0409 -->
+	<jpa:repositories base-package="org.apache.fineract.presentation.screen.*"/>
 
 	<!-- Added 23/03/2023 at 1827 -->
 	<jpa:repositories base-package="org.apache.fineract.portfolio.paymentrules.repo.*"/>
