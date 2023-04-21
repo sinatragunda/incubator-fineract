@@ -71,6 +71,7 @@
 										  org.apache.fineract.portfolio.paymentrules.*,
 										  org.apache.fineract.presentation.menu.*,
 										  org.apache.fineract.presentation.screen.*,
+										  org.apache.fineract.utility.*,
 										  org.taat.wese.weseaddons.ssb.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"

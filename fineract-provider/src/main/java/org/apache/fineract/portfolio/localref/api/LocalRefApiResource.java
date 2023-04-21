@@ -176,7 +176,7 @@ public class LocalRefApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String application(@Context final UriInfo uriInfo, @QueryParam("table") String tableOrShortcut ,@QueryParam("action") String action) {
 
-        System.err.println("------------------------------------table name is "+tableOrShortcut+"-----------and action is "+action);
+        //System.err.println("------------------------------------table name is "+tableOrShortcut+"-----------and action is "+action);
         //this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
 
         final ShortcutEntry shortcutEntry = this.commandShortcutHelper.shortcutEntry(tableOrShortcut);

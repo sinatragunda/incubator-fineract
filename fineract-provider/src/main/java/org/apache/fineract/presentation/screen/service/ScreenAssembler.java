@@ -8,10 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.wese.component.defaults.enumerations.CLASS_LOADER;
-import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
-import com.wese.component.defaults.enumerations.ELEMENT_TYPE;
-import com.wese.component.defaults.enumerations.OPERAND_GATES;
+import com.wese.component.defaults.enumerations.*;
+import com.wese.component.defaults.exceptions.BeanLoaderNotFoundException;
 import com.wese.component.defaults.helper.AnnotationHelper;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -42,17 +40,21 @@ public class ScreenAssembler {
         this.fromJsonHelper = fromJsonHelper;
     }
 
+
+
     public Screen fromJson(JsonCommand command){
 
         String name = command.stringValueOfParameterNamed(GenericConstants.nameParam);
         String shortName = command.stringValueOfParameterNamed(GenericConstants.shortNameParam);
 
         String refTableValue = command.stringValueOfParameterNamed(ScreenApiConstant.refTableParam);
-        REF_TABLE refTable = (REF_TABLE)EnumTemplateHelper.fromString(REF_TABLE.values(), refTableValue);
+        REF_TABLE refTable = refTable(refTableValue ,refTableValue);
 
-        CLASS_LOADER classLoader = CLASS_LOADER.fromString(refTableValue);
+        //System.err.println("----------------ref table value "+refTable);
 
-        System.err.println("--------------class loader is "+classLoader);
+        CLASS_LOADER classLoader = classLoader(refTableValue ,refTableValue);
+
+        //System.err.println("--------------class loader is "+classLoader);
 
         Long officeId = command.longValueOfParameterNamed(ClientApiConstants.officeIdParamName);
 
@@ -61,10 +63,10 @@ public class ScreenAssembler {
         Set<String> keySet = jsonObject.keySet();
 
         Set<ScreenElement> screenElementsSet = new HashSet<>();
-        Screen screen = new Screen(name ,null ,null ,refTable,true ,screenElementsSet);
+        Screen screen = new Screen(name ,shortName,null ,null ,refTable,true ,screenElementsSet);
 
         for(String key : keySet){
-            System.err.println("----------keyset val is "+key);
+            //System.err.println("----------keyset val is "+key);
             JsonObject keyObject = fromJsonHelper.extractJsonObjectNamed(key ,dataElement);
             ScreenElement screenElement = screenElementFromJson(keyObject ,screen ,null ,key ,classLoader);
             screenElementsSet.add(screenElement);
@@ -75,13 +77,56 @@ public class ScreenAssembler {
 
     }
 
+    /**
+     * Added 17/04/2023 at 0251
+     * Get classloader from ref table value
+     * Value can be string or int
+     */
+    private CLASS_LOADER classLoader(String intArg ,String value){
+
+        CLASS_LOADER classLoader = CLASS_LOADER.fromString(value);
+        boolean has = OptionalHelper.isPresent(classLoader);
+        if(!has){
+            try {
+                Integer arg = Integer.valueOf(intArg);
+                classLoader = (CLASS_LOADER) EnumTemplateHelper.fromInt(CLASS_LOADER.values(), arg);
+                has = OptionalHelper.isPresent(classLoader);
+                if (!has) {
+                    throw new BeanLoaderNotFoundException(arg.longValue());
+                }
+            }
+            catch (NumberFormatException n){}
+        }
+        return classLoader;
+    }
+    private REF_TABLE refTable(String intArg ,String value){
+
+        REF_TABLE refTable = (REF_TABLE) EnumTemplateHelper.fromString(REF_TABLE.values(), value);
+        boolean has = OptionalHelper.isPresent(refTable);
+        if(!has){
+            try {
+                Integer arg = Integer.valueOf(intArg);
+                refTable = (REF_TABLE) EnumTemplateHelper.fromInt(REF_TABLE.values(), arg);
+                has = OptionalHelper.isPresent(refTable);
+                if (!has) {
+                    throw new BeanLoaderNotFoundException(arg.longValue());
+                }
+            }
+            catch (NumberFormatException n){
+                System.err.println("--------------exception for converting reftable "+n.getMessage());
+            }
+        }
+        return refTable;
+    }
+
+
     private static String getDisplayName(String key ,String displayName ,Class cl){
 
-        System.err.println("=====================display name for key ? "+key);
+        //System.err.println("=====================display name for key ? "+key);
         boolean has = OptionalHelper.isPresent(displayName);
         if(!has){
             displayName = AnnotationHelper.getAttributeName(cl ,key);
-            System.err.println("-------------------------display name from annotation is "+displayName);
+            //System.err.println("-------------------------display name from annotation is "+displayName);
         }
         return displayName;
     }
@@ -100,12 +145,12 @@ public class ScreenAssembler {
          * Not best setting but to be changed .
          * Get default value of attribute ref if user has not provided from ui
          */
-        System.err.println("-------------------set display name again  ---------"+displayName);
+        //System.err.println("-------------------set display name again  ---------"+displayName);
         displayName = getDisplayName(key ,displayName ,cl);
 
         String modelName = AnnotationHelper.getModelName(cl ,key);
 
-        System.err.println("--------------------model name from annotation helper is "+modelName);
+        //System.err.println("--------------------model name from annotation helper is "+modelName);
 
         String value = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam ,element);
 
@@ -113,6 +158,10 @@ public class ScreenAssembler {
 
         COMPARISON_TYPE comparisonType = (COMPARISON_TYPE) EnumTemplateHelper.fromIntEx(COMPARISON_TYPE.values(),comparisonTypeInt);
         boolean mandatory = fromJsonHelper.extractBooleanNamed(ScreenApiConstant.mandatoryParam ,element);
+
+        COMPARISON_GROUP comparisonGroup =  AnnotationHelper.getComparisonGroup(cl ,key);
+
+        //System.err.println("----------------------group is "+comparisonGroup);
 
         Integer gateInt = fromJsonHelper.extractIntegerSansLocaleNamed(ScreenApiConstant.operandGateParam ,element);
 
@@ -122,7 +171,7 @@ public class ScreenAssembler {
 
         JsonObject subValueJsonObject = fromJsonHelper.extractJsonObjectNamed(ScreenApiConstant.subValueParam ,element);
 
-        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,gate , ELEMENT_TYPE.SYSTEM ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null);
+        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate , ELEMENT_TYPE.SYSTEM ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null);
 
         System.err.println("------------element to string  "+screenElement);
 
@@ -131,9 +180,9 @@ public class ScreenAssembler {
         boolean hasSubValues = OptionalHelper.isPresent(subValueJsonObject);
 
         if(hasSubValues){
-            System.err.println("--------------has subvalues "+hasSubValues);
+            //System.err.println("--------------has subvalues "+hasSubValues);
             for(String keyValue : subValuesKeySet){
-                System.err.println("===============key value is "+keyValue);
+                //System.err.println("===============key value is "+keyValue);
                 JsonObject subValueDataObject = subValueJsonObject.getAsJsonObject(keyValue);
                 ScreenElement childElement = screenElementFromJson(subValueDataObject,screen ,screenElement ,key ,classLoader);
                 childElementList.add(childElement);

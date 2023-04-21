@@ -47,7 +47,7 @@ public class SearchReadPlatformServiceExImpl implements SearchReadPlatformServic
         //context.getAuthenticatedUserIfPresent().validateHasPermissionTo("CREATE_SEARCH");
         String className =  command.stringValueOfParameterNamed("class");
 
-        System.err.println("-----------------------classname is "+className);
+        //System.err.println("-----------------------classname is "+className);
 
         BEAN_LOADER beanLoader = BEAN_LOADER.fromString(className);
         boolean hasBeanLoader = OptionalHelper.isPresent(beanLoader);
@@ -57,6 +57,7 @@ public class SearchReadPlatformServiceExImpl implements SearchReadPlatformServic
 
         Set<SearchRequest> searchRequestSet = SearchRequestHelper.createRequest(command ,fromJsonHelper);
         List<SearchRequest> searchRequestList = ListHelper.fromSet(searchRequestSet);
+        
         List responseData = SearchRequestFactory.invoke(applicationContext ,beanLoader ,searchRequestList);
 
         String landingPage = beanLoader.getLandingPage();

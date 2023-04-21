@@ -23,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.portfolio.paymentrules.data.PaymentSequenceData;
 import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
+import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_DIRECTION;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -88,6 +90,8 @@ public class PaymentRulesReadServiceImpl implements PaymentRulesReadService{
         public String schema() {
             String sql = " pr.id as id, " +
                     "pr.name as name, pr.office_id as officeId," +
+                    "pr.active as active ," +
+                    "pr.payment_direction as paymentDirection," +
                     "o.name as officeName "+
                     "from m_payment_rule pr "+
                     "left join m_office o on o.id = pr.office_id ";
@@ -102,8 +106,12 @@ public class PaymentRulesReadServiceImpl implements PaymentRulesReadService{
             final String name = rs.getString("name");
             final Long officeId = rs.getLong("officeId");
             final String officeName = rs.getString("officeName");
+            final Boolean active = rs.getBoolean("active");
+            final Integer payinDirection = rs.getInt("paymentDirection");
 
-            return new PaymentRuleData(id, name, officeName ,officeId);
+            final PAYMENT_DIRECTION paymentDirection = (PAYMENT_DIRECTION) EnumTemplateHelper.fromIntEx(PAYMENT_DIRECTION.values() ,payinDirection);
+
+            return new PaymentRuleData(id, name, officeName ,officeId,active ,paymentDirection);
         }
     }
 

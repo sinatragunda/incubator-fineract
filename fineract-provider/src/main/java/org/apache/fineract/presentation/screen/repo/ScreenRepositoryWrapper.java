@@ -6,6 +6,7 @@ package org.apache.fineract.presentation.screen.repo;
 
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.presentation.screen.domain.Screen;
+import org.apache.fineract.presentation.screen.exceptions.ScreenNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,8 @@ public class ScreenRepositoryWrapper {
     public Screen findOneWithNotFoundDetection(Long id){
         Screen screen = screenRepository.findOne(id);
         boolean has = OptionalHelper.isPresent(screen);
-        if(has){
-
+        if(!has){
+            throw new ScreenNotFoundException(id);
         }
         return screen;
     }

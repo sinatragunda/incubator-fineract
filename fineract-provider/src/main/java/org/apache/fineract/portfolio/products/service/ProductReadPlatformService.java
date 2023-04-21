@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.portfolio.products.domain.IProduct;
+import org.apache.fineract.portfolio.shareproducts.data.ShareProductData;
 
 public interface ProductReadPlatformService {
 
@@ -35,5 +36,7 @@ public interface ProductReadPlatformService {
     public Set<String> getResponseDataParams();
     
     public Collection<IProduct> retrieveAllForLookup() ;
+
+    public Collection<ShareProductData> retrieveAllShareProducts() ;
 
 }

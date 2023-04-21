@@ -4,7 +4,9 @@
  */
 package org.apache.fineract.presentation.screen.data;
 
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 
 import java.util.Collection;
 
@@ -16,6 +18,7 @@ public class ScreenData {
     private Boolean active ;
     private Boolean multirow ;
     private REF_TABLE refTable;
+    private EnumOptionData refTableOption;
     private Collection<ScreenElementData> screenElementDataList;
 
     public ScreenData(Long id ,String name, String shortName,Boolean active , Boolean multirow, REF_TABLE refTable) {
@@ -25,6 +28,11 @@ public class ScreenData {
         this.multirow = multirow;
         this.refTable = refTable;
         this.active = active ;
+        this.refTableOption = EnumTemplateHelper.template(refTable);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setScreenElementDataList(Collection<ScreenElementData> screenElementDataList){

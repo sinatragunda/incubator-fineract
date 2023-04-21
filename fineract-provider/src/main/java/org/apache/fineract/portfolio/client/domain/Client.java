@@ -107,7 +107,7 @@ public final class Client extends AbstractPersistableCustom<Long> {
     private String firstname;
 
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Middle Name",group = COMPARISON_GROUP.STRING)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model = "middlename",name = "Middle Name",group = COMPARISON_GROUP.STRING)
     @Column(name = "middlename", length = 50, nullable = true)
     private String middlename;
 
@@ -119,12 +119,12 @@ public final class Client extends AbstractPersistableCustom<Long> {
     @Column(name = "fullname", length = 100, nullable = true)
     private String fullname;
 
-    @AttributeRef(name="Display Name" ,group = COMPARISON_GROUP.STRING  ,type = FIELD_TYPE.OPTIONAL)
+    @AttributeRef(name="Display Name" ,model="displayName" ,group = COMPARISON_GROUP.STRING  ,type = FIELD_TYPE.OPTIONAL)
     @Column(name = "display_name", length = 100, nullable = false)
     private String displayName;
 
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Mobile Number" ,group = COMPARISON_GROUP.NUMERIC)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="mobileNo" ,name = "Mobile Number" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "mobile_no", length = 50, nullable = false, unique = true)
     private String mobileNo;
 

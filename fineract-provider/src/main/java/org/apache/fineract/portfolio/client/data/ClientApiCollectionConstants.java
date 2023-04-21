@@ -20,6 +20,7 @@ package org.apache.fineract.portfolio.client.data;
 
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.localref.helper.LocalRefConstants;
+import org.apache.fineract.portfolio.paymentrules.api.PaymentRulesConstants;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -62,7 +63,7 @@ public class ClientApiCollectionConstants extends ClientApiConstants{
             Arrays.asList(localeParamName, dateFormatParamName, reactivationDateParamName));
 
     protected static final Set<String> CLIENT_CLOSE_REQUEST_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList(localeParamName, dateFormatParamName, closureDateParamName, closureReasonIdParamName));
+            Arrays.asList(localeParamName, dateFormatParamName, closureDateParamName, closureReasonIdParamName , PaymentRulesConstants.payoutRuleIdParam));
 
     protected static final Set<String> CLIENT_REJECT_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList(localeParamName, dateFormatParamName, rejectionDateParamName, rejectionReasonIdParamName));

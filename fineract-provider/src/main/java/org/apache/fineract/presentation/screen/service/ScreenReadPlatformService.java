@@ -15,4 +15,6 @@ import java.util.List;
 public interface ScreenReadPlatformService {
     public Collection<ScreenData> retrieveAll();
     public ScreenData retrieveOne(Long id);
+
+    public ScreenData retrieveOneByName(String name);
 }

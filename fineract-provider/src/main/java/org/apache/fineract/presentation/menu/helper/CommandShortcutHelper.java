@@ -43,6 +43,7 @@ public class CommandShortcutHelper {
 
         String shortcut = token(arg ,0);
         System.err.println("=====================coalition of this arg "+arg+"==========and shortcut "+shortcut);
+        
         MenuItem menuItem = menuItemRepositoryWrapper.findByShortcut(shortcut);
         boolean hasEntry = OptionalHelper.isPresent(menuItem);
 
@@ -60,16 +61,17 @@ public class CommandShortcutHelper {
 
         String delim = " ";
         StringTokenizer token = new StringTokenizer(shortcut ,delim);
+        
         List<String> data = new ArrayList<>();
 
-        System.err.println("------------------counted tokens to ------"+token.countTokens());
+        ///System.err.println("------------------counted tokens to ------"+token.countTokens());
 
         int tokenSize = token.countTokens();
 
-        System.err.println("----------token size "+tokenSize+"----------------and index "+index);
+        //System.err.println("----------token size "+tokenSize+"----------------and index "+index);
 
         if(tokenSize >= (index+1)){
-            System.err.println("-----------------compare these son for getting token at index for value at index---"+index);
+            //System.err.println("-----------------compare these son for getting token at index for value at index---"+index);
             while(token.hasMoreTokens()) {
                 String value = token.nextToken();
                 data.add(value);
@@ -89,8 +91,17 @@ public class CommandShortcutHelper {
         StringBuilder stringBuilder = new StringBuilder();
 
         String refTable = menuItem.getRefTable().getCode().toLowerCase();
-        stringBuilder.append(refTable);
-        stringBuilder.append("_");
+
+        StringTokenizer tokenizer = new StringTokenizer(refTable ," ");
+
+        //System.err.println("--------------------count tokens are "+countTokens);
+
+        while(tokenizer.hasMoreTokens()){
+            String value = tokenizer.nextToken();
+            stringBuilder.append(value);
+            //System.err.println("-----------------has more tokens here ? "+tokenizer.hasMoreTokens());
+            stringBuilder.append("_");
+        }
 
         APPLICATION_ACTION action = menuItem.getApplicationAction();
 
@@ -120,7 +131,7 @@ public class CommandShortcutHelper {
         boolean hasParam = OptionalHelper.isPresent(param);
 
         if(hasParam){
-            System.err.println("---------param is --------"+hasParam);
+            //System.err.println("---------param is --------"+hasParam);
             stringBuilder = appendParam(stringBuilder ,param);
         }
 

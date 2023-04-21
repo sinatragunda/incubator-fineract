@@ -22,6 +22,7 @@ import com.google.gson.JsonArray;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.exception.AbstractPlatformDomainRuleException;
 import org.apache.fineract.infrastructure.core.exception.DataValidationException;
 import org.joda.time.LocalDate;
@@ -219,10 +220,19 @@ public class DataValidatorBuilder {
     }
 
     public DataValidatorBuilder notBlank() {
-        if (this.value == null && this.ignoreNullValue) { return this; }
+        /**
+         * Modified 20/04/2023 at 1046 
+         * Invert the request so that we map it to isNull correctly
+         */ 
+        boolean isNull = !OptionalHelper.isPresent(this.value.toString());
 
-        if (this.value == null || StringUtils.isBlank(this.value.toString())) {
+        System.err.println("----------------------value here is "+this.value.toString());
+
+        System.err.println("-----------validate is null ? --------"+isNull+"======== and not blank ? "+StringUtils.isBlank(this.value.toString()));
+
+        if (isNull || StringUtils.isBlank(this.value.toString())) {
             String realParameterName = this.parameter;
+            System.err.println("-------------real parameter is "+realParameterName);
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
                     .append(this.parameter);
             if (this.arrayIndex != null && StringUtils.isNotBlank(this.arrayPart)) {
@@ -245,6 +255,21 @@ public class DataValidatorBuilder {
         if (this.value == null && this.ignoreNullValue) { return this; }
 
         if (this.value != null && this.value.toString().trim().length() > maxLength) {
+            final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
+                    .append(this.parameter).append(".exceeds.max.length");
+            final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
+                    .append(" exceeds max length of ").append(maxLength).append(".");
+            final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
+                    defaultEnglishMessage.toString(), this.parameter, maxLength, this.value.toString());
+            this.dataValidationErrors.add(error);
+        }
+        return this;
+    }
+
+     public DataValidatorBuilder exceedingLengthOf(final Integer maxLength) {
+        if (this.value == null && this.ignoreNullValue) { return this; }
+
+        if (this.value != null && this.value.toString().trim().length() < maxLength) {
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
                     .append(this.parameter).append(".exceeds.max.length");
             final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
@@ -1076,8 +1101,11 @@ public class DataValidatorBuilder {
      * Purpose is to throw an error imediately after its added to apiparametererror list 
      */
      public DataValidatorBuilder onError(){
-        if(!dataValidationErrors.isEmpty()){
+
+        System.err.println("---------on error called "+dataValidationErrors.size());
+        if(!this.dataValidationErrors.isEmpty()){
             String message = dataValidationErrors.stream().findFirst().get().getDeveloperMessage();
+            System.err.println("--------------------throw error with message "+message);
             throw new DataValidationException(message);
         }
         return this ;

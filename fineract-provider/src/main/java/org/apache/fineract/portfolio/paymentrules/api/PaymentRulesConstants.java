@@ -10,7 +10,11 @@ public class PaymentRulesConstants {
     public static String nameParam = "name";
     public static String valueParam = "value";
     public static String sequenceNumberParam  = "sequenceNumber";
-    public static String paymentSequenceCodeParam = "id";
+    public static String paymentSequenceCodeParam = "code";
     public static String paymentSequenceValueParam = "value";
+
+    public static String paymentDirectionParam = "paymentDirection";
+
+    public static String payoutRuleIdParam = "payoutRuleId";
 
 }

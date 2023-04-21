@@ -20,6 +20,7 @@ package org.apache.fineract.infrastructure.codes.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.apache.fineract.infrastructure.codes.data.CodeData;
@@ -93,10 +94,14 @@ public class CodeReadPlatformServiceImpl implements CodeReadPlatformService {
             this.context.authenticatedUser();
 
             final CodeMapper rm = new CodeMapper();
-            final String sql = "select " + rm.schema() + " where c.code_name = ?";
+            final  String sql = MessageFormat.format("select {0} where c.code_name LIKE \"%{1}%\"" ,rm.schema() ,codeName);
 
-            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { codeName });
+            //final String sql = "select " + rm.schema() + " where c.code_name = ?";
+            //System.err.println("----------final sql is "+sql);
+
+            return this.jdbcTemplate.queryForObject(sql, rm);
         } catch (final EmptyResultDataAccessException e) {
+            //System.err.println("----------------exception caught ");
             throw new CodeNotFoundException(codeName);
         }
     }

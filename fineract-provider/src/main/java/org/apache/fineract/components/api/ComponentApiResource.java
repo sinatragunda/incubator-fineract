@@ -17,6 +17,7 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -87,5 +88,49 @@ public class ComponentApiResource {
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationDataList, FieldConstants.allowedParams);
 
+    }
+
+    @GET
+    @Path("{id}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveTemplateById(@Context final UriInfo uriInfo, @PathParam("id") final Integer id) {
+
+        this.context.authenticatedUser();
+
+        CLASS_LOADER classLoader = (CLASS_LOADER) EnumTemplateHelper.fromInt(CLASS_LOADER.values() ,id);
+        boolean hasClassLoader = OptionalHelper.isPresent(classLoader);
+
+        if(!hasClassLoader){
+            throw new BeanLoaderNotFoundException(id.longValue());
+        }
+
+        Class cl = null ;
+
+        try {
+            cl = classLoader.getCl();
+        }
+        catch (Exception c){
+            c.printStackTrace();
+        }
+
+        Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl,applicationContext);
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationDataList, FieldConstants.allowedParams);
+    }
+
+
+    /**
+     * Added 16/04/2023 at 0455
+     * Template class for components generally 
+     */ 
+    @GET
+    @Path("template")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String template(@Context final UriInfo uriInfo){
+
+        this.context.authenticatedUser();
+        FieldValidationData fieldValidationData = FieldValidationData.template();
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.fieldValidationDataToApiJsonSerializer.serialize(settings, fieldValidationData);
     }
 }

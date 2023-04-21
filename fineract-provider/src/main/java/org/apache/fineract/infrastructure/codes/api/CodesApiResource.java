@@ -124,6 +124,8 @@ public class CodesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveCodeByName(@PathParam("codeName") final String codeName, @Context final UriInfo uriInfo) {
 
+        System.err.println("------------retrieve code nby code name "+codeName);
+        
         final CodeData code = this.readPlatformService.retriveCode(codeName);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

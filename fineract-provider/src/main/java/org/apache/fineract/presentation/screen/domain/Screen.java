@@ -5,6 +5,7 @@
 package org.apache.fineract.presentation.screen.domain;
 
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
@@ -18,6 +19,10 @@ public class Screen extends AbstractPersistableCustom<Long> {
 
     @Column(name ="name")
     private String name ;
+
+
+    @Column(name ="short_name")
+    private String shortName ;
 
     @ManyToOne
     @Column(name ="office_id" ,nullable = false)
@@ -41,8 +46,9 @@ public class Screen extends AbstractPersistableCustom<Long> {
 
     protected Screen(){}
 
-    public Screen(String name, Office office, Screen parentScreen, REF_TABLE refTable, Boolean active, Set<ScreenElement> screenElementSet) {
+    public Screen(String name,String shortName , Office office, Screen parentScreen, REF_TABLE refTable, Boolean active, Set<ScreenElement> screenElementSet) {
         this.name = name;
+        this.shortName = shortName;
         this.office = office;
         this.parentScreen = parentScreen;
         this.refTable = refTable;
@@ -50,7 +56,37 @@ public class Screen extends AbstractPersistableCustom<Long> {
         this.screenElementSet = screenElementSet;
     }
 
+    public REF_TABLE getRefTable() {
+        return refTable;
+    }
+
+    public Set<ScreenElement> getScreenElementSet() {
+        return screenElementSet;
+    }
+
     public void setScreenElementSet(Set<ScreenElement> screenElementSet) {
+
+        boolean has = OptionalHelper.isPresent(this.screenElementSet);
+        if(has){
+            updateScreenElements(screenElementSet);
+            return;
+        }
         this.screenElementSet = screenElementSet;
     }
+
+    public void updateScreenElements(Set<ScreenElement> screenElementSet){
+
+        for(ScreenElement screenElement : screenElementSet){
+            boolean updated = this.screenElementSet.add(screenElement);
+
+            System.err.println("-----------------------------has updated "+updated);
+            if(!updated){
+                System.err.println("---------------remove and add element "+screenElement);
+                this.screenElementSet.remove(screenElement);
+                this.screenElementSet.add(screenElement);
+            }
+        }
+    }
+
+
 }

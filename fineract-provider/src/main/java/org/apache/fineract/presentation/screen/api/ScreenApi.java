@@ -22,10 +22,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Context;
+
 import java.util.Collection;
 
 @Path("/screen")
@@ -36,12 +44,12 @@ public class ScreenApi {
     private PlatformSecurityContext context;
     private ScreenCommandReciever screenCommandReciever;
     private final FromJsonHelper fromJsonHelper;
-    private final ToApiJsonSerializer toApiJsonSerializer;
+    private final ToApiJsonSerializer<ScreenData> toApiJsonSerializer;
 
     private ApiRequestParameterHelper apiRequestParameterHelper;
 
     @Autowired
-    public ScreenApi(PlatformSecurityContext context,final ScreenCommandReciever screenCommandReciever ,final FromJsonHelper fromJsonHelper ,final ToApiJsonSerializer toApiJsonSerializer ,final ApiRequestParameterHelper apiRequestParameterHelper) {
+    public ScreenApi(PlatformSecurityContext context,final ScreenCommandReciever screenCommandReciever ,final FromJsonHelper fromJsonHelper ,final ToApiJsonSerializer<ScreenData> toApiJsonSerializer ,final ApiRequestParameterHelper apiRequestParameterHelper) {
         this.context = context;
         this.screenCommandReciever = screenCommandReciever;
         this.fromJsonHelper = fromJsonHelper ;
@@ -62,20 +70,42 @@ public class ScreenApi {
 
     @Path("/{id}")
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveOne(Long id ,@Context final UriInfo uriInfo){
+    public String retrieveOne(@PathParam("id")Long id ,@Context final UriInfo uriInfo){
         //context.getAuthenticatedUserIfPresent().validateHasReadPermission();
+
+        System.err.println("---------------------are we even reaching first command ? "+id);
+
         ViewScreenCommand viewScreenCommand = new ViewScreenCommand(screenCommandReciever ,id);
         ScreenInvoker.invoke(viewScreenCommand);
         final ScreenData screenData = viewScreenCommand.getScreenData();
+
+        System.err.println("-----------------------------do we get screen data anyway ? ");
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, screenData);
+
+    }
+
+    @Path("/name/{name}")
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveOneByName(@PathParam("name")String name ,@Context final UriInfo uriInfo){
+        //context.getAuthenticatedUserIfPresent().validateHasReadPermission();
+
+        System.err.println("---------------------are we even reaching first command by name ? "+name);
+
+        ViewScreenCommand viewScreenCommand = new ViewScreenCommand(screenCommandReciever ,name);
+        ScreenInvoker.invoke(viewScreenCommand);
+
+        final ScreenData screenData = viewScreenCommand.getScreenData();
+
+        System.err.println("-----------------------------do we get screen data anyway ? ");
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, screenData);
 
     }
 
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@Context final UriInfo uriInfo){
         //context.getAuthenticatedUserIfPresent().validateHasReadPermission();

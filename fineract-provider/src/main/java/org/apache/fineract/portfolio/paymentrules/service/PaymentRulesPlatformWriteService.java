@@ -12,4 +12,6 @@ public interface PaymentRulesPlatformWriteService {
     public CommandProcessingResult create(JsonCommand command);
     public CommandProcessingResult update(Long id ,JsonCommand command);
 
+    public CommandProcessingResult handlePayment(Long paymentRuleId ,Long clientId);
+
 }

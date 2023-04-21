@@ -77,9 +77,8 @@ public class MenuApi {
 
     @Path("/{id}")
     @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveMenu(Long id ,@Context final UriInfo uriInfo){
+    public String retrieveMenu(@PathParam("id")Long id ,@Context final UriInfo uriInfo){
         //context.getAuthenticatedUserIfPresent().validateHasReadPermission();
         final MenuData menuData = (MenuData) menuReadPlatformService.retrieveOne(id);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -119,7 +118,8 @@ public class MenuApi {
 
     @Path("/menuitem/{id}")
     @GET
-    public String retrieveMenuItem(@PathParam("id")Long id , final UriInfo uriInfo){
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveMenuItem(@PathParam("id")Long id ,@Context final UriInfo uriInfo){
         //context.getAuthenticatedUserIfPresent().validateHasReadPermission();
         final MenuItemData menuItemData = menuItemReadPlatformService.retrieveOne(id);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

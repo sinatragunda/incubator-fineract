@@ -414,7 +414,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
         this.context.authenticatedUser();
 
-        System.err.println("-------------load loan template ---------------------");
+        //System.err.println("-------------load loan template ---------------------");
 
         final ClientData clientAccount = this.clientReadPlatformService.retrieveOne(clientId);
         final LocalDate expectedDisbursementDate = DateUtils.getLocalDateOfTenant();
@@ -2383,7 +2383,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
 
         sql = String.format("select %s where %s" ,loanMapper.loanSchema() ,sql);
 
-        System.err.println("---------------final query is "+sql);
+        //System.err.println("---------------final query is "+sql);
 
         return this.jdbcTemplate.query(sql ,loanMapper) ;
     }

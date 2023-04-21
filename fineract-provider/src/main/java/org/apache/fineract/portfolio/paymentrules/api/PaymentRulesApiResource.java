@@ -83,7 +83,7 @@ public class PaymentRulesApiResource {
     public String template(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
 
         //final PaymentRuleData paymentRuleData = paymentRulesReadService.template(loanProductReadPlatformService ,savingsProductReadPlatformService,shareProductReadPlatformService);
-        final  PaymentRuleData paymentRuleData = PaymentRuleData.template(loanProductReadPlatformService ,savingsProductReadPlatformService);
+        final  PaymentRuleData paymentRuleData = PaymentRuleData.template(loanProductReadPlatformService ,savingsProductReadPlatformService ,shareProductReadPlatformService);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, paymentRuleData);

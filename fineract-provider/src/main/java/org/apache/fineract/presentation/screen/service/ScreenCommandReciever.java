@@ -27,7 +27,7 @@ public class ScreenCommandReciever {
     }
 
     public CommandProcessingResult createScreen(JsonCommand command){
-        System.err.println("===================create screen son ");
+        //System.err.println("===================create screen son ");
         return screenWritePlatformService.create(command);
     }
 
@@ -37,6 +37,10 @@ public class ScreenCommandReciever {
 
     public ScreenData retrieveOne(Long id){
         return screenReadPlatformService.retrieveOne(id);
+    }
+
+    public ScreenData retrieveOneByName(String name){
+        return screenReadPlatformService.retrieveOneByName(name);
     }
 
 

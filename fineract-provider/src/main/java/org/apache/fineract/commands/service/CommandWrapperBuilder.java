@@ -3395,6 +3395,18 @@ public class CommandWrapperBuilder {
     }
 
 
+    /**
+     * Added 17/04/1930 at 1013
+     */ 
+    public CommandWrapperBuilder createVersionRecord() {
+        this.actionName = "CREATE";
+        this.entityName = "VERSION";
+        this.href = "/version";
+        return this;
+    }
+
+
+
     public CommandWrapperBuilder createMenu() {
         this.actionName = "CREATE";
         this.entityName = "MENU";

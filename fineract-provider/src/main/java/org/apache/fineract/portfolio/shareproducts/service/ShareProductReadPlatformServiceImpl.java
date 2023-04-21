@@ -167,8 +167,39 @@ public class ShareProductReadPlatformServiceImpl implements ProductReadPlatformS
     }
 
     @Override
+    public Collection<ShareProductData> retrieveAllShareProducts() {
+        ShareProductMapper mapper = new ShareProductMapper();
+        String sql = "select " + mapper.schema();
+        return this.jdbcTemplate.query(sql, mapper);
+    }
+
+    @Override
     public Set<String> getResponseDataParams() {
         return null;
+    }
+
+    /**
+     * Added 20/04/2023 at 0819 by Sinatra Gunda
+     * This is an additional class to avoid casting pro=blems from iProduct etc ,all seems to long to work it out and l have no time
+     */
+    private static final class ShareProductMapper implements RowMapper<ShareProductData> {
+
+        @SuppressWarnings("unused")
+        @Override
+        public ShareProductData mapRow(ResultSet rs, int rowNum) throws SQLException {
+            final Long id = rs.getLong("id");
+            final String name = rs.getString("name");
+            final String shortName = rs.getString("short_name");
+            final Long totalShares = rs.getLong("total_shares");
+            final SACCO_PROPERTY_TYPE propertyType = SACCO_PROPERTY_TYPE.fromInt(JdbcSupport.getInteger(rs ,"property_type"));
+            final BigDecimal monthlyDeposit = rs.getBigDecimal("monthly_deposit");
+            final BigDecimal dividendLowerLimit = rs.getBigDecimal("dividend_lower_limit");
+            return ShareProductData.generic(id, name, shortName, totalShares ,propertyType ,monthlyDeposit ,dividendLowerLimit);
+        }
+
+        public String schema() {
+            return "shareproduct.id, shareproduct.name, shareproduct.short_name, shareproduct.total_shares ,shareproduct.monthly_deposit ,shareproduct.dividend_lower_limit, shareproduct.property_type from m_share_product shareproduct";
+        }
     }
 
     private static final class AllShareProductRowMapper implements RowMapper<IProduct> {

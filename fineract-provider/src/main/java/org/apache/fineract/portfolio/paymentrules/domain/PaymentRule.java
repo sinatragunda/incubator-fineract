@@ -7,6 +7,7 @@ package org.apache.fineract.portfolio.paymentrules.domain;
 
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.organisation.office.domain.Office;
+import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_DIRECTION;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,6 +22,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
+import javax.persistence.*;
+
 
 @Entity
 @Table(name="m_payment_rule")
@@ -28,6 +31,16 @@ public class PaymentRule extends AbstractPersistableCustom<Long>{
 
     @Column(name="name")
     private String name ;
+
+
+    @Column(name="active")
+    private Boolean active ;
+
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name="payment_direction")
+    private PAYMENT_DIRECTION paymentDirection;
+
 
     @ManyToOne
     @JoinColumn(name="office_id")
@@ -42,10 +55,12 @@ public class PaymentRule extends AbstractPersistableCustom<Long>{
         this.paymentSequenceSet = paymentSequenceSet;
     }
 
-    public PaymentRule(String name ,Office office ,Set<PaymentSequence> paymentSequenceSet){
+    public PaymentRule(String name ,Office office ,Set<PaymentSequence> paymentSequenceSet ,Boolean active ,PAYMENT_DIRECTION paymentDirection){
         this.name = name ;
         this.office = office ;
         this.paymentSequenceSet = paymentSequenceSet;
+        this.active = active;
+        this.paymentDirection = paymentDirection;
     }
 
 
@@ -58,5 +73,9 @@ public class PaymentRule extends AbstractPersistableCustom<Long>{
         Comparator<PaymentSequence> comparator = (e , e1)-> e.getSequenceNumber().compareTo(e1.getSequenceNumber()) ;
         paymentSequenceSet.stream().sorted(comparator);
         return paymentSequenceSet;
+    }
+
+    public PAYMENT_DIRECTION getPaymentDirection() {
+        return paymentDirection;
     }
 }

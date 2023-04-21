@@ -4,12 +4,14 @@
  */
 package org.apache.fineract.presentation.screen.domain;
 
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import com.wese.component.defaults.enumerations.ELEMENT_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -28,6 +30,12 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
     @Enumerated(EnumType.ORDINAL)
     @Column(name ="comparison_type")
     private COMPARISON_TYPE comparisonType;
+
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name ="comparison_group")
+    private COMPARISON_GROUP comparisonGroup;
+
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name="gate")
@@ -57,11 +65,11 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
     @OneToMany(fetch = FetchType.EAGER ,cascade = CascadeType.ALL ,mappedBy = "parentScreenElement")
     private Set<ScreenElement> childElements ;
 
-    //@Transient Object userValue ;
+    @Transient String parameter ;
 
     protected ScreenElement(){}
 
-    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements) {
+    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup , OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements) {
         this.name = name;
         this.modelName = modelName;
         this.comparisonType = comparisonType;
@@ -74,6 +82,33 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         this.parentScreenElement = screenElement;
         this.childElements = childElements;
         this.displayName = displayName ;
+        this.comparisonGroup = comparisonGroup ;
+    }
+
+    public COMPARISON_GROUP getComparisonGroup() {
+        return this.comparisonGroup;
+    }
+
+    public COMPARISON_TYPE getComparisonType(){
+        return this.comparisonType;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    //public String getParameter() {return parameter;}
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public String getParameter(){
+        return this.parameter;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public void setChildElements(Set childElements){
@@ -95,7 +130,23 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
                 ", elementType=" + elementType +
                 ", showOnUi=" + showOnUi +
                 ", mandatory=" + mandatory +
+                ", paramerer ="+parameter+
                 ", value='" + value + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ScreenElement)) return false;
+        ScreenElement that = (ScreenElement) o;
+        return modelName.equals(that.modelName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelName);
+    }
+
+
 }

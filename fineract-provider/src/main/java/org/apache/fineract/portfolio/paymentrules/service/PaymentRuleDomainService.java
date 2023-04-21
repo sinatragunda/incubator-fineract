@@ -17,6 +17,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
+import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_DIRECTION;
+import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -44,6 +46,7 @@ public class PaymentRuleDomainService{
 	public PaymentRule assembleFromJson(JsonCommand command){
 
 		String name = command.stringValueOfParameterNamed(PaymentRulesConstants.nameParam);
+
 		String tag = command.locale();
 
 		Locale locale = Locale.forLanguageTag(tag);
@@ -52,7 +55,13 @@ public class PaymentRuleDomainService{
 
 		final Office office = officeRepositoryWrapper.findOneWithNotFoundDetection(officeId);
 
-		final PaymentRule paymentRule = new PaymentRule(name ,office ,null);
+		final Integer payinDirection = command.integerValueOfParameterNamed(PaymentRulesConstants.paymentDirectionParam);
+
+		final PAYMENT_DIRECTION paymentDirection = (PAYMENT_DIRECTION) EnumTemplateHelper.fromIntEx(PAYMENT_DIRECTION.values() ,payinDirection);
+
+		final Boolean active = true ;
+
+		final PaymentRule paymentRule = new PaymentRule(name ,office ,null ,active ,paymentDirection);
 
 		final Set<PaymentSequence> paymentSequenceSet = assemblePaymentSequenceFromJson(command ,paymentRule ,locale);
 
@@ -65,14 +74,19 @@ public class PaymentRuleDomainService{
 
 		Set<PaymentSequence> paymentSequenceSet = new HashSet<>();
 		JsonArray array = command.arrayOfParameterNamed(PaymentRulesConstants.paymentSequenceParam);
+
 		for(int i = 0 ; i< array.size() ;i++){
+
 			JsonObject obj = array.get(i).getAsJsonObject();
 			JsonElement element = JsonCommandHelper.toJsonElement(obj.toString());
+
+			System.err.println("-----------------json object is --------------"+obj.toString());
 
 			String value = fromJsonHelper.extractStringNamed(PaymentRulesConstants.valueParam ,element);
 			Integer sequenceNumber = fromJsonHelper.extractIntegerNamed(PaymentRulesConstants.sequenceNumberParam ,element ,locale);
 			Integer paymentSequenceCodeInt = fromJsonHelper.extractIntegerNamed(PaymentRulesConstants.paymentSequenceCodeParam ,element ,locale);
 
+			//System.err.println("---------------------paymentSequenceCode int is "+paymentSequenceCodeInt);
 			PAYMENT_CODE paymentCode = PAYMENT_CODE.fromInt(paymentSequenceCodeInt);
 			REF_TABLE refTable = paymentCode.getRefTable();
 			PaymentSequence paymentSequence = new PaymentSequence(refTable ,paymentCode,paymentRule ,value ,sequenceNumber);

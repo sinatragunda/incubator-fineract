@@ -34,9 +34,10 @@ import org.apache.fineract.portfolio.products.data.ProductData;
 
 // added 02/11/2020AT 11:26
 import org.apache.fineract.portfolio.products.domain.IProduct;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.apache.fineract.wese.enumerations.SACCO_PROPERTY_TYPE;
 
-public class ShareProductData implements IProduct {
+public class ShareProductData implements IProduct , EnumeratedData {
 
     private final Long id;
     private final String name;

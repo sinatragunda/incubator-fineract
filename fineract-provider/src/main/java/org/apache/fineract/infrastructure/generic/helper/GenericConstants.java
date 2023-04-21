@@ -6,6 +6,7 @@ package org.apache.fineract.infrastructure.generic.helper;
 
 public class GenericConstants {
 
+    public static String idParam ="id";
     public static String nameParam ="name";
     public static String amountParam = "amount";
     public static String dataParam = "data";
