@@ -207,10 +207,13 @@ public class Loan extends AbstractPersistableCustom<Long> {
     private Boolean syncDisbursementWithMeeting;
 
     // loan application states
+    @AttributeRef(name = "Applied Date" ,group=COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "submittedon_date")
     private Date submittedOnDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Submitted By" ,group=COMPARISON_GROUP.LIST)
     @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "submittedon_userid", nullable = true)
     private AppUser submittedBy;
@@ -340,6 +343,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @Column(name = "fixed_emi_amount", scale = 6, precision = 19, nullable = true)
     private BigDecimal fixedEmiAmount;
 
+
     @Column(name = "max_outstanding_loan_balance", scale = 6, precision = 19, nullable = true)
     private BigDecimal maxOutstandingLoanBalance;
 
@@ -357,9 +361,11 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "loan", optional = true, orphanRemoval = true, fetch=FetchType.EAGER)
     private LoanInterestRecalculationDetails loanInterestRecalculationDetails;
 
+    @AttributeRef(name = "Is Non Perfoming" ,group=COMPARISON_GROUP.BOOLEAN)
     @Column(name = "is_npa", nullable = false)
     private boolean isNpa;
 
+    @AttributeRef(name = "Accrued Till" ,group=COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "accrued_till")
     private Date accruedTill;

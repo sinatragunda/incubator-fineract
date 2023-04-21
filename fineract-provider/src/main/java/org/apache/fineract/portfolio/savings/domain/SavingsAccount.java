@@ -60,6 +60,10 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
+import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -130,12 +134,16 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @Version
     int version;
 
+    @AttributeRef(name = "Account Number" ,model = "accountNumber" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "account_no", length = 20, unique = true, nullable = false)
     protected String accountNumber;
 
+    @AttributeRef(name = "External Id" ,model = "externalId" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "external_id", nullable = true)
     protected String externalId;
 
+    @AttributeList(beanLoader = BEAN_LOADER.CLIENT)
+    @AttributeRef(name = "Client" ,model = "clientId" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = true)
     @JoinColumn(name = "client_id", nullable = true)
     protected Client client;
@@ -144,6 +152,8 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "group_id", nullable = true)
     protected Group group;
 
+    @AttributeList(beanLoader = BEAN_LOADER.ACCOUNT_PRODUCT)
+    @AttributeRef(name = "Product" ,model = "productId" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     protected SavingsProduct product;
@@ -161,10 +171,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @Column(name = "account_type_enum", nullable = false)
     protected Integer accountType;
 
+    @AttributeRef(name = "Submitted Date" ,model = "submittedDate" ,group = COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "submittedon_date", nullable = true)
     protected Date submittedOnDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Created By" ,model = "submittedBy" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "submittedon_userid", nullable = true)
     protected AppUser submittedBy;
@@ -185,10 +198,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "withdrawnon_userid", nullable = true)
     protected AppUser withdrawnBy;
 
+    @AttributeRef(name = "Approved By" ,model = "approvedBy" ,group = COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "approvedon_date")
     protected Date approvedOnDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Approved By" ,model = "approvedBy" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "approvedon_userid", nullable = true)
     protected AppUser approvedBy;
@@ -197,10 +213,13 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @Column(name = "activatedon_date", nullable = true)
     protected Date activatedOnDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Activated By" ,model = "activatedBy" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "activatedon_userid", nullable = true)
     protected AppUser activatedBy;
 
+    @AttributeRef(name = "Closed Date" ,model = "closedOnDate" ,group = COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "closedon_date")
     protected Date closedOnDate;
@@ -266,9 +285,11 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
     @Column(name = "withdrawal_fee_for_transfer", nullable = true)
     protected boolean withdrawalFeeApplicableForTransfer;
 
+    @AttributeRef(name = "With Overdraft" ,model = "allowOverdraft" ,group = COMPARISON_GROUP.BOOLEAN)
     @Column(name = "allow_overdraft")
     private boolean allowOverdraft;
 
+    @AttributeRef(name = "Overdraft Limit" ,model = "overdraftLimit" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "overdraft_limit", scale = 6, precision = 19, nullable = true)
     private BigDecimal overdraftLimit;
 

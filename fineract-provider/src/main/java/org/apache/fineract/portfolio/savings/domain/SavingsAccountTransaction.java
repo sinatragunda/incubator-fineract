@@ -39,6 +39,10 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.BEAN_LOADER;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
+import com.wese.component.defaults.reflection.AttributeList;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.core.domain.LocalDateInterval;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
@@ -63,10 +67,14 @@ import org.springframework.util.CollectionUtils;
 @Table(name = "m_savings_account_transaction")
 public final class SavingsAccountTransaction extends AbstractPersistableCustom<Long> {
 
+    @AttributeList(beanLoader = BEAN_LOADER.ACCOUNT)
+    @AttributeRef(name = "Account" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne(optional = false)
     @JoinColumn(name = "savings_account_id", referencedColumnName="id", nullable = false)
     private SavingsAccount savingsAccount;
 
+    @AttributeList(beanLoader = BEAN_LOADER.OFFICE)
+    @AttributeRef(name ="Office" ,group=COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
@@ -78,18 +86,23 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
     @Column(name = "transaction_type_enum", nullable = false)
     private Integer typeOf;
 
+    @AttributeRef(name="Transaction Date" ,group = COMPARISON_GROUP.DATE)
     @Temporal(TemporalType.DATE)
     @Column(name = "transaction_date", nullable = false)
     private  Date dateOf;
 
+    @AttributeRef(name="Amount" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "amount", scale = 6, precision = 19, nullable = false)
     private BigDecimal amount;
 
+    @AttributeRef(name="Is Reversed" ,group = COMPARISON_GROUP.BOOLEAN)
     @Column(name = "is_reversed", nullable = false)
     private boolean reversed;
 
+    @AttributeRef(name="Running Balance" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "running_balance_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal runningBalance;
+
 
     @Column(name = "cumulative_balance_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal cumulativeBalance;
@@ -104,6 +117,7 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "savingsAccountTransaction", orphanRemoval = true, fetch=FetchType.EAGER)
     private Set<SavingsAccountChargePaidBy> savingsAccountChargesPaid = new HashSet<>();
 
+    @AttributeRef(name = "Overdraft Amount" ,group = COMPARISON_GROUP.NUMERIC)
     @Column(name = "overdraft_amount_derived", scale = 6, precision = 19, nullable = true)
     private BigDecimal overdraftAmount;
 
@@ -111,10 +125,13 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
     @Column(name = "created_date", nullable = false)
     private Date createdDate;
 
+    @AttributeList(beanLoader = BEAN_LOADER.APPUSER)
+    @AttributeRef(name = "Created By" ,group = COMPARISON_GROUP.LIST)
     @ManyToOne
     @JoinColumn(name = "appuser_id", nullable = true)
     private AppUser appUser;
-    
+
+    @AttributeRef(name="Is Manual Transaction" ,group = COMPARISON_GROUP.BOOLEAN)
     @Column(name = "is_manual", length = 1, nullable = true)
     private boolean isManualTransaction;
 

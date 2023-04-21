@@ -76,6 +76,8 @@ import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundExc
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -1398,5 +1400,18 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         } catch (final EmptyResultDataAccessException e) {
             throw new SavingsProductNotFoundException(savingsProductId);
         }
+    }
+
+    @Override
+    public List<EnumOptionData> getDropdownData() {
+        Page page = retrieveAll(null);
+        return EnumeratedDataHelper.enumeratedData(page.getPageItems());
+    }
+
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String where) {
+
+        String sql = String.format("select %s where %s" ,savingAccountMapper.schema() ,where);
+        return this.jdbcTemplate.query(sql ,savingAccountMapper);
     }
 }

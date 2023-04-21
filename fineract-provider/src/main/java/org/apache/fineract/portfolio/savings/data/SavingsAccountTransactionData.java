@@ -6,9 +6,6 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,13 +26,14 @@ import org.apache.fineract.portfolio.paymentdetail.data.PaymentDetailData;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.service.SavingsEnumerations;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
  * Immutable data object representing a savings account transaction.
  */
 @SuppressWarnings("unused")
-public class SavingsAccountTransactionData {
+public class SavingsAccountTransactionData implements EnumeratedData {
 
     private Long id;
     private final SavingsAccountTransactionEnumData transactionType;
@@ -80,6 +78,7 @@ public class SavingsAccountTransactionData {
 
     // Added 22/07/2022
     private Long savingsProductId ;
+    private String clientName ;
 
 
     public static SavingsAccountTransactionData importInstance(BigDecimal transactionAmount,LocalDate transactionDate,
@@ -124,6 +123,28 @@ public class SavingsAccountTransactionData {
         this.paymentTypeOptions = null;
         this.submittedByUsername = null;
         this.note = null;
+    }
+
+    public SavingsAccountTransactionData(Long id, SavingsAccountTransactionEnumData transactionType, Long savingsId, String accountNo, LocalDate transactionDate, String currencyCode, BigDecimal amount, BigDecimal runningBalance, boolean reversed, String note, String clientName) {
+        this.id = id ;
+        this.transactionType = transactionType;
+        this.savingsAccountId = savingsId;
+        this.accountNo = accountNo;
+        this.clientName = clientName;
+        this.amount = amount;
+        this.transactionDate = transactionDate;
+        this.note = note ;
+        this.runningBalance = runningBalance ;
+        this.paymentTypeOptions = null;
+        this.submittedByUsername = null;
+        this.outstandingChargeAmount = null;
+        this.reversed = false;
+        this.transfer = null;
+        this.submittedOnDate = null;
+        this.interestedPostedAsOn = false;
+        this.paymentDetailData = null ;
+        this.currency = new CurrencyData(currencyCode);
+        this.date = null ;
     }
 
     public Integer getRowIndex() {
@@ -291,5 +312,14 @@ public class SavingsAccountTransactionData {
 
     public Long getSavingsProductId(){
         return this.savingsProductId;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+    @Override
+    public String getName() {
+        return String.format("%s : %s ",clientName ,accountNumber);
     }
 }

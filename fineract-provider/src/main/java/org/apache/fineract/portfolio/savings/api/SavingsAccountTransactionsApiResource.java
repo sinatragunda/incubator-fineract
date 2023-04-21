@@ -51,6 +51,7 @@ import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransaction;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountTransactionRepository;
 import org.apache.fineract.portfolio.savings.service.SavingsAccountReadPlatformService;
+import org.apache.fineract.portfolio.savings.service.SavingsAccountTransactionReadPlatformService;
 import org.apache.fineract.wese.helper.ComparatorUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -70,6 +71,7 @@ public class SavingsAccountTransactionsApiResource {
     private final SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     private final PaymentTypeReadPlatformService paymentTypeReadPlatformService;
     private final SavingsAccountTransactionRepository savingsAccountTransactionRepository;
+    private final SavingsAccountTransactionReadPlatformService savingsAccountTransactionReadPlatformService;
 
     @Autowired
     public SavingsAccountTransactionsApiResource(final PlatformSecurityContext context,
@@ -77,8 +79,8 @@ public class SavingsAccountTransactionsApiResource {
             final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
             final ApiRequestParameterHelper apiRequestParameterHelper,
             final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
-            PaymentTypeReadPlatformService paymentTypeReadPlatformService ,
-            SavingsAccountTransactionRepository savingsAccountTransactionRepository) {
+            final PaymentTypeReadPlatformService paymentTypeReadPlatformService ,
+            final SavingsAccountTransactionRepository savingsAccountTransactionRepository ,final SavingsAccountTransactionReadPlatformService savingsAccountTransactionReadPlatformService) {
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
@@ -86,6 +88,7 @@ public class SavingsAccountTransactionsApiResource {
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.paymentTypeReadPlatformService = paymentTypeReadPlatformService;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository ;
+        this.savingsAccountTransactionReadPlatformService = savingsAccountTransactionReadPlatformService;
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -112,6 +115,26 @@ public class SavingsAccountTransactionsApiResource {
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, savingsAccount,
                 SavingsApiSetConstants.SAVINGS_TRANSACTION_RESPONSE_DATA_PARAMETERS);
+    }
+
+    /**
+     * Added 21/04/2023 at 1050 by Sinatra Gunda
+     * Makes no use of savingsId as it just iterates all transaction accounts
+     * Should make room for using limits in the future
+     */
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAllTransaction(@PathParam("savingsId") Long savingsId,
+                              @Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+
+        Collection<SavingsAccountTransactionData> savingsAccountTransactionDataCollection = this.savingsAccountTransactionReadPlatformService.retrieveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        return this.toApiJsonSerializer.serialize(settings,savingsAccountTransactionDataCollection);
     }
 
     @GET

@@ -31,6 +31,7 @@ import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.savings.domain.EquityGrowthOnSavingsAccount;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.joda.time.LocalDate;
 
 /**
@@ -40,7 +41,7 @@ import org.joda.time.LocalDate;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountMonthlyDeposit;
 import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
 
-public class SavingsAccountData {
+public class SavingsAccountData implements EnumeratedData {
 
     private final Long id;
     private final String accountNo;
@@ -831,6 +832,11 @@ public class SavingsAccountData {
     // added 22/07/2021
     public Long getId(){
         return this.id ;
+    }
+
+    @Override
+    public String getName() {
+        return String.format("%s : %s " ,clientName ,accountNo);
     }
 
     public Long getSavingsProductId(){

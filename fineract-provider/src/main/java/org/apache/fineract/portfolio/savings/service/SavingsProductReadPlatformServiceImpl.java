@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.fineract.accounting.common.AccountingEnumerations;
@@ -49,6 +50,8 @@ import org.apache.fineract.portfolio.savings.domain.SavingsProductRepository;
 import org.apache.fineract.portfolio.savings.exception.SavingsProductNotFoundException;
 import org.apache.fineract.portfolio.savings.repo.SavingsProductPropertiesRepository;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -382,5 +385,18 @@ public class SavingsProductReadPlatformServiceImpl implements SavingsProductRead
         }
 
         return this.jdbcTemplate.query(sql, this.savingsProductRowMapper, new Object[] {currencyCode});
+    }
+
+    @Override
+    public List<EnumOptionData> getDropdownData() {
+        Collection collection = retrieveAll();
+        return EnumeratedDataHelper.enumeratedData(collection);
+    }
+
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String whereSql) {
+
+        String sql = String.format("select %s where %s" , savingsProductRowMapper.schema() ,whereSql);
+        return this.jdbcTemplate.query(sql ,savingsProductRowMapper);
     }
 }

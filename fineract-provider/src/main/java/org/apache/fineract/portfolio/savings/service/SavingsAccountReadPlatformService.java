@@ -27,9 +27,10 @@ import org.apache.fineract.portfolio.products.enumerations.ACCOUNT_TYPE;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 import org.joda.time.LocalDate;
 
-public interface SavingsAccountReadPlatformService {
+public interface SavingsAccountReadPlatformService extends DataEnumerationService {
 
     Page<SavingsAccountData> retrieveAll(SearchParameters searchParameters);
 

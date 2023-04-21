@@ -14,5 +14,5 @@ import java.util.Collection;
 public interface DataEnumerationService {
 
     public List<EnumOptionData> getDropdownData();
-    public Collection<? extends EnumeratedData> retrieveUsingQuery(String sql);
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String whereSql);
 }

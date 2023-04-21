@@ -21,8 +21,9 @@ package org.apache.fineract.portfolio.savings.service;
 import java.util.Collection;
 
 import org.apache.fineract.portfolio.savings.data.SavingsProductData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
-public interface SavingsProductReadPlatformService {
+public interface SavingsProductReadPlatformService extends DataEnumerationService {
 
     Collection<SavingsProductData> retrieveAll();
 
