@@ -96,7 +96,8 @@ public class ShareAccountDataSerializer {
     private static final Set<String> addtionalSharesParameters = new HashSet<>(Arrays.asList(ShareAccountApiConstants
                     .locale_paramname,
             ShareAccountApiConstants.requesteddate_paramname, ShareAccountApiConstants.requestedshares_paramname,
-            ShareAccountApiConstants.purchasedprice_paramname, ShareAccountApiConstants.dateformat_paramname));
+            ShareAccountApiConstants.purchasedprice_paramname, ShareAccountApiConstants.dateformat_paramname ,ShareAccountApiConstants.closeddate_paramname,
+            ShareAccountApiConstants.note_paramname));
 
 
     // added 27/03/2022
@@ -884,6 +885,7 @@ public class ShareAccountDataSerializer {
     }
 
     public Map<String, Object> validateAndRedeemShares(JsonCommand jsonCommand, ShareAccount account) {
+        
         Map<String, Object> actualChanges = new HashMap<>();
         if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
@@ -1031,18 +1033,28 @@ public class ShareAccountDataSerializer {
     }
 
     public Map<String, Object> validateAndClose(JsonCommand jsonCommand, ShareAccount account) {
+        
         Map<String, Object> actualChanges = new HashMap<>();
+        
         if (StringUtils.isBlank(jsonCommand.json())) { throw new InvalidJsonException(); }
+        
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, jsonCommand.json(), closeParameters);
+        
         final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("sharesaccount");
+        
         JsonElement element = jsonCommand.parsedJson();
         LocalDate closedDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.closeddate_paramname, element);
+        
         baseDataValidator.reset().parameter(ShareAccountApiConstants.approveddate_paramname).value(closedDate).notNull();
+        
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
+        
         boolean isTransactionBeforeExistingTransactions = false ;
+        
         Set<ShareAccountTransaction> transactions = account.getShareAccountTransactions() ;
+        
         for(ShareAccountTransaction transaction: transactions) {
             if(!transaction.isChargeTransaction()) {
                 LocalDate transactionDate = new LocalDate(transaction.getPurchasedDate()) ;
@@ -1061,13 +1073,20 @@ public class ShareAccountDataSerializer {
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException(dataValidationErrors); }
         
         AppUser approvedUser = this.platformSecurityContext.authenticatedUser();
+        
         final BigDecimal unitPrice = account.getShareProduct().deriveMarketPrice(DateUtils.getDateOfTenant());
+        
         ShareAccountTransaction transaction = ShareAccountTransaction.createRedeemTransaction(closedDate.toDate(),
                 account.getTotalApprovedShares(), unitPrice);
+
         account.addAdditionalPurchasedShares(transaction);
+        
         account.close(closedDate.toDate(), approvedUser);
+        
         handleRedeemSharesChargeTransactions(account, transaction);
+        
         actualChanges.put(ShareAccountApiConstants.requestedshares_paramname, transaction);
+        
         return actualChanges;
     }
 }

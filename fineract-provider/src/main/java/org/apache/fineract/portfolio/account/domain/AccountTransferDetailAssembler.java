@@ -227,6 +227,20 @@ public class AccountTransferDetailAssembler {
                 toShareAccount, transferType);
     }
 
+
+    /**
+     * Added 23/04/2023 at 1447
+     */ 
+    public AccountTransferDetails assembleShareToSavingsTransfer(final SavingsAccount toSavingsAccount,
+            final ShareAccount fromShareAccount, Integer transferType) {
+
+        final Office office = toSavingsAccount.office();
+        final Client client = fromShareAccount.getClient();
+
+        return AccountTransferDetails.shareToSavingsTransfer(office, client, toSavingsAccount,
+                fromShareAccount, transferType);
+    }
+
     public AccountTransferDetails assembleLoanToSavingsTransfer(final Loan fromLoanAccount, final SavingsAccount toSavingsAccount,
             Integer transferType) {
         final Office fromOffice = fromLoanAccount.getOffice();

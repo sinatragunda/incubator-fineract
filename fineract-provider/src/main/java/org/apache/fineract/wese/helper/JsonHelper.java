@@ -92,32 +92,39 @@ public class JsonHelper {
 
     public static JSONObject put(String payload ,String key ,Object data){
 
-       boolean isPayloadPresent = Optional.ofNullable(payload).isPresent();
+       boolean has = Optional.ofNullable(payload).isPresent();
        
        JSONObject json = new JSONObject() ;
 
-       if(isPayloadPresent){
-            json = new JSONObject(payload);
+       System.err.println("-----------------------is payload present ? "+has);
+
+       if(has) {
+           json = new JSONObject(payload);
        }
-       
        try{
            json.put(key ,data);
+           return json;
        }
 
-       catch (JSONException j){
-           System.err.println(Constants.separator+" json exception here ");
-           j.printStackTrace();
-       }
-
-       return json ;
+        catch (JSONException j){
+            System.err.println(Constants.separator+" json exception here ");
+            j.printStackTrace();
+        }
+       System.err.println("-------------------returning null ");
+       return null ;
    }
 
    // added 25/05/2022
    public static String update(String payload ,String key ,Object value){
 
         JSONObject json = put(payload ,key ,value);
-        return json.toString();
+        return Optional.of(json.toString()).orElse(payload);
    }
+//
+//   public static JSONObject update(String payload ,String key ,Object value){
+//       JSONObject json = put(payload ,key ,value);
+//       return json;
+//   }
 
 
 }

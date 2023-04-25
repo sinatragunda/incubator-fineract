@@ -46,6 +46,7 @@ public class DataValidatorBuilder {
     private Integer arrayIndex;
     private Object value;
     private boolean ignoreNullValue = false;
+    private boolean isNull = false ;
 
     /**
      * Added 10/03/2023 at 0144 
@@ -87,6 +88,7 @@ public class DataValidatorBuilder {
 
     public DataValidatorBuilder value(final Object value) {
         this.value = value;
+        this.isNull = OptionalHelper.isNull(value);
         return this;
     }
 
@@ -198,7 +200,10 @@ public class DataValidatorBuilder {
     }
 
     public DataValidatorBuilder notNull() {
-        if (this.value == null && !this.ignoreNullValue) {
+
+        System.err.println("-------------------value "+parameter+"+ is null ? "+isNull);
+
+        if (this.isNull && !this.ignoreNullValue) {
 
             String realParameterName = this.parameter;
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
@@ -224,13 +229,9 @@ public class DataValidatorBuilder {
          * Modified 20/04/2023 at 1046 
          * Invert the request so that we map it to isNull correctly
          */ 
-        boolean isNull = !OptionalHelper.isPresent(this.value.toString());
 
-        System.err.println("----------------------value here is "+this.value.toString());
-
-        System.err.println("-----------validate is null ? --------"+isNull+"======== and not blank ? "+StringUtils.isBlank(this.value.toString()));
-
-        if (isNull || StringUtils.isBlank(this.value.toString())) {
+        if (this.isNull || StringUtils.isBlank(this.value.toString())) {
+            
             String realParameterName = this.parameter;
             System.err.println("-------------real parameter is "+realParameterName);
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
@@ -252,7 +253,8 @@ public class DataValidatorBuilder {
     }
    
     public DataValidatorBuilder notExceedingLengthOf(final Integer maxLength) {
-        if (this.value == null && this.ignoreNullValue) { return this; }
+
+        if (this.isNull && this.ignoreNullValue) { return this; }
 
         if (this.value != null && this.value.toString().trim().length() > maxLength) {
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
@@ -1103,6 +1105,7 @@ public class DataValidatorBuilder {
      public DataValidatorBuilder onError(){
 
         System.err.println("---------on error called "+dataValidationErrors.size());
+        
         if(!this.dataValidationErrors.isEmpty()){
             String message = dataValidationErrors.stream().findFirst().get().getDeveloperMessage();
             System.err.println("--------------------throw error with message "+message);
@@ -1110,5 +1113,22 @@ public class DataValidatorBuilder {
         }
         return this ;
      } 
+
+     /**
+      * Added 22/04/2023 at 2113 
+      * Failure to get actual errors has forced us to implement more helper functions 
+      */
+
+     public DataValidatorBuilder throwNull(){
+
+        System.err.println("---------throw error for function now ");
+        
+        String message = String.format("%s not provided value which defies standard rules set ",this.parameter);
+
+        System.err.println("------------throw this message ------"+message);
+
+        throw new DataValidationException(message);
+        
+     }  
 
 }

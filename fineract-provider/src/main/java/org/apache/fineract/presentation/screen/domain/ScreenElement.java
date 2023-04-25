@@ -130,17 +130,22 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
                 ", elementType=" + elementType +
                 ", showOnUi=" + showOnUi +
                 ", mandatory=" + mandatory +
-                ", paramerer ="+parameter+
+                ", parameter ="+parameter+
                 ", value='" + value + '\'' +
                 '}';
     }
 
+    /**
+     * Modified 22/04/2023 at 1532
+     * Modified to find a way to add subelements into the set as well as previous installation made them equal to parent object
+     * So comparisonType would be different and value as well
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ScreenElement)) return false;
         ScreenElement that = (ScreenElement) o;
-        return modelName.equals(that.modelName);
+        return modelName.equals(that.modelName) && comparisonType == that.comparisonType && value.equals(that.value);
     }
 
     @Override

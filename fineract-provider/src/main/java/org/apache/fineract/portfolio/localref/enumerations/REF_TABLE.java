@@ -29,7 +29,8 @@ public enum REF_TABLE implements IEnum {
     JOURNAL_ENTRY("Journal Entry"),
     GL_ACCOUNT("Ledger Account"),
     VERSION("Version"),
-    PAYMENT_RULE("Payment Rule");
+    PAYMENT_RULE("Payment Rule"),
+    FUNCTION("Function");
 
     private String code;
 

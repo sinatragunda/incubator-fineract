@@ -330,7 +330,7 @@ public class StaffReadPlatformServiceImpl implements StaffReadPlatformService ,D
 
     public List<EnumOptionData> getDropdownData(){
 
-        List<StaffData> stuffDataList = (List<StaffData>)retrieveAllStaffForDropdown(1L);
+        Collection<StaffData> stuffDataList = retrieveAllStaff(null ,null ,false ,null );
         return EnumeratedDataHelper.enumeratedData(stuffDataList);
     }
 

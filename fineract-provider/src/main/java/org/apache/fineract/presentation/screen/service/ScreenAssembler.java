@@ -21,6 +21,7 @@ import org.apache.fineract.presentation.screen.domain.Screen;
 import org.apache.fineract.presentation.screen.domain.ScreenElement;
 import org.apache.fineract.presentation.screen.helper.ScreenApiConstant;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.service.IEnum;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,6 @@ public class ScreenAssembler {
     }
 
 
-
     public Screen fromJson(JsonCommand command){
 
         String name = command.stringValueOfParameterNamed(GenericConstants.nameParam);
@@ -49,6 +49,8 @@ public class ScreenAssembler {
 
         String refTableValue = command.stringValueOfParameterNamed(ScreenApiConstant.refTableParam);
         REF_TABLE refTable = refTable(refTableValue ,refTableValue);
+
+        Boolean multirow  = command.booleanObjectValueOfParameterNamed(ScreenApiConstant.multiRowParam);
 
         //System.err.println("----------------ref table value "+refTable);
 
@@ -63,7 +65,7 @@ public class ScreenAssembler {
         Set<String> keySet = jsonObject.keySet();
 
         Set<ScreenElement> screenElementsSet = new HashSet<>();
-        Screen screen = new Screen(name ,shortName,null ,null ,refTable,true ,screenElementsSet);
+        Screen screen = new Screen(name ,shortName,null ,null ,refTable,true ,screenElementsSet ,multirow);
 
         for(String key : keySet){
             //System.err.println("----------keyset val is "+key);
@@ -71,10 +73,9 @@ public class ScreenAssembler {
             ScreenElement screenElement = screenElementFromJson(keyObject ,screen ,null ,key ,classLoader);
             screenElementsSet.add(screenElement);
         }
-
-        screen.setScreenElementSet(screenElementsSet);
+        System.err.println("-----------------------------screen elements are ?"+screenElementsSet.size());
+        //screen.setScreenElementSet(screenElementsSet);
         return screen ;
-
     }
 
     /**
@@ -90,15 +91,21 @@ public class ScreenAssembler {
             try {
                 Integer arg = Integer.valueOf(intArg);
                 classLoader = (CLASS_LOADER) EnumTemplateHelper.fromInt(CLASS_LOADER.values(), arg);
-                has = OptionalHelper.isPresent(classLoader);
-                if (!has) {
-                    throw new BeanLoaderNotFoundException(arg.longValue());
-                }
+                beanLoaderValidation(classLoader ,arg.longValue());
             }
             catch (NumberFormatException n){}
         }
         return classLoader;
     }
+
+
+    private void beanLoaderValidation(Object object ,Long arg){
+        boolean has = OptionalHelper.isPresent(object);
+        if (!has){
+            throw new BeanLoaderNotFoundException(arg);
+        }
+    }
+
     private REF_TABLE refTable(String intArg ,String value){
 
         REF_TABLE refTable = (REF_TABLE) EnumTemplateHelper.fromString(REF_TABLE.values(), value);
@@ -107,10 +114,7 @@ public class ScreenAssembler {
             try {
                 Integer arg = Integer.valueOf(intArg);
                 refTable = (REF_TABLE) EnumTemplateHelper.fromInt(REF_TABLE.values(), arg);
-                has = OptionalHelper.isPresent(refTable);
-                if (!has) {
-                    throw new BeanLoaderNotFoundException(arg.longValue());
-                }
+                beanLoaderValidation(refTable ,arg.longValue());
             }
             catch (NumberFormatException n){
                 System.err.println("--------------exception for converting reftable "+n.getMessage());
@@ -119,14 +123,11 @@ public class ScreenAssembler {
         return refTable;
     }
 
-
     private static String getDisplayName(String key ,String displayName ,Class cl){
 
-        //System.err.println("=====================display name for key ? "+key);
         boolean has = OptionalHelper.isPresent(displayName);
         if(!has){
             displayName = AnnotationHelper.getAttributeName(cl ,key);
-            //System.err.println("-------------------------display name from annotation is "+displayName);
         }
         return displayName;
     }
@@ -167,27 +168,34 @@ public class ScreenAssembler {
 
         OPERAND_GATES gate = (OPERAND_GATES)EnumTemplateHelper.fromIntEx(OPERAND_GATES.values(), gateInt);
 
-        Boolean multirow = fromJsonHelper.extractBooleanNamed(ScreenApiConstant.multiRowParam ,element);
-
         JsonObject subValueJsonObject = fromJsonHelper.extractJsonObjectNamed(ScreenApiConstant.subValueParam ,element);
 
         ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate , ELEMENT_TYPE.SYSTEM ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null);
 
         System.err.println("------------element to string  "+screenElement);
 
-        Set<String> subValuesKeySet = new HashSet<>();
         Set<ScreenElement> childElementList = new HashSet<>();
+
         boolean hasSubValues = OptionalHelper.isPresent(subValueJsonObject);
 
+        System.err.println("---------print subvalue object -----"+subValueJsonObject);
+
+
         if(hasSubValues){
-            //System.err.println("--------------has subvalues "+hasSubValues);
+
+            Set<String> subValuesKeySet = subValueJsonObject.keySet();
+
+            System.err.println("-------------has sub values "+hasSubValues+"--------- why is it still empty  "+subValuesKeySet.size());
+
             for(String keyValue : subValuesKeySet){
-                //System.err.println("===============key value is "+keyValue);
+                System.err.println("===============key value is "+keyValue);
                 JsonObject subValueDataObject = subValueJsonObject.getAsJsonObject(keyValue);
                 ScreenElement childElement = screenElementFromJson(subValueDataObject,screen ,screenElement ,key ,classLoader);
                 childElementList.add(childElement);
             }
         }
+
+        System.err.println("------------how many child elements do we have here ?"+childElementList.size());
 
         screenElement.setChildElements(childElementList);
         return screenElement;

@@ -364,6 +364,18 @@ public class StandingInstructionReadPlatformServiceImpl implements StandingInstr
         return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { loanId });
     }
 
+    /**
+     * Added 24/04/2023 at 1032
+     */ 
+    @Override
+    public Collection<StandingInstructionData> findByLoanAndStatus(final Long loanId ,final Integer status) {
+        
+        final StandingInstructionMapper instructionMapper = new StandingInstructionMapper();
+        final String sql = "select " + instructionMapper.schema() + " where atsi.status = ? and fromloanacc.id= ? or toloanacc.id = ? ";
+        return this.jdbcTemplate.query(sql, instructionMapper, new Object[] { status ,loanId ,loanId});
+    }
+
+
     private static final class StandingInstructionMapper implements RowMapper<StandingInstructionData> {
 
         private final String schemaSql;

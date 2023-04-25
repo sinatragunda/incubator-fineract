@@ -92,10 +92,21 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
 
     private Collection<ScreenElementData> retrieveAllScreenElementData(Long screenId){
 
-        final String sql  = String.format("select %s where sce.screen_id = ? ",screenElementMapper.schema());
-        return this.jdbcTemplate.query(sql ,screenElementMapper ,new Object[]{screenId});
+        final String sql  = String.format("select %s where sce.screen_id = ? and parent_screen_element_id IS NULL ",screenElementMapper.schema());
+        Collection<ScreenElementData> collection = jdbcTemplate.query(sql ,screenElementMapper ,new Object[]{screenId});
+        collection.stream().forEach(setChildElements);
+        return collection;
     }
 
+    private Consumer<ScreenElementData> setChildElements = (e)->{
+        
+        final Long parentId = e.getId();
+        final String sql  = String.format("select %s where sce.parent_screen_element_id = ?",screenElementMapper.schema());
+        Collection<ScreenElementData> collection = jdbcTemplate.query(sql ,screenElementMapper ,new Object[]{parentId});
+        if(!collection.isEmpty()){
+            e.setChildElements(collection);
+        }
+    };
 
     private static final class ScreenMapper implements RowMapper<ScreenData> {
 
@@ -133,7 +144,8 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
                     " sce.comparison_type as comparisonType, " +
                     " sce.comparison_group as comparisonGroup, " +
                     " sce.gate as gate , sce.show_on_ui as showOnUi, " +
-                    " sce.value as value, " +
+                    " sce.value as value," +
+                    " sce.parent_screen_element_id as parentScreenElementId ," +
                     " sce.mandatory as mandatory, " +
                     " sce.screen_id as screenId " +
                     " from m_screen_element sce";
@@ -148,8 +160,9 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
             final String displayName = rs.getString("displayName");
             final Boolean show = rs.getBoolean("showOnUi");
             final Boolean mandatory = rs.getBoolean("mandatory");
-            final String value = rs.getString("value");
+            final String value = JdbcSupport.getString(rs ,"value");
             final String modelName = rs.getString("modelName");
+            final Long parentScreenElementId = JdbcSupport.getLong(rs ,"parentScreenElementId");
 
 
             final Integer comparisonTypeInt = JdbcSupport.getInteger(rs, "comparisonType");
@@ -161,7 +174,7 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
             final Integer comparisonGroupInt = JdbcSupport.getInteger(rs, "comparisonGroup");
             final COMPARISON_GROUP comparisonGroup = (COMPARISON_GROUP) EnumTemplateHelper.fromIntEx(COMPARISON_GROUP.values(), comparisonGroupInt);
 
-            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null);
+            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null ,parentScreenElementId);
             return screenElementData;
         }
     }

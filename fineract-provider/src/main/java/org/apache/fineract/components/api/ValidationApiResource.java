@@ -99,44 +99,6 @@ public class ValidationApiResource {
         return this.toApiJsonSerializer.serialize(settings,validationData ,
                 VALIDATION_RESPONSE_DATA_PARAMETERS);
     }
-//
-//    @GET
-//    @Consumes({ MediaType.APPLICATION_JSON })
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public String retrieveAll(@Context final UriInfo uriInfo) {
-//
-//        this.context.authenticatedUser().validateHasReadPermission(org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatConstants.ENTITY_NAME);
-//
-//        final List<org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData> accountNumberFormatData = this.accountNumberFormatReadPlatformService
-//                .getAllAccountNumberFormats();
-//
-//        final org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-//        return this.toApiJsonSerializer.serialize(settings, accountNumberFormatData,
-//                ACCOUNT_NUMBER_FORMAT_RESPONSE_DATA_PARAMETERS);
-//    }
-//
-//    @GET
-//    @Path("{accountNumberFormatId}")
-//    @Consumes({ MediaType.APPLICATION_JSON })
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public String retrieveOne(@Context final UriInfo uriInfo, @PathParam("accountNumberFormatId") final Long accountNumberFormatId) {
-//
-//        this.context.authenticatedUser().validateHasReadPermission(org.apache.fineract.infrastructure.accountnumberformat.service.AccountNumberFormatConstants.ENTITY_NAME);
-//
-//        final org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
-//
-//        org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData accountNumberFormatData = this.accountNumberFormatReadPlatformService
-//                .getAccountNumberFormat(accountNumberFormatId);
-//        if (settings.isTemplate()) {
-//            final org.apache.fineract.infrastructure.accountnumberformat.data.AccountNumberFormatData templateData = this.accountNumberFormatReadPlatformService.retrieveTemplate(org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType
-//                    .fromInt(accountNumberFormatData.getAccountType().getId().intValue()));
-//            accountNumberFormatData.templateOnTop(templateData.getAccountTypeOptions(), templateData.getPrefixTypeOptions());
-//        }
-//
-//        return this.toApiJsonSerializer.serialize(settings, accountNumberFormatData,
-//                ACCOUNT_NUMBER_FORMAT_RESPONSE_DATA_PARAMETERS);
-//    }
-
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })

@@ -23,8 +23,9 @@ import java.util.List;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.organisation.staff.data.StaffData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
-public interface StaffReadPlatformService {
+public interface StaffReadPlatformService extends DataEnumerationService {
 
     StaffData retrieveStaff(Long staffId);
 

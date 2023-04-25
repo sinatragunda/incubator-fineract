@@ -57,11 +57,8 @@ public class LoanScheduleHelper {
          */
 
         switch (paymentCode){
-            case LOAN_EARLY_REPAYMENT:
+            case LOAN_REPAYMENT:
                 loanRepaymentScheduleInstallment = activeSchedule(loanRepaymentScheduleInstallmentList ,transactionDate ,true);
-                break;
-            case LOAN_DUE_REPAYMENT:
-                loanRepaymentScheduleInstallment = activeSchedule(loanRepaymentScheduleInstallmentList ,transactionDate ,false);
                 break;
 
         }

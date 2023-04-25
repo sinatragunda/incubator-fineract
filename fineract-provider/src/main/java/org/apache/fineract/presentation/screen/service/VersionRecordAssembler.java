@@ -52,11 +52,12 @@ public class VersionRecordAssembler {
 
         Screen screen = screenRepositoryWrapper.findOneWithNotFoundDetection(screenId);
 
-        //System.err.println("--------------we now have screen repository");
+        System.err.println("--------------we now have screen repository");
 
         for(String model : keySet){
+
             JsonElement modelElement = command.jsonElementOfParamNamed(model);
-            //System.err.println("----------keyset val is "+model);
+            System.err.println("----------keyset val is "+model);
 
             if(model.equalsIgnoreCase(ScreenApiConstant.screenIdParam)){
                 //System.err.println("---------------id value for screen id skip it from contentisn");
@@ -75,13 +76,20 @@ public class VersionRecordAssembler {
 
         System.err.println("---------------screen element json  --------"+element);
 
+
         Long id = fromJsonHelper.extractLongNamed(GenericConstants.idParam,element);
-        String parameter = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam ,element);
+
+        String parameter = null ;
+
+        if(fromJsonHelper.parameterExists(ScreenApiConstant.valueParam ,element)){
+            parameter = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam ,element);
+        }
+
         ScreenElement screenElement = screenElementRepositoryWrapper.findOneWithNotFoundDetection(id);
+
         screenElement.setParameter(parameter);
 
-        System.err.println("--------------------------extracted value is "+parameter);
-
+        System.err.println("--------------------------extracted parameter  is "+parameter);
 
         System.err.println("---------------screen element object string   --------"+screenElement);
 

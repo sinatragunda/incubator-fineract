@@ -610,4 +610,8 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         shareAccountTransactionWrapper.setShareAccount(this);
         this.shareAccountTransactionWrapper = shareAccountTransactionWrapper ;
     }
+
+    public SavingsAccount getSavingsAccount(){
+        return this.savingsAccount;
+    }
 }

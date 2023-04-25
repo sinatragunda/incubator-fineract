@@ -198,7 +198,7 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
                 throw new UnsupportedCommandException(wrapper.commandName());
             }
         } else {
-            System.err.println("--------------------wrapper stuff "+wrapper.toString());
+            //System.err.println("--------------------wrapper stuff "+wrapper.toString());
             handler = this.commandHandlerProvider.getHandler(wrapper.entityName(), wrapper.actionName());
         }
 

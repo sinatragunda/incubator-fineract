@@ -23,14 +23,12 @@ public class VersionRecordHelper {
 
             ScreenElement screenElement = e;
             //System.err.println("------------value is null might through error when getting or comparing ? ");
-            Object value = e.getValue();
-            Object param = e.getParameter();
 
             /**
              * Modified 14/04/2023 at 1452
              * Value is the value from database and param is the user value
              */
-            boolean val = screenElement.getComparisonType().validate(screenElement ,value ,param);
+            boolean val = screenElement.getComparisonType().validate(screenElement);
             //System.err.println("-----------------done validating "+e.getDisplayName()+"--------with status "+val);
         };
 

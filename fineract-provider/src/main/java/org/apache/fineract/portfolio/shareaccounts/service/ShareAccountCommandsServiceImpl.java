@@ -45,6 +45,9 @@ public class ShareAccountCommandsServiceImpl implements AccountsCommandsService 
 
     @Override
     public Object handleCommand(Long accountId, String command, String jsonBody) {
+        
+        System.err.println("---------handle shares command but no undo function here "+command);
+
         final JsonElement parsedCommand = this.fromApiJsonHelper.parse(jsonBody);
         final JsonCommand jsonCommand = JsonCommand.from(jsonBody, parsedCommand, this.fromApiJsonHelper, null, null, null, null, null,
                 null, null, null, null, null,null,null);

@@ -29,21 +29,39 @@ import org.springframework.data.repository.query.Param;
 
 public interface StandingInstructionRepository extends JpaRepository<AccountTransferStandingInstruction, Long>,
         JpaSpecificationExecutor<AccountTransferStandingInstruction> {
-    public final static String FIND_BY_LOAN_AND_STATUS_QUERY = "select accountTransferStandingInstruction "
+
+    public final static String FIND_BY_LOAN_AND_STATUS_QUERY_WITH_TO_LOAN = "select accountTransferStandingInstruction "
             + "from AccountTransferStandingInstruction accountTransferStandingInstruction "
             + "where accountTransferStandingInstruction.status = :status "
-            + "and (accountTransferStandingInstruction.accountTransferDetails.toLoanAccount = :loan "
-            + "or accountTransferStandingInstruction.accountTransferDetails.fromLoanAccount = :loan)";
+            + "and accountTransferStandingInstruction.accountTransferDetails.toLoanAccount = :loan";
     
+    public final static String FIND_BY_LOAN_AND_STATUS_QUERY_WITH_FROM_LOAN = "select accountTransferStandingInstruction "
+            + "from AccountTransferStandingInstruction accountTransferStandingInstruction "
+            + "where accountTransferStandingInstruction.status = :status "
+            + "and accountTransferStandingInstruction.accountTransferDetails.fromLoanAccount = :loan";
+    
+
     public final static String FIND_BY_SAVINGS_AND_STATUS_QUERY = "select accountTransferStandingInstruction "
             + "from AccountTransferStandingInstruction accountTransferStandingInstruction "
             + "where accountTransferStandingInstruction.status = :status "
             + "and (accountTransferStandingInstruction.accountTransferDetails.toSavingsAccount = :savingsAccount "
             + "or accountTransferStandingInstruction.accountTransferDetails.fromSavingsAccount = :savingsAccount)";
     
-    @Query(FIND_BY_LOAN_AND_STATUS_QUERY)
+    @Query(FIND_BY_LOAN_AND_STATUS_QUERY_WITH_TO_LOAN)
     public Collection<AccountTransferStandingInstruction> findByLoanAccountAndStatus(@Param("loan") Loan loan, @Param("status") Integer status);
     
+    /**
+     * Added 24/04/2023 at 0943 
+     * Added to prevent the first from having too many joins 
+     * So this query lessens this burden and does half of the tranction 
+     */
+
+    @Query(FIND_BY_LOAN_AND_STATUS_QUERY_WITH_FROM_LOAN)
+    public Collection<AccountTransferStandingInstruction> findByLoanAccountAndStatusEx(@Param("loan") Loan loan, @Param("status") Integer status);
+    
+
+
     @Query(FIND_BY_SAVINGS_AND_STATUS_QUERY)
     public Collection<AccountTransferStandingInstruction> findBySavingsAccountAndStatus(@Param("savingsAccount") SavingsAccount savingsAccount, @Param("status") Integer status);    
+
 }

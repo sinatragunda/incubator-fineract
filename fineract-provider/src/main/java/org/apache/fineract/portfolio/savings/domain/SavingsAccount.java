@@ -1279,7 +1279,7 @@ public class SavingsAccount extends AbstractPersistableCustom<Long> {
 
         BigDecimal totalCharges = BigDecimal.ZERO ;
 
-        System.err.println("--------tracking charges ,this where we need to do a lot of work son -------"+transactionDate);
+        //System.err.println("--------tracking charges ,this where we need to do a lot of work son -------"+transactionDate);
 
         for (SavingsAccountCharge charge : this.chargesWithTracking(transactionDate)) {
 

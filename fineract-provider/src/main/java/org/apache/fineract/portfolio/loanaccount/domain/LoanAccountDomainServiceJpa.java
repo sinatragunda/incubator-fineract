@@ -26,6 +26,7 @@ import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlat
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
@@ -45,11 +46,16 @@ import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDays;
 import org.apache.fineract.organisation.workingdays.domain.WorkingDaysRepositoryWrapper;
+import org.apache.fineract.portfolio.account.data.AccountTransferData;
 import org.apache.fineract.portfolio.account.domain.AccountTransferRepository;
 import org.apache.fineract.portfolio.account.domain.AccountTransferStandingInstruction;
 import org.apache.fineract.portfolio.account.domain.AccountTransferTransaction;
 import org.apache.fineract.portfolio.account.domain.StandingInstructionRepository;
 import org.apache.fineract.portfolio.account.domain.StandingInstructionStatus;
+import org.apache.fineract.portfolio.account.helper.StandingInstructionHelper;
+import org.apache.fineract.portfolio.account.repo.StandingInstructionRepositoryWrapper;
+import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
+import org.apache.fineract.portfolio.account.service.StandingInstructionReadPlatformService;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.exception.ClientNotActiveException;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
@@ -75,7 +81,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.transaction.annotation.*;
 @Service
 public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
@@ -98,6 +104,9 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     private final LoanUtilService loanUtilService;
     private final StandingInstructionRepository standingInstructionRepository;
     private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+    private final StandingInstructionReadPlatformService standingInstructionReadPlatformService;
+    private final StandingInstructionRepositoryWrapper standingInstructionRepositoryWrapper;
+    private final AccountTransfersReadPlatformService accountTransfersReadPlatformService;
 
     @Autowired
     public LoanAccountDomainServiceJpa(final LoanAssembler loanAccountAssembler, final LoanRepositoryWrapper loanRepositoryWrapper,
@@ -111,7 +120,8 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
             final LoanRepaymentScheduleInstallmentRepository repaymentScheduleInstallmentRepository,
             final LoanAccrualPlatformService loanAccrualPlatformService, final PlatformSecurityContext context,
             final BusinessEventNotifierService businessEventNotifierService, final LoanUtilService loanUtilService, 
-            final StandingInstructionRepository standingInstructionRepository ,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService) {
+            final StandingInstructionRepository standingInstructionRepository ,final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService ,final StandingInstructionReadPlatformService standingInstructionReadPlatformService,
+                                       final StandingInstructionRepositoryWrapper standingInstructionRepositoryWrapper ,final AccountTransfersReadPlatformService accountTransfersReadPlatformService) {
         this.loanAccountAssembler = loanAccountAssembler;
         this.loanRepositoryWrapper = loanRepositoryWrapper;
         this.loanTransactionRepository = loanTransactionRepository;
@@ -130,6 +140,9 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         this.loanUtilService = loanUtilService;
         this.standingInstructionRepository = standingInstructionRepository;
         this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+        this.standingInstructionReadPlatformService = standingInstructionReadPlatformService;
+        this.standingInstructionRepositoryWrapper = standingInstructionRepositoryWrapper;
+        this.accountTransfersReadPlatformService = accountTransfersReadPlatformService;
     }
 
     @Transactional
@@ -237,9 +250,9 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     private void saveLoanTransactionWithDataIntegrityViolationChecks(LoanTransaction newRepaymentTransaction) {
         try {
-            System.err.println("------------------------------------------saving loan with integrity checks now son -------");
+            //System.err.println("------------------------------------------saving loan with integrity checks now son -------");
             this.loanTransactionRepository.save(newRepaymentTransaction);
-            System.err.println("-----------------------loan saved ------------");
+            //System.err.println("-----------------------loan saved ------------");
 
         } catch (DataIntegrityViolationException e) {
             final Throwable realCause = e.getCause();
@@ -576,17 +589,34 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         }
     }
 
+    /**
+     * Modified 25/04/2023 at 1237
+     * Changed to load account transfer transaction by jdbc rather than repository as its causing error of too many joints in mysql
+     */
     private void updateLoanTransaction(final Long loanTransactionId, final LoanTransaction newLoanTransaction) {
         
-        System.err.println("------------------------our transaction id is "+loanTransactionId);
+        //System.err.println("------------------------our transaction id is "+loanTransactionId);
 
-        final AccountTransferTransaction transferTransaction = this.accountTransferRepository.findByToLoanTransactionId(loanTransactionId);
-        
-        System.err.println("---------------------find by loan transaction --------"+loanTransactionId);
+        final AccountTransferData accountTransferData = accountTransfersReadPlatformService.findByToLoanTransactionId(loanTransactionId);
 
-        if (transferTransaction != null) {
-            transferTransaction.updateToLoanTransaction(newLoanTransaction);
-            this.accountTransferRepository.save(transferTransaction);
+        boolean has = OptionalHelper.isPresent(accountTransferData);
+
+        if(has){
+
+            final Long accountTransferId = accountTransferData.getId();
+
+            //System.err.println("-------------------------id for account transfer is "+accountTransferId);
+
+            final AccountTransferTransaction transferTransaction = this.accountTransferRepository.findOne(accountTransferId);
+
+            boolean hasTransfer = OptionalHelper.isPresent(transferTransaction);
+
+            System.err.println("---------------------find by loan transaction -----has a transfer transaction ---"+hasTransfer);
+
+            if (hasTransfer) {
+                transferTransaction.updateToLoanTransaction(newLoanTransaction);
+                this.accountTransferRepository.save(transferTransaction);
+            }
         }
     }
 
@@ -710,10 +740,10 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
         LoanTransaction payment = null;
 
-        System.out.println("-----------calculate some intricases------------ ");
+        //System.out.println("-----------calculate some intricases------------ ");
 
         if (payPrincipal.plus(interestPayable).plus(feePayable).plus(penaltyPayable).isGreaterThanZero()){
-            System.err.println("---------------not a zero balance foreclosure -------------"+loan.getId());
+            //System.err.println("---------------not a zero balance foreclosure -------------"+loan.getId());
             final PaymentDetail paymentDetail = null;
             String externalId = null;            
             final LocalDateTime currentDateTime = DateUtils.getLocalDateTimeOfTenant();
@@ -823,19 +853,43 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false,rollbackFor = Throwable.class)
     public void disableStandingInstructionsLinkedToClosedLoan(Loan loan) {
-        if ((loan != null) && (loan.status() != null) && loan.status().isClosed()) {
+
+        Boolean isLoan = OptionalHelper.isPresent(loan);
+
+        if ((isLoan) && (loan.status() != null) && loan.status().isClosed()) {
+
             final Integer standingInstructionStatus = StandingInstructionStatus.ACTIVE.getValue();
-            final Collection<AccountTransferStandingInstruction> accountTransferStandingInstructions = this.standingInstructionRepository
-                    .findByLoanAccountAndStatus(loan, standingInstructionStatus);
-            
-            if (!accountTransferStandingInstructions.isEmpty()) {
+            Collection<AccountTransferStandingInstruction> accountTransferStandingInstructions = new ArrayList<>();
+            try {
+                //System.err.println("--------------we have disabled this for now  but not sustaibable lets handle it ");
+                accountTransferStandingInstructions = getAccountTransferStandingInstructions(loan, standingInstructionStatus);
+
+            }
+            catch (Throwable exception){
+                System.err.println("-------------------------we dont know why we get this error at times and at times not----"+exception.getMessage());
+            }
+
+            if (!accountTransferStandingInstructions.isEmpty()){
+                System.err.println("-------------------------standing instruction closure now ---------------");
                 for (AccountTransferStandingInstruction accountTransferStandingInstruction : accountTransferStandingInstructions) {
                     accountTransferStandingInstruction.updateStatus(StandingInstructionStatus.DISABLED.getValue());
                     this.standingInstructionRepository.save(accountTransferStandingInstruction);
                 }
             }
         }
+        System.err.println("---disableStandingInstructionsLinkedToClosedLoan function-----------");
+    }
+
+    /**
+     * Modified 24/04/2023
+     * We still dont know why we get error here
+     */
+    private Collection<AccountTransferStandingInstruction> getAccountTransferStandingInstructions(Loan loan, Integer standingInstructionStatus) {
+
+        Long loanId = loan.getId();
+        Collection<AccountTransferStandingInstruction> accountTransferStandingInstructions = StandingInstructionHelper.getStandingInstructionsByLoanAndStatus(standingInstructionReadPlatformService ,standingInstructionRepositoryWrapper ,loanId ,standingInstructionStatus);
+        return accountTransferStandingInstructions;
     }
 }

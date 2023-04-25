@@ -134,6 +134,10 @@
 	<!-- Added 30/03/2023 at 1319 -->
 	<jpa:repositories base-package="org.apache.fineract.presentation.menu.*"/>
 
+
+	<!-- Added 244/0/2023 at 1054 -->
+	<jpa:repositories base-package="org.apache.fineract.portfolio.account.repo.*"/>
+
 	<import resource="infrastructure.xml" />
 
 	<import resource="securityContext.xml" />

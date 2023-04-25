@@ -38,4 +38,10 @@ public interface StandingInstructionReadPlatformService {
 
     StandingInstructionDuesData retriveLoanDuesData(Long loanId);
 
+
+    /**
+     * Added 24/04/2023 at 1028 
+     */
+    Collection<StandingInstructionData> findByLoanAndStatus(Long loanId ,Integer status);  
+
 }

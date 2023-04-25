@@ -52,5 +52,10 @@ public interface AccountTransfersReadPlatformService {
      * Added 29/01/2023 at 1038
      */
     Collection<AccountTransferData> findAllByLoanId(Long transferId);
+
+    /**
+     * Added 25/04/2023 at 1234 
+     */
+    AccountTransferData findByToLoanTransactionId(Long toLoanTransactionId);  
  
 }

@@ -67,16 +67,24 @@ public class AccountTransferAssembler {
     public AccountTransferDetails assembleSavingsToLoanTransfer(final JsonCommand command, final SavingsAccount fromSavingsAccount,
             final Loan toLoanAccount, final SavingsAccountTransaction withdrawal, final LoanTransaction loanRepaymentTransaction) {
 
+        System.err.println("----------------------savings to loan transfer assembler ---------"+loanRepaymentTransaction.getId());
+
         final AccountTransferDetails accountTransferDetails = this.accountTransferDetailAssembler.assembleSavingsToLoanTransfer(command,
                 fromSavingsAccount, toLoanAccount);
+
         final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
         final Money transactionMonetaryAmount = Money.of(fromSavingsAccount.getCurrency(), transactionAmount);
+
+        System.err.println("-------------------transaction amount is ---------------"+transactionAmount);
 
         final String description = command.stringValueOfParameterNamed(transferDescriptionParamName);
 
         AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToLoanTransfer(accountTransferDetails,
                 withdrawal, loanRepaymentTransaction, transactionDate, transactionMonetaryAmount, description);
+        
+        System.err.println("----------------------------------transaction json is --"+accountTransferTransaction);
+
         accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
         return accountTransferDetails;
     }
@@ -96,6 +104,30 @@ public class AccountTransferAssembler {
         AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToShareTransfer(accountTransferDetails,
                 withdrawal, shareAccountTransaction, transactionDate, transactionMonetaryAmount, description);
         
+        accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
+        return accountTransferDetails;
+    }
+
+    /**
+     * Added 23/04/2023 at 1421
+     */ 
+    public AccountTransferDetails assembleShareToSavingsTransfer(final JsonCommand command, final SavingsAccount savingsAccount,final SavingsAccountTransaction deposit, final ShareAccount shareAccount ,final ShareAccountTransaction shareAccountTransaction) {
+
+        System.err.println("-------------------------command is "+command);
+
+        final AccountTransferDetails accountTransferDetails = this.accountTransferDetailAssembler.assembleShareToSavingsTransfer(
+                savingsAccount, shareAccount,1);
+
+        final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
+        final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
+        final Money transactionMonetaryAmount = Money.of(savingsAccount.getCurrency(), transactionAmount);
+
+        final String description = command.stringValueOfParameterNamed(transferDescriptionParamName);
+
+        AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.shareToSavingsTransfer(accountTransferDetails,
+                deposit, shareAccountTransaction, transactionDate, transactionMonetaryAmount, description);
+        
+        System.err.println("---------------share to savings account transaction --------");
         accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
         return accountTransferDetails;
     }

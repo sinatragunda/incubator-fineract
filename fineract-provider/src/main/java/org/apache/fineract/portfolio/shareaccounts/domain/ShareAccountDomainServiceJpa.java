@@ -167,6 +167,17 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
     }
 
+    /**
+     * Added 23/04/2023 at 1632
+     */ 
+    @Transactional
+    @Override
+    public ShareAccountTransaction redeemShares(final ShareAccount shareAccount, final CommandProcessingResultBuilder builderResult,
+                                         final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail, final Note note,
+                                         final String txnExternalId,boolean isAccountTransfer) {
+        return null ;
+    }
+
     public boolean reverseShareAccountTransaction(ReverseShareAccountTransaction reverseShareAccountTransaction){
 
         Long shareAccountTransactionId = reverseShareAccountTransaction.getId();
@@ -214,6 +225,14 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
         }
         return status ;
     }
+
+    /**
+     * Added 23/04/2023 at 1608
+     */
+
+     public CommandProcessingResult redeemShares(Long id ,JsonCommand command){
+        return shareAccountWritePlatformService.redeemShares(id ,command);
+     } 
 
 
     private AppUser getAppUserIfPresent() {

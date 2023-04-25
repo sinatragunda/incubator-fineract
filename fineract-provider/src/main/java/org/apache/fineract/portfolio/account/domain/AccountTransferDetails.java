@@ -94,6 +94,14 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "to_share_account_id", nullable = true)
     private ShareAccount toShareAccount;
 
+    /**
+     * Added 23/04/2023 at 1435
+     */ 
+    @ManyToOne
+    @JoinColumn(name = "from_share_account_id", nullable = true)
+    private ShareAccount fromShareAccount;
+
+
 
     public static AccountTransferDetails savingsToSavingsTransfer(final Office fromOffice, final Client fromClient,
             final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final SavingsAccount toSavingsAccount,
@@ -108,6 +116,16 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
             final SavingsAccount fromSavingsAccount, final Office toOffice, final Client toClient, final ShareAccount toShareAccount,
             Integer transferType) {
         return new AccountTransferDetails(fromOffice, fromClient, fromSavingsAccount,toOffice, toClient, toShareAccount,
+                transferType);
+    }
+
+    /**
+     * Added 23/04/2023 at 1823
+     */ 
+    public static AccountTransferDetails shareToSavingsTransfer(final Office office, final Client client,
+            final SavingsAccount toSavingsAccount, final ShareAccount fromShareAccount,
+            Integer transferType) {
+        return new AccountTransferDetails(office, client, toSavingsAccount,office, client, fromShareAccount,
                 transferType);
     }
 
@@ -162,6 +180,22 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
         this.toShareAccount = toShareAccount ;
     }
 
+
+    private AccountTransferDetails(final Office office, final Client client, final SavingsAccount toSavingsAccount,final ShareAccount toShareAccount,final Integer transferType) {
+        this.fromOffice = office;
+        this.fromClient = client;
+        this.fromSavingsAccount = null;
+        this.fromLoanAccount = null;
+        this.toOffice = office;
+        this.toClient = client;
+        this.toSavingsAccount = toSavingsAccount;
+        this.toLoanAccount = null;
+        this.transferType = transferType;
+        this.accountTransferStandingInstruction = null;
+        this.isEquityTransfer = false ;
+        this.fromShareAccount = fromShareAccount ;
+    }
+
     public SavingsAccount toSavingsAccount() {
         return this.toSavingsAccount;
     }
@@ -210,6 +244,11 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
 
     public ShareAccount toShareAccount(){
         return this.toShareAccount ;
+    }
+
+
+    public ShareAccount fromShareAccount(){
+        return this.fromShareAccount ;
     }
 
     public List accountTransferTransactions(){

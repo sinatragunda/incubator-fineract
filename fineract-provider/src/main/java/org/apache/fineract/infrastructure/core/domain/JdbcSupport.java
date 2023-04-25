@@ -64,6 +64,10 @@ public class JdbcSupport {
         return (Long) JdbcUtils.getResultSetValue(rs, rs.findColumn(columnName), Long.class);
     }
 
+     public static String getString(final ResultSet rs, final String columnName) throws SQLException {
+        return (String) JdbcUtils.getResultSetValue(rs, rs.findColumn(columnName), String.class);
+    }
+
     public static Integer getInteger(final ResultSet rs, final String columnName) throws SQLException {
         return (Integer) JdbcUtils.getResultSetValue(rs, rs.findColumn(columnName), Integer.class);
     }

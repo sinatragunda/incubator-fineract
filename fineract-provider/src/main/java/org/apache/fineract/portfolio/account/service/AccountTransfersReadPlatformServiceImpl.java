@@ -360,6 +360,24 @@ public class AccountTransfersReadPlatformServiceImpl implements
 		return transactionId;
 	}
 
+	@Override
+	public AccountTransferData findByToLoanTransactionId(final Long toLoanTransactionId){
+
+		AccountTransferData transferData = null;
+		try{
+
+			final String sql = String.format("select  %s where toloantran.id = ?",this.accountTransfersMapper.schema());
+			transferData =  this.jdbcTemplate.queryForObject(sql ,this.accountTransfersMapper ,new Object[]{toLoanTransactionId});
+		}
+		catch (final EmptyResultDataAccessException e) {
+			//throw new AccountTransferNotFoundException(loanId);
+		}
+
+		return transferData;
+
+
+	}
+
 	private static final class AccountTransfersMapper implements
 			RowMapper<AccountTransferData> {
 

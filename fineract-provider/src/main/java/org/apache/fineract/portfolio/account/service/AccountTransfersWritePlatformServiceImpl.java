@@ -131,7 +131,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         this.accountTransfersDataValidator.validate(command);
 
-        //System.err.println("---------------data validated now -------------- ,this for this validation thing ----------------");
+        System.err.println("---------------data validated now -------------- ,this for this validation thing ----------------");
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
@@ -300,8 +300,51 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
             // use this as savings transaction id 
             subEntityId = withdrawal.getId();
 
-            //System.err.println("------------savings account id ----"+fromSavingsAccountId+"--savings transaction id is -------------"+subEntityId);
         }
+
+        /**
+         * Added 23/04/2023 at 1554 
+         */ 
+        else if(isShareToSavingsAccountTransfer(fromAccountType, toAccountType)) {
+
+            System.err.println("----------------------------transfer ----------------");
+
+            Long toSavingsAccountId = command.longValueOfParameterNamed(toAccountIdParamName);
+            
+            final SavingsAccount toSavingsAccount = this.savingsAccountAssembler.assembleFrom(toSavingsAccountId);
+
+            final SavingsTransactionBooleanValues transactionBooleanValues = new SavingsTransactionBooleanValues(isAccountTransfer,
+                    isRegularTransaction, toSavingsAccount.isWithdrawalFeeApplicableForTransfer(), isInterestTransfer, isWithdrawBalance);
+
+            final Long fromShareAccountId = command.longValueOfParameterNamed(fromAccountIdParamName);
+
+            final ShareAccount fromShareAccount = this.shareAccountAssembler.assembleFrom(fromShareAccountId);
+
+            final ShareAccountTransaction shareAccountTransaction = this.shareAccountDomainService.redeemShares(fromShareAccount, new CommandProcessingResultBuilder(),
+                    transactionDate, transactionAmount, paymentDetail,null ,null , isAccountTransfer);
+
+            final SavingsAccountTransaction deposit = this.savingsAccountDomainService.handleDeposit(toSavingsAccount, fmt,
+                    transactionDate, transactionAmount, paymentDetail, true ,false);
+
+            Note savingsNote = Note.savingsTransactionNote(toSavingsAccount ,deposit ,note);
+
+
+            final AccountTransferDetails accountTransferDetails = this.accountTransferAssembler.assembleShareToSavingsTransfer(command,
+                    toSavingsAccount, deposit , fromShareAccount,shareAccountTransaction);
+
+            this.accountTransferDetailRepository.saveAndFlush(accountTransferDetails);
+
+            shareAccountTransactionId = shareAccountTransaction.getId();
+
+            //System.err.println("------------share account id"+toShareAccountId+" +--------share transaction id is ---------------"+shareAccountTransactionId);
+
+            //System.err.println("----------------------we need something else as well to identify these --------------");
+
+            // use this as savings transaction id 
+            subEntityId = deposit.getId();
+
+        }
+
 
         final CommandProcessingResultBuilder builder = new CommandProcessingResultBuilder().withEntityId(transferDetailId);
 
@@ -712,6 +755,13 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
     // added 31/01/2022
     private boolean isSavingsToShareAccountTransfer(final PortfolioAccountType fromAccountType ,final PortfolioAccountType toAccountType){
         return fromAccountType.isSavingsAccount() && toAccountType.isSharesAccount();
+    }
+
+    /**
+     * Added 23/04/2023 at 1558
+     */ 
+    private boolean isShareToSavingsAccountTransfer(final PortfolioAccountType fromAccountType ,final PortfolioAccountType toAccountType){
+        return fromAccountType.isSharesAccount() && toAccountType.isSavingsAccount();
     }
     
     @Override

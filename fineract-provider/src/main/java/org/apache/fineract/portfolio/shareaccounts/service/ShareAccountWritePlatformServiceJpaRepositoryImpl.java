@@ -60,6 +60,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareAccountWritePlatformService {
 
+    private final RedeemSharesHelper redeemSharesHelper;
     private final ShareAccountDataSerializer accountDataSerializer;
 
     private final ShareAccountRepositoryWrapper shareAccountRepository;
@@ -75,7 +76,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     private final NoteRepository noteRepository;
 
     private final BusinessEventNotifierService businessEventNotifierService;
-    
+
     @Autowired
     public ShareAccountWritePlatformServiceJpaRepositoryImpl(final ShareAccountDataSerializer accountDataSerializer,
             final ShareAccountRepositoryWrapper shareAccountRepository, 
@@ -84,7 +85,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
             final AccountNumberFormatRepositoryWrapper accountNumberFormatRepository,
             final JournalEntryWritePlatformService journalEntryWritePlatformService,
             final NoteRepository noteRepository,
-            final BusinessEventNotifierService businessEventNotifierService) {
+            final BusinessEventNotifierService businessEventNotifierService ,final RedeemSharesHelper redeemSharesHelper) {
         this.accountDataSerializer = accountDataSerializer;
         this.shareAccountRepository = shareAccountRepository;
         this.shareProductRepository = shareProductRepository ;
@@ -93,6 +94,7 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
         this.journalEntryWritePlatformService = journalEntryWritePlatformService;
         this.noteRepository = noteRepository;
         this.businessEventNotifierService = businessEventNotifierService;
+        this.redeemSharesHelper = redeemSharesHelper;
     }
 
     @Override
@@ -465,7 +467,9 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
     }
 
     @Override
-    public CommandProcessingResult redeemShares(Long accountId, JsonCommand jsonCommand) {
+    public CommandProcessingResult redeemShares(Long accountId, JsonCommand jsonCommand){
+
+        Long transactionId = null ;
         try {
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
             Map<String, Object> changes = this.accountDataSerializer.validateAndRedeemShares(jsonCommand, account);
@@ -480,17 +484,21 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 //remove the redeem shares from total subscribed shares 
                 shareProduct.removeSubscribedShares(redeemShares); 
                 this.shareProductRepository.save(shareProduct);
+
+                transactionId = transaction.getId();
                 
+                redeemSharesHelper.transferToSavingsAccount(account ,transaction ,jsonCommand);
+
                 Set<ShareAccountTransaction> transactions = new HashSet<>();
                 transactions.add(transaction);
                 this.journalEntryWritePlatformService.createJournalEntriesForShares(populateJournalEntries(account, transactions));
                 changes.clear();
-                changes.put(ShareAccountApiConstants.requestedshares_paramname, transaction.getId());
+                changes.put(ShareAccountApiConstants.requestedshares_paramname, transactionId);
 
             }
             return new CommandProcessingResultBuilder() //
                     .withCommandId(jsonCommand.commandId()) //
-                    .withEntityId(accountId) //
+                    .withEntityId(transactionId) //
                     .with(changes) //
                     .build();
         } catch (DataIntegrityViolationException dve) {
@@ -501,10 +509,15 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
 
     @Override
     public CommandProcessingResult closeShareAccount(Long accountId, JsonCommand jsonCommand) {
+
         try {
+
+            System.err.println("-------------------------closing share account ,dont call redeem function anymore ");
+
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
             Map<String, Object> changes = this.accountDataSerializer.validateAndClose(jsonCommand, account);
-            if (!changes.isEmpty()) {
+            
+            if(!changes.isEmpty()) {
                 this.shareAccountRepository.save(account);
                 final String noteText = jsonCommand.stringValueOfParameterNamed("note");
                 if (StringUtils.isNotBlank(noteText)) {
@@ -517,7 +530,14 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
                 transaction = account.getShareAccountTransaction(transaction);
                 Set<ShareAccountTransaction> transactions = new HashSet<>();
                 transactions.add(transaction);
+
                 this.journalEntryWritePlatformService.createJournalEntriesForShares(populateJournalEntries(account, transactions));
+                
+                /// money should be posted to savings account now 
+                ///RedeemSharesHelper.transferToSavingsAccount(account ,transactions);
+                System.err.println("-----------------------changed function position now ");
+                redeemSharesHelper.transferToSavingsAccount(account ,transaction ,jsonCommand);
+
                 changes.clear();
                 changes.put(ShareAccountApiConstants.requestedshares_paramname, transaction.getId());
 
