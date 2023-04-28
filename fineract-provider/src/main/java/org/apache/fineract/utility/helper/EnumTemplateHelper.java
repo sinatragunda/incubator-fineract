@@ -30,6 +30,13 @@ public class EnumTemplateHelper {
         return enumOptionData;
     }
 
+    public static EnumOptionData templateWithValue(IEnum iEnum){
+        Long id = Long.valueOf(iEnum.ordinal());
+        EnumOptionData enumOptionData = new EnumOptionData(id ,iEnum.getCode() ,iEnum.getValue());
+        return enumOptionData;
+    }
+
+
     /**
      * Added 31/03/2023 at 0049
      */

@@ -46,6 +46,7 @@
 										  org.apache.fineract.audit.*,
 										  org.apache.fineract.infrastructure.creditbureau.*,
 										  org.apache.fineract.infrastructure.*,
+										  org.apache.fineract.infrastructure.wsplugin.*,
 										  org.apache.fineract.scheduledjobs.*,
 										  org.apache.fineract.organisation.*,
 										  org.apache.fineract.portfolio.loanaccount.*,
@@ -135,8 +136,14 @@
 	<jpa:repositories base-package="org.apache.fineract.presentation.menu.*"/>
 
 
-	<!-- Added 244/0/2023 at 1054 -->
+	<!-- Added 24/0/2023 at 1054 -->
 	<jpa:repositories base-package="org.apache.fineract.portfolio.account.repo.*"/>
+
+
+	<!-- Added 26/0/2023 at 1054 -->
+	<jpa:repositories base-package="org.apache.fineract.infrastructure.wsplugin.*"/>
+
+	<jpa:repositories base-package="org.apache.fineract.infrastructure.documentmanagement.repo.*"/>
 
 	<import resource="infrastructure.xml" />
 

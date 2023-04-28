@@ -59,6 +59,7 @@ public class Document extends AbstractPersistableCustom<Long> {
 
     public Document() {}
 
+
     public static Document createNew(final String parentEntityType, final Long parentEntityId, final String name, final String fileName,
             final Long size, final String type, final String description, final String location, final StorageType storageType) {
         return new Document(parentEntityType, parentEntityId, name, fileName, size, type, description, location, storageType);

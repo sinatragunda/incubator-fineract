@@ -26,6 +26,7 @@ public enum REF_TABLE implements IEnum {
     REPORT("Report"),
     OFFICE("Office"),
     SEARCH("Search"),
+    SCREEN("Screen"),
     JOURNAL_ENTRY("Journal Entry"),
     GL_ACCOUNT("Ledger Account"),
     VERSION("Version"),

@@ -12,6 +12,9 @@ public class GenericConstants {
     public static String dataParam = "data";
     public static String shortNameParam = "shortName";
     public static String officeIdParam  = "officeId";
+    public static String descriptionParam  = "description";
+    
+
     
        
 }

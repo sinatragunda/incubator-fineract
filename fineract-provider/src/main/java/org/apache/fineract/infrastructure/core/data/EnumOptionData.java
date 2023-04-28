@@ -37,6 +37,10 @@ public class EnumOptionData {
         this.value = value;
     }
 
+    /**
+     * Added 26/04/2023 at 0942 
+     */ 
+    
     public EnumOptionData(final Integer id, final String code) {
         this.id = new Long(id);
         this.code = code;

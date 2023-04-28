@@ -43,10 +43,21 @@ public class CommandProcessingResultBuilder {
     // added 27/03/2022
     private boolean status = false;
 
+    /**
+     * Added 26/04/2023 at 1320
+     */ 
+    private Object object;
+
     public CommandProcessingResult build() {
         return CommandProcessingResult.fromDetails(this.commandId, this.officeId, this.groupId, this.clientId, this.loanId, this.savingsId,
                 this.resourceIdentifier, this.entityId, this.transactionId, this.changes, this.productId, this.rollbackTransaction,
                 this.subEntityId ,this.status);
+    }
+
+
+    public CommandProcessingResultBuilder withObject(final Object obj) {
+        this.object = obj ;
+        return this;
     }
 
 

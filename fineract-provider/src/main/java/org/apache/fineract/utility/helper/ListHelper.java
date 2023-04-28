@@ -5,6 +5,7 @@
 package org.apache.fineract.utility.helper;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,5 +21,9 @@ public class ListHelper {
     }
 
 
+    public static Set toSet(List list){
+        Set set = new HashSet<>(list);
+        return set ;
+    }
 
 }

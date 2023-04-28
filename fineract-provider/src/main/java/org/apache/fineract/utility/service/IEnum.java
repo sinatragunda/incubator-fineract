@@ -9,7 +9,10 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import java.util.List;
 
 public interface IEnum {
-
     public int ordinal();
     public String getCode();
+
+    default public String getValue(){
+        return null ;
+    };
 }

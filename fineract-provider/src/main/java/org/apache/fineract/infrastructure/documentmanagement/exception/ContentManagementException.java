@@ -32,4 +32,11 @@ public class ContentManagementException extends AbstractPlatformDomainRuleExcept
                 / (1024 * 1024) + " MB exceeds the max permissable file size  of " + maxFileSize + " MB", name, fileSize);
     }
 
+    public ContentManagementException() {
+        super("error.msg.document.save",
+                "Error while manipulating saving doument ", "Error while manipulating saving doument", "");
+    }
+
+
+
 }

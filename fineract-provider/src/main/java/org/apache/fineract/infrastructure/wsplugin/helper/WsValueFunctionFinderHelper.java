@@ -17,14 +17,15 @@ import java.util.List ;
 
 public class WsValueFunctionFinderHelper {
 
-    public static List<WsScript> findFunctionsFromJarFile(InputStream inputStream,ClassLoader classLoader){
+    public static List<WsScript> findFunctionsFromJarFile(InputStream inputStream,ClassLoader parentClassLoader){
 
         boolean has = OptionalHelper.isPresent(inputStream);
         if(!has){
             throw new JarFileFailedToReadException();
         }
         File file = FileHelper.fromInputStream(inputStream ,"jar");
+        //ClassLoader classLoader1 = WsValueFunctionFinderHelper.class.getClassLoader();
 
-        return AnnotationSupportHelper.classesSupportedByAnnotation(null ,file , WsValue.class ,null);
+        return AnnotationSupportHelper.classesSupportedByAnnotation(null ,file , WsValue.class ,parentClassLoader);
     }
 }
