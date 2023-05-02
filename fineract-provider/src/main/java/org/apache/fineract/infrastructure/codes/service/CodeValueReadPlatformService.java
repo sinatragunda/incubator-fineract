@@ -21,6 +21,7 @@ package org.apache.fineract.infrastructure.codes.service;
 import java.util.Collection;
 
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
+import org.apache.fineract.utility.service.DataEnumerationService;
 
 /**
  * A service for retrieving code value information based on the code itself.
@@ -41,7 +42,7 @@ import org.apache.fineract.infrastructure.codes.data.CodeValueData;
  * permissions.
  * </p>
  */
-public interface CodeValueReadPlatformService {
+public interface CodeValueReadPlatformService extends DataEnumerationService {
 
     Collection<CodeValueData> retrieveCodeValuesByCode(final String code);
 

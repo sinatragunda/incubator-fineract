@@ -38,4 +38,8 @@ public class ScreenData {
     public void setScreenElementDataList(Collection<ScreenElementData> screenElementDataList){
         this.screenElementDataList =screenElementDataList;
     }
+
+    public REF_TABLE getRefTable(){
+        return this.refTable;
+    }
 }

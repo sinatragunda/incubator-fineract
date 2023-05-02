@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.presentation.screen.helper;
 
+import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.presentation.screen.domain.Screen;
 import org.apache.fineract.presentation.screen.domain.ScreenElement;
@@ -22,16 +23,22 @@ public class VersionRecordHelper {
         Consumer<ScreenElement> validateElements = (e)->{
 
             ScreenElement screenElement = e;
-            //System.err.println("------------value is null might through error when getting or comparing ? ");
-
             /**
              * Modified 14/04/2023 at 1452
              * Value is the value from database and param is the user value
+             * Though nothing happens to the return value as of yet
              */
-            boolean val = screenElement.getComparisonType().validate(screenElement);
-            //System.err.println("-----------------done validating "+e.getDisplayName()+"--------with status "+val);
+            COMPARISON_TYPE comparisonType = screenElement.getComparisonType();
+            comparisonType.validate(screenElement);
         };
 
-        screenElementSet.stream().forEach(validateElements);
+        Consumer<ScreenElement> validateChildElements = (e)->{
+            System.err.println("----------------validate child elements of "+e.getDisplayName());
+            Set<ScreenElement> childElements = e.getChildElements();
+            System.err.println("---------------child elements size is "+childElements.size());
+            childElements.stream().forEach(validateElements);
+        };
+
+        screenElementSet.stream().forEach(validateElements.andThen(validateChildElements));
     }
 }

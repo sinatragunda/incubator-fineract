@@ -8,9 +8,11 @@ import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import com.wese.component.defaults.enumerations.ELEMENT_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -109,6 +111,10 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
 
     public String getValue() {
         return value;
+    }
+
+    public Set getChildElements(){
+        return OptionalHelper.optionalOf(this.childElements ,new HashSet<>());
     }
 
     public void setChildElements(Set childElements){

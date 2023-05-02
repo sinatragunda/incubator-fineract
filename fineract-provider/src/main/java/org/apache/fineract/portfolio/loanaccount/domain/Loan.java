@@ -183,6 +183,8 @@ public class Loan extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "loan_officer_id", nullable = true)
     private Staff loanOfficer;
 
+    @AttributeList(beanLoader = BEAN_LOADER.VIRTUAL_LIST ,codeValue="LoanPurpose")
+    @AttributeRef(name ="Purpose" ,group=COMPARISON_GROUP.LIST)
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "loanpurpose_cv_id", nullable = true)
     private CodeValue loanPurpose;

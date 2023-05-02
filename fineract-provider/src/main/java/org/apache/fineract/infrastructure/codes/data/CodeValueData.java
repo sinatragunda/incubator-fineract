@@ -18,12 +18,14 @@
  */
 package org.apache.fineract.infrastructure.codes.data;
 
+import org.apache.fineract.utility.service.EnumeratedData;
+
 import java.io.Serializable;
 
 /**
  * Immutable data object represent code-value data in system.
  */
-public class CodeValueData implements Serializable {
+public class CodeValueData implements Serializable , EnumeratedData {
 
     private final Long id;
 

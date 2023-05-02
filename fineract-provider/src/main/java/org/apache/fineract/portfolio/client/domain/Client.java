@@ -132,10 +132,12 @@ public final class Client extends AbstractPersistableCustom<Long> {
 	@Column(name = "email_address", length = 50, unique = true)
     private String emailAddress;
 
+
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model = "isStaff", name = "Is Staff" ,group = COMPARISON_GROUP.BOOLEAN)
 	@Column(name = "is_staff", nullable = false)
     private boolean isStaff;
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="externalId", name = "External Id" ,group = COMPARISON_GROUP.PATTERN)
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="externalId", name = "External Id" ,group = COMPARISON_GROUP.STRING)
     @Column(name = "external_id", length = 100, nullable = true, unique = true)
     private String externalId;
 
@@ -233,11 +235,14 @@ public final class Client extends AbstractPersistableCustom<Long> {
     private Long savingsAccountId;
 
 
-    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Client Type",group = COMPARISON_GROUP.GENERIC)
+    @AttributeList(beanLoader = BEAN_LOADER.VIRTUAL_LIST ,codeValue = "ClientType")
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,name = "Client Type",group = COMPARISON_GROUP.LIST)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_type_cv_id", nullable = true)
     private CodeValue clientType;
 
+    @AttributeList(beanLoader = BEAN_LOADER.VIRTUAL_LIST ,codeValue = "ClientClassification")
+    @AttributeRef(type = FIELD_TYPE.OPTIONAL ,model="clientClassificationId", name = "Client Classification",group = COMPARISON_GROUP.LIST)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_classification_cv_id", nullable = true)
     private CodeValue clientClassification;

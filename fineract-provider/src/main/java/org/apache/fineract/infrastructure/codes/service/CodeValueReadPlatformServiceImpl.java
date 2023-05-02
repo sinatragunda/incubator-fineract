@@ -21,11 +21,15 @@ package org.apache.fineract.infrastructure.codes.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.codes.exception.CodeValueNotFoundException;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
+import org.apache.fineract.utility.service.EnumeratedData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -102,6 +106,16 @@ public class CodeValueReadPlatformServiceImpl implements CodeValueReadPlatformSe
         } catch (final EmptyResultDataAccessException e) {
             throw new CodeValueNotFoundException(codeValueId);
         }
+    }
 
+    @Override
+    public List<EnumOptionData> getDropdownData(String codeValue) {
+        Collection collection = this.retrieveCodeValuesByCode(codeValue);
+        return EnumeratedDataHelper.enumeratedData(collection);
+    }
+
+    @Override
+    public Collection<? extends EnumeratedData> retrieveUsingQuery(String whereSql) {
+        return null;
     }
 }

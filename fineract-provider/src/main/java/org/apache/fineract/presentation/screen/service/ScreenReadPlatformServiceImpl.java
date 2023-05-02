@@ -4,12 +4,15 @@
  */
 package org.apache.fineract.presentation.screen.service;
 
+import com.wese.component.defaults.enumerations.CLASS_LOADER;
 import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
+import com.wese.component.defaults.helper.FieldReflectionHelper;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
+import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -23,6 +26,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.apache.fineract.presentation.screen.domain.ScreenElement;
 import org.apache.fineract.presentation.screen.exceptions.ScreenNotFoundException;
@@ -34,6 +38,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import org.springframework.context.ApplicationContext;
 
 @Service
 public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService {
@@ -42,12 +47,15 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
     private JdbcTemplate jdbcTemplate;
     private ScreenMapper screenMapper = new ScreenMapper();
     private ScreenElementMapper screenElementMapper = new ScreenElementMapper();
+    private ApplicationContext applicationContext;
 
     @Autowired
-    public ScreenReadPlatformServiceImpl(PlatformSecurityContext context, RoutingDataSource routingDataSource) {
+    public ScreenReadPlatformServiceImpl(PlatformSecurityContext context, RoutingDataSource routingDataSource ,final ApplicationContext applicationContext) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
+        this.applicationContext = applicationContext;
     }
+
 
     @Override
     public Collection<ScreenData> retrieveAll(){
@@ -63,18 +71,30 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
         String sql = String.format("select %s where sc.id = ?" ,screenMapper.schema());
         ScreenData screenData = this.jdbcTemplate.queryForObject(sql ,screenMapper ,new Object[]{id});
         //System.err.println("-------------qeury one object now back "+ OptionalHelper.isPresent(screenData));
-
         linkScreenElementConsumer.accept(screenData);
         return  screenData;
     }
 
-
-    private Consumer<ScreenData> linkScreenElementConsumer = (e)-> {
-        Long id = e.getId();
-        Collection screenElements = retrieveAllScreenElementData(id);
-        e.setScreenElementDataList(screenElements);
+    /**
+     * Added 02/05/2023 at 1011
+     * Resolves list elements to get Dropdown data from respective BeanLoaders
+     */
+    private Consumer<ScreenElementData> listResolverConsumer = (e)-> {
+        String key = e.getName();
+        Class cl = e.getRefTable().getClassLoader().getCl();
+        List<EnumOptionData> enumOptionDataList  = FieldReflectionHelper.dataTemplateList(applicationContext ,cl ,key);
+        e.setSelectOptions(enumOptionDataList);
     };
 
+    private Consumer<ScreenData> linkScreenElementConsumer = (e)-> {
+
+        Long id = e.getId();
+        Collection<ScreenElementData> screenElementsCollection = retrieveAllScreenElementData(id);
+        Predicate<ScreenElementData> isGroupList = (v)-> v.getComparisonGroup().equals(COMPARISON_GROUP.LIST);
+
+        screenElementsCollection.stream().filter(isGroupList).forEach(listResolverConsumer);
+        e.setScreenElementDataList(screenElementsCollection);
+    };
 
     @Override
     public ScreenData retrieveOneByName(String name) {
@@ -147,8 +167,10 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
                     " sce.value as value," +
                     " sce.parent_screen_element_id as parentScreenElementId ," +
                     " sce.mandatory as mandatory, " +
-                    " sce.screen_id as screenId " +
-                    " from m_screen_element sce";
+                    " sce.screen_id as screenId, " +
+                    " ms.ref_table as refTable " +
+                    " from m_screen_element sce " +
+                    " join m_screen ms on ms.id = sce.screen_id ";
 
         }
 
@@ -164,7 +186,6 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
             final String modelName = rs.getString("modelName");
             final Long parentScreenElementId = JdbcSupport.getLong(rs ,"parentScreenElementId");
 
-
             final Integer comparisonTypeInt = JdbcSupport.getInteger(rs, "comparisonType");
             final COMPARISON_TYPE comparisonType = (COMPARISON_TYPE) EnumTemplateHelper.fromIntEx(COMPARISON_TYPE.values(), comparisonTypeInt);
 
@@ -174,7 +195,11 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
             final Integer comparisonGroupInt = JdbcSupport.getInteger(rs, "comparisonGroup");
             final COMPARISON_GROUP comparisonGroup = (COMPARISON_GROUP) EnumTemplateHelper.fromIntEx(COMPARISON_GROUP.values(), comparisonGroupInt);
 
-            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null ,parentScreenElementId);
+            final Integer refTableInt = JdbcSupport.getInteger(rs,"refTable");
+            final REF_TABLE refTable = (REF_TABLE)EnumTemplateHelper.fromIntEx(REF_TABLE.values() ,refTableInt);
+
+            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null ,parentScreenElementId ,refTable);
+
             return screenElementData;
         }
     }

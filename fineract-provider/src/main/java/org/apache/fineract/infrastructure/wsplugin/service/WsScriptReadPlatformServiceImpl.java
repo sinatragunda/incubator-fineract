@@ -5,6 +5,7 @@
 package org.apache.fineract.infrastructure.wsplugin.service;
 
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.wsplugin.data.WsScriptContainerData;
@@ -22,10 +23,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.CollectionUtils;
+import org.springframework.context.ApplicationContext;
+
 
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -66,7 +70,7 @@ public class WsScriptReadPlatformServiceImpl implements WsScriptReadPlatformServ
         String sql  = String.format("select %s" ,wsSriptContainerMapper.schema());
         Collection<WsScriptContainerData> wsScriptContainerData = this.jdbcTemplate.query(sql ,wsSriptContainerMapper);
 
-        Predicate<WsScriptContainerData> isEagerLoading = (e)-> eagerLoading;
+        Predicate<WsScriptContainerData> isEagerLoading = (e)-> OptionalHelper.optionalOf(eagerLoading ,false);
         wsScriptContainerData.stream().filter(isEagerLoading).forEach(attachWsScriptConsumer);
 
         return wsScriptContainerData;

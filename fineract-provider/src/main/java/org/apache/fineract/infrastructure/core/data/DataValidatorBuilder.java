@@ -260,7 +260,7 @@ public class DataValidatorBuilder {
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
                     .append(this.parameter).append(".exceeds.max.length");
             final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
-                    .append(" exceeds max length of ").append(maxLength).append(".");
+                    .append(" exceeds maximum length of ").append(maxLength).append(".");
             final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
                     defaultEnglishMessage.toString(), this.parameter, maxLength, this.value.toString());
             this.dataValidationErrors.add(error);
@@ -273,9 +273,9 @@ public class DataValidatorBuilder {
 
         if (this.value != null && this.value.toString().trim().length() < maxLength) {
             final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
-                    .append(this.parameter).append(".exceeds.max.length");
+                    .append(this.parameter).append(".not.exceeds.max.length");
             final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
-                    .append(" exceeds max length of ").append(maxLength).append(".");
+                    .append(" does not exceeds minimum length of ").append(maxLength).append(".");
             final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
                     defaultEnglishMessage.toString(), this.parameter, maxLength, this.value.toString());
             this.dataValidationErrors.add(error);

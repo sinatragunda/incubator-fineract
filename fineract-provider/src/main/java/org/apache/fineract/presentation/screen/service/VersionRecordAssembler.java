@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.presentation.screen.service;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.generic.helper.GenericConstants;
@@ -63,11 +64,14 @@ public class VersionRecordAssembler {
                 //System.err.println("---------------id value for screen id skip it from contentisn");
                 continue;
             }
-            ScreenElement screenElement = screenElementFromJson(modelElement );
-            screenElementsSet.add(screenElement);
+            ScreenElement screenElement = screenElementFromJson(modelElement);
+            boolean has = OptionalHelper.isPresent(screenElement);
+            if (has) {
+                screenElementsSet.add(screenElement);
+            }
         }
-        System.err.println("-----------------------elements from supplied data are "+screenElementsSet.size());
 
+        System.err.println("-----------------------elements from supplied data are "+screenElementsSet.size());
         screen.setScreenElementSet(screenElementsSet);
         return screen;
     }
@@ -76,22 +80,29 @@ public class VersionRecordAssembler {
 
         System.err.println("---------------screen element json  --------"+element);
 
+        boolean hasId = fromJsonHelper.parameterExists(GenericConstants.idParam ,element);
 
-        Long id = fromJsonHelper.extractLongNamed(GenericConstants.idParam,element);
+        System.err.println("------------------------hasId --------"+hasId);
 
-        String parameter = null ;
+        ScreenElement screenElement = null;
 
-        if(fromJsonHelper.parameterExists(ScreenApiConstant.valueParam ,element)){
-            parameter = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam ,element);
+        if(hasId) {
+            Long id = fromJsonHelper.extractLongNamed(GenericConstants.idParam, element);
+
+            String parameter = null;
+
+            if (fromJsonHelper.parameterExists(ScreenApiConstant.valueParam, element)) {
+                parameter = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam, element);
+            }
+
+            screenElement = screenElementRepositoryWrapper.findOneWithNotFoundDetection(id);
+
+            screenElement.setParameter(parameter);
+
+            System.err.println("--------------------------extracted parameter  is " + parameter);
+
+            System.err.println("---------------screen element object string   --------" + screenElement);
         }
-
-        ScreenElement screenElement = screenElementRepositoryWrapper.findOneWithNotFoundDetection(id);
-
-        screenElement.setParameter(parameter);
-
-        System.err.println("--------------------------extracted parameter  is "+parameter);
-
-        System.err.println("---------------screen element object string   --------"+screenElement);
 
         return screenElement;
     }

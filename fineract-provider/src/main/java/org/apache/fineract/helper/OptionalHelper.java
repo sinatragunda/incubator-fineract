@@ -36,7 +36,15 @@ public class OptionalHelper {
         return  !hasZeroValue(number);
     }
 
-    public static Object optionalOf(Object object ,Object orValue){
-        return Optional.ofNullable(object).orElse(orValue);
+    public static <T> T optionalOf(T object ,T orValue){
+        T value = null ;
+        try {
+            value = Optional.ofNullable(object).orElse(orValue);
+        }
+        catch (Exception n){
+            System.err.println("----------------catch exception in optional class ,return of value "+orValue);
+            value = orValue;
+        }
+        return value;
     }
 }

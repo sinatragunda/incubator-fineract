@@ -9,11 +9,13 @@ import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.EnumeratedData;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.List ;
 
 public class ScreenElementData implements EnumeratedData {
 
@@ -34,7 +36,10 @@ public class ScreenElementData implements EnumeratedData {
     private EnumOptionData comparisonTypeOption ;
     private EnumOptionData comparisonGroupOption;
 
-    public ScreenElementData(Long id , String name , String value, String modelName, String displayName, boolean show, boolean mandatory, OPERAND_GATES operandGates, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup, Collection<ScreenElementData> childElements ,Long parentScreenElementId) {
+    private List<EnumOptionData> selectOptions;
+    private REF_TABLE refTable;
+
+    public ScreenElementData(Long id , String name , String value, String modelName, String displayName, boolean show, boolean mandatory, OPERAND_GATES operandGates, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup, Collection<ScreenElementData> childElements ,Long parentScreenElementId ,REF_TABLE refTable) {
         this.id = id ;
         this.name = name;
         this.value = value;
@@ -50,6 +55,7 @@ public class ScreenElementData implements EnumeratedData {
         this.comparisonTypeOption = EnumTemplateHelper.template(comparisonType);
         this.comparisonGroupOption = EnumTemplateHelper.template(comparisonGroup);
         this.parentScreenElementId = parentScreenElementId ;
+        this.refTable = refTable;
     }
 
     @Override
@@ -62,8 +68,20 @@ public class ScreenElementData implements EnumeratedData {
         return this.name;
     }
 
+    public REF_TABLE getRefTable() {
+        return refTable;
+    }
+
+    public COMPARISON_GROUP getComparisonGroup() {
+        return comparisonGroup;
+    }
+
     public void setChildElements(Collection<ScreenElementData> childElements) {
         this.childElements = childElements;
+    }
+
+    public void setSelectOptions(List<EnumOptionData> enumOptionDataList){
+        this.selectOptions = enumOptionDataList;
     }
 }
 

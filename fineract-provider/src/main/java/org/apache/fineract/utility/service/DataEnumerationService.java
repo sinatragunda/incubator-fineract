@@ -13,6 +13,14 @@ import java.util.Collection;
  */
 public interface DataEnumerationService {
 
-    public List<EnumOptionData> getDropdownData();
+    default public List<EnumOptionData> getDropdownData(){ return null ;};
     public Collection<? extends EnumeratedData> retrieveUsingQuery(String whereSql);
+
+    /**
+     * Added 05/05/2023 at 0730
+     * Added to cater for CodeValues options ...
+     * Still plan is needed for EnumOptionData fields
+     */
+    default public List<EnumOptionData> getDropdownData(String codeValue){ return  null ;}
+
 }

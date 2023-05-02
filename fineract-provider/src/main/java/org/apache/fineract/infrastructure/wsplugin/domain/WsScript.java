@@ -45,9 +45,11 @@ public class WsScript extends AbstractPersistableCustom<Long> {
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "script_type")
     private SCRIPT_TYPE scriptType;
+
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "return_type")
     private RETURN_TYPE returnType;
+    
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "execution_level")
     private EXECUTION_LEVEL executionLevel;
