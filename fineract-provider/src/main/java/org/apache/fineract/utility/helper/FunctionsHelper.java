@@ -20,6 +20,19 @@ public class FunctionsHelper {
         return val ;
     };
 
+
+    public static Function todayDate  =(r)->{
+        Integer val = null;
+        try{
+            String castedValue = String.valueOf(r);
+            val = Integer.parseInt(castedValue);
+        }
+        catch (NumberFormatException n){
+            n.printStackTrace();
+        }
+        return val ;
+    };
+
     public static <T ,R> R execute(Function function,T arg){
         return (R)function.apply(arg);
     }

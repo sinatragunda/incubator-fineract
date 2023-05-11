@@ -13,6 +13,7 @@ import org.apache.fineract.infrastructure.wsplugin.data.WsScriptData;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.EXECUTION_LEVEL;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.RETURN_TYPE;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.SCRIPT_TYPE;
+import org.apache.fineract.infrastructure.wsplugin.helper.WsInternalScriptsLoader;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 
 import java.util.Collection;
@@ -72,6 +73,9 @@ public class WsScriptReadPlatformServiceImpl implements WsScriptReadPlatformServ
 
         Predicate<WsScriptContainerData> isEagerLoading = (e)-> OptionalHelper.optionalOf(eagerLoading ,false);
         wsScriptContainerData.stream().filter(isEagerLoading).forEach(attachWsScriptConsumer);
+
+        WsScriptContainerData internalScriptsContainerData = WsInternalScriptsLoader.loadAsContainerData();
+        wsScriptContainerData.add(internalScriptsContainerData);
 
         return wsScriptContainerData;
 

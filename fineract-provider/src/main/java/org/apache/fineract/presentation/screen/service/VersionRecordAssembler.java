@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 @Service
 public class VersionRecordAssembler {
 
@@ -71,18 +70,18 @@ public class VersionRecordAssembler {
             }
         }
 
-        System.err.println("-----------------------elements from supplied data are "+screenElementsSet.size());
+        //System.err.println("-----------------------elements from supplied data are "+screenElementsSet.size());
         screen.setScreenElementSet(screenElementsSet);
         return screen;
     }
 
     private ScreenElement screenElementFromJson(JsonElement element){
 
-        System.err.println("---------------screen element json  --------"+element);
+        //System.err.println("---------------screen element json  --------"+element);
 
         boolean hasId = fromJsonHelper.parameterExists(GenericConstants.idParam ,element);
 
-        System.err.println("------------------------hasId --------"+hasId);
+        //System.err.println("------------------------hasId --------"+hasId);
 
         ScreenElement screenElement = null;
 

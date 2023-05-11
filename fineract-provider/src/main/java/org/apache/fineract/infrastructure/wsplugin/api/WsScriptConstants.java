@@ -15,6 +15,7 @@ public class WsScriptConstants {
     public static String qualifiedClassNameParam = "qualifiedClassName";
     public static String returnTypeParam = "returnType";
 
+    public static String hookAnnotationParam = "hook";
 
 
 

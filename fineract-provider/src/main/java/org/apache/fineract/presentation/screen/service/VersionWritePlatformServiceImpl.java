@@ -22,18 +22,20 @@ public class VersionWritePlatformServiceImpl implements VersionWritePlatformServ
 
     private PlatformSecurityContext context ;
     private VersionRecordAssembler versionRecordAssembler;
+    private VersionPortfolioCommandWritePlatformService versionPortfolioCommandWritePlatformService;
 
     @Autowired
-    public VersionWritePlatformServiceImpl(PlatformSecurityContext context, VersionRecordAssembler versionRecordAssembler) {
+    public VersionWritePlatformServiceImpl(PlatformSecurityContext context, VersionRecordAssembler versionRecordAssembler ,VersionPortfolioCommandWritePlatformService versionPortfolioCommandWritePlatformService) {
         this.context = context;
         this.versionRecordAssembler = versionRecordAssembler;
+        this.versionPortfolioCommandWritePlatformService = versionPortfolioCommandWritePlatformService;
     }
 
     @Override
     public CommandProcessingResult create(JsonCommand command) {
 
         System.err.println("----------validate----------------");
-        VersionRecordHelper.validateRecord(versionRecordAssembler ,command);
+        VersionRecordHelper.validateRecord(versionPortfolioCommandWritePlatformService, versionRecordAssembler ,command);
         System.err.println("------------done validation -----------");
         CommandProcessingResult result = new CommandProcessingResultBuilder().withEntityId(5L).build();
         return result;

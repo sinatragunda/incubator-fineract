@@ -26,4 +26,5 @@ public interface ShareAccountTransactionReadPlatformService {
 
     public ShareAccountTransactionData retrieveOne(final Long transactionId);
 
+    public Collection<ShareAccountTransactionData> retrieveAll();
 }

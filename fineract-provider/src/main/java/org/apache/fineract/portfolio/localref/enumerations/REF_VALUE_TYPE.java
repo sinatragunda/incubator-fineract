@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.portfolio.localref.enumerations;
 
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.IEnum;
@@ -20,6 +21,30 @@ public enum REF_VALUE_TYPE implements IEnum{
     CODE_VALUE("Template"),
     NUMERAL("Numeric"),
     DATE("Date");
+
+
+    public COMPARISON_GROUP group(){
+        COMPARISON_GROUP comparisonGroup = COMPARISON_GROUP.GENERIC;
+        switch (this){
+            case DATE:
+                comparisonGroup = COMPARISON_GROUP.DATE;
+                break;
+            case STRING:
+                comparisonGroup = COMPARISON_GROUP.STRING;
+                break;
+            case DECIMAL:
+            case NUMERAL:
+                comparisonGroup = COMPARISON_GROUP.NUMERIC;
+                break;
+            case CODE_VALUE:
+                comparisonGroup = COMPARISON_GROUP.LIST;
+                break;
+            case BOOLEAN:
+                comparisonGroup = COMPARISON_GROUP.BOOLEAN;
+                break;
+        }
+        return comparisonGroup;
+    }
 
     private String code ;
     REF_VALUE_TYPE(String code){

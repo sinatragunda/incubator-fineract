@@ -20,5 +20,7 @@ public interface LocalRefRepository extends JpaRepository<LocalRef, Long>, JpaSp
     @Query("select lr from LocalRef lr where lr.refTable= :refTable")
     Collection<LocalRef> findByRefTable(@Param("refTable") REF_TABLE refTable);
 
+    @Query("select lr from LocalRef lr where lr.name = :name")
+    LocalRef findByName(@Param("name") String name);
 
 }

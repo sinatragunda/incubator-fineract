@@ -20,7 +20,12 @@ import org.apache.fineract.infrastructure.security.service.PlatformSecurityConte
 import org.apache.fineract.infrastructure.wsplugin.data.WsScriptContainerData;
 import org.apache.fineract.infrastructure.wsplugin.service.WsScriptReadPlatformService;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
+import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.helper.LocalRefToFieldValidationData;
+import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.helper.ListHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -53,15 +58,17 @@ public class ComponentApiResource {
     private ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer;
     private WsScriptReadPlatformService wsScriptReadPlatformService ;
     private ToApiJsonSerializer<ComponentData> componentDataToApiJsonSerializer;
+    private LocalRefReadPlatformService localRefReadPlatformService;
 
     @Autowired
-    public ComponentApiResource(PlatformSecurityContext context, ApiRequestParameterHelper apiRequestParameterHelper, ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer ,ApplicationContext applicationContext ,final WsScriptReadPlatformService wsScriptReadPlatformService ,final ToApiJsonSerializer<ComponentData> componentDataToApiJsonSerializer) {
+    public ComponentApiResource(PlatformSecurityContext context, ApiRequestParameterHelper apiRequestParameterHelper, ToApiJsonSerializer<FieldValidationData> fieldValidationDataToApiJsonSerializer ,ApplicationContext applicationContext ,final WsScriptReadPlatformService wsScriptReadPlatformService ,final ToApiJsonSerializer<ComponentData> componentDataToApiJsonSerializer ,final LocalRefReadPlatformService localRefReadPlatformService) {
         this.context = context;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.fieldValidationDataToApiJsonSerializer = fieldValidationDataToApiJsonSerializer;
         this.applicationContext = applicationContext;
         this.wsScriptReadPlatformService = wsScriptReadPlatformService;
         this.componentDataToApiJsonSerializer = componentDataToApiJsonSerializer;
+        this.localRefReadPlatformService = localRefReadPlatformService;
 
     }
 
@@ -103,8 +110,16 @@ public class ComponentApiResource {
     private ComponentData getComponentData(Class cl ,CLASS_LOADER classLoader ,Boolean eagerLoading) {
         Set<FieldValidationData> fieldValidationDataList = FieldReflectionHelper.getClassAttributes(cl,applicationContext);
         Collection<WsScriptContainerData> wsScriptContainerDataCollection = wsScriptReadPlatformService.retrieveAll(eagerLoading);
-        ComponentData componentData = new ComponentData(classLoader ,wsScriptContainerDataCollection ,fieldValidationDataList);
+        Set<FieldValidationData> localRefsFieldValidationDataSet = getLocalRefsAsFieldValidationData(classLoader);
+        ComponentData componentData = new ComponentData(classLoader ,wsScriptContainerDataCollection ,fieldValidationDataList ,localRefsFieldValidationDataSet);
         return componentData;
+    }
+
+    private Set<FieldValidationData> getLocalRefsAsFieldValidationData(CLASS_LOADER classLoader){
+        REF_TABLE refTable = REF_TABLE.fromClassLoader(classLoader);
+        LocalRefData localRefData = localRefReadPlatformService.template(refTable);
+        List<FieldValidationData> fieldValidationDataList = LocalRefToFieldValidationData.convertForTemplate(localRefData);
+        return ListHelper.toSet(fieldValidationDataList);
     }
 
     @GET

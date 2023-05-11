@@ -47,10 +47,12 @@ public class ShareAccountTransactionData {
     private final BigDecimal amountPaid ;
 
     private final Boolean reversed ;
+
+    private final String clientName ;
     
     public ShareAccountTransactionData(final Long id, final Long accountId, final LocalDate purchasedDate, final Long numberOfShares,
             final BigDecimal purchasedPrice, final EnumOptionData status, final EnumOptionData type, final BigDecimal amount, final BigDecimal chargeAmount,
-            final BigDecimal amountPaid ,final Boolean reversed) {
+            final BigDecimal amountPaid ,final Boolean reversed ,String clientName) {
         this.id = id;
         this.accountId = accountId;
         this.purchasedDate = purchasedDate;
@@ -62,6 +64,7 @@ public class ShareAccountTransactionData {
         this.chargeAmount = chargeAmount ;
         this.amountPaid = amountPaid ;
         this.reversed = reversed ;
+        this.clientName = clientName ;
     }
 
     public LocalDate getPurchasedDate() {

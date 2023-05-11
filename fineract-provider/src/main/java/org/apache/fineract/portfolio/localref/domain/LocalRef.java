@@ -146,4 +146,8 @@ public class LocalRef extends AbstractPersistableCustom<Long> {
         }
         return actualChanges;
     }
+
+    public REF_VALUE_TYPE getRefValueType() {
+        return refValueType;
+    }
 }

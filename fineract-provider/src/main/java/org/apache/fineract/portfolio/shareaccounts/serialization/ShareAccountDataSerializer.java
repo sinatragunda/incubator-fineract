@@ -281,6 +281,16 @@ public class ShareAccountDataSerializer {
             }
         }
 
+
+        if (this.fromApiJsonHelper.parameterExists(ShareAccountApiConstants.approveddate_paramname, element)) {
+            final Date approvedDate = this.fromApiJsonHelper.extractLocalDateNamed(ShareAccountApiConstants.approveddate_paramname,
+                    element).toDate();
+            baseDataValidator.reset().parameter(ShareAccountApiConstants.approveddate_paramname).value(approvedDate).notNull();
+            if (account.setApprovedDate(approvedDate)) {
+                actualChanges.put(ShareAccountApiConstants.approveddate_paramname, approvedDate);
+            }
+        }
+
         if (this.fromApiJsonHelper.parameterExists(ShareAccountApiConstants.externalid_paramname, element)) {
             final String externalId = this.fromApiJsonHelper.extractStringNamed(ShareAccountApiConstants.externalid_paramname, element);
             // baseDataValidator.reset().parameter(ShareAccountApiConstants.externalid_paramname).value(externalId).notNull();

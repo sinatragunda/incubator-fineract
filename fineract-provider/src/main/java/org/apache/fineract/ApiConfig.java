@@ -7,6 +7,5 @@
 package org.apache.fineract;
 
 public class ApiConfig {
-
     public final static String apiVersion = "/fineract-provider/api/v1";
 }

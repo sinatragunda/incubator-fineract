@@ -100,7 +100,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,
             LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,
             LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam,
-            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam
+            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam
         ));
 
     private final FromJsonHelper fromApiJsonHelper;

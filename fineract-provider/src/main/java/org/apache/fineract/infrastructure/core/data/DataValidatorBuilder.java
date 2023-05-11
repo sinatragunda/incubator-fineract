@@ -466,6 +466,32 @@ public class DataValidatorBuilder {
         return this;
     }
 
+    /**
+     * Added 03/05/2023 at 1621
+     */
+
+    public DataValidatorBuilder integerSmallerThanNumber(Integer number) {
+        
+        if (isNull && this.ignoreNullValue) { return this; }
+
+        if (!isNull){
+
+            System.err.println("-------------------------compate this "+this.value+"-----------with  "+number);
+
+            final Integer intValue = Integer.valueOf(this.value.toString());
+            if (intValue > number) {
+                final StringBuilder validationErrorCode = new StringBuilder("validation.msg.").append(this.resource).append(".")
+                        .append(this.parameter).append(".not.greater.than.specified.number");
+                final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(this.parameter)
+                        .append(" must be smaller than ").append(number);
+                final ApiParameterError error = ApiParameterError.parameterError(validationErrorCode.toString(),
+                        defaultEnglishMessage.toString(), this.parameter, intValue, number);
+                this.dataValidationErrors.add(error);
+            }
+        }
+        return this;
+    }
+
     public DataValidatorBuilder integerGreaterThanNumber(Integer number) {
         if (this.value == null && this.ignoreNullValue) { return this; }
 

@@ -243,6 +243,7 @@ public class ShareAccount extends AbstractPersistableCustom<Long> {
         boolean toReturn = false;
         if (!this.approvedDate.equals(approvedDate)) {
             this.approvedDate = approvedDate;
+            this.activatedDate = approvedDate;
             toReturn = true;
         }
         return toReturn;

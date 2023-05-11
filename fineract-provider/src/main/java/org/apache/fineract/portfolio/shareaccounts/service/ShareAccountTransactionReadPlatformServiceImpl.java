@@ -205,6 +205,22 @@ public class ShareAccountTransactionReadPlatformServiceImpl implements ShareAcco
         }
     }
 
+    /**
+     * Added 10/05/2023 at 1543 
+     */
+    public Collection<ShareAccountTransactionData> retrieveAll() {
+        this.context.authenticatedUser();
+        try {
+            final ShareAccountTransactionsMapper rm = new ShareAccountTransactionsMapper();
+            final String sql = "select " + rm.schema();
+            return this.jdbcTemplate.query(sql, rm);
+        } catch (final EmptyResultDataAccessException e) {
+            //throw new ShareAccountTransactionNotFoundException(transactionId);
+        }
+        return new ArrayList<>();
+    }
+
+
     
     private static final class ShareAccountTransactionsMapper implements RowMapper<ShareAccountTransactionData> {
 
@@ -214,9 +230,12 @@ public class ShareAccountTransactionReadPlatformServiceImpl implements ShareAcco
                     +" tr.total_shares as totalShares ,"
                     +" tr.unit_price as unitPrice ,"
                     +" tr.charge_amount as chargeAmount, "
+                    +" mc.display_name as clientName ,"
                     +" tr.amount as amount ,"
                     +" tr.is_reversed as isReversed "
-                    +" from m_share_account_transactions tr";
+                    +" from m_share_account_transactions tr"
+                    +" join m_share_account msa on msa.id = tr.account_id "
+                    +" left join m_client mc on mc.id = msa.client_id ";
         }
 
         @Override
@@ -232,8 +251,9 @@ public class ShareAccountTransactionReadPlatformServiceImpl implements ShareAcco
             final BigDecimal amountPaid = rs.getBigDecimal("amountPaid");
 
             final LocalDate transactionDate = JdbcSupport.getLocalDate(rs, "transactionDate");
+            final String clientName = rs.getString("clientName");
 
-            ShareAccountTransactionData shareAccountTransactionData = new ShareAccountTransactionData(id ,accountId,transactionDate ,numberOfShares ,unitPrice ,null ,null ,amount ,chargeAmount,amountPaid,isReversed);
+            ShareAccountTransactionData shareAccountTransactionData = new ShareAccountTransactionData(id ,accountId,transactionDate ,numberOfShares ,unitPrice ,null ,null ,amount ,chargeAmount,amountPaid,isReversed ,clientName);
             return shareAccountTransactionData ;
         }
     }

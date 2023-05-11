@@ -4,19 +4,22 @@
  */
 package org.apache.fineract.presentation.screen.service;
 
-import com.wese.component.defaults.enumerations.CLASS_LOADER;
-import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
-import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
-import com.wese.component.defaults.enumerations.OPERAND_GATES;
+import com.wese.component.defaults.enumerations.*;
 import com.wese.component.defaults.helper.FieldReflectionHelper;
 import org.apache.fineract.helper.OptionalHelper;
+import org.apache.fineract.infrastructure.codes.data.CodeData;
+import org.apache.fineract.infrastructure.codes.data.CodeValueData;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
 import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.enumerations.REF_VALUE_TYPE;
+import org.apache.fineract.portfolio.localref.helper.LocalRefToFieldValidationData;
+import org.apache.fineract.portfolio.localref.service.LocalRefReadPlatformService;
 import org.apache.fineract.presentation.screen.data.ScreenData;
 import org.apache.fineract.presentation.screen.data.ScreenElementData;
 import org.apache.fineract.presentation.screen.domain.Screen;
@@ -25,12 +28,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.apache.fineract.presentation.screen.domain.ScreenElement;
 import org.apache.fineract.presentation.screen.exceptions.ScreenNotFoundException;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
+import org.apache.fineract.utility.helper.EnumeratedDataHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Scope;
@@ -48,12 +53,14 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
     private ScreenMapper screenMapper = new ScreenMapper();
     private ScreenElementMapper screenElementMapper = new ScreenElementMapper();
     private ApplicationContext applicationContext;
+    private LocalRefReadPlatformService localRefReadPlatformService;
 
     @Autowired
-    public ScreenReadPlatformServiceImpl(PlatformSecurityContext context, RoutingDataSource routingDataSource ,final ApplicationContext applicationContext) {
+    public ScreenReadPlatformServiceImpl(PlatformSecurityContext context, RoutingDataSource routingDataSource ,final ApplicationContext applicationContext ,final LocalRefReadPlatformService localRefReadPlatformService) {
         this.context = context;
         this.jdbcTemplate = new JdbcTemplate(routingDataSource);
         this.applicationContext = applicationContext;
+        this.localRefReadPlatformService = localRefReadPlatformService;
     }
 
 
@@ -86,13 +93,42 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
         e.setSelectOptions(enumOptionDataList);
     };
 
+    /**
+     * Resolves list values from CodeValues ,templates
+     * LocalRefs can only carry Virtual list values rather than an application itself
+     */
+    private Consumer<ScreenElementData> localRefListResolver = (e)->{
+        Long id = e.getLocalRefData().getId();
+
+        System.err.println("----------------------------local ref id is "+id);
+
+        LocalRefData localRefData = localRefReadPlatformService.retrieveOneForTemplate(id);
+
+        System.err.println("----------------do we have localrefdata ? "+ OptionalHelper.isPresent(localRefData));
+
+        List<EnumOptionData> enumOptionDataList = LocalRefToFieldValidationData.getTemplateData(localRefData);
+
+        System.err.println("------------------enum option list here is "+OptionalHelper.isPresent(enumOptionDataList));
+
+        e.setSelectOptions(enumOptionDataList);
+    };
+
     private Consumer<ScreenData> linkScreenElementConsumer = (e)-> {
 
         Long id = e.getId();
         Collection<ScreenElementData> screenElementsCollection = retrieveAllScreenElementData(id);
         Predicate<ScreenElementData> isGroupList = (v)-> v.getComparisonGroup().equals(COMPARISON_GROUP.LIST);
 
-        screenElementsCollection.stream().filter(isGroupList).forEach(listResolverConsumer);
+        Predicate<ScreenElementData> isSystemElement = (v)-> v.getElementType()==ELEMENT_TYPE.SYSTEM;
+
+        /**
+         * Avoid Reflection Errors so need to filter only elements that are of System Type
+         * So another negate option will filter those of type LocalRef to resolve its list values
+         */
+        screenElementsCollection.stream().filter(isGroupList.and(isSystemElement)).forEach(listResolverConsumer);
+
+        screenElementsCollection.stream().filter(isGroupList.and(isSystemElement.negate())).forEach(localRefListResolver);
+
         e.setScreenElementDataList(screenElementsCollection);
     };
 
@@ -167,10 +203,14 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
                     " sce.value as value," +
                     " sce.parent_screen_element_id as parentScreenElementId ," +
                     " sce.mandatory as mandatory, " +
+                    " sce.element_type as elementType, " +
+                    " sce.local_ref_id as localRefId ," +
+                    " mlr.ref_value_type as refValueType ," +
                     " sce.screen_id as screenId, " +
                     " ms.ref_table as refTable " +
                     " from m_screen_element sce " +
-                    " join m_screen ms on ms.id = sce.screen_id ";
+                    " join m_screen ms on ms.id = sce.screen_id " +
+                    " left join m_local_ref mlr on mlr.id = sce.local_ref_id ";
 
         }
 
@@ -193,12 +233,28 @@ public class ScreenReadPlatformServiceImpl implements ScreenReadPlatformService 
             final OPERAND_GATES operandGate = (OPERAND_GATES) EnumTemplateHelper.fromIntEx(OPERAND_GATES.values(), gateInt);
 
             final Integer comparisonGroupInt = JdbcSupport.getInteger(rs, "comparisonGroup");
-            final COMPARISON_GROUP comparisonGroup = (COMPARISON_GROUP) EnumTemplateHelper.fromIntEx(COMPARISON_GROUP.values(), comparisonGroupInt);
+            COMPARISON_GROUP comparisonGroup = (COMPARISON_GROUP) EnumTemplateHelper.fromIntEx(COMPARISON_GROUP.values(), comparisonGroupInt);
 
             final Integer refTableInt = JdbcSupport.getInteger(rs,"refTable");
             final REF_TABLE refTable = (REF_TABLE)EnumTemplateHelper.fromIntEx(REF_TABLE.values() ,refTableInt);
 
-            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null ,parentScreenElementId ,refTable);
+            final Integer elementTypeInt = JdbcSupport.getInteger(rs ,"elementType");
+            final ELEMENT_TYPE elementType = (ELEMENT_TYPE)EnumTemplateHelper.fromIntEx(ELEMENT_TYPE.values() ,elementTypeInt);
+
+            LocalRefData localRefData = null;
+
+            if(elementType== ELEMENT_TYPE.LOCAL_REF){
+                System.err.println("----------------local ref data collection here ----------");
+                final Long localRefId = rs.getLong("localRefId");
+                final Integer refValueTypeInt = JdbcSupport.getInteger(rs ,"refValueType");
+                final REF_VALUE_TYPE refValueType = (REF_VALUE_TYPE) EnumTemplateHelper.fromIntEx(REF_VALUE_TYPE.values() ,refValueTypeInt);
+                comparisonGroup = refValueType.group();
+
+                System.err.println("---------------------comparison group for local ref value is "+comparisonGroup);
+                localRefData = new LocalRefData(localRefId ,refValueType);
+            }
+
+            ScreenElementData screenElementData = new ScreenElementData(id, name, value, modelName, displayName, show, mandatory, operandGate, comparisonType, comparisonGroup, null ,parentScreenElementId ,refTable ,elementType ,localRefData);
 
             return screenElementData;
         }

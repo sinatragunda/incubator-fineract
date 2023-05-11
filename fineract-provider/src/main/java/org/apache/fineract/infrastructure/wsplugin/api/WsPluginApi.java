@@ -28,7 +28,6 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
-import com.wese.component.wsscripts.domain.WsScript;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
@@ -43,6 +42,7 @@ import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWri
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.wsplugin.data.WsScriptContainerData;
 import org.apache.fineract.infrastructure.wsplugin.data.WsScriptData;
+import org.apache.fineract.infrastructure.wsplugin.domain.WsScript;
 import org.apache.fineract.infrastructure.wsplugin.helper.WsScriptHelper;
 import org.apache.fineract.infrastructure.wsplugin.helper.WsValueFunctionFinderHelper;
 import org.apache.fineract.infrastructure.wsplugin.service.WsScriptReadPlatformService;

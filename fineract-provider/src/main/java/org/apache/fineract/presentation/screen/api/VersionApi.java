@@ -51,6 +51,8 @@ public class VersionApi {
 
     private ApiRequestParameterHelper apiRequestParameterHelper;
 
+    public static ClassLoader classLoader = null ;
+
     @Autowired
     public VersionApi(PlatformSecurityContext context,final ScreenCommandReciever screenCommandReciever ,final FromJsonHelper fromJsonHelper ,final ToApiJsonSerializer<ScreenData> toApiJsonSerializer ,final ApiRequestParameterHelper apiRequestParameterHelper ,final PortfolioCommandSourceWritePlatformService portfolioCommandSourceWritePlatformService) {
         this.context = context;
@@ -59,6 +61,10 @@ public class VersionApi {
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.portfolioCommandSourceWritePlatformService = portfolioCommandSourceWritePlatformService;
+
+        if(classLoader==null) {
+            this.classLoader = super.getClass().getClassLoader();
+        }
     }
 
     @Path("/{name}")

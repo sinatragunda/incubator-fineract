@@ -29,7 +29,14 @@ public class LocalRefRepositoryWrapper {
         LocalRef localRef = localRefRepository.findOne(id);
         Supplier error = ()-> new LocalRefNotFoundException(id);
         Optional.ofNullable(localRef).orElseThrow(error);
-        System.err.println("===========returning local ref now son =====");
+        return localRef;
+    }
+
+
+    public LocalRef findOneWithoutNotFoundDetection(final String name){
+        LocalRef localRef = localRefRepository.findByName(name);
+        Supplier error = ()-> new LocalRefNotFoundException(name);
+        Optional.ofNullable(localRef).orElseThrow(error);
         return localRef;
     }
 

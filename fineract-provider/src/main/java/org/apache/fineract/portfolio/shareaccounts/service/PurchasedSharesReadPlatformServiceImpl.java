@@ -83,7 +83,7 @@ public class PurchasedSharesReadPlatformServiceImpl implements
 			// added 29/03/2022
 			final Boolean reversed = rs.getBoolean("is_reversed");
 			
-			return new ShareAccountTransactionData(id,accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid,reversed);
+			return new ShareAccountTransactionData(id,accountId, purchasedDate, numberOfShares, purchasedPrice, statusEnum, typeEnum, amount, chargeAmount, amountPaid,reversed,null);
 		}
 		
 		public String schema() {

@@ -25,6 +25,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.wese.component.defaults.AttributeRef;
+import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import org.springframework.data.domain.Persistable;
 
 

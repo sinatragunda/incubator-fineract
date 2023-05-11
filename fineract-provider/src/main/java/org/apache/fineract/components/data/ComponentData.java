@@ -21,10 +21,21 @@ public class ComponentData {
     private Collection<WsScriptContainerData> wsScriptContainerData ;
     private Set<FieldValidationData> fieldValidationDataSet;
 
+    private Set<FieldValidationData> localRefsDataSet;
+
     public ComponentData(CLASS_LOADER classLoader,Collection<WsScriptContainerData> wsScriptContainerData, Set<FieldValidationData> fieldValidationDataSet) {
         this.classLoader = classLoader;
         this.classLoaderData = EnumTemplateHelper.template(this.classLoader);
         this.wsScriptContainerData = wsScriptContainerData;
         this.fieldValidationDataSet = fieldValidationDataSet;
+    }
+
+
+    public ComponentData(CLASS_LOADER classLoader,Collection<WsScriptContainerData> wsScriptContainerData, Set<FieldValidationData> fieldValidationDataSet ,Set<FieldValidationData> localRefsDataSet) {
+        this.classLoader = classLoader;
+        this.classLoaderData = EnumTemplateHelper.template(this.classLoader);
+        this.wsScriptContainerData = wsScriptContainerData;
+        this.fieldValidationDataSet = fieldValidationDataSet;
+        this.localRefsDataSet  = localRefsDataSet;
     }
 }

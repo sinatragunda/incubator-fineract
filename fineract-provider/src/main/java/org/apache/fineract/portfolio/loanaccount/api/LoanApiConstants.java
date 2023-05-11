@@ -46,7 +46,7 @@ public interface LoanApiConstants {
             "syncDisbursementWithMeeting", "loanCounter", "loanProductCounter", "notes", "accountLinkingOptions", "linkedAccount",
             "interestRateDifferential", "isFloatingInterestRate", "interestRatesPeriods", LoanApiConstants.canUseForTopup,
             LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.topupAmount, LoanApiConstants.clientActiveLoanOptions,
-            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam , DataTableApiConstant.tableDataParam));
+            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam));
 
 
     public static final String emiAmountParameterName = "fixedEmiAmount";
@@ -175,6 +175,26 @@ public interface LoanApiConstants {
     // added 04/01/2021 ,loan agents etc
     public static final String agentDataParam = "agentData";
 
+    /**
+     * Added 09/05/2023 at 1322 
+     * Added for new custom loan scheduling 
+     */ 
+    public static final String scheduleParam = "schedule";
+    public static final String installmentNumberParam = "installmentNumber";
+
+    public static final String feesChargesParam = "fee";
+    public static final String penaltyChargesParam = "penaltyChargesDue";
+    public static final String fromDateParam = "installmentNumber";
+    public static final String toDateParam = "installmentNumber";
+   
+    public static final String interestDueParam = "interestDue";
+      
+    public static final String principalDueParam = "principalDue";
+   
+
+    public static final String totalDueParam = "totalDueForPeriod";
+    public static final String customScheduleParam = "schedule";
+   
 
 
 }

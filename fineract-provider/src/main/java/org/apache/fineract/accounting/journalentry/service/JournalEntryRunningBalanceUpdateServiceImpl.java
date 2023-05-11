@@ -68,7 +68,7 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     
     // if a limit is not added to the running balance select statements below and the resultset is more than 400,000, 
     // the script will eat up all of the server memory
-    private final String selectRunningBalanceSqlLimit = "limit 0, 10000";
+    private final String selectRunningBalanceSqlLimit = "limit 0, 5000";
     
     private final String officeRunningBalanceSql = "select je.office_running_balance as runningBalance,je.account_id as accountId from acc_gl_journal_entry je "
             + "inner join (select max(id) as id from acc_gl_journal_entry where office_id=?  and entry_date < ? group by account_id,entry_date) je2 "
@@ -98,6 +98,9 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     @Override
     @CronTarget(jobName = JobName.ACCOUNTING_RUNNING_BALANCE_UPDATE)
     public void updateRunningBalance() {
+        
+        System.err.println("----------------------run some job here --------------");
+
         String dateFinder = "select MIN(je.entry_date) as entityDate from acc_gl_journal_entry  je "
                 + "where je.is_running_balance_calculated=0 ";
         try {
@@ -105,6 +108,10 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
             updateOrganizationRunningBalance(entityDate);
         } catch (EmptyResultDataAccessException e) {
             logger.debug("No results found for updation of running balance ");
+        }
+        catch(OutOfMemoryError n){
+            System.err.println("---------------------------------error within -----------"+n.getMessage());
+            n.printStackTrace();
         }
     }
 
@@ -133,10 +140,17 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     }
 
     private void updateOrganizationRunningBalance(Date entityDate) {
+
+        System.err.println("----------------------------sqql limit is -------------"+selectRunningBalanceSqlLimit);
+
+        System.err.println("--------------------what is this entity date ? "+entityDate);
+
         Map<Long, BigDecimal> runningBalanceMap = new HashMap<>(5);
+        
         Map<Long, Map<Long, BigDecimal>> officesRunningBalance = new HashMap<>();
 
         List<Map<String, Object>> list = jdbcTemplate.queryForList(organizationRunningBalanceSql, entityDate, entityDate);
+        
         for (Map<String, Object> entries : list) {
         	Long accountId = Long.parseLong(entries.get("accountId").toString()); //Drizzle is returning Big Integer where as MySQL returns Long.
             if (!runningBalanceMap.containsKey(accountId)) {
@@ -145,6 +159,7 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
         }
 
         List<Map<String, Object>> officesRunningBalanceList = jdbcTemplate.queryForList(officesRunningBalanceSql, entityDate, entityDate);
+       
         for (Map<String, Object> entries : officesRunningBalanceList) {
             Long accountId = Long.parseLong(entries.get("accountId").toString());
             Long officeId = Long.parseLong(entries.get("officeId").toString());
@@ -160,8 +175,18 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
             }
         }
 
+        System.err.println("-------------------------------entry mapper schema ----------"+entryMapper.organizationRunningBalanceSchema());
+
+        System.err.println("-----------------------------------we assume heap problem is when creating this array ....");
+
         List<JournalEntryData> entryDatas = jdbcTemplate.query(entryMapper.organizationRunningBalanceSchema(), entryMapper,
                 new Object[] { entityDate });
+
+
+        System.err.println("---------------------max fetch size is ---------------"+jdbcTemplate.getFetchSize());
+
+        System.err.println("----------------------entry data size is "+entryDatas.size());
+
         if (entryDatas.size() > 0) {
             // run a batch update of 1000 SQL statements at a time
             final Integer batchUpdateSize = 1000;

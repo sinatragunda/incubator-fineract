@@ -20,5 +20,6 @@ public class ScreenApiConstant {
     public static String multiRowParam = "multirow";
 
     public static String screenIdParam = "screenId";
+    public static String wsScriptIdParam = "wsScriptId";
 
 }

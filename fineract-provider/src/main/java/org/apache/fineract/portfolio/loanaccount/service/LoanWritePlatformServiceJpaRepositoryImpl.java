@@ -3026,14 +3026,12 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
         
         final ScheduleGeneratorDTO scheduleGeneratorDTO = this.loanUtilService.buildScheduleGeneratorDTO(loan, recalculateFrom);
 
-        System.err.println("----------------recalculate loan accruals now --------");
         ChangedTransactionDetail changedTransactionDetail = loan.recalculateScheduleFromLastTransaction(scheduleGeneratorDTO,
                 existingTransactionIds, existingReversedTransactionIds, currentUser);
 
         int count = 0 ;
         if (changedTransactionDetail != null) {
             for (final Map.Entry<Long, LoanTransaction> mapEntry : changedTransactionDetail.getNewTransactionMappings().entrySet()) {
-                System.err.println("-----------------------------count is "+count);
                 this.loanTransactionRepository.save(mapEntry.getValue());
                 this.accountTransfersWritePlatformService.updateLoanTransaction(mapEntry.getKey(), mapEntry.getValue());
                 ++count ;
@@ -3069,6 +3067,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     }
 
     private List<LoanRepaymentScheduleInstallment> retrieveRepaymentScheduleFromModel(LoanScheduleModel model) {
+
         final List<LoanRepaymentScheduleInstallment> installments = new ArrayList<>();
         for (final LoanScheduleModelPeriod scheduledLoanInstallment : model.getPeriods()) {
             if (scheduledLoanInstallment.isRepaymentPeriod()) {

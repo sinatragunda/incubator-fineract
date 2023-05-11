@@ -703,6 +703,9 @@ public class LoanScheduleAssembler {
 
         // date validations
         List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
+
+        System.err.println("-----------------does this has data initial ?"+installments.size());
+        
         Set<LocalDate> dueDates = new TreeSet<>();
         LocalDate graceApplicable = loan.getExpectedDisbursedOnLocalDate();
         Integer graceOnPrincipal = loan.getLoanProductRelatedDetail().graceOnPrincipalPayment();

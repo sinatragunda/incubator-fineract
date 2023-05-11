@@ -5,11 +5,13 @@
 package org.apache.fineract.portfolio.localref.enumerations;
 
 import com.wese.component.defaults.enumerations.CLASS_LOADER;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.IEnum;
 
 import java.util.List;
+import java.util.Optional;
 
 public enum REF_TABLE implements IEnum {
     
@@ -44,6 +46,20 @@ public enum REF_TABLE implements IEnum {
 
     public CLASS_LOADER getClassLoader() {
         return classLoader;
+    }
+
+    public static REF_TABLE fromClassLoader(CLASS_LOADER classLoader){
+
+        for(REF_TABLE t : REF_TABLE.values()){
+            CLASS_LOADER tLoader = t.getClassLoader();
+            Boolean hasLoader = OptionalHelper.isPresent(tLoader);
+            if(hasLoader) {
+                if (tLoader.ordinal() == classLoader.ordinal()) {
+                    return t;
+                }
+            }
+        }
+        return null ;
     }
 
     public static List template(){

@@ -24,7 +24,6 @@ public class Screen extends AbstractPersistableCustom<Long> {
     @Column(name ="name")
     private String name ;
 
-
     @Column(name ="short_name")
     private String shortName ;
 

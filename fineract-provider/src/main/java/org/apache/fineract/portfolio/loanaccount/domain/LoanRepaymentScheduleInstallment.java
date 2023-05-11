@@ -35,6 +35,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.domain.AbstractAuditableCustom;
 import org.apache.fineract.organisation.monetary.domain.MonetaryCurrency;
 import org.apache.fineract.organisation.monetary.domain.Money;
@@ -145,10 +146,11 @@ public final class LoanRepaymentScheduleInstallment extends AbstractAuditableCus
             final LocalDate dueDate, final BigDecimal principal, final BigDecimal interest, final BigDecimal feeCharges,
             final BigDecimal penaltyCharges, final boolean recalculatedInterestComponent,
             final Set<LoanInterestRecalcualtionAdditionalDetails> compoundingDetails) {
+
         this.loan = loan;
         this.installmentNumber = installmentNumber;
-        this.fromDate = fromDate.toDateTimeAtStartOfDay().toDate();
-        this.dueDate = dueDate.toDateTimeAtStartOfDay().toDate();
+        this.fromDate = atStartOfDay(fromDate);
+        this.dueDate = atStartOfDay(dueDate);
         this.principal = defaultToNullIfZero(principal);
         this.interestCharged = defaultToNullIfZero(interest);
         this.feeChargesCharged = defaultToNullIfZero(feeCharges);
@@ -166,10 +168,27 @@ public final class LoanRepaymentScheduleInstallment extends AbstractAuditableCus
         this.obligationsMet = false;
     }
 
+    /**
+     * Added 10/05/2023 at 0651
+     */
+    public Date atStartOfDay(LocalDate date){
+        
+        boolean has = OptionalHelper.isPresent(date);
+        if(has){
+            return date.toDateTimeAtStartOfDay().toDate();
+        }
+        return null ;
+    }
+
     private BigDecimal defaultToNullIfZero(final BigDecimal value) {
         BigDecimal result = value;
-        if (BigDecimal.ZERO.compareTo(value) == 0) {
-            result = null;
+        try {
+            if (BigDecimal.ZERO.compareTo(value) == 0) {
+                result = null;
+            }
+        }
+        catch(NullPointerException n){
+            result = null ;
         }
         return result;
     }
@@ -805,5 +824,11 @@ public final class LoanRepaymentScheduleInstallment extends AbstractAuditableCus
     public Money getTotalPaid(final MonetaryCurrency currency) {
         return getPenaltyChargesPaid(currency).plus(getFeeChargesPaid(currency)).plus(getInterestPaid(currency))
                 .plus(getPrincipalCompleted(currency));
+    }
+
+    public LoanRepaymentScheduleInstallment updateFromAnotherInstallment(LoanRepaymentScheduleInstallment installment ,MonetaryCurrency monetaryCurrency){
+        this.principal = installment.getPrincipal(monetaryCurrency).getAmount();
+        this.interestCharged = installment.getInterestCharged(monetaryCurrency).getAmount();
+        return this ;
     }
 }

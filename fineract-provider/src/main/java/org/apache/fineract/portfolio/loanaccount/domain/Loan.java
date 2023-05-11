@@ -1191,6 +1191,7 @@ public class Loan extends AbstractPersistableCustom<Long> {
 
     public void updateLoanSchedule(final LoanScheduleModel modifiedLoanSchedule, AppUser currentUser) {
         this.repaymentScheduleInstallments.clear();
+        System.err.println("--------------------------------------update loan schedule -----------");
         for (final LoanScheduleModelPeriod scheduledLoanInstallment : modifiedLoanSchedule.getPeriods()) {
 
             if (scheduledLoanInstallment.isRepaymentPeriod()) {
@@ -6522,9 +6523,10 @@ public class Loan extends AbstractPersistableCustom<Long> {
 			installmentNumber++;
 		}
   
-        
+        System.err.println("----------------------------review installment post size -------,why we adding extra one here ? "+newInstallments.size());
 		LoanRepaymentScheduleInstallment newInstallment = new LoanRepaymentScheduleInstallment(null, newInstallments.size() + 1,
                 installmentStartDate, transactionDate, totalPrincipal.getAmount(),
+
                 balances[0].getAmount(), balances[1].getAmount(), balances[2].getAmount(), isInterestComponent, null);
         newInstallment.updateInstallmentNumber(newInstallments.size() + 1);
         newInstallments.add(newInstallment);        

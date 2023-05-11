@@ -4,12 +4,15 @@
  */
 package org.apache.fineract.presentation.screen.domain;
 
+import com.wese.component.defaults.domain.WsObject;
 import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
 import com.wese.component.defaults.enumerations.ELEMENT_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import org.apache.fineract.infrastructure.wsplugin.domain.WsScript;
+import org.apache.fineract.portfolio.localref.domain.LocalRef;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -69,9 +72,18 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
 
     @Transient String parameter ;
 
+    @ManyToOne
+    @JoinColumn(name ="wsscript_id")
+    private WsScript wsScript;
+
+
+    @ManyToOne
+    @JoinColumn(name ="local_ref_id")
+    private LocalRef localRef ;
+
     protected ScreenElement(){}
 
-    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup , OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements) {
+    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup , OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements ,WsScript wsScript,LocalRef localRef) {
         this.name = name;
         this.modelName = modelName;
         this.comparisonType = comparisonType;
@@ -85,6 +97,12 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         this.childElements = childElements;
         this.displayName = displayName ;
         this.comparisonGroup = comparisonGroup ;
+        this.wsScript = wsScript ;
+        this.localRef = localRef;
+    }
+
+    public String getModelName() {
+        return modelName;
     }
 
     public COMPARISON_GROUP getComparisonGroup() {
@@ -97,6 +115,10 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     //public String getParameter() {return parameter;}
@@ -113,6 +135,14 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         return value;
     }
 
+    public LocalRef getLocalRef() {
+        return localRef;
+    }
+
+    public WsScript getWsScript(){
+        return this.wsScript;
+    }
+
     public Set getChildElements(){
         return OptionalHelper.optionalOf(this.childElements ,new HashSet<>());
     }
@@ -125,6 +155,10 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         this.parentScreenElement = screenElement;
     }
 
+    public ELEMENT_TYPE getElementType(){
+        return this.elementType;
+    }
+
     @Override
     public String toString() {
         return "ScreenElement{" +
@@ -132,6 +166,7 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
                 ", displayName='" + displayName + '\'' +
                 ", modelName='" + modelName + '\'' +
                 ", comparisonType=" + comparisonType +
+                ", comparisonGroup= "+ comparisonGroup +
                 ", operandGates=" + operandGates +
                 ", elementType=" + elementType +
                 ", showOnUi=" + showOnUi +
@@ -152,6 +187,13 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         if (!(o instanceof ScreenElement)) return false;
         ScreenElement that = (ScreenElement) o;
         return modelName.equals(that.modelName) && comparisonType == that.comparisonType && value.equals(that.value);
+    }
+
+    public void updateFromWsObject(WsObject wsObject){
+        Object object = wsObject.get();
+        String value  = object.toString();
+        setParameter(value);
+        System.err.println("----------------screen element "+this);
     }
 
     @Override

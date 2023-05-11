@@ -17,5 +17,7 @@ public interface LocalRefReadPlatformService {
     public Collection<LocalRefData> retrieveAll(Long officeId);
     public Collection<LocalRefValueData> retrieveRecord(REF_TABLE refTable , Long recordId);
 
+    public LocalRefData retrieveOneForTemplate(Long id);
+
 
 }

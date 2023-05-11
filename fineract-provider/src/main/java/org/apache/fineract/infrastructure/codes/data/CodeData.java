@@ -18,13 +18,15 @@
  */
 package org.apache.fineract.infrastructure.codes.data;
 
+import org.apache.fineract.utility.service.EnumeratedData;
+
 import java.io.Serializable;
 import java.util.Collection;
 
 /**
  * Immutable data object representing a code.
  */
-public class CodeData implements Serializable {
+public class CodeData implements Serializable , EnumeratedData {
 
     private final Long id;
     @SuppressWarnings("unused")
@@ -48,7 +50,21 @@ public class CodeData implements Serializable {
         return this.id;
     }
 
+    public Collection<CodeValueData> getCodeValueDataCollection() {
+        return codeValueDataCollection;
+    }
+
     public void setCodeValueData(Collection codeValueData){
         this.codeValueDataCollection = codeValueData;
+    }
+
+    @Override
+    public Long getId() {
+        return id ;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

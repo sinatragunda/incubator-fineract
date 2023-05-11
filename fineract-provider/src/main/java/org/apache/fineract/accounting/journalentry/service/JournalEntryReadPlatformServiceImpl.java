@@ -112,6 +112,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
             StringBuilder sb = new StringBuilder();
             sb.append(" journalEntry.id as id, glAccount.classification_enum as classification ,")
                     .append("journalEntry.transaction_id,")
+                    .append(" journalEntry.share_transaction_id as shareTransactionId ,")
                     .append(" glAccount.name as glAccountName, glAccount.gl_code as glAccountCode,glAccount.id as glAccountId, ")
                     .append(" journalEntry.office_id as officeId, office.name as officeName, journalEntry.ref_num as referenceNumber, ")
                     .append(" journalEntry.manual_entry as manualEntry,journalEntry.entry_date as transactionDate, ")
@@ -142,6 +143,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
             if (associationParametersData.isTransactionDetailsRequired()) {
                 sb.append(" left join m_loan_transaction as lt on journalEntry.loan_transaction_id = lt.id ")
                         .append(" left join m_savings_account_transaction as st on journalEntry.savings_transaction_id = st.id ")
+                        .append(" left join m_share_account_transactions as msat on journalEntry.share_transaction_id = msat.id ")
                         .append(" left join m_payment_detail as pd on lt.payment_detail_id = pd.id or st.payment_detail_id = pd.id or journalEntry.payment_details_id = pd.id")
                         .append(" left join m_payment_type as pt on pt.id = pd.payment_type_id ")
                         .append(" left join m_note as note on lt.id = note.loan_transaction_id or st.id = note.savings_account_transaction_id ");
@@ -228,11 +230,13 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                      * Conditional using PortfolioProductType
                      */
                     //System.err.println("---------------------------entity type is ---------"+entityType.getValue());
+                    
                     PortfolioProductType portfolioProductType =  PortfolioProductType.fromInt(entityTypeId);
 
                     if(portfolioProductType.isShareProduct()){
-                        //System.err.println("------------------is isShareProduct transaction");
-                        transaction = Long.parseLong(transactionId.substring(2).trim());
+                        System.err.println("------------------is isShareProduct transaction--------------"+transactionId);
+                        final Long shareTransactionId = rs.getLong("shareTransactionId");
+                        transaction = shareTransactionId;
                     }
 
                     else{
@@ -240,6 +244,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
                     }
                 
                 }
+
 
                 TransactionTypeEnumData transactionTypeEnumData = null;
 

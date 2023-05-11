@@ -4,8 +4,8 @@
  */
 package org.apache.fineract.infrastructure.wsplugin.helper;
 
-import com.wese.component.wsscripts.domain.WsScript;
 import org.apache.fineract.infrastructure.wsplugin.data.WsScriptData;
+import org.apache.fineract.infrastructure.wsplugin.domain.WsScript;
 
 import java.util.ArrayList;
 import java.util.List;

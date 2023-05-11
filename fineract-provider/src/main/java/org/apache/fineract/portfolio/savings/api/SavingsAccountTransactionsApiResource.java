@@ -128,6 +128,8 @@ public class SavingsAccountTransactionsApiResource {
     public String retrieveAllTransaction(@PathParam("savingsId") Long savingsId,
                               @Context final UriInfo uriInfo) {
 
+        System.err.println("----------------------retrieve all transactions son ");
+
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
 
         Collection<SavingsAccountTransactionData> savingsAccountTransactionDataCollection = this.savingsAccountTransactionReadPlatformService.retrieveAll();

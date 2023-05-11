@@ -69,51 +69,24 @@ public class LocalRefRecordHelper {
         } 
 
         JsonObject jsonObject = fromJsonHelper.extractJsonObjectNamed("localrefs" ,jsonElement);
+        
         Set<Map.Entry<String ,JsonElement>> set = jsonObject.entrySet();
-
-        List<Long> availableLocalRefsId = new ArrayList<>();
         
         for(Map.Entry<String ,JsonElement> entry : set){
 
-            JsonElement element = entry.getValue();
+            String key = entry.getKey();
+            String value = entry.getValue().toString();
 
-            //System.err.println("----------------------------------data "+element);
+            System.err.println("------------value is "+value+"-------------and key is ----"+key);
 
-            //System.err.println("---------------------entry key is "+entry.getKey());
+            LocalRef localRef = this.localRefRepositoryWrapper.findOneWithoutNotFoundDetection(key);
 
-            JsonObject data = fromJsonHelper.extractJsonObjectNamed("data" ,element);
-
-            Set<Map.Entry<String,JsonElement>> dataSet = data.entrySet();
-
-            //System.err.println("--------------data object is -----------"+data);
-
-            for (Map.Entry<String,JsonElement> dataEntry : dataSet) {
-                /**
-                 * Some bug petaining to how keys are formed from json in angularjs so need to catch an error
-                 * Cause provided key would be string instead of Lomg
-                 */
-                String idKey = dataEntry.getKey();
-                Long localRefId = localRefId(idKey);
-
-                String value = dataEntry.getValue().toString().replace("\"","");
-                /**
-                 * Consumer to populate localrefvalue
-                 */
-                availableLocalRefsId.add(localRefId);
-                Consumer consumer = (e)->{
-                    LocalRef localRef = localRefRepositoryWrapper.findOneWithoutNotFoundDetection(localRefId);
-                    validateEntry(localRef ,value);
-                    LocalRefValue localRefValue = new LocalRefValue(localRef ,recordId ,value);
-                    localRefValueList.add(localRefValue);
-                };
-
-                Optional.ofNullable(localRefId).ifPresent(consumer);
-
-            }
-
+            validateEntry(localRef ,value);
+            LocalRefValue localRefValue = new LocalRefValue(localRef ,recordId ,value);
+            localRefValueList.add(localRefValue);
         }
 
-        validateIfMandatoryLocalRefsEntriesExists(availableLocalRefsId ,refTable);
+        validateIfMandatoryLocalRefsEntriesExists(localRefValueList ,refTable);
 
         Consumer<LocalRefValue> saveConsumer = (e)->localRefValueRepositoryWrapper.save(e);
         localRefValueList.forEach(saveConsumer);
@@ -135,11 +108,11 @@ public class LocalRefRecordHelper {
     }
 
 
-    private void validateIfMandatoryLocalRefsEntriesExists(List<Long> availableLocalRefsIdsList ,REF_TABLE refTable){
+    private void validateIfMandatoryLocalRefsEntriesExists(List<LocalRefValue> availableLocalRefs ,REF_TABLE refTable){
 
         Collection<LocalRef> localRefList = localRefRepositoryWrapper.findByRefTable(refTable);
 
-        System.err.println("=====================compare available refs ids with these present "+availableLocalRefsIdsList.size());
+        System.err.println("=====================compare available refs ids with these present "+availableLocalRefs.size());
 
         Consumer<LocalRef> consumer = (e)->{
             boolean isMandatory = e.isMandatory();
@@ -147,8 +120,8 @@ public class LocalRefRecordHelper {
             if(isMandatory){
 
                 boolean exist[] = {false} ;
-                availableLocalRefsIdsList.stream().forEach(l->{
-                    boolean sameItem = l.equals(e.getId());
+                availableLocalRefs.stream().map(LocalRefValue::getLocalRef).forEach(l->{
+                    boolean sameItem = l.getId().equals(e.getId());
                     if(sameItem){
                         exist[0] = true ;
                     }
@@ -158,7 +131,6 @@ public class LocalRefRecordHelper {
                 }
             }
         };
-
         localRefList.stream().forEach(consumer);
     }
 

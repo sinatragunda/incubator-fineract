@@ -52,7 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Path("/shareaccounttransaction/{transactionId}")
+import java.util.Collection;
+
+@Path("/shareaccounttransaction")
 @Component
 @Scope("singleton")
 public class ShareAccountTransactionApiResource {
@@ -99,6 +101,7 @@ public class ShareAccountTransactionApiResource {
     }
 
     @GET
+    @Path("{transactionId}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTransaction(@PathParam("transactionId") final Long transactionId,@Context final UriInfo uriInfo) {
 
@@ -111,5 +114,21 @@ public class ShareAccountTransactionApiResource {
 
     }
 
+    /**
+     * Added 10/05/2023 at 1545 
+     */ 
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAll(@Context final UriInfo uriInfo) {
+
+        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        
+        final Collection<ShareAccountTransactionData> shareAccountTransactionData = this.shareAccountTransactionReadPlatformService.retrieveAll();
+
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+
+        return this.shareAccountTransactionDataDefaultToApiJsonSerializer.serialize(settings, shareAccountTransactionData,null);
+
+    }
 
 }

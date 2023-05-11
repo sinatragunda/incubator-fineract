@@ -6,9 +6,11 @@ package org.apache.fineract.presentation.screen.data;
 
 import com.wese.component.defaults.enumerations.COMPARISON_GROUP;
 import com.wese.component.defaults.enumerations.COMPARISON_TYPE;
+import com.wese.component.defaults.enumerations.ELEMENT_TYPE;
 import com.wese.component.defaults.enumerations.OPERAND_GATES;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.localref.data.LocalRefData;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.EnumeratedData;
@@ -39,7 +41,11 @@ public class ScreenElementData implements EnumeratedData {
     private List<EnumOptionData> selectOptions;
     private REF_TABLE refTable;
 
-    public ScreenElementData(Long id , String name , String value, String modelName, String displayName, boolean show, boolean mandatory, OPERAND_GATES operandGates, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup, Collection<ScreenElementData> childElements ,Long parentScreenElementId ,REF_TABLE refTable) {
+    private ELEMENT_TYPE elementType;
+    private EnumOptionData elementTypeData;
+    private LocalRefData localRefData;
+
+    public ScreenElementData(Long id , String name , String value, String modelName, String displayName, boolean show, boolean mandatory, OPERAND_GATES operandGates, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup, Collection<ScreenElementData> childElements , Long parentScreenElementId , REF_TABLE refTable , ELEMENT_TYPE elementType , LocalRefData localRefData) {
         this.id = id ;
         this.name = name;
         this.value = value;
@@ -56,6 +62,9 @@ public class ScreenElementData implements EnumeratedData {
         this.comparisonGroupOption = EnumTemplateHelper.template(comparisonGroup);
         this.parentScreenElementId = parentScreenElementId ;
         this.refTable = refTable;
+        this.elementType = elementType ;
+        this.elementTypeData = EnumTemplateHelper.template(elementType);
+        this.localRefData = localRefData;
     }
 
     @Override
@@ -66,6 +75,14 @@ public class ScreenElementData implements EnumeratedData {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    public ELEMENT_TYPE getElementType() {
+        return elementType;
+    }
+
+    public LocalRefData getLocalRefData() {
+        return localRefData;
     }
 
     public REF_TABLE getRefTable() {

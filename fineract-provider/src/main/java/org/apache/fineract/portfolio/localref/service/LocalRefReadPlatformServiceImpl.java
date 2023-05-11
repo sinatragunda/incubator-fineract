@@ -48,12 +48,12 @@ import java.util.function.Consumer;
 public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformService{
 
     private final PermissionReadPlatformServiceImpl permissionReadPlatformService;
-    private final CodeReadPlatformService codeReadPlatformService;
+    private CodeReadPlatformService codeReadPlatformService;
     private final String localRefTable = "m_local_ref";
     private final LocalRefMapper localRefMapper = new LocalRefMapper();
     private final LocalRefValueMapper localRefValueMapper = new LocalRefValueMapper();
     private final JdbcTemplate jdbcTemplate ;
-    private final CodeValueReadPlatformService codeValueReadPlatformService;
+    private CodeValueReadPlatformService codeValueReadPlatformService;
     private final LocalRefValueRepositoryWrapper localRefValueRepositoryWrapper;
 
     @Autowired
@@ -71,12 +71,8 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
         Collection codeDataCollection = codeReadPlatformService.retrieveAllCodes();
         LocalRefData localRefData = LocalRefData.template();
-        localRefData.setCodeData(codeDataCollection);
-
+        localRefData.setCodeDataCollection(codeDataCollection);
         Collection existingRefs = retrieveEmptyLocalRefs(refTable);
-
-        //System.err.println("--------------------existing local refs "+existingRefs.size());
-
         localRefData.setExistingLocalRefs(existingRefs);
         return localRefData;
 
@@ -92,22 +88,39 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
         String sqlTemp  = localRefValueMapper.schema();
         
         final String sql = String.format("select %s where lr.ref_table = ? and lrv.record_id = ? ",sqlTemp);
-        
-        //System.err.println("-====================record sql is ==========="+sql);
-        
         Collection<LocalRefValueData> localRefValueDataCollection = this.jdbcTemplate.query(sql, this.localRefValueMapper, new Object[] {refTable.ordinal() ,recordId ,refTable.ordinal() ,recordId});
-
-        //System.err.println("=======================before data filtering duplicates "+localRefValueDataCollection.size());
-
         localRefValueDataCollection = filterDuplicate(localRefValueDataCollection);
-
-        //System.err.println("=======================total records found are ,after filtering duplicates "+localRefValueDataCollection.size());
         return localRefValueDataCollection;
+    }
+
+
+    private Consumer<LocalRefData> attachCodeValues = (e)->{
+        REF_VALUE_TYPE refValueType = e.getRefValueType();
+
+        if(refValueType == REF_VALUE_TYPE.CODE_VALUE){
+            Long codeId = e.getCodeId();
+            CodeData codeData = codeReadPlatformService.retrieveCode(codeId);
+            Collection<CodeValueData> codeValueDataCollection = codeValueReadPlatformService.retrieveAllCodeValues(codeId);
+            codeData.setCodeValueData(codeValueDataCollection);
+            e.setCodeData(codeData);
+        }
+    };
+
+    /**
+     * Added 04/05/20223 at 1326
+     * Retrieve LocalRef by Id for templating
+     * For use in Versions
+     */
+    public LocalRefData retrieveOneForTemplate(Long id){
+        LocalRefData localRefData = retrieveOne(id);
+        attachCodeValues.accept(localRefData);
+        return localRefData;
     }
 
     /**
      * Added 24/02/2023 at 1253
-     * Nees to be removed here and put into seperate function
+     * Need to be removed here and put into seperate function
+     * No idea what problems l faced here putting this but can still use hashCoding to set Set
      */
     private Collection<LocalRefValueData> filterDuplicate(Collection<LocalRefValueData> localRefValueDataCollection){
 
@@ -161,20 +174,7 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
 
         final String sql = String.format("select %s where lr.ref_table = ?",localRefMapper.schema());
         Collection<LocalRefData> localRefDataCollection = this.jdbcTemplate.query(sql, this.localRefMapper, new Object[] { refTable.ordinal()});
-
-        Consumer<LocalRefData> consumer = (e)->{
-            REF_VALUE_TYPE refValueType = REF_VALUE_TYPE.fromInt(Math.toIntExact(e.getRefValueType().getId()));
-            if(refValueType == REF_VALUE_TYPE.CODE_VALUE){
-                Long codeId = e.getCodeId();
-                CodeData codeData = codeReadPlatformService.retrieveCode(codeId);
-                Collection<CodeValueData> codeValueDataCollection = codeValueReadPlatformService.retrieveAllCodeValues(codeId);
-                //e.setCodeData(Arrays.asList(codeData));
-                codeData.setCodeValueData(codeValueDataCollection);
-                e.setCodeData(Arrays.asList(codeData));
-            }
-        };
-
-        localRefDataCollection.forEach(consumer);
+        localRefDataCollection.forEach(attachCodeValues);
         return localRefDataCollection;
     }
 

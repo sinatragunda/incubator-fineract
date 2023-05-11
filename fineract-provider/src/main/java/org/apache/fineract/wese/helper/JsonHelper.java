@@ -89,42 +89,62 @@ public class JsonHelper {
         return put(null ,key ,value);
     }
 
+    public static JSONObject put(String payload ,String key ,Map map){
+        JSONObject json = null;
+        try{
+            json = new JSONObject(payload);
+            JSONObject child = new JSONObject(map);
+            json.put(key ,child);
+        }
+        catch (JSONException j){
+            System.err.println(Constants.separator+" json exception here ");
+            j.printStackTrace();
+        }
+
+       return json ;
+   }
+
+   public static String update(String payload ,String key ,Map value){
+
+        JSONObject json = put(payload ,key ,value);
+        return Optional.of(json.toString()).orElse(payload);
+   }
+
+
+
+
+
 
     public static JSONObject put(String payload ,String key ,Object data){
 
-       boolean has = Optional.ofNullable(payload).isPresent();
+       Boolean has = Optional.ofNullable(payload).isPresent();
        
        JSONObject json = new JSONObject() ;
 
        System.err.println("-----------------------is payload present ? "+has);
 
-       if(has) {
-           json = new JSONObject(payload);
-       }
        try{
-           json.put(key ,data);
-           return json;
-       }
+            if(has){
+                json = new JSONObject(payload);
+            }
 
+            json.put(key ,data);
+       }
         catch (JSONException j){
             System.err.println(Constants.separator+" json exception here ");
             j.printStackTrace();
         }
-       System.err.println("-------------------returning null ");
-       return null ;
+
+       return json ;
    }
 
    // added 25/05/2022
    public static String update(String payload ,String key ,Object value){
 
-        JSONObject json = put(payload ,key ,value);
+        System.err.println("-----------------convert to string first ----------");
+        String arg = value.toString();
+        JSONObject json = put(payload ,key ,arg);
         return Optional.of(json.toString()).orElse(payload);
    }
-//
-//   public static JSONObject update(String payload ,String key ,Object value){
-//       JSONObject json = put(payload ,key ,value);
-//       return json;
-//   }
-
 
 }

@@ -8,7 +8,10 @@ import org.apache.fineract.utility.service.IEnum;
 
 public enum SCRIPT_TYPE implements IEnum {
 
-    JAVA("Java");
+    JAVA("Java"),
+    INTERNAL("Internal"),
+    EXTERNAL("External");
+
 
     SCRIPT_TYPE(String code){
         this.code = code;

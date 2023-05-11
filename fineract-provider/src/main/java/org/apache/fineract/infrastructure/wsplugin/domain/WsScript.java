@@ -60,20 +60,28 @@ public class WsScript extends AbstractPersistableCustom<Long> {
 
     protected WsScript(){}
 
-    public WsScript(String methodName,String qualifiedClassName , Type type) {
+    public WsScript(String qualifiedClassName ,String methodName , Type type) {
         this.qualifiedClassName = qualifiedClassName;
         this.methodName = methodName;
         this.type = type;
         this.returnType = (RETURN_TYPE) EnumTemplateHelper.fromStringEx(RETURN_TYPE.values() ,type.getTypeName());
-        this.scriptType = SCRIPT_TYPE.JAVA;
+        this.scriptType = SCRIPT_TYPE.EXTERNAL;
     }
 
-    public WsScript(String qualifiedClassName, String methodName, RETURN_TYPE returnType) {
+    public WsScript(String qualifiedClassName, String methodName, RETURN_TYPE returnType ,SCRIPT_TYPE scriptType) {
         this.qualifiedClassName = qualifiedClassName;
         this.methodName = methodName;
         this.returnType = returnType;
-        this.scriptType = SCRIPT_TYPE.JAVA;
+        this.scriptType = scriptType;
         this.executionLevel = EXECUTION_LEVEL.FIELD;
+    }
+
+    public SCRIPT_TYPE getScriptType() {
+        return scriptType;
+    }
+
+    public WsScriptContainer getWsScriptContainer() {
+        return wsScriptContainer;
     }
 
     public void setWsScriptContainer(WsScriptContainer wsScriptContainer) {

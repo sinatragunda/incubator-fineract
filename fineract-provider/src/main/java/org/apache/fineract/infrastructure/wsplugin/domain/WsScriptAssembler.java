@@ -9,6 +9,7 @@ import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.wsplugin.api.WsScriptConstants;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.RETURN_TYPE;
+import org.apache.fineract.infrastructure.wsplugin.enumerations.SCRIPT_TYPE;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.wese.helper.JsonCommandHelper;
 
@@ -37,7 +38,6 @@ public class WsScriptAssembler {
 
             boolean has = OptionalHelper.isPresent(wsScript);
             if(has) {
-                System.err.println("----------------wscript has  "+wsScript);
                 wsScriptList.add(wsScript);
             }
         }
@@ -46,15 +46,15 @@ public class WsScriptAssembler {
 
     public static WsScript assembleFromJson(JsonCommand command){
 
-        String methodName = command.stringValueOfParameterNamed(WsScriptConstants.methodNameParam);
         String className = command.stringValueOfParameterNamed(WsScriptConstants.qualifiedClassNameParam);
+        String methodName = command.stringValueOfParameterNamed(WsScriptConstants.methodNameParam);
         Boolean addToContainer = command.booleanObjectValueOfParameterNamed("add");
         String returnTypeStr = command.stringValueOfParameterNamed(WsScriptConstants.returnTypeParam);
 
         RETURN_TYPE returnType = (RETURN_TYPE) EnumTemplateHelper.fromStringEx(RETURN_TYPE.values() ,returnTypeStr);
 
         if(addToContainer){
-            WsScript wsScript = new WsScript(methodName ,className ,returnType);
+            WsScript wsScript = new WsScript(className ,methodName ,returnType, SCRIPT_TYPE.EXTERNAL);
             return wsScript;
         }
         return null ;

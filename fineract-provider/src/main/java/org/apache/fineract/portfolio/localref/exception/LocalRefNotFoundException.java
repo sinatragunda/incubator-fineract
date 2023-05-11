@@ -11,4 +11,8 @@ public class LocalRefNotFoundException extends AbstractPlatformResourceNotFoundE
     public LocalRefNotFoundException(final Long id){
         super("Local Ref value invalid", "Local ref with identifier " + id + " does not exist", id);
     }
+
+    public LocalRefNotFoundException(final String name){
+        super("Local Ref value invalid", "Local ref with name " + name + " does not exist", name);
+    }
 }

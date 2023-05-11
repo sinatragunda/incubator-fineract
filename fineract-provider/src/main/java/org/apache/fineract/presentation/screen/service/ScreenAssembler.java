@@ -15,8 +15,12 @@ import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.generic.helper.GenericConstants;
+import org.apache.fineract.infrastructure.wsplugin.domain.WsScript;
+import org.apache.fineract.infrastructure.wsplugin.repo.WsScriptRepositoryWrapper;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
+import org.apache.fineract.portfolio.localref.domain.LocalRef;
 import org.apache.fineract.portfolio.localref.enumerations.REF_TABLE;
+import org.apache.fineract.portfolio.localref.repo.LocalRefRepositoryWrapper;
 import org.apache.fineract.presentation.screen.domain.Screen;
 import org.apache.fineract.presentation.screen.domain.ScreenElement;
 import org.apache.fineract.presentation.screen.helper.ScreenApiConstant;
@@ -35,10 +39,14 @@ import java.util.Set;
 public class ScreenAssembler {
 
     private FromJsonHelper fromJsonHelper;
+    private WsScriptRepositoryWrapper wsScriptRepositoryWrapper;
+    private LocalRefRepositoryWrapper localRefRepositoryWrapper;
 
     @Autowired
-    public ScreenAssembler(FromJsonHelper fromJsonHelper) {
+    public ScreenAssembler(FromJsonHelper fromJsonHelper ,final WsScriptRepositoryWrapper wsScriptRepositoryWrapper ,final LocalRefRepositoryWrapper localRefRepositoryWrapper) {
         this.fromJsonHelper = fromJsonHelper;
+        this.wsScriptRepositoryWrapper = wsScriptRepositoryWrapper;
+        this.localRefRepositoryWrapper = localRefRepositoryWrapper;
     }
 
 
@@ -146,12 +154,9 @@ public class ScreenAssembler {
          * Not best setting but to be changed .
          * Get default value of attribute ref if user has not provided from ui
          */
-        //System.err.println("-------------------set display name again  ---------"+displayName);
         displayName = getDisplayName(key ,displayName ,cl);
 
         String modelName = AnnotationHelper.getModelName(cl ,key);
-
-        //System.err.println("--------------------model name from annotation helper is "+modelName);
 
         String value = fromJsonHelper.extractStringNamed(ScreenApiConstant.valueParam ,element);
 
@@ -170,7 +175,33 @@ public class ScreenAssembler {
 
         JsonObject subValueJsonObject = fromJsonHelper.extractJsonObjectNamed(ScreenApiConstant.subValueParam ,element);
 
-        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate , ELEMENT_TYPE.SYSTEM ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null);
+        boolean hasWsScript = fromJsonHelper.parameterExists(ScreenApiConstant.wsScriptIdParam ,element);
+
+        //final Integer elementTypeId = fromJsonHelper.extractIntegerSansLocaleNamed(ScreenApiConstant.elementTypeParam ,element);
+        //final ELEMENT_TYPE elementType = (ELEMENT_TYPE)EnumTemplateHelper.fromIntEx(ELEMENT_TYPE.values() ,elementTypeId);
+
+        ELEMENT_TYPE elementType = ELEMENT_TYPE.SYSTEM;
+        LocalRef localRef = null ;
+        Boolean hasModelName = OptionalHelper.isPresent(modelName);
+        if (!hasModelName){
+            /**
+             * Added 04/05/2023 at 0953
+             * The assumption is it has no model name since its posted from ui then its a local ref
+             */
+            elementType = ELEMENT_TYPE.LOCAL_REF;
+            modelName = key;
+            localRef = localRefRepositoryWrapper.findOneWithoutNotFoundDetection(modelName);
+            comparisonGroup = localRef.getRefValueType().group();
+        }
+
+        WsScript wsScript = null ;
+        
+        if (hasWsScript){
+            Long wsScriptId = fromJsonHelper.extractLongNamed(ScreenApiConstant.wsScriptIdParam ,element);
+            wsScript = wsScriptRepositoryWrapper.findOneWithNotFoundDetection(wsScriptId);
+        }
+
+        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate ,elementType ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null ,wsScript ,localRef);
 
         System.err.println("------------element to string  "+screenElement);
 
@@ -179,7 +210,6 @@ public class ScreenAssembler {
         boolean hasSubValues = OptionalHelper.isPresent(subValueJsonObject);
 
         System.err.println("---------print subvalue object -----"+subValueJsonObject);
-
 
         if(hasSubValues){
 
@@ -191,12 +221,12 @@ public class ScreenAssembler {
                 System.err.println("===============key value is "+keyValue);
                 JsonObject subValueDataObject = subValueJsonObject.getAsJsonObject(keyValue);
                 ScreenElement childElement = screenElementFromJson(subValueDataObject,screen ,screenElement ,key ,classLoader);
+                childElement.setDisplayName(displayName);
                 childElementList.add(childElement);
             }
         }
 
         System.err.println("------------how many child elements do we have here ?"+childElementList.size());
-
         screenElement.setChildElements(childElementList);
         return screenElement;
     }

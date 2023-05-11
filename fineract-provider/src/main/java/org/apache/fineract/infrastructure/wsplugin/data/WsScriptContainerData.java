@@ -29,6 +29,11 @@ public class WsScriptContainerData implements EnumeratedData {
         this.documentId = documentId;
     }
 
+    public WsScriptContainerData(String name, Collection<WsScriptData> wsScriptDataCollection) {
+        this.name = name;
+        this.wsScriptDataCollection = wsScriptDataCollection;
+    }
+
     @Override
     public Long getId() {
         return this.id;

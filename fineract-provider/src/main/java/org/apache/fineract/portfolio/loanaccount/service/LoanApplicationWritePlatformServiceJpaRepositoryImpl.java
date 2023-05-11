@@ -91,6 +91,7 @@ import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorLoanResolver;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
+import org.apache.fineract.portfolio.loanaccount.loanschedule.helper.LoanRepaymentScheduleCheatSheet;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleAssembler;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleCalculationPlatformService;
 import org.apache.fineract.portfolio.loanaccount.serialization.LoanApplicationCommandFromApiJsonHelper;
@@ -186,6 +187,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
      * Added 20/02/2023 at 0001
      */
     private final LocalRefRecordHelper localRefRecordHelper;
+    private final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository;
 
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
@@ -211,7 +213,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                                                                 final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
                                                                 final AccountDetailsReadPlatformService accountDetailsReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
                                                                 final HirePurchaseRepository hirePurchaseRepository,
-                                                                final LocalRefRecordHelper localRefRecordHelper) {
+                                                                final LocalRefRecordHelper localRefRecordHelper ,final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -250,6 +252,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.savingsAccountReadPlatformService = savingsAccountReadPlatformService;
         this.hirePurchaseRepository = hirePurchaseRepository ;
         this.localRefRecordHelper = localRefRecordHelper;
+        this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
 
     }
 
@@ -342,17 +345,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              * Modified 01/11/2022 at 1253
              * Skip function if isGroupLoan ,function will later be modified
              */
-
-
             if(!isGroupLoan) {
                 command = injectAccountId(command, loanProduct, clientId);
             }
 
-            //System.err.println("--------validate for loans ------");
-
             this.fromApiJsonDeserializer.validateForCreate(command.json(), isMeetingMandatoryForJLGLoans, loanProduct);
-
-            //System.err.println("-----------failed ------------");
 
             final List<ApiParameterError> dataValidationErrors = new ArrayList<>();
             final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("loan");
@@ -462,15 +459,19 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
             // loan created at this point now
             this.loanRepositoryWrapper.save(newLoanApplication);
 
+            System.err.println("-------------------has repayment schedules been calculated at this point ? ,with what size ? "+newLoanApplication.getLoanRepaymentScheduleInstallmentsSize());
 
+            /**
+             * Added 09/05/2023 at 1405
+             * A cheat way of focring custom repayment schedule saved into the system
+             * No time for dealing with the techinalities of having to validate and attach in proper locations
+             * What this does it just take an already create installment and modifify values based on installment numbers then update
+             */
             /**
              * Added 19/02/2023 at 2349
              * Create value for local ref
              */
-            //System.err.println("===============================update record here error for datatables ========");
-            
             localRefRecordHelper.create(command ,newLoanApplication , REF_TABLE.LOAN);
-            //System.err.println("===============will it reverse the loan transaction ?=======");
 
             // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists
             //HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
@@ -541,6 +542,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                         EntityTables.LOAN.getName(), newLoanApplication.getId(), newLoanApplication.productId(),
                         command.arrayOfParameterNamed(LoanApiConstants.datatables));
             }
+
+            LoanRepaymentScheduleCheatSheet.cheat(loanRepaymentScheduleInstallmentRepository ,newLoanApplication ,command);
 
             /**
              * Added 08/03/2023 at 0744 
@@ -1575,9 +1578,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
     private void saveAndFlushLoanWithDataIntegrityViolationChecks(final Loan loan) {
         try {
+            System.err.println("--------------saveAndFlush-------------------");
             List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
             for (LoanRepaymentScheduleInstallment installment : installments) {
-                if (installment.getId() == null) {
+                System.err.println("-------------------------installment --"+installment.getInstallmentNumber());
+                if (installment.getId() == null){
                     this.repaymentScheduleInstallmentRepository.save(installment);
                 }
             }

@@ -2540,6 +2540,7 @@ public abstract class AbstractLoanScheduleGenerator implements LoanScheduleGener
     private LoanRepaymentScheduleInstallment addLoanRepaymentScheduleInstallment(final List<LoanRepaymentScheduleInstallment> installments,
             final LoanScheduleModelPeriod scheduledLoanInstallment) {
         LoanRepaymentScheduleInstallment installment = null;
+        
         if (scheduledLoanInstallment.isRepaymentPeriod()) {
             installment = new LoanRepaymentScheduleInstallment(null, scheduledLoanInstallment.periodNumber(),
                     scheduledLoanInstallment.periodFromDate(), scheduledLoanInstallment.periodDueDate(),
@@ -2625,6 +2626,7 @@ public abstract class AbstractLoanScheduleGenerator implements LoanScheduleGener
                 penaltyCharges = penaltyCharges.plus(currentInstallment.getPenaltyChargesOutstanding(currency));
             }
         }
+
         final Set<LoanInterestRecalcualtionAdditionalDetails> compoundingDetails = null;
         return new LoanRepaymentScheduleInstallment(null, 0, onDate, onDate, totalPrincipal.getAmount(), totalInterest.getAmount(),
                 feeCharges.getAmount(), penaltyCharges.getAmount(), false, compoundingDetails);

@@ -4,8 +4,8 @@
  */
 package org.apache.fineract.infrastructure.wsplugin.data;
 
-import com.wese.component.wsscripts.domain.WsScript;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.wsplugin.domain.WsScript;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.EXECUTION_LEVEL;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.RETURN_TYPE;
 import org.apache.fineract.infrastructure.wsplugin.enumerations.SCRIPT_TYPE;
@@ -41,12 +41,12 @@ public class WsScriptData implements EnumeratedData {
         this.executionLevelData = EnumTemplateHelper.template(executionLevel);
     }
 
-    public WsScriptData(Long id, String methodName, String qualifiedClassName, String returnTypeStr , SCRIPT_TYPE scriptType, EnumOptionData scriptTypeData) {
+    public WsScriptData(Long id, String methodName, String qualifiedClassName, String returnTypeStr , SCRIPT_TYPE scriptType) {
         this.id = id;
         this.methodName = methodName;
         this.qualifiedClassName = qualifiedClassName;
         this.scriptType = scriptType;
-        this.scriptTypeData = scriptTypeData;
+        this.scriptTypeData = EnumTemplateHelper.template(scriptType);
         this.returnType = (RETURN_TYPE) EnumTemplateHelper.fromStringEx(RETURN_TYPE.values() ,returnTypeStr);
         this.returnTypeData = EnumTemplateHelper.template(this.returnType);
     }
@@ -54,15 +54,18 @@ public class WsScriptData implements EnumeratedData {
     public WsScriptData(WsScript wsScript){
         this.methodName = wsScript.getMethodName();
         this.qualifiedClassName = wsScript.getQualifiedClassName();
-        this.scriptType = SCRIPT_TYPE.JAVA;
+        this.scriptType = wsScript.getScriptType();
         this.scriptTypeData = EnumTemplateHelper.template(scriptType);
 
-        String returnTypeString = wsScript.getReturnType().getTypeName();
+        String returnTypeString = wsScript.getReturnType().getCode();
         //this.returnType = EnumTemplateHelper.template()
         this.returnType = (RETURN_TYPE) EnumTemplateHelper.fromStringEx(RETURN_TYPE.values() ,returnTypeString);
         this.returnTypeData = EnumTemplateHelper.templateWithValue(this.returnType);
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
     @Override
     public Long getId() {
         return this.id;
