@@ -26,4 +26,8 @@ public class MenuTable extends AbstractPersistableCustom<Long> {
 		this.menu = menu;
 		this.menuItem = menuItem;
 	}
+
+	public MenuItem getMenuItem() {
+		return menuItem;
+	}
 }

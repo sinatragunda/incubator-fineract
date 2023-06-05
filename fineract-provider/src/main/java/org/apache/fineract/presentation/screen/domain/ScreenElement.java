@@ -36,7 +36,6 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
     @Column(name ="comparison_type")
     private COMPARISON_TYPE comparisonType;
 
-
     @Enumerated(EnumType.ORDINAL)
     @Column(name ="comparison_group")
     private COMPARISON_GROUP comparisonGroup;
@@ -81,9 +80,14 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
     @JoinColumn(name ="local_ref_id")
     private LocalRef localRef ;
 
+
+    @Column(name ="sequence_number")
+    private Integer sequenceNumber ;
+
+
     protected ScreenElement(){}
 
-    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup , OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements ,WsScript wsScript,LocalRef localRef) {
+    public ScreenElement(String name, String displayName , String modelName, COMPARISON_TYPE comparisonType, COMPARISON_GROUP comparisonGroup , OPERAND_GATES operandGates, ELEMENT_TYPE elementType, Boolean showOnUi, Boolean mandatory, String value, Screen screen, ScreenElement screenElement , Set<ScreenElement> childElements ,WsScript wsScript,LocalRef localRef ,Integer sequenceNumber) {
         this.name = name;
         this.modelName = modelName;
         this.comparisonType = comparisonType;
@@ -99,6 +103,7 @@ public class ScreenElement extends AbstractPersistableCustom<Long> {
         this.comparisonGroup = comparisonGroup ;
         this.wsScript = wsScript ;
         this.localRef = localRef;
+        this.sequenceNumber = sequenceNumber;
     }
 
     public String getModelName() {

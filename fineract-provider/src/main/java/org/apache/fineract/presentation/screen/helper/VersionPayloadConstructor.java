@@ -28,8 +28,7 @@ public class VersionPayloadConstructor {
         Consumer<ScreenElement> convertToJson = (e)->{
             String value = e.getParameter();
             String key  = e.getModelName();
-
-            System.err.println("---------value to insert and key --"+key+"------------"+value);
+            //System.err.println("---------value to insert and key --"+key+"------------"+value);
             objectMap.put(key ,value);
         };
 
@@ -49,8 +48,7 @@ public class VersionPayloadConstructor {
             payload = JsonHelper.update(payload, "localrefs", objectMap);
         }
 
-        System.err.println("--------------payload is ------------"+payload);
-
+        //System.err.println("--------------payload is ------------"+payload);
         return payload;
     }
 }

@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 public final class ShareAccountTransactionWrapper {
 
     private ShareAccount shareAccount ;
-
     public Integer calculateSharesPossibleForAmount(final ShareProduct shareProduct , final Money total) {
         
         Integer shares[] = {0};
@@ -61,9 +60,15 @@ public final class ShareAccountTransactionWrapper {
         try{
             shareAccountTransaction = repo.findOne(transactionId);
         }
-        catch(NullPointerException e){
+        /**
+         * Modified 24/05/2023 at 0710 
+         * PersistenceException thrown here but we dont know how to handle it or do know when its be thrown next .
+         */ 
+        catch(Exception e){
             /// some exception thrown if value not present
+            System.err.println("----------------exception thrown we dont know how to handle ");
         }
+        
         return shareAccountTransaction ;
     }
 

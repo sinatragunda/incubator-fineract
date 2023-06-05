@@ -255,13 +255,12 @@ public class ChargeReadPlatformServiceImpl implements ChargeReadPlatformService 
 
         try{
             Collection<ChargeTierData> collection =  this.jdbcTemplate.query(sql ,mapper ,new Object[]{chargeId});
-            System.err.println("-------------records found are "+collection.size());
             List list = ListHelper.fromCollection(collection);
             chargeData.setChargeTierDataList(list);
         }
 
         catch(EmptyResultDataAccessException n){
-            System.err.println("--------------we have no links son --------");
+            //System.err.println("--------------we have no links son --------");
         }
      }
 

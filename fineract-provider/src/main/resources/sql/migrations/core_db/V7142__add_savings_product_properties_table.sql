@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 23/03/2023 1749
 
-CREATE TABLE `m_savings_product_properties` (
+CREATE TABLE IF NOT EXISTS `m_savings_product_properties` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`payment_rule_id` BIGINT NOT NULL DEFAULT '0',
 	PRIMARY KEY (`id`)

@@ -46,11 +46,19 @@ import javax.ws.rs.core.UriInfo;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
+import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountData;
+import org.apache.fineract.portfolio.ssbpayments.data.SsbTransactionData;
+import org.apache.fineract.portfolio.ssbpayments.data.SsbTransactionRecordData;
+import org.apache.fineract.portfolio.ssbpayments.domain.SsbTransactionRecord;
+import org.apache.fineract.portfolio.ssbpayments.repo.SsbTransactionRecordRepositoryWrapper;
+import org.apache.fineract.portfolio.ssbpayments.service.SsbTransactionReadPlatformService;
+import org.apache.fineract.portfolio.ssbpayments.service.SsbTransactionReadPlatformServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -58,10 +66,12 @@ import org.springframework.util.CollectionUtils;
 
 
 // Added 16/12/2021
+
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
+
 import org.taat.wese.weseaddons.ssb.service.SsbService;
 import org.taat.wese.weseaddons.ssb.enumerations.SSB_REPORT_TYPE ;
 
@@ -77,10 +87,13 @@ public class SsbPaymentsApiResource {
     private final SsbService ssbService ;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService;
+    private final SsbTransactionReadPlatformService ssbTransactionReadPlatformService;
+    private final ToApiJsonSerializer<SsbTransactionData> ssbTransactionDataToApiJsonSerializer;
+    private final SsbTransactionRecordRepositoryWrapper ssbTransactionRecordRepositoryWrapper;
 
     @Autowired
     public SsbPaymentsApiResource(final PlatformSecurityContext context, final DefaultToApiJsonSerializer<SavingsAccountData> toApiJsonSerializer,
-                                  final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService,final SsbService ssbService ,final BulkImportWorkbookService bulkImportWorkbookService) {
+                                  final PortfolioCommandSourceWritePlatformService commandSourceWritePlatformService, final SsbService ssbService , final BulkImportWorkbookService bulkImportWorkbookService , final SsbTransactionReadPlatformService ssbTransactionReadPlatformService ,final ToApiJsonSerializer ssbTransactionDataToApiJsonSerializer ,final SsbTransactionRecordRepositoryWrapper ssbTransactionRecordRepositoryWrapper) {
 
         this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
@@ -89,6 +102,9 @@ public class SsbPaymentsApiResource {
         this.ssbService = ssbService;
         this.bulkImportWorkbookService = bulkImportWorkbookService;
         this.commandSourceWritePlatformService = commandSourceWritePlatformService;
+        this.ssbTransactionReadPlatformService = ssbTransactionReadPlatformService;
+        this.ssbTransactionDataToApiJsonSerializer = ssbTransactionDataToApiJsonSerializer;
+        this.ssbTransactionRecordRepositoryWrapper = ssbTransactionRecordRepositoryWrapper;
     }
 
     @POST
@@ -107,16 +123,50 @@ public class SsbPaymentsApiResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String postFinancialTransactions(@FormDataParam("file") InputStream uploadedInputStream,@FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("ssb") String ssb) {
 
-        String response = ssbService.postFinancialTransactions(null ,uploadedInputStream ,ssb).toString();
+        System.err.println("-------------------------- has filedetail ? "+ OptionalHelper.has(fileDetail));
+        String filename = fileDetail.getFileName();
+        String response = ssbService.postFinancialTransactions(filename ,uploadedInputStream ,ssb).toString();
         return response;
-
     }
+
+    @GET
+    @Path("{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveOne(@PathParam("id") Long id) {
+
+        SsbTransactionRecordData ssbTransactionRecordData = this.ssbTransactionReadPlatformService.retrieveOne(id);
+        return ssbTransactionDataToApiJsonSerializer.serialize(ssbTransactionRecordData);
+    }
+
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String retrieveAll() {
+
+        Collection<SsbTransactionRecordData> ssbTransactionRecordDataCollection = this.ssbTransactionReadPlatformService.retrieveAll();
+        return ssbTransactionDataToApiJsonSerializer.serialize(ssbTransactionRecordDataCollection);
+    }
+
+
     @GET
     @Path("/reverse")
     public String reverseFinancialTransactions(@QueryParam("type") String type) {
         String response = ssbService.reverseFinancialTransactions(type).toString();
         return response;
     }
+
+    @GET
+    @Path("/reverse/{id}")
+    public String batchRegistryReverseFinancialTransactions(@PathParam("id") Long id){
+
+        System.err.println("--------------------------------------reverse transaction with id "+id);
+        SsbTransactionRecord ssbTransactionRecord = ssbTransactionRecordRepositoryWrapper.findOneWithNotFoundDetection(id);
+        String response = ssbService.batchReverseFinancialTransactions(ssbTransactionRecord).toString();
+        return response;
+    }
+
+
 
     @GET
     @Path("/trancfile")

@@ -29,6 +29,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ShareAccountTransactionRepository extends JpaRepository<ShareAccountTransaction, Long>, JpaSpecificationExecutor<ShareAccountTransaction> {
-
     List<ShareAccountTransaction> findByShareAccountId(Long id);
 }

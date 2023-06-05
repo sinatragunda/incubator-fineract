@@ -742,18 +742,13 @@ public class ShareAccountDataSerializer {
             .failWithCodeNoParameterAddedToErrorCode("purchase.transaction.date.cannot.be.before.existing.transactions");
         }
         
-        if (!dataValidationErrors.isEmpty()) { 
-
-            for(ApiParameterError e : dataValidationErrors){
-                System.err.println("-------------error is ---------"+e.getDeveloperMessage());
-            }
-            
+        if (!dataValidationErrors.isEmpty()) {
             throw new PlatformApiDataValidationException(dataValidationErrors);
         }
 
         final BigDecimal unitPrice = shareProduct.deriveMarketPrice(requestedDate.toDate());
 
-        System.err.println("======================unit price is ====="+unitPrice+"====================sharesRequested ========="+sharesRequested);
+        //System.err.println("======================unit price is ====="+unitPrice+"====================sharesRequested ========="+sharesRequested);
 
         ShareAccountTransaction purchaseTransaction = new ShareAccountTransaction(requestedDate.toDate(), sharesRequested, unitPrice);
 
@@ -767,7 +762,7 @@ public class ShareAccountDataSerializer {
         }
         handleAdditionalSharesChargeTransactions(account, purchaseTransaction);
 
-        System.err.println("----------------done handling additional shares charge transactions------");
+        //System.err.println("----------------done handling additional shares charge transactions------");
         actualChanges.put(ShareAccountApiConstants.additionalshares_paramname, purchaseTransaction);
         return actualChanges;
     }

@@ -99,7 +99,7 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
     @CronTarget(jobName = JobName.ACCOUNTING_RUNNING_BALANCE_UPDATE)
     public void updateRunningBalance() {
         
-        System.err.println("----------------------run some job here --------------");
+        //System.err.println("----------------------run some job here --------------");
 
         String dateFinder = "select MIN(je.entry_date) as entityDate from acc_gl_journal_entry  je "
                 + "where je.is_running_balance_calculated=0 ";
@@ -110,7 +110,7 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
             logger.debug("No results found for updation of running balance ");
         }
         catch(OutOfMemoryError n){
-            System.err.println("---------------------------------error within -----------"+n.getMessage());
+            //System.err.println("---------------------------------error within -----------"+n.getMessage());
             n.printStackTrace();
         }
     }
@@ -141,9 +141,9 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
 
     private void updateOrganizationRunningBalance(Date entityDate) {
 
-        System.err.println("----------------------------sqql limit is -------------"+selectRunningBalanceSqlLimit);
+        //System.err.println("----------------------------sqql limit is -------------"+selectRunningBalanceSqlLimit);
 
-        System.err.println("--------------------what is this entity date ? "+entityDate);
+        //System.err.println("--------------------what is this entity date ? "+entityDate);
 
         Map<Long, BigDecimal> runningBalanceMap = new HashMap<>(5);
         
@@ -175,17 +175,17 @@ public class JournalEntryRunningBalanceUpdateServiceImpl implements JournalEntry
             }
         }
 
-        System.err.println("-------------------------------entry mapper schema ----------"+entryMapper.organizationRunningBalanceSchema());
+        //System.err.println("-------------------------------entry mapper schema ----------"+entryMapper.organizationRunningBalanceSchema());
 
-        System.err.println("-----------------------------------we assume heap problem is when creating this array ....");
+        //System.err.println("-----------------------------------we assume heap problem is when creating this array ....");
 
         List<JournalEntryData> entryDatas = jdbcTemplate.query(entryMapper.organizationRunningBalanceSchema(), entryMapper,
                 new Object[] { entityDate });
 
 
-        System.err.println("---------------------max fetch size is ---------------"+jdbcTemplate.getFetchSize());
+        //System.err.println("---------------------max fetch size is ---------------"+jdbcTemplate.getFetchSize());
 
-        System.err.println("----------------------entry data size is "+entryDatas.size());
+        //System.err.println("----------------------entry data size is "+entryDatas.size());
 
         if (entryDatas.size() > 0) {
             // run a batch update of 1000 SQL statements at a time

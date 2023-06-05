@@ -27,7 +27,7 @@ public class LoanTransactionHelper {
         map.put("dateFormat","dd MMMM yyyy");
         map.put("transactionDate" ,transactionDate);
         String json =  JsonHelper.serializeMapToJson(map);
-        System.err.println("-------------------------serialized string is "+json);
+        //System.err.println("-------------------------serialized string is "+json);
         return json;
     }
 }

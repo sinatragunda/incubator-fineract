@@ -21,5 +21,7 @@ public class ScreenApiConstant {
 
     public static String screenIdParam = "screenId";
     public static String wsScriptIdParam = "wsScriptId";
+    public static String sequenceNumberParam = "sequenceNumber";
+
 
 }

@@ -131,7 +131,7 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
         this.accountTransfersDataValidator.validate(command);
 
-        System.err.println("---------------data validated now -------------- ,this for this validation thing ----------------");
+        //System.err.println("---------------data validated now -------------- ,this for this validation thing ----------------");
 
         final LocalDate transactionDate = command.localDateValueOfParameterNamed(transferDateParamName);
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);

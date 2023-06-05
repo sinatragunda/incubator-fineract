@@ -67,7 +67,7 @@ public class AccountTransferAssembler {
     public AccountTransferDetails assembleSavingsToLoanTransfer(final JsonCommand command, final SavingsAccount fromSavingsAccount,
             final Loan toLoanAccount, final SavingsAccountTransaction withdrawal, final LoanTransaction loanRepaymentTransaction) {
 
-        System.err.println("----------------------savings to loan transfer assembler ---------"+loanRepaymentTransaction.getId());
+        //System.err.println("----------------------savings to loan transfer assembler ---------"+loanRepaymentTransaction.getId());
 
         final AccountTransferDetails accountTransferDetails = this.accountTransferDetailAssembler.assembleSavingsToLoanTransfer(command,
                 fromSavingsAccount, toLoanAccount);
@@ -76,14 +76,14 @@ public class AccountTransferAssembler {
         final BigDecimal transactionAmount = command.bigDecimalValueOfParameterNamed(transferAmountParamName);
         final Money transactionMonetaryAmount = Money.of(fromSavingsAccount.getCurrency(), transactionAmount);
 
-        System.err.println("-------------------transaction amount is ---------------"+transactionAmount);
+        //System.err.println("-------------------transaction amount is ---------------"+transactionAmount);
 
         final String description = command.stringValueOfParameterNamed(transferDescriptionParamName);
 
         AccountTransferTransaction accountTransferTransaction = AccountTransferTransaction.savingsToLoanTransfer(accountTransferDetails,
                 withdrawal, loanRepaymentTransaction, transactionDate, transactionMonetaryAmount, description);
         
-        System.err.println("----------------------------------transaction json is --"+accountTransferTransaction);
+        //System.err.println("----------------------------------transaction json is --"+accountTransferTransaction);
 
         accountTransferDetails.addAccountTransferTransaction(accountTransferTransaction);
         return accountTransferDetails;

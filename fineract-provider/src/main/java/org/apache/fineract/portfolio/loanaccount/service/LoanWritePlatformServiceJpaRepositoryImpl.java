@@ -1957,7 +1957,7 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
     @CronTarget(jobName = JobName.TRANSFER_FEE_CHARGE_FOR_LOANS)
     public void transferFeeCharges() throws JobExecutionException {
 
-        System.err.println("----------------------------when are fee charges paid ----------------");
+        //System.err.println("----------------------------when are fee charges paid ----------------");
 
         final Collection<LoanChargeData> chargeDatas = this.loanChargeReadPlatformService.retrieveLoanChargesForFeePayment(
                 ChargePaymentMode.ACCOUNT_TRANSFER.getValue(), LoanStatus.ACTIVE.getValue());

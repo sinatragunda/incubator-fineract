@@ -18,7 +18,7 @@
 
 -- Created 30/03/2023 1914
 
-CREATE TABLE `m_menu_table` (
+CREATE TABLE IF NOT EXISTS `m_menu_table` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`menu_id` BIGINT NOT NULL,
 	`menu_item_id` BIGINT NOT NULL,

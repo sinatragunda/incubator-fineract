@@ -85,6 +85,8 @@ public class ComponentApiResource {
 
         this.context.authenticatedUser();
 
+        System.err.println("--------------classname is "+className);
+
         CLASS_LOADER classLoader = CLASS_LOADER.fromString(className);
         boolean hasClassLoader = OptionalHelper.isPresent(classLoader);
 
@@ -116,7 +118,7 @@ public class ComponentApiResource {
     }
 
     private Set<FieldValidationData> getLocalRefsAsFieldValidationData(CLASS_LOADER classLoader){
-        REF_TABLE refTable = REF_TABLE.fromClassLoader(classLoader);
+        REF_TABLE refTable = REF_TABLE.fromClassLoaderWithException(classLoader);
         LocalRefData localRefData = localRefReadPlatformService.template(refTable);
         List<FieldValidationData> fieldValidationDataList = LocalRefToFieldValidationData.convertForTemplate(localRefData);
         return ListHelper.toSet(fieldValidationDataList);

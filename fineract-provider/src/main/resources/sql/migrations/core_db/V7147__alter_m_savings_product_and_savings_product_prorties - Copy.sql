@@ -18,8 +18,8 @@
 -- Created 23/03/2023 at 0906
 
 
-ALTER TABLE `m_savings_product`
-	DROP COLUMN `savings_product_properties_id`;
+-- ALTER TABLE `m_savings_product`
+-- 	DROP COLUMN `savings_product_properties_id`;
 
 ALTER TABLE `m_savings_product_properties`
 	ADD COLUMN `savings_product_id` INT NULL AFTER `payment_rule_id`;

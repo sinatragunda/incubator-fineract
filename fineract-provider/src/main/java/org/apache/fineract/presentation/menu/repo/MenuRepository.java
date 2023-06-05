@@ -19,8 +19,11 @@ package org.apache.fineract.presentation.menu.repo; /**
 import java.util.List;
 
 import org.apache.fineract.presentation.menu.domain.Menu;
+import org.apache.fineract.presentation.menu.enumerations.MENU_PLACEMENT;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface MenuRepository extends JpaRepository<Menu, Long>, JpaSpecificationExecutor<Menu> {
+public interface MenuRepository extends JpaRepository<Menu, Long>, JpaSpecificationExecutor<Menu>{
+
+    Menu findOneByMenuPlacement(MENU_PLACEMENT menuPlacement);
 }

@@ -160,6 +160,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     @Override
     public List<DatatableData> retrieveDatatableNames(final String appTable) {
 
+        System.err.println("------------------table we are retrieving is "+appTable);
+
         String andClause;
         if (appTable == null) {
             andClause = "";
@@ -176,14 +178,22 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
                 + " and (p.code in ('ALL_FUNCTIONS', 'ALL_FUNCTIONS_READ') or p.code = concat('READ_', registered_table_name))) "
                 + andClause + " order by application_table_name, registered_table_name";
 
+
+                //System.err.println("---------------------sql is "+sql);
+
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
 
         final List<DatatableData> datatables = new ArrayList<>();
+
+        //System.err.println("----------------------------we now into rs ");
+
         while (rs.next()) {
             final Long id = rs.getLong("id");
             final String appTableName = rs.getString("application_table_name");
             final String registeredDatatableName = rs.getString("registered_table_name");
             final String prettyName = rs.getString("pretty_name");
+
+            System.err.println("---------------------registed table name is "+registeredDatatableName);
 
             final List<ResultsetColumnHeaderData> columnHeaderData = this.genericDataService
                     .fillResultsetColumnHeaders(registeredDatatableName);
@@ -276,19 +286,24 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     }
 
     @Transactional
-    private void _registerDataTable(final String applicationTableName, final String dataTableName, final Integer category,
+    private void _registerDataTable(final String applicationTableName, String dataTableName, final Integer category,
             final String permissionsSql) {
 
 
         String prettyName = dataTableName ;
 
-        String dataTableNameEx = dataTableName.replaceAll(" ","");
+        /**
+         * Modified 19/05/2023 at 0026 
+         * Make the names lowercase cause at database level they being stored as low case 
+         */
+
+        dataTableName = dataTableName.replaceAll(" ","").toLowerCase();
 
         System.err.println("------------------------------registeDataTable function ");
 
         validateAppTable(applicationTableName);
 
-        assertDataTableExists(dataTableNameEx);
+        assertDataTableExists(dataTableName);
 
         System.err.println("--------which we will prettifiy-----------------register table now son  with new portfolio name "+applicationTableName);
 
@@ -296,7 +311,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
 
         final String registerDatatableSql = "insert into x_registered_table (registered_table_name, application_table_name,category ,pretty_name) values ('"
-                + dataTableNameEx + "', '" + applicationTableName + "', '" + category + "', '" + prettyName + "')";
+                + dataTableName + "', '" + applicationTableName + "', '" + category + "', '" + prettyName + "')";
 
         System.err.println("---------------------------------------"+registerDatatableSql);
 
@@ -306,7 +321,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
             // add the registered table to the config if it is a ppi
             if (this.isSurveyCategory(category)) {
-                this.jdbcTemplate.execute("insert into c_configuration (name, value, enabled ) values('" + dataTableNameEx + "', '0','0')");
+                this.jdbcTemplate.execute("insert into c_configuration (name, value, enabled ) values('" + dataTableName + "', '0','0')");
             }
         }
         catch (final DataIntegrityViolationException dve) {

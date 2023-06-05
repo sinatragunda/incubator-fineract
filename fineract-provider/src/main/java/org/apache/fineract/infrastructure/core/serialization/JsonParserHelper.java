@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.joda.time.LocalDate;
@@ -131,7 +132,17 @@ public class JsonParserHelper {
         Integer value = null;
         if (element.isJsonObject()) {
             final JsonObject object = element.getAsJsonObject();
-            final Locale locale = extractLocaleValue(object);
+            Locale locale = extractLocaleValue(object);
+
+            /**
+             * Modified 30/05/2023 at 0445 
+             * Default to Locale.UK if locale is not passed 
+             */
+            Boolean hasLocale = OptionalHelper.has(locale);
+            
+            if(!hasLocale){
+                locale = Locale.UK ;
+            }  
             value = extractIntegerNamed(parameterName, object, locale, modifiedParameters);
         }
         return value;

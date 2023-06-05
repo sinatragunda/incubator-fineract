@@ -48,6 +48,7 @@ public class Screen extends AbstractPersistableCustom<Long> {
     @Column(name="multirow")
     private Boolean multirow ;
 
+    @OrderBy("sequenceNumber")
     @OneToMany(fetch = FetchType.EAGER  ,cascade = CascadeType.ALL ,mappedBy = "screen")
     private Set<ScreenElement> screenElementSet;
 

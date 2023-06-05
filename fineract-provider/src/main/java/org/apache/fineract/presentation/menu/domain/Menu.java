@@ -4,6 +4,7 @@
  */
 package org.apache.fineract.presentation.menu.domain;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import org.apache.fineract.infrastructure.generic.helper.GenericConstants;
@@ -11,9 +12,7 @@ import org.apache.fineract.presentation.menu.enumerations.MENU_PLACEMENT;
 import org.apache.fineract.presentation.menu.helper.MenuConstants;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,6 +57,48 @@ public class Menu extends AbstractPersistableCustom<Long> {
         this.parentMenu = parentMenu;
     }
 
+    public Map<String, Object> update(final JsonCommand command) {
+
+        final Map<String, Object> actualChanges = new LinkedHashMap<>(9);
+
+        if (command.isChangeInStringParameterNamed(GenericConstants.nameParam, this.name)) {
+            final String newValue = command.stringValueOfParameterNamed(GenericConstants.nameParam);
+            actualChanges.put(GenericConstants.nameParam, newValue);
+            //this.name = StringUtils.defaultIfEmpty(newValue, null);
+            this.name = newValue;
+        }
+
+        if(command.isChangeInIntegerParameterNamed(MenuConstants.menuPlacementParam ,this.menuPlacement.ordinal())){
+            final Integer newValue = command.integerValueOfParameterNamed(MenuConstants.menuPlacementParam);
+            actualChanges.put(MenuConstants.menuPlacementParam ,newValue);
+            this.menuPlacement = (MENU_PLACEMENT) EnumTemplateHelper.fromInt(MENU_PLACEMENT.values() ,newValue);
+        }
+
+        if(command.hasParameter(MenuConstants.parentMenuIdParam)){
+            Boolean has = OptionalHelper.has(this.parentMenu);
+            if(has){
+                if(command.isChangeInLongParameterNamed(MenuConstants.parentMenuIdParam ,this.parentMenu.getId())){
+                    final Long newValue = command.longValueOfParameterNamed(MenuConstants.parentMenuIdParam);
+                    actualChanges.put(MenuConstants.parentMenuIdParam ,newValue);
+                }
+            }
+            else{
+                final Long newValue = command.longValueOfParameterNamed(MenuConstants.parentMenuIdParam);
+                actualChanges.put(MenuConstants.parentMenuIdParam ,newValue);
+            }
+        }
+        return actualChanges;
+    }
+
+
+    public void setParentMenu(Menu parentMenu) {
+        this.parentMenu = parentMenu;
+    }
+
+    public MENU_PLACEMENT getMenuPlacement() {
+        return menuPlacement;
+    }
+
     public List<MenuItem> getMenuItemList() {
         return menuItemList;
     }
@@ -66,23 +107,7 @@ public class Menu extends AbstractPersistableCustom<Long> {
         this.menuTableList = menuTableList;
     }
 
-
-    public Map<String ,Object> update(JsonCommand command){
-
-        final Map<String, Object> actualChanges = new LinkedHashMap<>(9);
-
-        if (command.isChangeInIntegerParameterNamed(MenuConstants.menuPlacementParam,this.menuPlacement.ordinal())) {
-            final Integer newValue = command.integerValueOfParameterNamed(MenuConstants.menuPlacementParam);
-            actualChanges.put(MenuConstants.menuPlacementParam, newValue);
-            this.menuPlacement = (MENU_PLACEMENT) EnumTemplateHelper.fromInt(MENU_PLACEMENT.values() ,newValue);
-        }
-
-        if (command.isChangeInStringParameterNamed(GenericConstants.nameParam,this.name)){
-            final String newValue = command.stringValueOfParameterNamed(GenericConstants.nameParam);
-            actualChanges.put(GenericConstants.nameParam, newValue);
-            this.name = newValue ;
-        }
-
-        return actualChanges ;
+    public List<MenuTable> getMenuTableList() {
+        return menuTableList;
     }
 }

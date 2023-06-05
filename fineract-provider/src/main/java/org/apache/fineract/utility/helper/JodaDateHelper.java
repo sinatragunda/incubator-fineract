@@ -18,8 +18,7 @@ public class JodaDateHelper {
 
         DateTimeFormatter dateFormatter = DateTimeFormat.forPattern(pattern);
         String dateFormatted = localDate.toString(pattern);
-
-        System.err.println("-----------formatted joda date is "+dateFormatted);
+        //System.err.println("-----------formatted joda date is "+dateFormatted);
         return dateFormatted ;
     }
 }

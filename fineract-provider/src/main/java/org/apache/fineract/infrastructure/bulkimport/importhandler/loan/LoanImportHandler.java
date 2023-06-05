@@ -34,6 +34,7 @@ import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.DateSe
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.EnumOptionDataValueSerializer;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.infrastructure.generic.exceptions.ArrayListExceptionsHelper;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
 import org.apache.fineract.portfolio.loanaccount.data.*;
 import org.apache.fineract.portfolio.loanaccount.helper.NkwaziLoanAdjustmentsHelper;
@@ -98,11 +99,16 @@ public class LoanImportHandler implements ImportHandler {
         Sheet loanSheet = workbook.getSheet(TemplatePopulateImportConstants.LOANS_SHEET_NAME);
         Integer noOfEntries = ImportHandlerUtils.getNumberOfRows(loanSheet, TemplatePopulateImportConstants.FIRST_COLUMN_INDEX);
 
+
+        System.err.println("-----number of entries "+noOfEntries);
+
         try{    
             for (int rowIndex = 1; rowIndex <= noOfEntries; rowIndex++) {
 
                     Row row;
                     row = loanSheet.getRow(rowIndex);
+
+                    
                     if ( ImportHandlerUtils.isNotImported(row, LoanConstants.STATUS_COL)) {
                         try{
                             addLoanToList(locale, dateFormat, row);
@@ -446,7 +452,11 @@ public class LoanImportHandler implements ImportHandler {
         int progressLevel = 0;
         String loanId;
         String errorMessage="";
+
+        System.err.println("-------------------loans size is "+loans.size());
+
         for (int i = 0; i < loans.size(); i++) {
+
             Row row = loanSheet.getRow(loans.get(i).getRowIndex());
             Cell errorReportCell = row.createCell(LoanConstants.FAILURE_REPORT_COL);
             Cell statusCell = row.createCell(LoanConstants.STATUS_COL);
@@ -467,17 +477,32 @@ public class LoanImportHandler implements ImportHandler {
 
                 if (progressLevel <= 2 && disbursalDates.get(i)!=null) progressLevel = importDisbursalData(result, i,dateFormat);
 
-                if (loanRepayments.get(i) != null) progressLevel = importLoanRepayment(result, i,dateFormat);
+                
+                boolean hasIndexBoundError = ArrayListExceptionsHelper.hasIndexBoundError(loanRepayments ,i);
+
+                System.err.println("----------has index bound error ? "+hasIndexBoundError+"-------for loan id "+loanId);
+                if(!hasIndexBoundError){
+                    System.err.println("-----------system suppose to skip this shit and move on ");
+                    if(loanRepayments.get(i) != null){
+                        progressLevel = importLoanRepayment(result, i,dateFormat);
+                    }
+                }
 
                 successCount++;
+
+                System.err.println("--------------success count is "+successCount);
+
+
                 statusCell.setCellValue(TemplatePopulateImportConstants.STATUS_CELL_IMPORTED);
                 statusCell.setCellStyle(ImportHandlerUtils.getCellStyle(workbook, IndexedColors.LIGHT_GREEN));
             }catch (RuntimeException ex){
 
-                System.err.println("-------------------------------------failed processing loan ----------------");
                 errorCount++;
                 ex.printStackTrace();
                 errorMessage=ImportHandlerUtils.getErrorMessage(ex);
+
+                System.err.println("-------------------------------------failed processing loan with message----------------"+errorMessage);
+                
                 writeLoanErrorMessage(loanId,errorMessage,progressLevel,statusCell,errorReportCell,row);
             }
 

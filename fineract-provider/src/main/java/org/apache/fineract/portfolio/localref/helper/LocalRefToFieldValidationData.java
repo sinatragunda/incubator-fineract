@@ -26,6 +26,7 @@ public class LocalRefToFieldValidationData {
 
         List<FieldValidationData> fieldValidationDataSet = new ArrayList<>();
         Boolean has = OptionalHelper.isPresent(localRefData);
+        Integer sequenceNumber[] = {0}; 
 
         if(has) {
 
@@ -50,7 +51,9 @@ public class LocalRefToFieldValidationData {
                     fieldType = FIELD_TYPE.MANDATORY;
                 }
 
-                FieldValidationData fieldValidationData = new FieldValidationData(name, name, fieldType, null, comparisonGroup, dataListOptions, name, elementType);
+                ++sequenceNumber[0];
+
+                FieldValidationData fieldValidationData = new FieldValidationData(name, name, fieldType, null, comparisonGroup, dataListOptions, name, elementType ,sequenceNumber[0]);
                 fieldValidationDataSet.add(fieldValidationData);
             };
 
@@ -63,18 +66,14 @@ public class LocalRefToFieldValidationData {
     public static List<EnumOptionData> getTemplateData(LocalRefData e) {
 
         List<EnumOptionData> dataListOptions = new ArrayList<>();
-        System.err.println("------------------------get template data "+OptionalHelper.isPresent(e));
         try {
             CodeData codeData = e.getCodeData();
             Collection codeValuesList = codeData.getCodeValueDataCollection();
             dataListOptions = EnumeratedDataHelper.enumeratedData(codeValuesList);
         }
         catch (Exception n){
-            n.printStackTrace();
+            //n.printStackTrace();
         }
-
-        System.err.println("-----------------we have elements now ? "+dataListOptions.size());
-
         return dataListOptions;
     }
 }

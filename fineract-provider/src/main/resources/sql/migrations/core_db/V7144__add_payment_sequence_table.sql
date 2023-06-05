@@ -18,7 +18,7 @@
 -- Created by Sinatra Gunda (treyviis@gmail.com)
 -- Created 23/03/2023 1759
 
-CREATE TABLE `m_payment_rule_sequence` (
+CREATE TABLE IF NOT EXISTS `m_payment_rule_sequence` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`value` VARCHAR(200) NOT NULL DEFAULT '0',
 	`sequence_number` INT(10) NOT NULL DEFAULT 0,

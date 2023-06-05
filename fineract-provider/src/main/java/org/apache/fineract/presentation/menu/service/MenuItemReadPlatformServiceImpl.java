@@ -62,7 +62,11 @@ public class MenuItemReadPlatformServiceImpl implements MenuItemReadPlatformServ
     @Override
     public List<MenuItemData> retrieveAllByMenuId(Long menuId) {
 
-        String sql = String.format("select %s join m_menu_table mmt where mmt.id = ?",menuItemMapper.schema());
+        String sql = String.format("select %s join m_menu_table mmt on mmt.menu_item_id = mi.id where mmt.menu_id = ?",menuItemMapper.schema());
+        
+
+        //System.err.println("=====================query is "+sql);
+
         return this.jdbcTemplate.query(sql ,menuItemMapper ,new Object[]{menuId});
     }
 

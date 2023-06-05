@@ -105,7 +105,7 @@ public class ClientPersonImportHandler implements ImportHandler {
             activationDate=submittedOn;
         }
         String mobileNo=null;
-        if (ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row)!=null)
+        if (ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row,true)!=null)
             mobileNo = ImportHandlerUtils.readAsLong(ClientPersonConstants.MOBILE_NO_COL, row).toString();
         LocalDate dob = ImportHandlerUtils.readAsDate(ClientPersonConstants.DOB_COL, row);
 

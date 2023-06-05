@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Component">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/fineract-provider/libs/Component.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../WeseComponents/Component/out/artifacts/Component_jar2/Component.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -25,7 +25,7 @@ public class TemplateRecordHelper {
 
         String applicationTableName = dataTable.getApplicationTableName();
 
-        System.err.println("==================print table application name "+applicationTableName);
+        //System.err.println("==================print table application name "+applicationTableName);
 
         List<? extends Record> recordList = new ArrayList<>();
         DATA_TABLE_CATEGORY tableCategory = DATA_TABLE_CATEGORY.fromString(applicationTableName);
@@ -38,7 +38,7 @@ public class TemplateRecordHelper {
                 break;
         }
 
-        System.err.println("================record size is "+recordList.size()+"=========whsts this effectively final thing");
+        //System.err.println("================record size is "+recordList.size()+"=========whsts this effectively final thing");
 
         List<? extends Record> finalRecordList = recordList;
 

@@ -23,9 +23,10 @@ public class LoanTransactionRepositoryWrapper {
     }
 
     public LoanTransaction findOneWithNotFoundDetection(Long id){
+        
         LoanTransaction loanTransaction = loanTransactionRepository.findOne(id);
+        
         Boolean has = OptionalHelper.isPresent(loanTransaction);
-
         if(!has){
             throw new LoanTransactionNotFoundException(id);
         }

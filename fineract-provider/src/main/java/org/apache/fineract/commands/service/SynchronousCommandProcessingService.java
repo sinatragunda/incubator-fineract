@@ -145,8 +145,6 @@ public class SynchronousCommandProcessingService implements CommandProcessingSer
 
     private NewCommandSourceHandler findCommandHandler(final CommandWrapper wrapper) {
 
-        System.err.println("-==================why do we come here though ? ");
-
         NewCommandSourceHandler handler = null;
 
         if (wrapper.isDatatableResource()) {

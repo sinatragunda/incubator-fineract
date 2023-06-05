@@ -105,6 +105,29 @@ public class ImportHandlerUtils {
 
     }
 
+    /**
+     * Added 01/06/2023 at 0020 
+     * With error handling capabilities 
+     */
+    public static Long readAsLong(int colIndex, Row row ,boolean throwError) {
+        
+        if(throwError){
+            try{
+                return readAsLong(colIndex ,row);
+            }
+            catch(Exception e){
+                System.err.println("----------------Error reading long "+e.getMessage());
+            }
+        }
+        else{
+            return readAsLong(colIndex ,row);
+        }
+
+        return null ;
+
+    }
+     
+
     public static Long readAsLong(int colIndex, Row row) {
         Cell c = row.getCell(colIndex);
         if (c == null || c.getCellType() == Cell.CELL_TYPE_BLANK)

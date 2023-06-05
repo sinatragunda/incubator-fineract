@@ -3385,6 +3385,18 @@ public class CommandWrapperBuilder {
     }
 
     /**
+     * Added 30/05/2023 at0028
+     */ 
+    public CommandWrapperBuilder updateMenu(Long id) {
+        this.actionName = "UPDATE";
+        this.entityName = "MENU";
+        this.href = "/menu";
+        this.entityId = id;
+        return this;
+    }
+
+
+    /**
      * Added 10/04/1930 at 1930
      */ 
     public CommandWrapperBuilder createSearch() {
@@ -3404,7 +3416,6 @@ public class CommandWrapperBuilder {
         this.href = "/version";
         return this;
     }
-
 
 
     public CommandWrapperBuilder createMenu() {

@@ -7,6 +7,7 @@ package org.apache.fineract.portfolio.localref.enumerations;
 import com.wese.component.defaults.enumerations.CLASS_LOADER;
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.localref.exception.RefTableNotFoundException;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.IEnum;
 
@@ -34,7 +35,8 @@ public enum REF_TABLE implements IEnum {
     GL_ACCOUNT("Ledger Account" ,CLASS_LOADER.GL_ACCOUNT),
     VERSION("Version",null),
     PAYMENT_RULE("Payment Rule" ,null),
-    FUNCTION("Function" ,null);
+    FUNCTION("Function" ,null),
+    ACCOUNT_TRANSACTION("Account Transaction" ,CLASS_LOADER.ACCOUNT_TRANSACTION);
 
     private String code;
     private CLASS_LOADER classLoader;
@@ -60,6 +62,17 @@ public enum REF_TABLE implements IEnum {
             }
         }
         return null ;
+    }
+
+    public static REF_TABLE fromClassLoaderWithException(CLASS_LOADER classLoader){
+
+        REF_TABLE refTable = fromClassLoader(classLoader);
+        boolean has = OptionalHelper.has(refTable);
+
+        if(!has){
+            throw new RefTableNotFoundException(classLoader.getCode());
+        }
+        return refTable;
     }
 
     public static List template(){

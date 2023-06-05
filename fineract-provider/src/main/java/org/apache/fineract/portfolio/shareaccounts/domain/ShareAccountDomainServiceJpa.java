@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -182,8 +183,11 @@ public class ShareAccountDomainServiceJpa implements ShareAccountDomainService {
 
         Long shareAccountTransactionId = reverseShareAccountTransaction.getId();
         Date transactionDate = reverseShareAccountTransaction.getTransactionDate();
+        
         ShareAccountTransaction shareAccountTransaction = shareAccountTransactionWrapper.findShareAccountTransaction(shareAccountTransactionRepository ,shareAccountTransactionId);
-        boolean isPresent = Optional.ofNullable(shareAccountTransaction).isPresent();
+        
+        boolean isPresent = OptionalHelper.isPresent(shareAccountTransaction);
+        
         boolean status = true;
 
         if(isPresent){

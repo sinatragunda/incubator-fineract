@@ -201,7 +201,7 @@ public class DataValidatorBuilder {
 
     public DataValidatorBuilder notNull() {
 
-        System.err.println("-------------------value "+parameter+"+ is null ? "+isNull);
+        //System.err.println("-------------------value "+parameter+"+ is null ? "+isNull);
 
         if (this.isNull && !this.ignoreNullValue) {
 

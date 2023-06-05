@@ -77,7 +77,7 @@ public class LocalRefRecordHelper {
             String key = entry.getKey();
             String value = entry.getValue().toString();
 
-            System.err.println("------------value is "+value+"-------------and key is ----"+key);
+            //System.err.println("------------value is "+value+"-------------and key is ----"+key);
 
             LocalRef localRef = this.localRefRepositoryWrapper.findOneWithoutNotFoundDetection(key);
 

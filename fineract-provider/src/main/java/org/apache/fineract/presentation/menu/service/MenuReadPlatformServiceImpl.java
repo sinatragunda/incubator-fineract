@@ -41,7 +41,7 @@ public class MenuReadPlatformServiceImpl implements MenuReadPlatformService{
 
     private Consumer<MenuData> attachMenuItems = (e)->{
         Long id = e.getId();
-        System.err.println("--------------attach menu item for id "+id);
+        //System.err.println("--------------attach menu item for id "+id);
         List<MenuItemData> menuItemDataList = menuItemReadPlatformService.retrieveAllByMenuId(id);
         e.setMenuItemDataList(menuItemDataList);
     };
@@ -67,7 +67,7 @@ public class MenuReadPlatformServiceImpl implements MenuReadPlatformService{
     @Override
     public MenuData retrieveOne(Long id){
 
-        String sql = String.format("select %s" ,menuMapper.schema());
+        String sql = String.format("select %s where m.id = ? " ,menuMapper.schema());
         MenuData menuData = this.jdbcTemplate.queryForObject(sql ,menuMapper ,new Object[]{id});
         attachMenuItems.accept(menuData);
         return menuData;

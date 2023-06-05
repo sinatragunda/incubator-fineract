@@ -233,7 +233,7 @@ public class ReadReportingServiceImpl implements ReadReportingService {
         final GenericResultsetData result = this.genericDataService.fillGenericResultSet(sql);
 
         final long elapsed = System.currentTimeMillis() - startTime;
-        logger.info("FINISHING Report/Request Name: " + name + " - " + type + "     Elapsed Time: " + elapsed);
+        //logger.info("FINISHING Report/Request Name: " + name + " - " + type + "     Elapsed Time: " + elapsed);
         return result;
     }
 

@@ -69,6 +69,8 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
     @Override
     public LocalRefData template(REF_TABLE refTable) {
 
+        System.err.println(refTable);
+
         Collection codeDataCollection = codeReadPlatformService.retrieveAllCodes();
         LocalRefData localRefData = LocalRefData.template();
         localRefData.setCodeDataCollection(codeDataCollection);
@@ -172,7 +174,12 @@ public class LocalRefReadPlatformServiceImpl implements LocalRefReadPlatformServ
      */
     private Collection<LocalRefData> retrieveEmptyLocalRefs(final REF_TABLE refTable) {
 
+        //System.err.println("--------------------ref table is "+refTable);
+
         final String sql = String.format("select %s where lr.ref_table = ?",localRefMapper.schema());
+
+        //System.err.println("------------------sql for empty refs is "+sql);
+
         Collection<LocalRefData> localRefDataCollection = this.jdbcTemplate.query(sql, this.localRefMapper, new Object[] { refTable.ordinal()});
         localRefDataCollection.forEach(attachCodeValues);
         return localRefDataCollection;

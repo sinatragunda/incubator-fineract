@@ -25,6 +25,7 @@ import javax.persistence.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Entity
 @Table(name="m_menu_item")
@@ -114,5 +115,18 @@ public class MenuItem extends AbstractPersistableCustom<Long> {
 
     public String getParam(){
         return this.param;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MenuItem)) return false;
+        MenuItem menuItem = (MenuItem) o;
+        return this.getId().equals(menuItem.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

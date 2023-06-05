@@ -162,6 +162,8 @@ public class ScreenAssembler {
 
         Integer comparisonTypeInt = fromJsonHelper.extractIntegerSansLocaleNamed(ScreenApiConstant.comparisonTypeParam ,element);
 
+        Integer sequenceNumber = fromJsonHelper.extractIntegerSansLocaleNamed(ScreenApiConstant.sequenceNumberParam ,element);
+
         COMPARISON_TYPE comparisonType = (COMPARISON_TYPE) EnumTemplateHelper.fromIntEx(COMPARISON_TYPE.values(),comparisonTypeInt);
         boolean mandatory = fromJsonHelper.extractBooleanNamed(ScreenApiConstant.mandatoryParam ,element);
 
@@ -183,6 +185,7 @@ public class ScreenAssembler {
         ELEMENT_TYPE elementType = ELEMENT_TYPE.SYSTEM;
         LocalRef localRef = null ;
         Boolean hasModelName = OptionalHelper.isPresent(modelName);
+
         if (!hasModelName){
             /**
              * Added 04/05/2023 at 0953
@@ -201,7 +204,7 @@ public class ScreenAssembler {
             wsScript = wsScriptRepositoryWrapper.findOneWithNotFoundDetection(wsScriptId);
         }
 
-        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate ,elementType ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null ,wsScript ,localRef);
+        ScreenElement screenElement = new ScreenElement(key ,displayName , modelName ,comparisonType ,comparisonGroup , gate ,elementType ,showOnUi ,mandatory ,value ,screen ,parentScreenElement ,null ,wsScript ,localRef ,sequenceNumber);
 
         System.err.println("------------element to string  "+screenElement);
 

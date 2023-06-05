@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
+import org.apache.fineract.infrastructure.generic.helper.DataValidationHelper;
 
 public class DocumentCommandValidator {
 
@@ -48,8 +49,12 @@ public class DocumentCommandValidator {
         baseDataValidator.reset().anyOfNotNull(this.command.getName(), this.command.getFileName(), this.command.getDescription(),
                 this.command.getLocation(), this.command.getSize());
 
-        if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
-                "Validation errors exist.", dataValidationErrors); }
+        if (!dataValidationErrors.isEmpty()) { 
+
+            DataValidationHelper.printError(dataValidationErrors);
+            throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
+                "Validation errors exist.", dataValidationErrors); 
+        }
     }
 
     public void validateForCreate() {

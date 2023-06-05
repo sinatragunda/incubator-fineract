@@ -18,7 +18,7 @@
 
 -- Created 30/03/2023 1910 by Sinatra Gunda
 
-CREATE TABLE `m_menu` (
+CREATE TABLE IF NOT EXISTS `m_menu` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(50) NOT NULL,
 	`menu_placement` SMALLINT NOT NULL,

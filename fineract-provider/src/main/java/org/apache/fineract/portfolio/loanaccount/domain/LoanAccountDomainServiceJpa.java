@@ -271,7 +271,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
 
     private void saveAndFlushLoanWithDataIntegrityViolationChecks(final Loan loan) {
         try {
-            System.err.println("----------------save and flush this shit ---------------");
+            //System.err.println("----------------save and flush this shit ---------------");
             List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
             for (LoanRepaymentScheduleInstallment installment : installments) {
                 if (installment.getId() == null) {
@@ -294,7 +294,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
     @Override
     public void saveLoanWithDataIntegrityViolationChecks(final Loan loan) {
         try {
-            System.err.println("--------------------violation checks --------");
+            //System.err.println("--------------------violation checks --------");
             List<LoanRepaymentScheduleInstallment> installments = loan.getRepaymentScheduleInstallments();
             for (LoanRepaymentScheduleInstallment installment : installments) {
                 if (installment.getId() == null) {
@@ -480,7 +480,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
         loanTransaction.reverse();
         saveLoanTransactionWithDataIntegrityViolationChecks(loanTransaction);
 
-        System.err.println("------------------recalculate accruals here son ,with new method now  ------------------");
+        //System.err.println("------------------recalculate accruals here son ,with new method now  ------------------");
 
         Loan loan = loanTransaction.getLoan();
 
@@ -879,7 +879,7 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                 }
             }
         }
-        System.err.println("---disableStandingInstructionsLinkedToClosedLoan function-----------");
+        //System.err.println("---disableStandingInstructionsLinkedToClosedLoan function-----------");
     }
 
     /**

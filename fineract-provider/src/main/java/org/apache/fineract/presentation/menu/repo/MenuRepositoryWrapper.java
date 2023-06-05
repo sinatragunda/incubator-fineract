@@ -18,6 +18,7 @@ package org.apache.fineract.presentation.menu.repo; /**
  */
 import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.presentation.menu.domain.Menu;
+import org.apache.fineract.presentation.menu.enumerations.MENU_PLACEMENT;
 import org.apache.fineract.presentation.menu.exception.MenuNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,11 @@ public class MenuRepositoryWrapper {
 
         if (!has) { throw new MenuNotFoundException(id); }
 
+        return menu;
+    }
+
+    public Menu findOneByMenuPlacement(final MENU_PLACEMENT menuPlacement){
+        final Menu menu = this.repository.findOneByMenuPlacement(menuPlacement);
         return menu;
     }
 

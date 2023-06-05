@@ -201,11 +201,11 @@ public class PortfolioAccountReadPlatformServiceImpl implements PortfolioAccount
                     sqlParams.add(portfolioAccountDTO.getCurrencyCode());
                 }
 
-                System.err.println("----------------------------retrieve all sql is ------------"+sql);
+                //System.err.println("----------------------------retrieve all sql is ------------"+sql);
 
                 accounts = this.jdbcTemplate.query(sql, this.sharesAccountMapper, sqlParams.toArray());
 
-                System.err.println("-------------------portfoliolist is ---------"+accounts.size());
+                //System.err.println("-------------------portfoliolist is ---------"+accounts.size());
             
             default:
             break;

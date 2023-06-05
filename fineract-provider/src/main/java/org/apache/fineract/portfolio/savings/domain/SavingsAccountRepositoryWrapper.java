@@ -53,7 +53,7 @@ public class SavingsAccountRepositoryWrapper {
     @Transactional(readOnly=true)
     public SavingsAccount findOneWithNotFoundDetection(final Long savingsId) {
 
-        System.err.println("--------------------is savings id ----"+savingsId);
+        //System.err.println("--------------------is savings id ----"+savingsId);
         final SavingsAccount account = this.repository.findOne(savingsId);
 
         if (account == null) { throw new SavingsAccountNotFoundException(savingsId); }
@@ -64,7 +64,7 @@ public class SavingsAccountRepositoryWrapper {
     @Transactional(readOnly=true)
     public SavingsAccount findOneWithNotFoundDetection(final Long savingsId, final DepositAccountType depositAccountType) {
         
-        System.err.println("--------------------is savings id  by deposit type ----"+savingsId);
+        //System.err.println("--------------------is savings id  by deposit type ----"+savingsId);
         
         final SavingsAccount account = this.repository.findByIdAndDepositAccountType(savingsId, depositAccountType.getValue());
         if (account == null) { throw new SavingsAccountNotFoundException(savingsId); }

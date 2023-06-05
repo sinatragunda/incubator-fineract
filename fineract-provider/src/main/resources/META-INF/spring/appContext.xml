@@ -73,6 +73,7 @@
 										  org.apache.fineract.presentation.menu.*,
 										  org.apache.fineract.presentation.screen.*,
 										  org.apache.fineract.utility.*,
+										  org.apache.fineract.portfolio.ssbpayments.*,
 										  org.taat.wese.weseaddons.ssb.*">
 
 		<context:exclude-filter expression="org.springframework.stereotype.Controller"
@@ -142,6 +143,9 @@
 
 	<!-- Added 26/0/2023 at 1054 -->
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.wsplugin.*"/>
+
+	<!-- Added 26/05/2023 at 1200 -->
+	<jpa:repositories base-package="org.apache.fineract.portfolio.ssbpayments.*"/>
 
 	<jpa:repositories base-package="org.apache.fineract.infrastructure.documentmanagement.repo.*"/>
 

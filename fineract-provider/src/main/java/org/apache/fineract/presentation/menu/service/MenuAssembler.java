@@ -58,15 +58,20 @@ public class MenuAssembler {
 
  	public List<MenuItem> menuItemsFromJsonIdKeys(JsonCommand command){
 
- 		JsonArray array = command.arrayOfParameterNamed(MenuConstants.menuItemsParam);
- 		List<MenuItem> menuItems = new ArrayList<>();
- 		for(JsonElement element: array){
-			JsonObject jsonObject = element.getAsJsonObject();
- 			JsonCommand arg = JsonCommandHelper.jsonCommand(fromJsonHelper, jsonObject.toString());
- 			Long id = arg.longValueOfParameterNamed("id");
- 			MenuItem menuItem = this.menuItemRepositoryWrapper.findOneWithNotFoundDetection(id);
- 			menuItems.add(menuItem);
- 		}
+ 		 JsonArray array = command.arrayOfParameterNamed(MenuConstants.menuItemsParam);
+ 		 List<MenuItem> menuItems = new ArrayList<>();
+
+		 boolean has = OptionalHelper.has(array);
+
+		 if(has) {
+			 for(JsonElement element : array) {
+				 JsonObject jsonObject = element.getAsJsonObject();
+				 JsonCommand arg = JsonCommandHelper.jsonCommand(fromJsonHelper, jsonObject.toString());
+				 Long id = arg.longValueOfParameterNamed("id");
+				 MenuItem menuItem = this.menuItemRepositoryWrapper.findOneWithNotFoundDetection(id);
+				 menuItems.add(menuItem);
+			 }
+		 }
 
  		return menuItems;
  	}

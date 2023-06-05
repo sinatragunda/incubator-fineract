@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.infrastructure.dataqueries.data;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.utility.helper.EnumTemplateHelper;
 import org.apache.fineract.utility.service.IEnum;
@@ -55,7 +56,14 @@ public enum EntityTables implements IEnum {
 	APPLICATION("m_application",
 			new Integer[]{StatusEnum.CREATE.getCode(),
 					StatusEnum.ACTIVATE.getCode()},
-			"m_application_id" ,"Hybrid"),;
+			"m_application_id" ,"Hybrid"),
+	/**
+	 * Added 19/05/2023 at 0123
+	 */ 
+	OFFICE("m_office",
+			new Integer[]{StatusEnum.CREATE.getCode(),
+					StatusEnum.ACTIVATE.getCode()},
+			"office_id" ,"Office");
 
 	private static final Map<String, EntityTables> lookup = new HashMap<String, EntityTables>();
 	static {
@@ -78,15 +86,12 @@ public enum EntityTables implements IEnum {
 	}
 
 	public static List<String> getEntitiesList() {
-
+		
 		List<String> data = new ArrayList<String>();
-
 		for (EntityTables entity : EntityTables.values()){
-			System.err.println("=================what are we pushing here ? "+entity.name);
 			data.add(entity.name);
 		}
 		return data;
-
 	}
 
 	public static Integer[] getStatus(String name) {
@@ -113,17 +118,22 @@ public enum EntityTables implements IEnum {
 	}
 
 	public static String portfolioName(String table){
+
 		EntityTables entityTables = (EntityTables)EnumTemplateHelper.fromString(EntityTables.values() ,table);
-		return Optional.ofNullable(entityTables.portfolioName).orElse("Undefined");
+		
+		boolean has = OptionalHelper.has(entityTables);
+		if(has){
+			return entityTables.portfolioName;
+		}
+		return null;
 	}
 
 	public static List<EnumOptionData> template(){
 		List<EnumOptionData> enumOptionDataList = new ArrayList<>();
 		EntityTables[] entityTables = EntityTables.values();
 		for(EntityTables e : entityTables){
-			System.err.println("-=================do we even get here son ? ");
-			EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.name ,e.portfolioName);
-			enumOptionDataList.add(enumOptionData);
+		    EnumOptionData enumOptionData = new EnumOptionData(Long.valueOf(e.ordinal()) ,e.name ,e.portfolioName);
+		    enumOptionDataList.add(enumOptionData);
 		}
 		return enumOptionDataList;
 	}

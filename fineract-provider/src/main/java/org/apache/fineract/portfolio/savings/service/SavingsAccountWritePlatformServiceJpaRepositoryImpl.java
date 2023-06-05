@@ -629,9 +629,9 @@ public class SavingsAccountWritePlatformServiceJpaRepositoryImpl implements Savi
         TransactionCode transactionCode = transactionCodeFromGlEntries(transactionId.toString());
 
         //System.err.println("-------------------------------------existing ids are----------------- ");
-        existingTransactionIds.stream().forEach((e)-> System.err.println(e));
-        //System.err.println("-------------------------------------existing reversed ids are----------------- ");
-        existingReversedTransactionIds.stream().forEach((e)-> System.err.println(e));
+        //existingTransactionIds.stream().forEach((e)-> System.err.println("------is this where the trans is "+e));
+        
+        //existingReversedTransactionIds.stream().forEach((e)-> System.err.println("------is this where the trans is "+e));
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds ,transactionCode);
         //System.err.println("---------------------------we should then mark the transactions as reversed here ? ");

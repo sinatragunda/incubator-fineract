@@ -91,6 +91,9 @@ public class ShareAccountTransactionWritePlatformServiceJpaRepositoryImpl implem
         	handleDataIntegrityIssues(jsonCommand, throwable, dve);
         	return CommandProcessingResult.empty();
         }
+        catch (NullPointerException n){
+            return CommandProcessingResult.empty();
+        }
     }
 
     private void handleDataIntegrityIssues(final JsonCommand command, final Throwable realCause, final Exception dve) {

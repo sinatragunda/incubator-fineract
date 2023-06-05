@@ -594,10 +594,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
     // Like creates duplicate entries that need to be refiltered so to not have duplicate entries 
     private Predicate<JournalEntryData> filterDuplicateEntries(String transactionId){
 
-        Predicate<JournalEntryData> predicate = (e)->{
-             //System.err.printf("-------------comparing %s with id %s\n" ,e.getTransactionId() ,transactionId);
-             return e.getTransactionId().equalsIgnoreCase(transactionId);   
-        };
+        Predicate<JournalEntryData> predicate = (e)-> e.getTransactionId().equalsIgnoreCase(transactionId);   
         return predicate;
     }
 
@@ -612,8 +609,7 @@ public class JournalEntryReadPlatformServiceImpl implements JournalEntryReadPlat
     public Collection<? extends EnumeratedData> retrieveUsingQuery(String query) {
 
         GLJournalEntryMapper rm = new GLJournalEntryMapper(null);
-        String sql = String.format("select %s where %s" ,rm.schema() ,query);
-
+        String sql = String.format("select SQL_CALC_FOUND_ROWS %s where %s LIMIT 5000" ,rm.schema() ,query);
         return this.jdbcTemplate.query(sql ,rm);
     }
 }
