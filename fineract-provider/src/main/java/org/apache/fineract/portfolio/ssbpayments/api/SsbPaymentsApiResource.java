@@ -123,7 +123,7 @@ public class SsbPaymentsApiResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String postFinancialTransactions(@FormDataParam("file") InputStream uploadedInputStream,@FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("ssb") String ssb) {
 
-        System.err.println("-------------------------- has filedetail ? "+ OptionalHelper.has(fileDetail));
+        //System.err.println("-------------------------- has filedetail ? "+ OptionalHelper.has(fileDetail));
         String filename = fileDetail.getFileName();
         String response = ssbService.postFinancialTransactions(filename ,uploadedInputStream ,ssb).toString();
         return response;

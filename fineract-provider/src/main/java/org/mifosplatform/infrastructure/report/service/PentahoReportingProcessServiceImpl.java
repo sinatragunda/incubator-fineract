@@ -223,11 +223,20 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                 HtmlReportUtil.createStreamHTML(masterReport, baos);
                 return Response.ok().entity(baos.toByteArray()).type("text/html").build();
             }
-        } catch (final ResourceException e) {
+        } catch (final ResourceException e){
+
+            System.err.println("------resource exception----------error is "+e.getMessage());
+            e.printStackTrace();
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         } catch (final ReportProcessingException e) {
+
+            System.err.println("----report processing ------------error is "+e.getMessage());
+            e.printStackTrace();
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         } catch (final IOException e) {
+
+            System.err.println("--io exception--------------error is "+e.getMessage());
+            e.printStackTrace();
             throw new PlatformDataIntegrityException("error.msg.reporting.error", e.getMessage());
         }
 

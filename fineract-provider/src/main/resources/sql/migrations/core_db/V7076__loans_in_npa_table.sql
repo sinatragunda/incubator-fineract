@@ -10,7 +10,7 @@ ifnull(ml.arrearstolerance_amount,0) AS "Arreas Tolerance",
 IFNULL(ml.total_outstanding_derived ,0) AS "Total Due" 
 FROM m_loan ml JOIN m_client mc ON ml.client_id = mc.id  
 WHERE mc.office_id = ${officeId} 
-AND ml.is_npa = TRUE','Used For keeping track of loans in Arreas today', 0, 1,1);
+AND ml.is_npa = 1','Used For keeping track of loans in Arreas today', 0, 1,1);
 
 INSERT INTO stretchy_report_parameter ( report_id, parameter_id, report_parameter_name) 
 VALUES ((select sr.id from stretchy_report sr where sr.report_name='Loans In Npa'),
