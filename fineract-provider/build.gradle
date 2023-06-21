@@ -273,9 +273,14 @@ task dist(type:Zip){
 
 task deployPentahoReports() {
 	def pentahoReportDir = System.properties['user.home'] + System.properties['file.separator'] + '.mifosx' + System.properties['file.separator'] + 'pentahoReports'
-	copy {
-        from "src/main/pentahoReports"
-        into pentahoReportDir
+	def prodReportDir = "C:\\Users\\HP\\Documents\\GitHub\\eb-wesecbs-prod\\assets\\.mifosx\\pentahoReports"
+    def devReportDir = "C:\\Users\\HP\\Documents\\GitHub\\eb-wesecbs-dev\\assets\\.mifosx\\pentahoReports"
+
+    [pentahoReportDir ,prodReportDir ,devReportDir].each{ dest->
+        copy {
+            from "src/main/pentahoReports"
+            into dest
+        }
     }
 
     doLast {

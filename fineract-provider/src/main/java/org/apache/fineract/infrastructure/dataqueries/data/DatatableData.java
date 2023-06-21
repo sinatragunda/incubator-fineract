@@ -120,5 +120,10 @@ public class DatatableData {
     public String getApplicationTableName(){
         return this.applicationTableName;
     }
+
+    public Boolean isHybridTable(){
+        
+        return this.applicationTableName.equalsIgnoreCase("m_application");
+    }
     
 }

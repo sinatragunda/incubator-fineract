@@ -74,5 +74,7 @@ public class LoanConstants {
 
     public static final int PRINCIPAL_COL = 50;//AY
     public static final int CLIENT_IDENTIFIER_TYPE = 51;//AZ    
+    public static final int NOTE_COL = 54 ;// Note col range to 56
+
 
 }

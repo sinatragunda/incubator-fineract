@@ -23,6 +23,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.domain.JdbcSupport;
@@ -111,6 +114,30 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
 
     }
 
+    public List<DatatableData> retrieveTemplatesForHybridTable(String entity){
+
+        System.err.println("-----------------retieving hybrid table linkage ======== ");
+
+        List<EntityDatatableChecks> tableRequiredBeforeAction = this.entityDatatableChecksRepository.findByEntity(entity);
+
+        List<DatatableData> ret = new ArrayList<>();
+            
+        Consumer<EntityDatatableChecks> hybridTables = (e)->{
+
+            for (EntityDatatableChecks t : tableRequiredBeforeAction){
+                DatatableData datatableData = this.readWriteNonCoreDataService.retrieveDatatable(t.getDatatableName());
+                setEntries(datatableData);
+                ret.add(datatableData);
+            }
+        };
+
+        tableRequiredBeforeAction.stream().forEach(hybridTables);
+
+        Predicate<DatatableData> isHybridTable = (e)-> e.getApplicationTableName().equals("m_application");
+
+        return ret.stream().filter(isHybridTable).collect(Collectors.toList());
+    }
+
     @Override
     public List<DatatableData> retrieveTemplates(final Long status, final String entity, final Long productId) {
 
@@ -142,7 +169,7 @@ public class EntityDatatableChecksReadPlatformServiceImpl implements EntityDatat
     }
 
     /**
-     * Added 0703/2023 at 0617
+     * Added 07/03/2023 at 0617
      * Attach datatable entries ,call at template 
      * Data entries should be available to enable client to select from dropdown 
      */  

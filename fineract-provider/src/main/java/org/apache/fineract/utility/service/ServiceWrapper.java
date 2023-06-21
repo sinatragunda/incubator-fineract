@@ -5,6 +5,7 @@
 package org.apache.fineract.utility.service;
 
 
+import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.portfolio.loanproduct.service.LoanProductReadPlatformService;
 import org.apache.fineract.portfolio.products.service.ProductReadPlatformService;
@@ -39,6 +40,7 @@ public class ServiceWrapper {
     }
 
     public SavingsAccountReadPlatformService getSavingsAccountReadPlatformService() {
+        //ServerSentSSbProcessUpdate.streamSseMvc()
         return savingsAccountReadPlatformService;
     }
 

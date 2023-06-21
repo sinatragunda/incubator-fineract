@@ -1,12 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="029a3476-4b0e-4b78-9b15-250d3b77952b" name="Default" comment="" />
-    <ignored path="$PROJECT_DIR$/../build/" />
-    <ignored path="$PROJECT_DIR$/.gradle/" />
-    <ignored path="$PROJECT_DIR$/out/" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
+    <list default="true" id="029a3476-4b0e-4b78-9b15-250d3b77952b" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/incubator-fineract.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/helper/BigDecimalHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/helper/WarHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/handler/ReverseTransferCommandHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/helper/CloseClientUsingPaymentRules.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/helper/LoanNotesHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/data/PaymentRuleDataValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/exceptions/PaymentDirectionValidateException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/helper/CloseClientPayoutHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/exception/AccountSweepingRequiresProduct.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/exception/ClientDefaultSavingsAccountNotFound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/exception/InsufficientAccountBalanceToPayOffLoan.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/OnSavingsDepositEventListenerPaymentRules.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/sse/ServerSentEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/utility/data/ValidationException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/utility/service/InfrastructureServiceWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/incubator_fineract_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jpa-buddy.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Component.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/ssbmodule.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dependencies.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/dependencies.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider.ipr" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider.iws" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/libs/Component.jar" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/libs/Component.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/libs/ssbmodule.jar" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/libs/ssbmodule.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/commands/service/CommandWrapperBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/LoanConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/LoanConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/TemplatePopulateImportConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/constants/TemplatePopulateImportConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/ImportHandlerUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/ImportHandlerUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/loan/LoanImportHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/bulkimport/importhandler/loan/LoanImportHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/boot/db/DataSourceProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/boot/db/DataSourceProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/CommandProcessingResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/data/CommandProcessingResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/TomcatJdbcDataSourcePerTenantService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/core/service/TomcatJdbcDataSourcePerTenantService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/data/DatatableData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/data/DatatableData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/data/GenericResultsetData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/data/GenericResultsetData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/domain/EntityDatatableChecksRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/domain/EntityDatatableChecksRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/repo/HybridTableEntityRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/repo/HybridTableEntityRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/EntityDatatableChecksReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/EntityDatatableChecksReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/EntityDatatableChecksReadService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/EntityDatatableChecksReadService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/HybridTableEntityRepositoryWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/HybridTableEntityRepositoryWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/ReadWriteNonCoreDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/infrastructure/dataqueries/service/ReadWriteNonCoreDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/api/AccountTransfersApiResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/api/AccountTransfersApiResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/domain/AccountTransferDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/domain/AccountTransferDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/domain/AccountTransferTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/domain/AccountTransferTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/helper/StandingInstructionHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/helper/StandingInstructionHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/service/AccountTransfersWritePlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/service/AccountTransfersWritePlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/service/AccountTransfersWritePlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/account/service/AccountTransfersWritePlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientReadPlatformServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientReadPlatformServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/client/service/ClientWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoanApiConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoanApiConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoansApiResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/api/LoansApiResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/data/LoanAccountData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/data/LoanAccountData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/domain/LoanAccountDomainServiceJpa.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/domain/LoanAccountDomainServiceJpa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/domain/LoanTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/domain/LoanTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/guarantor/service/GuarantorDomainServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/guarantor/service/GuarantorDomainServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/helper/LoanScheduleHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/helper/LoanScheduleHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/serialization/LoanApplicationCommandFromApiJsonHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/serialization/LoanApplicationCommandFromApiJsonHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanApplicationWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/loanaccount/service/LoanWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/localref/helper/LocalRefRecordHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/localref/helper/LocalRefRecordHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/note/data/NoteData.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/note/data/NoteData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/domain/PaymentSequence.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/domain/PaymentSequence.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/enumerations/PAYMENT_CODE.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/enumerations/PAYMENT_CODE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/helper/PaymentHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/helper/SavingsPaymentRuleHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/service/PaymentRulesPlatformWriteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/paymentrules/service/PaymentRulesPlatformWriteServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/data/SavingsAccountConstant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountDomainServiceJpa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/domain/SavingsAccountTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/SavingsAccountHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/savings/helper/SavingsAccountHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountRepositoryWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/serialization/ShareAccountDataSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/serialization/ShareAccountDataSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountWritePlatformServiceJpaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/shareaccounts/service/ShareAccountWritePlatformServiceJpaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/ssbpayments/api/SsbPaymentsApiResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/portfolio/ssbpayments/api/SsbPaymentsApiResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/presentation/screen/service/ScreenAssembler.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/presentation/screen/service/ScreenAssembler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/utility/service/ServiceWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/java/org/apache/fineract/utility/service/ServiceWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Details(Pentaho).prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Details(Pentaho).prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Details.properties" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Active Loans - Details.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Client Tag Report.prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Client Tag Report.prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Payment Voucher.prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Payment Voucher.prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Shares Account Summary Taat.prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Shares Account Summary Taat.prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Shares Account Summary.prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/Shares Account Summary.prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/p.prpt" beforeDir="false" afterPath="$PROJECT_DIR$/fineract-provider/src/main/pentahoReports/p.prpt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/incubator-fineract.iml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,85 +146,22 @@
     <breakpoint_rules converted="true" />
     <ui_properties converted="true" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ApiConfig.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/ApiConfig.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="10" column="72" lean-forward="false" selection-start-line="10" selection-start-column="72" selection-end-line="10" selection-end-column="72" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TenantAwareBasicAuthenticationFilter.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/infrastructure/security/filter/TenantAwareBasicAuthenticationFilter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="93">
-              <caret line="235" column="5" lean-forward="false" selection-start-line="235" selection-start-column="5" selection-end-line="235" selection-end-column="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MODULES/mdl-fineract-provider" pinned="false" current-in-tab="false">
-        <entry file="uml://MODULES/mdl-fineract-provider">
-          <provider selected="true" editor-type-id="UmlEditorProvider">
-            <state>
-              <ID>MODULES</ID>
-              <OriginalElement>mdl-fineract-provider</OriginalElement>
-              <nodes>
-                <node x="0.0" y="0.0">mdl-fineract-provider</node>
-              </nodes>
-              <notes />
-              <edges />
-              <settings layout="Hierarchic Group" zoom="1.0" x="-182.5" y="-19.5" />
-              <SelectedNodes />
-              <Categories>
-                <Category>Test dependencies</Category>
-              </Categories>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WebXmlConfiguration.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/infrastructure/core/boot/WebXmlConfiguration.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="77" column="0" lean-forward="false" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ThreadCheat.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/wese/helper/ThreadCheat.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="40" column="9" lean-forward="false" selection-start-line="40" selection-start-column="9" selection-end-line="40" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AuthenticationApiResource.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/infrastructure/security/api/AuthenticationApiResource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="731">
-              <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -180,6 +211,9 @@
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract</dir>
       <dir>D:\Documents\Coding\incubator-fineract\fineract-provider\src\main</dir>
     </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
@@ -249,6 +283,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="MavenProjectNavigator">
     <treeState>
       <expand />
@@ -265,10 +302,14 @@
     <option name="width" value="1346" />
     <option name="height" value="698" />
   </component>
+  <component name="ProjectId" id="2RVF6LgUs7LklAGro0OFQdARkyN" />
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state />
     </entry>
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
@@ -465,123 +506,24 @@
       <pane id="Scope" />
     </panes>
   </component>
-  <component name="PropertiesComponent">
-    <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="MemberChooser.sorted" value="false" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.52068967" />
-    <property name="extract.method.default.visibility" value="private" />
-    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
-    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
-    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="fineract-provider" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/HP/Documents/GitHub/Java/incubator-fineract"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Documents\Coding\incubator-fineract\fineract-provider\src\main\java\org\apache\fineract\wese\helper" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager" selected="JUnit.AdhikarLoanRepaymentScheduleTransactionProcessorTest">
-    <configuration name="AdhikarLoanRepaymentScheduleTransactionProcessorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="org.apache.fineract.portfolio.loanaccount.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <module name="fineract-provider" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.apache.fineract.portfolio.loanaccount" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.portfolio.loanaccount.AdhikarLoanRepaymentScheduleTransactionProcessorTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <method>
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ServerApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="org.apache.fineract.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.ServerApplication" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="fineract-provider" />
-      <envs />
-      <method>
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="StorageTest.testNotificationStorage" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="org.apache.fineract.notification.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <module name="fineract-provider" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.apache.fineract.notification" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.notification.StorageTest" />
-      <option name="METHOD_NAME" value="testNotificationStorage" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <method>
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module />
       <option name="HTML_USED" value="false" />
@@ -594,78 +536,108 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" runner="idea" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+    <configuration name="ServerApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.ServerApplication" />
+      <module name="fineract-provider" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="" />
-      <envs />
-      <method>
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.fineract.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
         <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AdhikarLoanRepaymentScheduleTransactionProcessorTest" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+      <module name="fineract-provider" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.fineract.portfolio.loanaccount.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.apache.fineract.portfolio.loanaccount" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.portfolio.loanaccount.AdhikarLoanRepaymentScheduleTransactionProcessorTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StorageTest.testNotificationStorage" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="fineract-provider" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.fineract.notification.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.apache.fineract.notification" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.fineract.notification.StorageTest" />
+      <option name="METHOD_NAME" value="testNotificationStorage" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
-      <extension name="coverage" enabled="false" merge="false" runner="idea" />
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="moduleWithDependencies" />
       </option>
-      <envs />
-      <patterns />
-      <method>
+      <method v="2">
         <option name="BuildArtifacts" enabled="false" />
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
+    <configuration default="true" type="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
-      <method>
+      <option name="AUTO_RESTART" value="false" />
+      <method v="2">
         <option name="BuildArtifacts" enabled="false" />
       </method>
     </configuration>
-    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
-      <Host>localhost</Host>
-      <Port>5050</Port>
-    </configuration>
-    <list size="3">
-      <item index="0" class="java.lang.String" itemvalue="Application.ServerApplication" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.StorageTest.testNotificationStorage" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.AdhikarLoanRepaymentScheduleTransactionProcessorTest" />
+    <list>
+      <item itemvalue="Application.ServerApplication" />
+      <item itemvalue="JUnit.AdhikarLoanRepaymentScheduleTransactionProcessorTest" />
+      <item itemvalue="JUnit.StorageTest.testNotificationStorage" />
     </list>
     <recent_temporary>
-      <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.AdhikarLoanRepaymentScheduleTransactionProcessorTest" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.StorageTest.testNotificationStorage" />
-        <item index="2" class="java.lang.String" itemvalue="Application.ServerApplication" />
+      <list>
+        <item itemvalue="JUnit.StorageTest.testNotificationStorage" />
+        <item itemvalue="Application.ServerApplication" />
       </list>
     </recent_temporary>
   </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
-  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration" maxAnnotateRevisions="500">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
@@ -796,18 +768,21 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="3" />
-    </breakpoint-manager>
-    <watches-manager />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/java/org/apache/fineract/portfolio/shareaccounts/domain/ShareAccountDomainService.java">

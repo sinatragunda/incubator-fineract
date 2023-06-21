@@ -21,6 +21,8 @@ package org.apache.fineract.portfolio.note.data;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
+
 /**
  * Immutable data object represent note or case information about a client, loan
  * or loan transaction.
@@ -78,4 +80,27 @@ public class NoteData {
         this.updatedById = lastModifiedById;
         this.updatedByUsername = updatedByUsername;
     }
+
+    public NoteData(String message){
+        this.note = message;
+        this.id = null ;
+        this.clientId = null;
+        this.groupId = null;
+        this.loanId = null;
+        this.loanTransactionId =null;
+        this.depositAccountId = null;
+        this.savingAccountId = null;
+        this.noteType = null;
+        this.createdOn = null;
+        this.createdById = null;
+        this.createdByUsername = null;
+        this.updatedOn = null;
+        this.updatedById = null;
+        this.updatedByUsername = null;
+    }
+
+    public String getNote(){
+        return this.note;
+    }
+
 }

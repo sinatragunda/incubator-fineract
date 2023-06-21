@@ -135,7 +135,7 @@ public final class SavingsAccountTransaction extends AbstractPersistableCustom<L
     @Column(name = "is_manual", length = 1, nullable = true)
     private boolean isManualTransaction;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "savings_transaction_id", referencedColumnName = "id", nullable = false)
     private List<SavingsAccountTransactionTaxDetails> taxDetails = new ArrayList<>();
     

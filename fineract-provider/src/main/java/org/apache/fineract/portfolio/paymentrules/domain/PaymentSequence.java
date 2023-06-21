@@ -8,6 +8,7 @@ package org.apache.fineract.portfolio.paymentrules.domain;
 import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,7 +43,7 @@ public class PaymentSequence extends AbstractPersistableCustom<Long> {
     @Column(name="payment_code")
     private PAYMENT_CODE paymentCode;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="payment_rule_id")
     private PaymentRule paymentRule;
 
@@ -74,5 +75,18 @@ public class PaymentSequence extends AbstractPersistableCustom<Long> {
 
     public PaymentRule getPaymentRule() {
         return paymentRule;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PaymentSequence)) return false;
+        PaymentSequence that = (PaymentSequence) o;
+        return sequenceNumber.equals(that.sequenceNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sequenceNumber);
     }
 }

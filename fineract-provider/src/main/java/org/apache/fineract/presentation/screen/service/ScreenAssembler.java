@@ -131,11 +131,14 @@ public class ScreenAssembler {
         return refTable;
     }
 
-    private static String getDisplayName(String key ,String displayName ,Class cl){
+    private static String getDisplayName(String key ,String displayName ,Class cl,Boolean isSystemField){
 
         boolean has = OptionalHelper.isPresent(displayName);
         if(!has){
-            displayName = AnnotationHelper.getAttributeName(cl ,key);
+            
+            if(isSystemField){
+                displayName = AnnotationHelper.getAttributeName(cl ,key);
+            }
         }
         return displayName;
     }
@@ -147,14 +150,9 @@ public class ScreenAssembler {
         JsonElement element = JsonCommandHelper.toJsonElement(jsonObject.toString());
 
         Boolean showOnUi = fromJsonHelper.extractBooleanNamed(ScreenApiConstant.showOnUiParam ,element);
+        
         String displayName = fromJsonHelper.extractStringNamed(ScreenApiConstant.displayNameParam ,element);
 
-        /**
-         * Modified 13/04/2023 at 1551
-         * Not best setting but to be changed .
-         * Get default value of attribute ref if user has not provided from ui
-         */
-        displayName = getDisplayName(key ,displayName ,cl);
 
         String modelName = AnnotationHelper.getModelName(cl ,key);
 
@@ -184,8 +182,10 @@ public class ScreenAssembler {
 
         ELEMENT_TYPE elementType = ELEMENT_TYPE.SYSTEM;
         LocalRef localRef = null ;
+
         Boolean hasModelName = OptionalHelper.isPresent(modelName);
 
+        boolean isSystemField = true ;
         if (!hasModelName){
             /**
              * Added 04/05/2023 at 0953
@@ -195,7 +195,17 @@ public class ScreenAssembler {
             modelName = key;
             localRef = localRefRepositoryWrapper.findOneWithoutNotFoundDetection(modelName);
             comparisonGroup = localRef.getRefValueType().group();
+            isSystemField = false;
         }
+
+
+        /**
+         * Modified 13/04/2023 at 1551 and at 08/06/2023 at 0421
+         * Not best setting but to be changed .
+         * Get default value of attribute ref if user has not provided from ui
+         * Added isSystemField bool check to avoid exception on Annotation.getAttribute if value is LocalRef
+         */
+        displayName = getDisplayName(key ,displayName ,cl ,isSystemField);
 
         WsScript wsScript = null ;
         

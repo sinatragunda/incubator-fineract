@@ -1353,7 +1353,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
                 constructEntityMap(BUSINESS_ENTITY.LOAN, loan));
         
         // disable all active standing instructions linked to the loan
-        this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
+
+        System.err.println("--------------------------------disable standing instruction linked ------------------");
+        //this.loanAccountDomainService.disableStandingInstructionsLinkedToClosedLoan(loan);
         
         return new CommandProcessingResultBuilder() //
                 .withCommandId(command.commandId()) //
@@ -3256,5 +3258,9 @@ public class LoanWritePlatformServiceJpaRepositoryImpl implements LoanWritePlatf
 	   				loan.getExpectedDisbursedOnLocalDate());
 	   	}
 	   	
-	   }
+	}
+
+    public SavingsAccountDomainService getSavingsAccountDomainService(){
+        return this.savingsAccountDomainService;
+    }
 }

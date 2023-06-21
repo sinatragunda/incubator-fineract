@@ -30,6 +30,12 @@ public interface EntityDatatableChecksRepository
 			JpaRepository<EntityDatatableChecks, Long>,
 			JpaSpecificationExecutor<EntityDatatableChecks> {
 
+	/**
+	 * Added 10/06/2023 at 0822 
+	 */
+	public List<EntityDatatableChecks> findByEntity(String entityName);
+
+
 	public List<EntityDatatableChecks> findByEntityAndStatus(String entityName, Long status);
 
 	@Query("select t from  EntityDatatableChecks t WHERE t.status =:status and t.entity=:entity and t.productId = :productId ")

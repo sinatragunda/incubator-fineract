@@ -252,7 +252,8 @@ public class LoanAccountData extends Record implements EnumeratedData {
     /**
      * Added 18/02/2023 at 1656
      */
-    private LocalRefData localRefData;  
+    private LocalRefData localRefData; 
+    private Map localrefs; 
 
     public static LoanAccountData importInstanceIndividual(EnumOptionData loanTypeEnumOption,Long clientId,Long productId,
             Long loanOfficerId,LocalDate submittedOnDate,
@@ -263,14 +264,14 @@ public class LoanAccountData extends Record implements EnumeratedData {
             Integer graceOnPrincipalPayment,Integer graceOnInterestPayment,Integer graceOnInterestCharged,
             LocalDate interestChargedFromDate,LocalDate repaymentsStartingFromDate,Integer rowIndex ,
             String externalId,Long groupId,Collection<LoanChargeData> charges,String linkAccountId,
-            String locale,String dateFormat,String revolvingAccountId ,Boolean autoSettlementAtDisbursement ,Long loanFactorAccountId){
+            String locale,String dateFormat,String revolvingAccountId ,Boolean autoSettlementAtDisbursement ,Long loanFactorAccountId ,Collection<NoteData> notes ,Map localrefs){
 
         return new LoanAccountData(loanTypeEnumOption, clientId, productId, loanOfficerId, submittedOnDate, fundId,
                 principal, numberOfRepayments,
                 repaymentEvery, repaidEveryFrequencyEnums, loanTermFrequency, loanTermFrequencyTypeEnum, nominalInterestRate, expectedDisbursementDate,
                 amortizationEnumOption, interestMethodEnum, interestCalculationPeriodTypeEnum, inArrearsTolerance, transactionProcessingStrategyId,
                 graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged, interestChargedFromDate, repaymentsStartingFromDate,
-                rowIndex, externalId, null, charges, linkAccountId,locale,dateFormat ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId,null);
+                rowIndex, externalId, null, charges, linkAccountId,locale,dateFormat ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId,null ,notes ,localrefs);
     }
 
 
@@ -290,7 +291,7 @@ public class LoanAccountData extends Record implements EnumeratedData {
                 repaidEvery, repaidEveryFrequencyEnums, loanTermFrequency, loanTermFrequencyTypeEnum, nominalInterestRate, null,
                 amortizationEnumOption, interestMethodEnum, interestCalculationPeriodEnum, arrearsTolerance,
                 transactionProcessingStrategyId, graceOnPrincipalPayment, graceOnInterestPayment, graceOnInterestCharged,
-                interestChargedFromDate, repaymentsStartingFromDate, rowIndex, externalId, null, null, linkAccountId,locale,dateFormat ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId,null);
+                interestChargedFromDate, repaymentsStartingFromDate, rowIndex, externalId, null, null, linkAccountId,locale,dateFormat ,revolvingAccountId ,autoSettlementAtDisbursement ,loanFactorAccountId,null ,null,null);
     }
     
     private LoanAccountData(EnumOptionData loanType,Long clientId,Long productId,Long loanOfficerId,LocalDate submittedOnDate,
@@ -301,7 +302,7 @@ public class LoanAccountData extends Record implements EnumeratedData {
             Integer graceOnPrincipalPayment,Integer graceOnInterestPayment,Integer graceOnInterestCharged,
             LocalDate interestChargedFromDate,LocalDate repaymentsStartingFromDate,Integer rowIndex ,
             String externalId,Long groupId,Collection<LoanChargeData> charges,String linkAccountId,
-            String locale,String dateFormat,String revolvingAccountId ,Boolean autoSettlementAtDisbursement ,Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData) {
+            String locale,String dateFormat,String revolvingAccountId ,Boolean autoSettlementAtDisbursement ,Long loanFactorAccountId ,final HirePurchaseData hirePurchaseData ,final Collection<NoteData> notes ,Map localrefs) {
         this.dateFormat=dateFormat;
         this.locale= locale;
         this.rowIndex=rowIndex;
@@ -388,7 +389,7 @@ public class LoanAccountData extends Record implements EnumeratedData {
         this.collateral = null;
         this.guarantors = null;
         this.meeting = null;
-        this.notes = null;
+        this.notes = notes;
         this.disbursementDetails = null;
         this.originalSchedule = null;
         this.productOptions = null;
@@ -452,6 +453,7 @@ public class LoanAccountData extends Record implements EnumeratedData {
 
         // added 25/05/2022
         this.hirePurchaseData = hirePurchaseData;
+        this.localrefs = localrefs;
     }
 
 
@@ -617,6 +619,7 @@ public class LoanAccountData extends Record implements EnumeratedData {
         final String revolvingAccountId = null ;
         final Long loanFactorAccountId = null ;
         final LocalRefData localRefData = null ;
+        final Map localrefs = null ;
         return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal, principal,

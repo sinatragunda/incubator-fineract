@@ -32,7 +32,16 @@ public class StandingInstructionHelper {
             accountTransferStandingInstructions.add(accountTransferStandingInstruction);
         };
 
-        standingInstructionDataCollection.stream().forEach(convertToEntity);
+        System.err.println("-----------standing instructions are ------------"+standingInstructionDataCollection.size());
+
+        for(StandingInstructionData e : standingInstructionDataCollection){
+
+            Long id = e.getId();
+            AccountTransferStandingInstruction accountTransferStandingInstruction = standingInstructionRepositoryWrapper.findOneWithNotFoundDetection(id);
+            //accountTransferStandingInstructions.add(accountTransferStandingInstruction);
+        }
+
+        //standingInstructionDataCollection.stream().forEach(convertToEntity);
 
         return accountTransferStandingInstructions;
     }

@@ -63,6 +63,7 @@ import org.apache.fineract.portfolio.client.exception.ClientHasNoStaffException;
 import org.apache.fineract.portfolio.client.exception.ClientMustBePendingToBeDeletedException;
 import org.apache.fineract.portfolio.client.exception.InvalidClientSavingProductException;
 import org.apache.fineract.portfolio.client.exception.InvalidClientStateTransitionException;
+import org.apache.fineract.portfolio.client.helper.CloseClientUsingPaymentRules;
 import org.apache.fineract.portfolio.client.helper.CreateClientHelper;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_ENTITY;
 import org.apache.fineract.portfolio.common.BusinessEventNotificationConstants.BUSINESS_EVENTS;
@@ -158,6 +159,11 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
      */
     private final LocalRefRecordHelper localRefRecordHelper ;
 
+    /**
+     * Added 19/06/2023 at 0943
+     */
+    private final CloseClientUsingPaymentRules closeClientUsingPaymentRules;
+
 
     @Autowired
     public ClientWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context,
@@ -177,7 +183,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                                                        final ShareProductRepository shareProductRepository,
                                                        final ShareAccountWritePlatformService shareAccountWritePlatformService,
                                                        final ShareProductReadPlatformServiceImpl shareProductReadPlatformService, final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService , final SelfServiceRegistrationWritePlatformService selfServiceRegistrationWritePlatformService ,
-                                                       final LocalRefRecordHelper localRefRecordHelper
+                                                       final LocalRefRecordHelper localRefRecordHelper ,final CloseClientUsingPaymentRules closeClientUsingPaymentRules
                                                        ) {
         this.context = context;
         this.clientRepository = clientRepository;
@@ -209,6 +215,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         this.selfServiceRegistrationWritePlatformService = selfServiceRegistrationWritePlatformService;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService ;
         this.localRefRecordHelper = localRefRecordHelper;
+        this.closeClientUsingPaymentRules = closeClientUsingPaymentRules;
     }
 
     @Transactional
@@ -925,6 +932,12 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             entityDatatableChecksWritePlatformService.runTheCheck(clientId,EntityTables.CLIENT.getName(),
                     StatusEnum.CLOSE.getCode().longValue(),EntityTables.CLIENT.getForeignKeyColumnNameOnDatatable());
 
+            /**
+             * Added 19/06/2023 at 0717 
+             * Close client using payment rules (payout rule) if enabled 
+             */
+            closeClientUsingPaymentRules.closeClient(client ,command ,closureDate);
+
             final List<Loan> clientLoans = this.loanRepositoryWrapper.findLoanByClientId(clientId);
             for (final Loan loan : clientLoans) {
                 final LoanStatusMapper loanStatus = new LoanStatusMapper(loan.status().getValue());
@@ -940,6 +953,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     throw new InvalidClientStateTransitionException("close", "loan.overpaid", errorMessage);
                 }
             }
+
             final List<SavingsAccount> clientSavingAccounts = this.savingsRepositoryWrapper.findSavingAccountByClientId(clientId);
 
             for (final SavingsAccount saving : clientSavingAccounts) {

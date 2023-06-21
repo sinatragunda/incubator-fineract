@@ -25,12 +25,21 @@ import java.util.List;
  */
 public final class GenericResultsetData {
 
+    private final boolean isHybridTable;
     private final List<ResultsetColumnHeaderData> columnHeaders;
     private final List<ResultsetRowData> data;
+
 
     public GenericResultsetData(final List<ResultsetColumnHeaderData> columnHeaders, final List<ResultsetRowData> resultsetDataRows) {
         this.columnHeaders = columnHeaders;
         this.data = resultsetDataRows;
+        this.isHybridTable = false ;
+    }
+
+    public GenericResultsetData(final List<ResultsetColumnHeaderData> columnHeaders, final List<ResultsetRowData> resultsetDataRows ,boolean isHybridTable) {
+        this.columnHeaders = columnHeaders;
+        this.data = resultsetDataRows;
+        this.isHybridTable = isHybridTable;
     }
 
     public List<ResultsetColumnHeaderData> getColumnHeaders() {
@@ -49,7 +58,6 @@ public final class GenericResultsetData {
                 colType = columnHeader.getColumnType();
             }
         }
-
         return colType;
     }
 

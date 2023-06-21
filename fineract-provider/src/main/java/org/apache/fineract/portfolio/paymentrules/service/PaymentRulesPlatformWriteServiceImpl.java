@@ -9,6 +9,7 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.portfolio.client.domain.Client;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.client.service.ClientReadPlatformService;
+import org.apache.fineract.portfolio.paymentrules.data.PaymentRuleDataValidator;
 import org.apache.fineract.portfolio.paymentrules.domain.PaymentRule;
 import org.apache.fineract.portfolio.paymentrules.repo.PaymentRuleRepository;
 import org.apache.fineract.portfolio.paymentrules.repo.PaymentRuleRepositoryWrapper;
@@ -27,14 +28,16 @@ public class PaymentRulesPlatformWriteServiceImpl implements PaymentRulesPlatfor
     private PaymentRuleDomainService paymentRuleDomainService;
     private ClientRepositoryWrapper clientRepositoryWrapper;
     private PaymentRuleChain paymentRuleChain;
+    private PaymentRuleDataValidator paymentRuleDataValidator;
 
     @Autowired
-    public PaymentRulesPlatformWriteServiceImpl(final RoutingDataSource dataSource, final PaymentRuleRepositoryWrapper paymentRuleRepositoryWrapper, final PaymentRuleDomainService paymentRuleDomainService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final PaymentRuleChain paymentRuleChain) {
+    public PaymentRulesPlatformWriteServiceImpl(final RoutingDataSource dataSource, final PaymentRuleRepositoryWrapper paymentRuleRepositoryWrapper, final PaymentRuleDomainService paymentRuleDomainService ,final ClientRepositoryWrapper clientRepositoryWrapper ,final PaymentRuleChain paymentRuleChain ,final PaymentRuleDataValidator paymentRuleDataValidator) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.paymentRuleRepositoryWrapper = paymentRuleRepositoryWrapper;
         this.paymentRuleDomainService = paymentRuleDomainService;
         this.clientRepositoryWrapper = clientRepositoryWrapper;
         this.paymentRuleChain = paymentRuleChain;
+        this.paymentRuleDataValidator = paymentRuleDataValidator;
     }
 
     @Override
@@ -50,7 +53,8 @@ public class PaymentRulesPlatformWriteServiceImpl implements PaymentRulesPlatfor
     @Override
     public CommandProcessingResult create(JsonCommand command) {
 
-        // validate for update here and what not 
+        // validate for update here and what not
+        paymentRuleDataValidator.validateForCreate(command.json());
         final PaymentRule paymentRule = paymentRuleDomainService.assembleFromJson(command);
 
         this.paymentRuleRepositoryWrapper.save(paymentRule);

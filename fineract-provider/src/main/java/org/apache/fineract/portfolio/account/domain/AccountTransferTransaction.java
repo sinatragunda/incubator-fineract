@@ -44,7 +44,7 @@ import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
 @Table(name = "m_account_transfer_transaction")
 public class AccountTransferTransaction extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_transfer_details_id", nullable = true)
     private AccountTransferDetails accountTransferDetails;
 

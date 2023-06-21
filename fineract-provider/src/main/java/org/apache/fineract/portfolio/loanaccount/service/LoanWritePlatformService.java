@@ -33,6 +33,7 @@ import org.apache.fineract.portfolio.collectionsheet.command.CollectionSheetBulk
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransaction;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.OverdueLoanScheduleData;
+import org.apache.fineract.portfolio.savings.domain.SavingsAccountDomainService;
 import org.joda.time.LocalDate;
 
 public interface LoanWritePlatformService {
@@ -113,6 +114,9 @@ public interface LoanWritePlatformService {
     /**
      * Added 20/09/2022 ar 2145
      */
-    CommandProcessingResult errorCorrection(final Long loanId);  
+    CommandProcessingResult errorCorrection(final Long loanId);
+
+
+    SavingsAccountDomainService getSavingsAccountDomainService();
 
 }

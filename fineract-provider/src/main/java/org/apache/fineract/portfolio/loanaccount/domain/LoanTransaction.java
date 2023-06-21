@@ -82,7 +82,7 @@ public class LoanTransaction extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "office_id", nullable = false)
     private Office office;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = true ,fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_detail_id", nullable = true)
     private PaymentDetail paymentDetail;
 

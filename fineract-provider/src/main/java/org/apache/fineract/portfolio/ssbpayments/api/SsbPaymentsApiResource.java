@@ -27,7 +27,6 @@ package org.apache.fineract.portfolio.ssbpayments.api;
 import java.io.InputStream;
 import java.util.*;
 
-import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -46,7 +45,7 @@ import javax.ws.rs.core.UriInfo;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.apache.fineract.helper.OptionalHelper;
+import org.apache.fineract.helper.WarHelper;
 import org.apache.fineract.infrastructure.bulkimport.data.GlobalEntityType;
 import org.apache.fineract.infrastructure.bulkimport.service.BulkImportWorkbookService;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
@@ -58,7 +57,6 @@ import org.apache.fineract.portfolio.ssbpayments.data.SsbTransactionRecordData;
 import org.apache.fineract.portfolio.ssbpayments.domain.SsbTransactionRecord;
 import org.apache.fineract.portfolio.ssbpayments.repo.SsbTransactionRecordRepositoryWrapper;
 import org.apache.fineract.portfolio.ssbpayments.service.SsbTransactionReadPlatformService;
-import org.apache.fineract.portfolio.ssbpayments.service.SsbTransactionReadPlatformServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -123,6 +121,8 @@ public class SsbPaymentsApiResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String postFinancialTransactions(@FormDataParam("file") InputStream uploadedInputStream,@FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("ssb") String ssb) {
 
+        WarHelper.sse();
+        //ServerSentEvent.streamSseMvc();
         //System.err.println("-------------------------- has filedetail ? "+ OptionalHelper.has(fileDetail));
         String filename = fileDetail.getFileName();
         String response = ssbService.postFinancialTransactions(filename ,uploadedInputStream ,ssb).toString();
@@ -201,4 +201,5 @@ public class SsbPaymentsApiResource {
     public String reportTemplate(@QueryParam("type") String type){
         return ssbService.report(type).toString();
     }
+
 }

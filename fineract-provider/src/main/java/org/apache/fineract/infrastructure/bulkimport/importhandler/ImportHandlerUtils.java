@@ -22,6 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.bulkimport.constants.TemplatePopulateImportConstants;
 import org.apache.fineract.infrastructure.bulkimport.importhandler.helper.SanitizeExcelValues;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
@@ -34,10 +35,7 @@ import org.joda.time.LocalDate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 // Added 28/09/2021
@@ -420,6 +418,30 @@ public class ImportHandlerUtils {
         }
         return 0L;
     }
+
+    /**
+     * Added 14/06/2023 at 0208
+     *
+     */
+    public static Map<String ,Integer> localRefs(Sheet sheet){
+        
+        Map map = new HashMap<>();
+        for(Row row : sheet) {
+
+            Cell cell = row.getCell(0);
+            if(cell.getCellType() == Cell.CELL_TYPE_STRING){
+                String value = cell.getStringCellValue();
+                Integer position = readAsInt(1 ,row);
+                boolean hasBoth = OptionalHelper.has(value) && OptionalHelper.has(position);
+                if(hasBoth){
+                    map.put(value ,position);
+                }
+            }
+        }
+        return map ;
+    }   
+
+
     public static String getCodeByName(Sheet sheet, String name) {
         String sheetName = sheet.getSheetName();
         sheetName.equals(TemplatePopulateImportConstants.EXTRAS_SHEET_NAME);

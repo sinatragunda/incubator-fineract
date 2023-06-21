@@ -52,6 +52,7 @@ public class TemplatePopulateImportConstants {
     public static final String EMPLOYEE_SHEET_NAME="Employee";
     public static final String ROLES_SHEET_NAME="Roles";
     public static final String USER_SHEET_NAME="Users";
+    public static final String LOCAL_REFS_SHEET_NAME = "LocalRefs";
 
     // added 15/12/2021
     public static final String SSB_PAYMENTS_SHEET_NAME = "Ssb Payments";

@@ -43,7 +43,7 @@ import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 @Table(name = "m_account_transfer_details")
 public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_office_id", nullable = false)
     private Office fromOffice;
 
@@ -55,7 +55,7 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @JoinColumn(name = "from_savings_account_id", nullable = true)
     private SavingsAccount fromSavingsAccount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_office_id", nullable = false)
     private Office toOffice;
 
@@ -81,7 +81,7 @@ public class AccountTransferDetails extends AbstractPersistableCustom<Long> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "accountTransferDetails", orphanRemoval = true, fetch=FetchType.EAGER)
     private List<AccountTransferTransaction> accountTransferTransactions = new ArrayList<>();
 
-    @OneToOne(mappedBy = "accountTransferDetails", cascade = CascadeType.ALL, optional = true, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "accountTransferDetails", cascade = CascadeType.ALL, optional = true, orphanRemoval = true, fetch = FetchType.LAZY)
     private AccountTransferStandingInstruction accountTransferStandingInstruction;
 
     // Added 29/12/2021 ,make it possible for equity accounts to act as savings account and make transfers

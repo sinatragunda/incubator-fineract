@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.ApiParameterError;
 import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
@@ -701,6 +702,8 @@ public class ShareAccountDataSerializer {
         final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("sharesaccount");
         
         JsonElement element = jsonCommand.parsedJson();
+
+        System.err.println("----------------is share account found ? "+ OptionalHelper.has(account));
         
         if(!account.status().equals(ShareAccountStatusType.ACTIVE.getValue())) {
             baseDataValidator.failWithCodeNoParameterAddedToErrorCode("is.not.in.active.state") ;

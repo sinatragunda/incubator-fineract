@@ -10,10 +10,14 @@ import org.apache.fineract.utility.service.IEnum;
 
 public enum PAYMENT_CODE implements IEnum {
 
+
     LOAN_REPAYMENT("Loan Due Repayment" ,REF_TABLE.LOAN),
+    LOAN_EARLY_REPAYMENT("Loan Due Repayment With Early Repayments" ,REF_TABLE.LOAN),
     ACCOUNT_SWEEP("Account Sweep",REF_TABLE.ACCOUNT),
     PURCHASE_SHARES("Purchase Shares",REF_TABLE.SHARE),
-    SHARE_REDEEM("Redeem Shares" ,REF_TABLE.SHARE);
+    SHARE_REDEEM("Redeem Shares" ,REF_TABLE.SHARE),
+    LOAN_PAYOFF("Pay off loans" ,REF_TABLE.LOAN),
+    BALANCE_TRANSFER("Balance transfer" ,REF_TABLE.ACCOUNT);
 
 
     PAYMENT_CODE(String code , REF_TABLE refTable){

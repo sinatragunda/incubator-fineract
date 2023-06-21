@@ -18,6 +18,8 @@
  */
 package org.apache.fineract.infrastructure.core.data;
 
+import org.apache.fineract.helper.OptionalHelper;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -232,5 +234,9 @@ public class CommandProcessingResult implements Serializable {
 
     public Boolean getStatus(){
         return status ;
+    }
+
+    public Boolean hasCommandId(){
+        return OptionalHelper.has(this.commandId);
     }
 }

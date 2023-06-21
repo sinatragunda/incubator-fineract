@@ -92,8 +92,12 @@ public class DataSourceProperties extends PoolProperties {
         setLogAbandoned(true);
         setSuspectTimeout(60);
 
-        setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"
-                + "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+//        setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"
+//                + "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+//
+        System.err.println("----------------------------------slow query interceptor blocked --------------------");
+        setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState");
+
     }
 
     @Override

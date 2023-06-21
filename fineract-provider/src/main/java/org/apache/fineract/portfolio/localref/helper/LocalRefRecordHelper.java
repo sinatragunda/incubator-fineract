@@ -75,15 +75,17 @@ public class LocalRefRecordHelper {
         for(Map.Entry<String ,JsonElement> entry : set){
 
             String key = entry.getKey();
-            String value = entry.getValue().toString();
 
-            //System.err.println("------------value is "+value+"-------------and key is ----"+key);
+            String value = entry.getValue().toString().replaceAll("\"" ,"");
 
             LocalRef localRef = this.localRefRepositoryWrapper.findOneWithoutNotFoundDetection(key);
 
             validateEntry(localRef ,value);
+
             LocalRefValue localRefValue = new LocalRefValue(localRef ,recordId ,value);
+            
             localRefValueList.add(localRefValue);
+        
         }
 
         validateIfMandatoryLocalRefsEntriesExists(localRefValueList ,refTable);

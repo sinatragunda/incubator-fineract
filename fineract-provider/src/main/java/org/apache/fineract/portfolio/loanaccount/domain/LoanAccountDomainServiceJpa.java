@@ -238,7 +238,8 @@ public class LoanAccountDomainServiceJpa implements LoanAccountDomainService {
                 constructEntityMap(BUSINESS_ENTITY.LOAN_TRANSACTION, newRepaymentTransaction));
 
         // disable all active standing orders linked to this loan if status changes to closed
-        disableStandingInstructionsLinkedToClosedLoan(loan);
+        System.err.println("-------------------------------disable standing instruction --------");
+        //disableStandingInstructionsLinkedToClosedLoan(loan);
 
         builderResult.withEntityId(newRepaymentTransaction.getId()) //
                 .withOfficeId(loan.getOfficeId()) //

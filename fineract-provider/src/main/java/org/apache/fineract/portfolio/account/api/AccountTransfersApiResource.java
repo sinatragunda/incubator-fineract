@@ -92,10 +92,6 @@ public class AccountTransfersApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String create(final String apiRequestBodyAsJson) {
-
-
-        //System.err.println("----------------create funds transfer-------------");
-
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createAccountTransfer().withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
@@ -161,6 +157,21 @@ public class AccountTransfersApiResource {
 
         final CommandWrapper commandRequest = new CommandWrapperBuilder().refundByTransfer().withJson(apiRequestBodyAsJson).build();
 
+        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+        return this.toApiJsonSerializer.serialize(result);
+    }
+
+    /**
+     * Added 09/06/2023 at 0150
+     */
+    @GET
+    @Path("reverse/{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String reverseTransfer(@PathParam("id")Long transactionId) {
+
+        final CommandWrapper commandRequest = new CommandWrapperBuilder().reverseTransfer(transactionId).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);

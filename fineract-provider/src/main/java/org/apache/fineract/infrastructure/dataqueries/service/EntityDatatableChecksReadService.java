@@ -34,4 +34,6 @@ public interface EntityDatatableChecksReadService {
 
     Page<EntityDataTableChecksData> retrieveAll(SearchParameters searchParameters, Long status, String entity, Long productLoanId);
 
+    public List<DatatableData> retrieveTemplatesForHybridTable(String entity);
+
 }

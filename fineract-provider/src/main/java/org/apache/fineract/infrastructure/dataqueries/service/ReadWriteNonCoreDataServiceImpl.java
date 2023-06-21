@@ -50,6 +50,7 @@ import org.apache.fineract.infrastructure.core.service.RoutingDataSource;
 import org.apache.fineract.infrastructure.dataqueries.api.DataTableApiConstant;
 import org.apache.fineract.infrastructure.dataqueries.data.*;
 import org.apache.fineract.infrastructure.dataqueries.domain.ApplicationRecord;
+import org.apache.fineract.infrastructure.dataqueries.domain.HybridTableEntity;
 import org.apache.fineract.infrastructure.dataqueries.domain.XRegisteredTable;
 import org.apache.fineract.infrastructure.dataqueries.enumerations.DATA_TABLE_CATEGORY;
 import org.apache.fineract.infrastructure.dataqueries.exception.DatatableEntryRequiredException;
@@ -65,6 +66,8 @@ import org.apache.fineract.portfolio.loanaccount.data.LoanAccountData;
 import org.apache.fineract.portfolio.loanaccount.service.LoanReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.utility.domain.Record;
+import org.apache.fineract.utility.service.InfrastructureServiceWrapper;
+import org.apache.fineract.utility.service.ServiceWrapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -110,6 +113,8 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     private final static List<String> stringDataTypes = Arrays.asList("char", "varchar", "blob", "text", "tinyblob", "tinytext",
             "mediumblob", "mediumtext", "longblob", "longtext");
 
+
+    private EntityDatatableChecksReadService entityDatatableChecksReadService;
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final PlatformSecurityContext context;
@@ -127,13 +132,17 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     private final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper;
     private final XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
+    private InfrastructureServiceWrapper infrastructureServiceWrapper;
+    private final HybridTableEntityRepositoryWrapper hybridTableEntityRepositoryWrapper;
+    private final HybridEntityReadPlatformService hybridEntityReadPlatformService;
 
     @Autowired(required = true)
     public ReadWriteNonCoreDataServiceImpl(final RoutingDataSource dataSource, final PlatformSecurityContext context,
                                            final FromJsonHelper fromJsonHelper, final GenericDataService genericDataService,
                                            final DatatableCommandFromApiJsonDeserializer fromApiJsonDeserializer, final CodeReadPlatformService codeReadPlatformService,
                                            final ConfigurationDomainService configurationDomainService, final DataTableValidator dataTableValidator,
-                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper ,final CodeValueReadPlatformService codeValueReadPlatformService) {
+                                           final ColumnValidator columnValidator , final ApplicationRecordRepositoryWrapper applicationRecordRepositoryWrapper ,final  XRegisteredTableRepositoryWrapper xRegisteredTableRepositoryWrapper ,final CodeValueReadPlatformService codeValueReadPlatformService ,final InfrastructureServiceWrapper infrastructureServiceWrapper ,final HybridTableEntityRepositoryWrapper hybridTableEntityRepositoryWrapper ,final HybridEntityReadPlatformService hybridEntityReadPlatformService) {
+
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
         this.context = context;
@@ -149,7 +158,10 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         this.applicationRecordRepositoryWrapper = applicationRecordRepositoryWrapper;
         this.xRegisteredTableRepositoryWrapper = xRegisteredTableRepositoryWrapper;
         this.codeValueReadPlatformService = codeValueReadPlatformService;
-
+        this.infrastructureServiceWrapper = infrastructureServiceWrapper;
+        this.entityDatatableChecksReadService= infrastructureServiceWrapper.getEntityDatatableChecksReadService();
+        this.hybridTableEntityRepositoryWrapper = hybridTableEntityRepositoryWrapper;
+        this.hybridEntityReadPlatformService = hybridEntityReadPlatformService;
     }
     @Override
     public DatatableData template() {
@@ -178,14 +190,9 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
                 + " and (p.code in ('ALL_FUNCTIONS', 'ALL_FUNCTIONS_READ') or p.code = concat('READ_', registered_table_name))) "
                 + andClause + " order by application_table_name, registered_table_name";
 
-
-                //System.err.println("---------------------sql is "+sql);
-
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
 
         final List<DatatableData> datatables = new ArrayList<>();
-
-        //System.err.println("----------------------------we now into rs ");
 
         while (rs.next()) {
             final Long id = rs.getLong("id");
@@ -201,8 +208,21 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             datatables.add(DatatableData.create(id ,appTableName, registeredDatatableName,prettyName,columnHeaderData));
         }
 
+        /**
+         * Added 10/06/2023 at 0609
+         * Should also get datatables linked through entity checks ,problem is hybrid tables wont show so this segment
+         * adds this functionality
+         */
+        List<DatatableData> hybridTables  = entityDatatableChecksReadService.retrieveTemplatesForHybridTable(appTable);
+        datatables.addAll(hybridTables);
+
         return datatables;
     }
+
+    /**
+     * Added 10/06/2023 at 0856
+     * Failing to get off the unresolved dependands error so will settle with pasting the function here
+     */
 
     @Override
     public DatatableData retrieveDatatable(final String datatable) {
@@ -232,6 +252,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
             //templateRecords(datatableData ,appTableName);
             System.err.println("---------set data record tempalte here son ===============");
         }
+
 
         return datatableData;
     }
@@ -1301,6 +1322,19 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
         return new GenericResultsetData(columnHeaders, result);
     }
 
+    private String hybridTableFkField(Long refId){
+
+        Collection<HybridEntityTableData> hybridTableEntityList = hybridEntityReadPlatformService.retrieveOneByRefId(refId);
+
+        String where = null;
+        if(!hybridTableEntityList.isEmpty()){
+            Long applicationRecordId = hybridTableEntityList.stream().findFirst().get().getApplicationRecordId();
+            System.err.println("----------------id found is "+applicationRecordId);
+            where = String.format("application_id = %d" ,applicationRecordId);
+        }
+        return where;
+    }
+
 
     @Override
     public GenericResultsetData retrieveDataTableGenericResultSet(final String dataTableName, final Long appTableId, final String order,
@@ -1309,34 +1343,74 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         final String appTable = queryForApplicationTableName(dataTableName);
 
-        checkMainResourceExistsWithinScope(appTable, appTableId);
+        //checkMainResourceExistsWithinScope(appTable, appTableId);
+
+        System.err.println("-----------------execute this ----------");
 
         final List<ResultsetColumnHeaderData> columnHeaders = this.genericDataService.fillResultsetColumnHeaders(dataTableName);
 
         String sql = "";
 
-        // id only used for reading a specific entry in a one to many datatable
-        // (when updating)
-        sql = "select * from `" + dataTableName + "` where id = " + id;
+        /**
+         * Added 12/06/2023 at 0936 
+         */
+        final DatatableData datatableData = this.retrieveDatatable(dataTableName);
+        
+        final Boolean has = OptionalHelper.has(datatableData);
+        Boolean isHybridTable = false ;
 
-        if (id == null) {
-        	String whereClause = getFKField(appTable) + " = " + appTableId;
+        if(has){
+            // id only used for reading a specific entry in a one to many datatable
+            // (when updating)
+            sql = "select * from `" + dataTableName + "` where id = " + id;
 
-        	SQLInjectionValidator.validateSQLInput(whereClause);
-            //sql = null;
-            sql ="select * from `" + dataTableName + "` where " + whereClause;
+            if (id == null) {
+            	
+                isHybridTable = datatableData.isHybridTable();
+
+                String whereClause = "";
+
+                if(isHybridTable){
+
+                    /**
+                     * Modified 13/06/2023 at 0133
+                     * We need to list all entries where refId is equal to appTableId then we use refTable to restrict only  values belonging to laod without having to join another table
+                     */
+                    whereClause = hybridTableFkField(appTableId);
+                    boolean hasWhereClause = OptionalHelper.has(whereClause);
+
+                    if(!hasWhereClause){
+                        return null ;
+                    }
+                    sql = String.format("select * from %s where %s" ,dataTableName , whereClause);
+                
+                }
+
+                else{
+                    whereClause = getFKField(appTable) + " = " + appTableId;
+                    sql = String.format("select * from %s where %s" ,dataTableName, whereClause);
+                }
+
+                System.err.println("---------mysl statement is --------"+sql);
+
+            	SQLInjectionValidator.validateSQLInput(whereClause);
+                //sql = null;
+                
+                System.err.println("-----------------query is ----"+sql);
+            }
+
+
+            if (StringUtils.isNotBlank(order)) {
+                this.columnValidator.validateSqlInjection(sql, order);
+                sql = sql + " order by " + order;
+            }
+
+            System.err.println("=====================result set row data sql here is "+sql);
+
+            final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
+            return new GenericResultsetData(columnHeaders, result ,isHybridTable);
         }
-
-
-        if (StringUtils.isNotBlank(order)) {
-            this.columnValidator.validateSqlInjection(sql, order);
-            sql = sql + " order by " + order;
-        }
-
-        System.err.println("=====================result set row data sql here is "+sql);
-
-        final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
-        return new GenericResultsetData(columnHeaders, result);
+        return null ;
     }
 
     private GenericResultsetData retrieveDataTableGenericResultSetForUpdate(final String appTable, final String dataTableName,
@@ -1358,13 +1432,21 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
 
         final List<ResultsetRowData> result = fillDatatableResultSetDataRows(sql);
 
-        return new GenericResultsetData(columnHeaders, result);
+        return new GenericResultsetData(columnHeaders, result,false);
     }
+
+
+
 
     private CommandProcessingResult checkMainResourceExistsWithinScope(final String appTable, final Long appTableId) {
 
+        System.err.println("-----------apptable is "+appTable);
+     
+        
         final String sql = dataScopedSQL(appTable, appTableId);
-        logger.info("data scoped sql: " + sql);
+        
+        logger.info("--------------data scoped sql: -------------"+sql);
+        
         final SqlRowSet rs = this.jdbcTemplate.queryForRowSet(sql);
 
         if (!rs.next()) { throw new DatatableNotFoundException(appTable, appTableId); }
@@ -1607,7 +1689,7 @@ public class ReadWriteNonCoreDataServiceImpl implements ReadWriteNonCoreDataServ
     }
     /**
      * Added 13/02/2023 at 1242
-     * Only to be used when application table is application
+     * Only to be used when application table is applicationG
      * Modified 07/03/2023 at 0227
      * Table needs to reference x_registered_table id now
      */

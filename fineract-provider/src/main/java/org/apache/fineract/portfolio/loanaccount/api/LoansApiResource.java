@@ -162,7 +162,7 @@ public class LoansApiResource {
             "syncDisbursementWithMeeting", "loanCounter", "loanProductCounter", "notes", "accountLinkingOptions", "linkedAccount",
             "interestRateDifferential", "isFloatingInterestRate", "interestRatesPeriods", LoanApiConstants.canUseForTopup,
             LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.topupAmount, LoanApiConstants.clientActiveLoanOptions,
-            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam ,HirePurchaseConstants.hirePurchaseParam));
+            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam ,HirePurchaseConstants.hirePurchaseParam ,LoanApiConstants.emiAmountParameterName));
 
     private final Set<String> LOAN_APPROVAL_DATA_PARAMETERS = new HashSet<>(Arrays.asList("approvalDate", "approvalAmount"));
     private final String resourceNameForPermissions = "LOAN";

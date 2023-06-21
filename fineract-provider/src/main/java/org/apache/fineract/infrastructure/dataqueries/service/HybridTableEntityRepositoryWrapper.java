@@ -14,6 +14,7 @@ import org.apache.fineract.infrastructure.dataqueries.repo.HybridTableEntityRepo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List ;
 @Service
 public class HybridTableEntityRepositoryWrapper {
 
@@ -37,5 +38,10 @@ public class HybridTableEntityRepositoryWrapper {
             throw new ApplicationRecordNotFoundException(id);
         }
         return hybridTableEntity;
+    }
+
+    public List<HybridTableEntity> findByRefId(Long id){
+        List<HybridTableEntity> entities = hybridTableEntityRepository.findByAbstractPersistableCustomId(id);
+        return entities;
     }
 }

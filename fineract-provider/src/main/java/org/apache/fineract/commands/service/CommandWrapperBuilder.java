@@ -3408,12 +3408,24 @@ public class CommandWrapperBuilder {
 
 
     /**
-     * Added 17/04/1930 at 1013
+     * Added 17/04/2023 at 1013
      */ 
     public CommandWrapperBuilder createVersionRecord() {
         this.actionName = "CREATE";
         this.entityName = "VERSION";
         this.href = "/version";
+        return this;
+    }
+
+
+    /**
+     * Added 09/06/2023 at 0151
+     */ 
+    public CommandWrapperBuilder reverseTransfer(Long transactionId) {
+        this.actionName = "REVERSETRANSFER";
+        this.entityName = "ACCOUNTTRANSFER";
+        this.href = "/accounttransfers/reverse";
+        this.entityId = transactionId;
         return this;
     }
 

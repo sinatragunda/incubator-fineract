@@ -20,6 +20,8 @@ package org.apache.fineract.portfolio.savings.domain;
 
 import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
+import org.apache.fineract.infrastructure.campaigns.sms.service.SmsCampaignDomainServiceImpl;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.security.helper.OverrideHelper;
@@ -35,6 +37,7 @@ import org.apache.fineract.portfolio.common.service.BusinessEventNotifierService
 import org.apache.fineract.portfolio.note.domain.Note;
 import org.apache.fineract.portfolio.note.domain.NoteRepository;
 import org.apache.fineract.portfolio.paymentdetail.domain.PaymentDetail;
+import org.apache.fineract.portfolio.paymentrules.helper.SavingsPaymentRuleHelper;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentType;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepository;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
@@ -42,6 +45,7 @@ import org.apache.fineract.portfolio.savings.SavingsAccountTransactionType;
 import org.apache.fineract.portfolio.savings.SavingsTransactionBooleanValues;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountTransactionDTO;
 import org.apache.fineract.portfolio.savings.exception.DepositAccountTransactionNotAllowedException;
+import org.apache.fineract.portfolio.savings.helper.OnSavingsDepositEventListenerPaymentRules;
 import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.joda.time.LocalDate;
@@ -50,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.context.annotation.Lazy;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
@@ -59,6 +64,8 @@ import java.util.*;
 import org.apache.fineract.portfolio.savings.helper.SavingsMonthlyDepositHelper;
 //import org.apache.fineract.portfolio.savings.repo.SavingsAccountMonthlyDepositRepository;
 import org.joda.time.format.DateTimeFormat;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainService {
@@ -80,6 +87,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
      */
     private final TellerWritePlatformService tellerWritePlatformService;
     private final PaymentTypeRepositoryWrapper paymentTypeRepositoryWrapper;
+    private final SavingsPaymentRuleHelper savingsPaymentRuleHelper;
 
 
     @Autowired
@@ -90,7 +98,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
             final ConfigurationDomainService configurationDomainService, final PlatformSecurityContext context,
             final DepositAccountOnHoldTransactionRepository depositAccountOnHoldTransactionRepository, 
             final BusinessEventNotifierService businessEventNotifierService ,
-            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository ,final TellerWritePlatformService tellerWritePlatformService ,final  PaymentTypeRepositoryWrapper paymentTypeRepositoryWrapper) {
+            final SavingsAccountMonthlyDepositRepository savingsAccountMonthlyDepositRepository ,final SavingsAccountAssembler savingsAccountAssembler ,final NoteRepository noteRepository ,final TellerWritePlatformService tellerWritePlatformService ,final  PaymentTypeRepositoryWrapper paymentTypeRepositoryWrapper ,@Lazy final SavingsPaymentRuleHelper savingsPaymentRuleHelper) {
         this.savingsAccountRepository = savingsAccountRepository;
         this.savingsAccountTransactionRepository = savingsAccountTransactionRepository;
         this.applicationCurrencyRepositoryWrapper = applicationCurrencyRepositoryWrapper;
@@ -104,9 +112,21 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         this.noteRepository = noteRepository;
         this.tellerWritePlatformService = tellerWritePlatformService;
         this.paymentTypeRepositoryWrapper = paymentTypeRepositoryWrapper;
+        this.savingsPaymentRuleHelper = savingsPaymentRuleHelper;
     }
 
-    @Transactional
+
+    /**
+     * Added 16/06/2023 at 0929
+     * PaymentRule event listeners ,to be run after a successful deposit or withdrawal
+     */
+    @PostConstruct
+    public void addListners() {
+        this.businessEventNotifierService.addBusinessEventPostListners(BUSINESS_EVENTS.SAVINGS_DEPOSIT, new OnSavingsDepositEventListenerPaymentRules(savingsPaymentRuleHelper));
+    }
+
+
+        @Transactional
     @Override
     public SavingsAccountTransaction handleWithdrawal(final SavingsAccount account, final DateTimeFormatter fmt,
             final LocalDate transactionDate, final BigDecimal transactionAmount, final PaymentDetail paymentDetail,
@@ -208,6 +228,7 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, transactionBooleanValues.isAccountTransfer() ,transactionCode);
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_WITHDRAWAL,
                 constructEntityMap(BUSINESS_ENTITY.SAVINGS_TRANSACTION, withdrawal));
+
         return withdrawal;
     }
 
@@ -390,9 +411,10 @@ public class SavingsAccountDomainServiceJpa implements SavingsAccountDomainServi
          * */
         SavingsMonthlyDepositHelper.handleDepositOrWithdraw(savingsAccountMonthlyDepositRepository ,account ,transactionAmount ,transactionDate ,true);
 
-        //System.err.println("--------------transaction code is not inserted anywhere ---------"+Optional.ofNullable(transactionCode).isPresent());
+        //System.err.println("--------------deposit event listener has deposit transaction ?  ---------"+ OptionalHelper.has(deposit));
 
         postJournalEntries(account, existingTransactionIds, existingReversedTransactionIds, isAccountTransfer ,transactionCode);
+
         this.businessEventNotifierService.notifyBusinessEventWasExecuted(BUSINESS_EVENTS.SAVINGS_DEPOSIT,
                 constructEntityMap(BUSINESS_ENTITY.SAVINGS_TRANSACTION, deposit));
         return deposit;

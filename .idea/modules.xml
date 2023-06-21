@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/incubator-fineract.iml" filepath="$PROJECT_DIR$/incubator-fineract.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/incubator-fineract.iml" filepath="$PROJECT_DIR$/.idea/incubator-fineract.iml" />
     </modules>
   </component>
 </project>

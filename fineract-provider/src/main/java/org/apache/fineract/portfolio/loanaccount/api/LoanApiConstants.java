@@ -46,7 +46,7 @@ public interface LoanApiConstants {
             "syncDisbursementWithMeeting", "loanCounter", "loanProductCounter", "notes", "accountLinkingOptions", "linkedAccount",
             "interestRateDifferential", "isFloatingInterestRate", "interestRatesPeriods", LoanApiConstants.canUseForTopup,
             LoanApiConstants.isTopup, LoanApiConstants.loanIdToClose, LoanApiConstants.topupAmount, LoanApiConstants.clientActiveLoanOptions,
-            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam));
+            LoanApiConstants.datatables,LoanApiConstants.revolvingAccountIdParam ,LoanApiConstants.autoSettlementAtDisbursementParamName , LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam ,LoanApiConstants.notesParam ,LoanApiConstants.emiAmountParameterName));
 
 
     public static final String emiAmountParameterName = "fixedEmiAmount";
@@ -194,6 +194,8 @@ public interface LoanApiConstants {
 
     public static final String totalDueParam = "totalDueForPeriod";
     public static final String customScheduleParam = "schedule";
+
+    public static final String notesParam = "notes";
    
 
 

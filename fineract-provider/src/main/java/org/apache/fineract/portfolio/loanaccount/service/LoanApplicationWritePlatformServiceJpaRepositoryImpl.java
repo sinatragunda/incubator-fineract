@@ -88,6 +88,7 @@ import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationDateEx
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeDeleted;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanApplicationNotInSubmittedAndPendingApprovalStateCannotBeModified;
 import org.apache.fineract.portfolio.loanaccount.helper.LoanFactorLoanResolver;
+import org.apache.fineract.portfolio.loanaccount.helper.LoanNotesHelper;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.AprCalculator;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanApplicationTerms;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
@@ -189,6 +190,11 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     private final LocalRefRecordHelper localRefRecordHelper;
     private final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository;
 
+    /**
+     * Added 14/06/2023 at 0222
+     */
+    private final LoanNotesHelper loanNotesHelper;
+
     @Autowired
     public LoanApplicationWritePlatformServiceJpaRepositoryImpl(final PlatformSecurityContext context, final FromJsonHelper fromJsonHelper,
                                                                 final LoanApplicationTransitionApiJsonValidator loanApplicationTransitionApiJsonValidator,
@@ -213,7 +219,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                                                                 final EntityDatatableChecksWritePlatformService entityDatatableChecksWritePlatformService,
                                                                 final AccountDetailsReadPlatformService accountDetailsReadPlatformService , final SavingsAccountReadPlatformService savingsAccountReadPlatformService,
                                                                 final HirePurchaseRepository hirePurchaseRepository,
-                                                                final LocalRefRecordHelper localRefRecordHelper ,final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository) {
+                                                                final LocalRefRecordHelper localRefRecordHelper ,final LoanRepaymentScheduleInstallmentRepository loanRepaymentScheduleInstallmentRepository ,final LoanNotesHelper loanNotesHelper) {
         this.context = context;
         this.fromJsonHelper = fromJsonHelper;
         this.loanApplicationTransitionApiJsonValidator = loanApplicationTransitionApiJsonValidator;
@@ -253,6 +259,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
         this.hirePurchaseRepository = hirePurchaseRepository ;
         this.localRefRecordHelper = localRefRecordHelper;
         this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
+        this.loanNotesHelper = loanNotesHelper;
 
     }
 
@@ -266,6 +273,8 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
     public CommandProcessingResult submitApplication(JsonCommand command) {
 
         try {
+
+            System.err.println("---------------loan command is "+command);
 
             final AppUser currentUser = getAppUserIfPresent();
             boolean isMeetingMandatoryForJLGLoans = configurationDomainService.isMeetingMandatoryForJLGLoans();
@@ -334,10 +343,10 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
              *   Modified to allow to exclude special loans from the checking instance .
              */
             AllowMultipleInstancesHelper.status(loanProduct ,accountDetailsReadPlatformService ,productId ,clientId ,excludeLoansList ,isGroupLoan ,groupId);
+            
             /**
              *modified 29/09/2021 .Modified to change loan factoring to make it into a seperate function instead of scattering the page like it was doing
             */
-
             LoanFactorLoanResolver.loanFactor(loanReadPlatformService ,savingsAccountReadPlatformService ,loanProductRepository  ,fromJsonHelper , command, loanProduct, client ,excludeLoansList ,isGroupLoan);
 
             /**
@@ -389,6 +398,7 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
                     final LoanTransactionData revolvingLoanAccount = this.loanReadPlatformService.retrieveLoanForeclosureTemplate(id ,transactionDate);
                     loanTransactionsDataList.add(revolvingLoanAccount);
                 }
+
                 RevolvingLoanHelper.validateApplication(loanTransactionsDataList ,newLoanApplication);
             }
 
@@ -475,6 +485,12 @@ public class LoanApplicationWritePlatformServiceJpaRepositoryImpl implements Loa
 
             // added 25/05/2022 ...Create item as hirepurchase if some hirepurchase data exists
             //HirePurchaseCreateLoan.create(command ,newLoanApplication ,hirePurchaseRepository);
+
+            /**
+             * Added 14/06/2023 at 0024
+             * Facility to add new comments ,mostly from loan imports
+             */
+            loanNotesHelper.createNotesFromLoan(newLoanApplication ,command);
 
             if (loanProduct.isInterestRecalculationEnabled()) {
                 this.fromApiJsonDeserializer.validateLoanForInterestRecalculation(newLoanApplication);

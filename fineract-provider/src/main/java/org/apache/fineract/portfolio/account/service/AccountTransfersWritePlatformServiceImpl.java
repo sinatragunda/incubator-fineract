@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import org.apache.fineract.accounting.journalentry.domain.TransactionCode;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -64,6 +65,7 @@ import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccount;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountAssembler;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountDomainService;
 import org.apache.fineract.portfolio.shareaccounts.domain.ShareAccountTransaction;
+import org.apache.fineract.useradministration.exception.PermissionNotFoundException;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -408,34 +410,69 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
 
     }
 
+
+    @Override
+    @Transactional
+    public CommandProcessingResult reverseTransfer(final Long transactionId){
+
+        List<AccountTransferTransaction> accountTransfers = new ArrayList<>();
+            
+        AccountTransferData accountTransferData = this.accountTransfersReadPlatformService.retrieveOne(transactionId);
+
+        Boolean has = OptionalHelper.has(accountTransferData);
+
+        if(has){
+
+            Long id = accountTransferData.getId();
+            
+            System.err.println("-----------------------------------we have found id of record ----"+id);
+
+            if(true){
+                //throw new PermissionNotFoundException("Reverse Transfer");
+            }
+
+            AccountTransferTransaction accountTransferTransaction = this.accountTransferRepository.findOne(id);
+
+            System.out.println("-----------------------we have record ? "+ Optional.of(accountTransferTransaction).isPresent());
+
+            accountTransfers.add(accountTransferTransaction);
+        }
+
+        Consumer<AccountTransferTransaction> reverseConsumer = (e)-> reverse(e);
+        accountTransfers.stream().forEach(reverseConsumer);
+
+        return CommandProcessingResult.resourceResult(accountTransferData.getId() ,transactionId);
+
+    }
+
     @Override
     @Transactional
     public void reverseAllTransactions(final Long accountId, final PortfolioAccountType accountTypeId) {
         List<AccountTransferTransaction> acccountTransfers = new ArrayList<>();
-        if (accountTypeId.isLoanAccount()) {
+        
+        if(accountTypeId.isLoanAccount()) {
 
             Collection<AccountTransferData> accountTransferDataList = this.accountTransfersReadPlatformService.findAllByLoanId(accountId);
 
             Consumer<AccountTransferData> findAccountTransferRecord = (e)->{
                 Long id = e.getId();
-                
-                //System.err.println("-----------------------------------we have found id of record ----"+id);
+
+                System.err.println("-----------------------------------we have found id of record ----"+id);
                 AccountTransferTransaction accountTransferTransaction = this.accountTransferRepository.findOne(id);
 
-                //System.out.println("-----------------------we have record ? "+ Optional.of(accountTransferTransaction).isPresent());
+                System.out.println("-----------------------we have record ? "+ Optional.of(accountTransferTransaction).isPresent());
 
                 acccountTransfers.add(accountTransferTransaction);
             };
-
-
-            //System.err.println("------------------------------------------- value here is "+accountTransferDataList.size());
+            System.err.println("------------------------------------------- value here is "+accountTransferDataList.size());
 
             accountTransferDataList.stream().forEach(findAccountTransferRecord);
             //acccountTransfers = this.accountTransferRepository.findAllByLoanId(accountId);
+
         }
 
         if(!acccountTransfers.isEmpty()){
-            //System.out.println("------------------------------undo all transactions -------------------");
+            System.out.println("------------------------------undo all transactions -------------------");
             undoTransactions(acccountTransfers);
         }
     }
@@ -444,34 +481,43 @@ public class AccountTransfersWritePlatformServiceImpl implements AccountTransfer
      * @param acccountTransfers
      */
     private void undoTransactions(final List<AccountTransferTransaction> acccountTransfers) {
-        for (final AccountTransferTransaction accountTransfer : acccountTransfers) {
-
-            //System.out.println("=--------------------reverse the transaction ---------"+accountTransfer);
-
-            if (accountTransfer.getFromLoanTransaction() != null) {
-                //System.out.println("---------------------from loan transaction not null--------------");
-                this.loanAccountDomainService.reverseTransfer(accountTransfer.getFromLoanTransaction());
-            }
-            if (accountTransfer.getToLoanTransaction() != null) {
-                //System.out.println("---------------------get to loan transaction not null--------------");
-                this.loanAccountDomainService.reverseTransfer(accountTransfer.getToLoanTransaction());
-            }
-            if (accountTransfer.getFromTransaction() != null) {
-                //System.out.println("---------------------get from transaction not null--------------");
-                this.savingsAccountWritePlatformService.undoTransaction(accountTransfer.accountTransferDetails().fromSavingsAccount()
-                        .getId(), accountTransfer.getFromTransaction().getId(), true);
-            }
-            if (accountTransfer.getToSavingsTransaction() != null) {
-                //System.out.println("---------------------get to savings transaction not null--------------");
-                this.savingsAccountWritePlatformService.undoTransaction(
-                        accountTransfer.accountTransferDetails().toSavingsAccount().getId(), accountTransfer.getToSavingsTransaction()
-                                .getId(), true);
-            }
-            accountTransfer.reverse();
-            //System.out.println("-------------------done reversing ");
-            this.accountTransferRepository.save(accountTransfer);
+        
+        for (final AccountTransferTransaction accountTransfer : acccountTransfers){
+            reverse(accountTransfer);
         }
     }
+
+    private void reverse(AccountTransferTransaction accountTransfer){
+
+        System.err.println("-----------------------revese function now -------------------");
+
+        if (accountTransfer.getFromLoanTransaction() != null) {
+            System.out.println("---------------------from loan transaction not null--------------");
+            this.loanAccountDomainService.reverseTransfer(accountTransfer.getFromLoanTransaction());
+        }
+        if (accountTransfer.getToLoanTransaction() != null) {
+            System.out.println("---------------------get to loan transaction not null--------------");
+            this.loanAccountDomainService.reverseTransfer(accountTransfer.getToLoanTransaction());
+        }
+        if (accountTransfer.getFromTransaction() != null) {
+            System.out.println("---------------------get from transaction not null--------------");
+            this.savingsAccountWritePlatformService.undoTransaction(accountTransfer.accountTransferDetails().fromSavingsAccount()
+                    .getId(), accountTransfer.getFromTransaction().getId(), true);
+        }
+        if (accountTransfer.getToSavingsTransaction() != null) {
+            System.out.println("---------------------get to savings transaction not null--------------");
+            this.savingsAccountWritePlatformService.undoTransaction(
+                    accountTransfer.accountTransferDetails().toSavingsAccount().getId(), accountTransfer.getToSavingsTransaction()
+                            .getId(), true);
+        }
+
+        System.err.println("--------------------------------accountreverse now ");
+        accountTransfer.reverse();
+
+        System.out.println("-------------------done reversing ");
+        this.accountTransferRepository.save(accountTransfer);
+    }
+
 
     @Override
     @Transactional

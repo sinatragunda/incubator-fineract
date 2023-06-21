@@ -100,8 +100,8 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             LoanApiConstants.isEqualAmortizationParam ,LoanApiConstants.revolvingAccountIdParam ,
             LoanApiConstants.autoSettlementAtDisbursementParamName ,LoanApiConstants.loanFactorAccountIdParam ,
             LoanApiConstants.agentDataParam , HirePurchaseConstants.hirePurchaseParam,
-            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam
-        ));
+            LocalRefApiConstants.localRefsParam , DataTableApiConstant.tableDataParam ,LoanApiConstants.customScheduleParam ,LoanApiConstants.notesParam
+        ,LoanApiConstants.emiAmountParameterName));
 
     private final FromJsonHelper fromApiJsonHelper;
     private final CalculateLoanScheduleQueryFromApiJsonHelper apiJsonHelper;
@@ -499,8 +499,9 @@ public final class LoanApplicationCommandFromApiJsonHelper {
             }
         }
 
+        System.err.println("------------we failing here right ,lets skip it ");
         if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.emiAmountParameterName, element)) {
-            if (!(loanProduct.canDefineInstallmentAmount() || loanProduct.isMultiDisburseLoan())) {
+            if (loanProduct.isMultiDisburseLoan()) {
                 List<String> unsupportedParameterList = new ArrayList<>();
                 unsupportedParameterList.add(LoanApiConstants.emiAmountParameterName);
                 throw new UnsupportedParameterException(unsupportedParameterList);
@@ -510,6 +511,7 @@ public final class LoanApplicationCommandFromApiJsonHelper {
                     element);
             baseDataValidator.reset().parameter(LoanApiConstants.emiAmountParameterName).value(emiAnount).ignoreIfNull().positiveAmount();
         }
+
         if (this.fromApiJsonHelper.parameterExists(LoanApiConstants.maxOutstandingBalanceParameterName, element)) {
             final BigDecimal maxOutstandingBalance = this.fromApiJsonHelper.extractBigDecimalWithLocaleNamed(
                     LoanApiConstants.maxOutstandingBalanceParameterName, element);

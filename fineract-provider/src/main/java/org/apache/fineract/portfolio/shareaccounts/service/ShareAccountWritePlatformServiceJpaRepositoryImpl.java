@@ -26,6 +26,7 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fineract.accounting.journalentry.service.JournalEntryWritePlatformService;
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormat;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.AccountNumberFormatRepositoryWrapper;
 import org.apache.fineract.infrastructure.accountnumberformat.domain.EntityAccountType;
@@ -229,6 +230,8 @@ public class ShareAccountWritePlatformServiceJpaRepositoryImpl implements ShareA
             //System.err.println("---------------------apply additional shares for account "+accountId);
 
             ShareAccount account = this.shareAccountRepository.findOneWithNotFoundDetection(accountId);
+            
+            System.err.println("----------has this account been found ? "+ OptionalHelper.has(account));
             Map<String, Object> changes = this.accountDataSerializer.validateAndApplyAddtionalShares(jsonCommand, account);
             ShareAccountTransaction transaction = null;
             if (!changes.isEmpty()) {

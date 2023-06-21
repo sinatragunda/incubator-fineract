@@ -11,10 +11,13 @@ import org.apache.fineract.portfolio.loanaccount.domain.LoanRepaymentScheduleIns
 import org.apache.fineract.portfolio.loanaccount.enumerations.LOAN_TRANSITION;
 import org.apache.fineract.portfolio.paymentrules.enumerations.PAYMENT_CODE;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,7 +36,7 @@ public class LoanScheduleHelper {
         this.loanRepaymentScheduleInstallmentRepository = loanRepaymentScheduleInstallmentRepository;
     }
 
-    public LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment(Loan loan , Date transactionDate , PAYMENT_CODE paymentCode){
+    public LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment(Loan loan , LocalDate transactionDate , PAYMENT_CODE paymentCode){
 
         Long loanId = loan.getId();
 
@@ -41,24 +44,21 @@ public class LoanScheduleHelper {
 
         Comparator<LoanRepaymentScheduleInstallment> periodComparator = (l , r)-> l.getInstallmentNumber().compareTo(r.getInstallmentNumber()) ;
 
-        loanRepaymentScheduleInstallmentList.stream().sorted(periodComparator);
+        Predicate<LoanRepaymentScheduleInstallment> obligationsMet = (e)-> e.isObligationsMet();
 
-        LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment = null;
+        loanRepaymentScheduleInstallmentList = loanRepaymentScheduleInstallmentList.stream().filter(obligationsMet.negate()).sorted(periodComparator).collect(Collectors.toList());
 
-        boolean hasSchedule = OptionalHelper.isPresent(loanRepaymentScheduleInstallment);
-
-        if(!hasSchedule){
-            return null;
-        }
-
+        LoanRepaymentScheduleInstallment loanRepaymentScheduleInstallment = null ;
         /**
          * Added 19/09/2022
          * Allow early repayment on loans .If false on loans whose payment date is after current date will be processed
          */
-
         switch (paymentCode){
             case LOAN_REPAYMENT:
-                loanRepaymentScheduleInstallment = activeSchedule(loanRepaymentScheduleInstallmentList ,transactionDate ,true);
+                loanRepaymentScheduleInstallment = activeSchedule(loanRepaymentScheduleInstallmentList ,transactionDate.toDate() ,false);
+                break;
+            case LOAN_EARLY_REPAYMENT:
+                loanRepaymentScheduleInstallment = activeSchedule(loanRepaymentScheduleInstallmentList ,transactionDate.toDate() ,true);
                 break;
 
         }
@@ -66,29 +66,35 @@ public class LoanScheduleHelper {
     }
 
 
-    public LoanRepaymentScheduleInstallment activeSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList , Date transactionDate , boolean allowEarlyRepayments){
+    private LoanRepaymentScheduleInstallment activeSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList , Date transactionDate , boolean allowEarlyRepayments){
 
         for(LoanRepaymentScheduleInstallment loanRepaymentSchedule : loanRepaymentScheduleList){
 
             if(!loanRepaymentSchedule.isObligationsMet()){
+
+                boolean isPartlyPaid = loanRepaymentSchedule.isPartlyPaid();
+
+                if(isPartlyPaid){
+                    System.err.println("-------------is partly paid ------------");
+                }
+
                 if(allowEarlyRepayments) {
                     return loanRepaymentSchedule;
                 }
+
                 LocalDate dueDate = loanRepaymentSchedule.getDueDate();
                 boolean isFutureTransaction = transactionDate.before(dueDate.toDate());
+
                 if(!isFutureTransaction){
                     return loanRepaymentSchedule;
                 }
             }
-            return loanRepaymentSchedule;
         }
         return null ;
     }
 
+    private LoanRepaymentScheduleInstallment dueSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList ,LocalDate transactionDate){
 
-
-
-    public LoanRepaymentScheduleInstallment dueSchedule(Collection<LoanRepaymentScheduleInstallment> loanRepaymentScheduleList ,LocalDate transactionDate){
         for(LoanRepaymentScheduleInstallment loanRepaymentSchedule : loanRepaymentScheduleList){
             if(loanRepaymentSchedule.isOverdueOn(transactionDate)){
                 return loanRepaymentSchedule;

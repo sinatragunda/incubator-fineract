@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.shareaccounts.domain;
 
+import org.apache.fineract.helper.OptionalHelper;
 import org.apache.fineract.portfolio.accounts.exceptions.ShareAccountNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,19 +38,13 @@ public class ShareAccountRepositoryWrapper {
 	
 	public ShareAccount findOneWithNotFoundDetection(final Long accountId) {
 		
-		Long id = new Long(accountId);	
-		ShareAccount shareAccount = null ;
+		ShareAccount shareAccount = this.shareAccountRepository.findOneById(accountId);
+		Boolean has = OptionalHelper.has(shareAccount);
 
-		//System.err.println("------------------------find account with id "+id);
-		try{
-			shareAccount = this.shareAccountRepository.findOneById(id) ;
-			if(shareAccount == null) {
-				throw new ShareAccountNotFoundException(id) ;
-			}
+		if(!has){
+			throw new ShareAccountNotFoundException(accountId) ;
 		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
+
 		return shareAccount ;
 	}
 
